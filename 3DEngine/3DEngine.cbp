@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="3DEngine" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="$(SolutionDir)Debug Win32/../lib/3DEngine" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Debug Win32" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-DGLEW_STATIC" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add directory="D:/projects/Tutorial 0.3.8/glsdk/glm" />
+					<Add directory="D:/projects/glew-1.12.0/include/GL" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="D:/projects/Tutorial 0.3.8/glsdk/glm" />
+					<Add directory="D:/projects/glew-1.12.0/include/GL" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="OpenGL32" />
+					<Add library="soil" />
+					<Add library="sfml-audio-s-d" />
+					<Add library="sfml-system-s-d" />
+					<Add library="glew32s" />
+					<Add directory="D:/projects/3DEngine/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="lib" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Release Win32" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-DSFML_STATIC" />
+					<Add option="-DWIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-D_LIB" />
+					<Add option="-D_CRT_SECURE_NO_WARNINGS" />
+					<Add option="-DGLEW_STATIC" />
+					<Add option="-W" />
+					<Add directory="D:/projects/Tutorial 0.3.8/glsdk/glm" />
+					<Add directory="D:/projects/glew-1.12.0/include/GL" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="D:/projects/Tutorial 0.3.8/glsdk/glm" />
+					<Add directory="D:/projects/glew-1.12.0/include/GL" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="OpenGL32" />
+					<Add library="soil" />
+					<Add library="sfml-audio-s" />
+					<Add library="sfml-system-s" />
+					<Add library="glew32s" />
+					<Add directory="D:/projects/3DEngine/lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="../src/2DPolygon.cpp" />
+		<Unit filename="../src/2DPolygon.h" />
+		<Unit filename="../src/2DVector.cpp" />
+		<Unit filename="../src/2DVector.h" />
+		<Unit filename="../src/BBox.cpp" />
+		<Unit filename="../src/BBox.h" />
+		<Unit filename="../src/BaseApp.cpp" />
+		<Unit filename="../src/BaseApp.h" />
+		<Unit filename="../src/Delegate.h" />
+		<Unit filename="../src/Engine.cpp" />
+		<Unit filename="../src/Engine.h" />
+		<Unit filename="../src/ImageLib.cpp" />
+		<Unit filename="../src/ImageLib.h" />
+		<Unit filename="../src/Macros.h" />
+		<Unit filename="../src/Reader.cpp" />
+		<Unit filename="../src/Reader.h" />
+		<Unit filename="../src/SOIL.h" />
+		<Unit filename="../src/SoundLib.cpp" />
+		<Unit filename="../src/SoundLib.h" />
+		<Unit filename="../src/Sprite.cpp" />
+		<Unit filename="../src/Sprite.h" />
+		<Unit filename="../src/SysFnt.h" />
+		<Unit filename="../src/TexFont.cpp" />
+		<Unit filename="../src/TexFont.h" />
+		<Unit filename="../src/TexLoader.cpp" />
+		<Unit filename="../src/TexLoader.h" />
+		<Unit filename="../src/Texture.cpp" />
+		<Unit filename="../src/Texture.h" />
+		<Unit filename="../src/TileLayer.cpp" />
+		<Unit filename="../src/TileLayer.h" />
+		<Unit filename="../src/Timer.h" />
+		<Unit filename="../src/Types.h" />
+		<Unit filename="../src/UI/GUIbase.cpp" />
+		<Unit filename="../src/UI/GUIbase.h" />
+		<Unit filename="../src/UI/GUIbutton.cpp" />
+		<Unit filename="../src/UI/GUIbutton.h" />
+		<Unit filename="../src/UI/GUIcheckButton.cpp" />
+		<Unit filename="../src/UI/GUIcheckButton.h" />
+		<Unit filename="../src/UI/GUIcontainer.cpp" />
+		<Unit filename="../src/UI/GUIcontainer.h" />
+		<Unit filename="../src/UI/GUIdlg.cpp" />
+		<Unit filename="../src/UI/GUIdlg.h" />
+		<Unit filename="../src/UI/GUIgroup.cpp" />
+		<Unit filename="../src/UI/GUIgroup.h" />
+		<Unit filename="../src/UI/GUIiconButton.cpp" />
+		<Unit filename="../src/UI/GUIiconButton.h" />
+		<Unit filename="../src/UI/GUIicons.h" />
+		<Unit filename="../src/UI/GUIimageGrid.cpp" />
+		<Unit filename="../src/UI/GUIimageGrid.h" />
+		<Unit filename="../src/UI/GUIlabel.cpp" />
+		<Unit filename="../src/UI/GUIlabel.h" />
+		<Unit filename="../src/UI/GUImouse.h" />
+		<Unit filename="../src/UI/GUInumeric.cpp" />
+		<Unit filename="../src/UI/GUInumeric.h" />
+		<Unit filename="../src/UI/GUIpanel.cpp" />
+		<Unit filename="../src/UI/GUIpanel.h" />
+		<Unit filename="../src/UI/GUIpanelContainer.cpp" />
+		<Unit filename="../src/UI/GUIpanelContainer.h" />
+		<Unit filename="../src/UI/GUIradio.cpp" />
+		<Unit filename="../src/UI/GUIradio.h" />
+		<Unit filename="../src/UI/GUIroot.cpp" />
+		<Unit filename="../src/UI/GUIroot.h" />
+		<Unit filename="../src/UI/GUIscrollbar.cpp" />
+		<Unit filename="../src/UI/GUIscrollbar.h" />
+		<Unit filename="../src/UI/GUItextbox.cpp" />
+		<Unit filename="../src/UI/GUItextbox.h" />
+		<Unit filename="../src/UIengine.cpp" />
+		<Unit filename="../src/UIengine.h" />
+		<Unit filename="../src/Window.cpp" />
+		<Unit filename="../src/Window.h" />
+		<Unit filename="../src/colour.cpp" />
+		<Unit filename="../src/colour.h" />
+		<Unit filename="../src/dynBuf.cpp" />
+		<Unit filename="../src/dynBuf.h" />
+		<Unit filename="../src/grid.cpp" />
+		<Unit filename="../src/grid.h" />
+		<Unit filename="../src/isoSurface.cpp" />
+		<Unit filename="../src/isoSurface.h" />
+		<Unit filename="../src/particle.cpp" />
+		<Unit filename="../src/particle.h" />
+		<Unit filename="../src/renderer/2d.cpp" />
+		<Unit filename="../src/renderer/2d.h" />
+		<Unit filename="../src/renderer/3d.cpp" />
+		<Unit filename="../src/renderer/3d.h" />
+		<Unit filename="../src/renderer/3dobject.cpp" />
+		<Unit filename="../src/renderer/3dobject.h" />
+		<Unit filename="../src/renderer/camera.cpp" />
+		<Unit filename="../src/renderer/camera.h" />
+		<Unit filename="../src/renderer/light.cpp" />
+		<Unit filename="../src/renderer/light.h" />
+		<Unit filename="../src/renderer/model.cpp" />
+		<Unit filename="../src/renderer/model.h" />
+		<Unit filename="../src/renderer/renderer.cpp" />
+		<Unit filename="../src/renderer/renderer.h" />
+		<Unit filename="../src/simplexnoise.cpp" />
+		<Unit filename="../src/simplexnoise.h" />
+		<Unit filename="../src/smallsysf.h" />
+		<Unit filename="../src/terrain.cpp" />
+		<Unit filename="../src/terrain.h" />
+		<Unit filename="../src/vertBufs.cpp" />
+		<Unit filename="../src/vertBufs.h" />
+		<Unit filename="C:/Users/Tony/Desktop/Google Chrome (2).lnk" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

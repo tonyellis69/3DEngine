@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{ABEE2174-E439-41DC-B78D-BB09B70D7E20}</ProjectGuid>
+    <RootNamespace>My2DEngine</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.26228.4</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)lib\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>D:\projects\SFML-1.6\include;D:\projects\glew\include\GL;D:\projects\glm;D:\projects\Tutorial 0.3.8\glsdk\glm;D:\projects\glew-1.12.0\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>OpenGL32.lib;soil.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)..\lib\$(ProjectName).lib</OutputFile>
+      <AdditionalLibraryDirectories>D:\projects\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>D:\projects\Tutorial 0.3.8\glsdk\glm;D:\projects\glew-1.12.0\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>SFML_STATIC;WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>OpenGL32.lib;soil.lib;sfml-audio-s.lib;sfml-system-s.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\projects\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\2DPolygon.cpp" />
+    <ClCompile Include="..\src\2DVector.cpp" />
+    <ClCompile Include="..\Src\BaseApp.cpp" />
+    <ClCompile Include="..\src\BBox.cpp" />
+    <ClCompile Include="..\src\chunk.cpp" />
+    <ClCompile Include="..\src\colour.cpp" />
+    <ClCompile Include="..\src\direction.cpp" />
+    <ClCompile Include="..\src\dynBuf.cpp" />
+    <ClCompile Include="..\Src\Engine.cpp" />
+    <ClCompile Include="..\src\grid.cpp" />
+    <ClCompile Include="..\src\handonLayer.cpp" />
+    <ClCompile Include="..\Src\ImageLib.cpp" />
+    <ClCompile Include="..\src\isoSurface.cpp" />
+    <ClCompile Include="..\src\particle.cpp" />
+    <ClCompile Include="..\src\Reader.cpp" />
+    <ClCompile Include="..\src\renderer\2d.cpp" />
+    <ClCompile Include="..\src\renderer\3d.cpp" />
+    <ClCompile Include="..\src\renderer\3dobject.cpp" />
+    <ClCompile Include="..\src\renderer\camera.cpp" />
+    <ClCompile Include="..\src\renderer\light.cpp" />
+    <ClCompile Include="..\src\renderer\model.cpp" />
+    <ClCompile Include="..\src\renderer\renderer.cpp" />
+    <ClCompile Include="..\src\simplexnoise.cpp" />
+    <ClCompile Include="..\Src\SoundLib.cpp" />
+    <ClCompile Include="..\src\Sprite.cpp" />
+    <ClCompile Include="..\src\superChunk.cpp" />
+    <ClCompile Include="..\src\terrain.cpp" />
+    <ClCompile Include="..\Src\TexFont.cpp" />
+    <ClCompile Include="..\Src\TexLoader.cpp" />
+    <ClCompile Include="..\src\Texture.cpp" />
+    <ClCompile Include="..\src\TileLayer.cpp" />
+    <ClCompile Include="..\src\UIengine.cpp" />
+    <ClCompile Include="..\src\UI\GUIbase.cpp" />
+    <ClCompile Include="..\src\UI\GUIbutton.cpp" />
+    <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
+    <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
+    <ClCompile Include="..\src\UI\GUIdlg.cpp" />
+    <ClCompile Include="..\src\UI\GUIgroup.cpp" />
+    <ClCompile Include="..\src\UI\GUIiconButton.cpp" />
+    <ClCompile Include="..\src\UI\GUIimageGrid.cpp" />
+    <ClCompile Include="..\src\UI\GUIlabel.cpp" />
+    <ClCompile Include="..\src\UI\GUInumeric.cpp" />
+    <ClCompile Include="..\src\UI\GUIpanel.cpp" />
+    <ClCompile Include="..\src\UI\GUIpanelContainer.cpp" />
+    <ClCompile Include="..\src\UI\GUIradio.cpp" />
+    <ClCompile Include="..\src\UI\GUIroot.cpp" />
+    <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
+    <ClCompile Include="..\src\UI\GUItextbox.cpp" />
+    <ClCompile Include="..\src\vertBufs.cpp" />
+    <ClCompile Include="..\src\watch.cpp" />
+    <ClCompile Include="..\Src\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\2DPolygon.h" />
+    <ClInclude Include="..\src\2DVector.h" />
+    <ClInclude Include="..\Src\BaseApp.h" />
+    <ClInclude Include="..\src\BBox.h" />
+    <ClInclude Include="..\src\chunk.h" />
+    <ClInclude Include="..\src\cnode.h" />
+    <ClInclude Include="..\src\colour.h" />
+    <ClInclude Include="..\src\Delegate.h" />
+    <ClInclude Include="..\src\direction.h" />
+    <ClInclude Include="..\src\dynBuf.h" />
+    <ClInclude Include="..\Src\Engine.h" />
+    <ClInclude Include="..\src\grid.h" />
+    <ClInclude Include="..\src\handonLayer.h" />
+    <ClInclude Include="..\Src\ImageLib.h" />
+    <ClInclude Include="..\src\isoSurface.h" />
+    <ClInclude Include="..\Src\Macros.h" />
+    <ClInclude Include="..\src\particle.h" />
+    <ClInclude Include="..\src\Reader.h" />
+    <ClInclude Include="..\src\renderer\2d.h" />
+    <ClInclude Include="..\src\renderer\3d.h" />
+    <ClInclude Include="..\src\renderer\3dobject.h" />
+    <ClInclude Include="..\src\renderer\camera.h" />
+    <ClInclude Include="..\src\renderer\light.h" />
+    <ClInclude Include="..\src\renderer\model.h" />
+    <ClInclude Include="..\src\renderer\renderer.h" />
+    <ClInclude Include="..\src\simplexnoise.h" />
+    <ClInclude Include="..\src\smallsysf.h" />
+    <ClInclude Include="..\Src\SOIL.h" />
+    <ClInclude Include="..\Src\SoundLib.h" />
+    <ClInclude Include="..\src\Sprite.h" />
+    <ClInclude Include="..\src\superChunk.h" />
+    <ClInclude Include="..\Src\SysFnt.h" />
+    <ClInclude Include="..\src\terrain.h" />
+    <ClInclude Include="..\Src\TexFont.h" />
+    <ClInclude Include="..\Src\TexLoader.h" />
+    <ClInclude Include="..\src\Texture.h" />
+    <ClInclude Include="..\src\TileLayer.h" />
+    <ClInclude Include="..\Src\Timer.h" />
+    <ClInclude Include="..\Src\Types.h" />
+    <ClInclude Include="..\src\UIengine.h" />
+    <ClInclude Include="..\src\UI\GUIbase.h" />
+    <ClInclude Include="..\src\UI\GUIbutton.h" />
+    <ClInclude Include="..\src\UI\GUIcheckButton.h" />
+    <ClInclude Include="..\src\UI\GUIcontainer.h" />
+    <ClInclude Include="..\src\UI\GUIdlg.h" />
+    <ClInclude Include="..\src\UI\GUIgroup.h" />
+    <ClInclude Include="..\src\UI\GUIiconButton.h" />
+    <ClInclude Include="..\src\UI\GUIicons.h" />
+    <ClInclude Include="..\src\UI\GUIimageGrid.h" />
+    <ClInclude Include="..\src\UI\GUIlabel.h" />
+    <ClInclude Include="..\src\UI\GUImouse.h" />
+    <ClInclude Include="..\src\UI\GUInumeric.h" />
+    <ClInclude Include="..\src\UI\GUIpanel.h" />
+    <ClInclude Include="..\src\UI\GUIpanelContainer.h" />
+    <ClInclude Include="..\src\UI\GUIradio.h" />
+    <ClInclude Include="..\src\UI\GUIroot.h" />
+    <ClInclude Include="..\src\UI\GUIscrollbar.h" />
+    <ClInclude Include="..\src\UI\GUItextbox.h" />
+    <ClInclude Include="..\src\vertBufs.h" />
+    <ClInclude Include="..\src\watch.h" />
+    <ClInclude Include="..\Src\Window.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
