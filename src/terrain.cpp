@@ -12,6 +12,8 @@ using namespace watch;
 
 #include "colour.h"
 
+  CSuperChunk*  dbgSC = NULL;
+
 CTerrain::CTerrain() : C3dObject() {
 	totalTris = 0;
 }
@@ -169,6 +171,8 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layerSCsampleRange));
 				sChunk->tmpIndex = i32vec3(x,y,z);
 				sChunk->genColour = vec4(col::randHue(),1);
+				if (sChunk->tmpIndex == i32vec3(0, 2, 0) && sChunk->LoD == 1)
+					dbgSC = sChunk;
 			}
 		}
 	}
@@ -313,18 +317,46 @@ void CTerrain::update() {
 	double startT = watch::pTimer->milliseconds();
 
 	size_t s = toSkin.size();
-	while ( ( watch::pTimer->milliseconds()  - startT) < 75) {
+	while ((watch::pTimer->milliseconds() - startT) < 75) {
 		if (s == 0)
 			return;
 		Chunk* chunk = toSkin.back().chunk;
-		CSuperChunk* replaceSC = toSkin.back().replaceSC;
+		CSuperChunk* parentSC = toSkin.back().parentSC;
 		toSkin.pop_back(); //remove from list
-		
+		if (parentSC == dbgSC && chunk->tag == 1572)
+			int h = 0;
 		//pass chunk to shade chunk func. Generates model and registers it.
 		createChunkMesh(*chunk);
 
 		//check if this chunk replaces another
-		replacementCheck(chunk->getPos(),chunk,replaceSC);
+		if (parentSC) {
+			if (parentSC->tmpIndex == i32vec3(1, 2, 0) && parentSC->LoD == 2)
+				int r = 0;
+			parentSC->chunksToSkin--;
+			if (parentSC->chunksToSkin == 0 && parentSC->overlapDir != none) { //all chunks skinned for this SC
+				Tdirection overlapDir = parentSC->overlapDir;
+				Tdirection faceDir = flipDir(overlapDir);
+				CSuperChunk* overlappedSC = parentSC->adj(overlapDir);
+				if (overlappedSC->LoD < chunk->LoD) { //if this new L2 chunk overlaps a cluster of smaller, L1 SCs...
+					overlappedSC->removeOutscrolledChunks(faceDir);
+					overlappedSC->adj(getXdir(overlapDir))->removeOutscrolledChunks(faceDir); //////
+					overlappedSC->adj(getYdir(overlapDir))->removeOutscrolledChunks(faceDir);
+					overlappedSC->adj(getYdir(overlapDir))->adj(getXdir(overlapDir))->removeOutscrolledChunks(faceDir);
+					parentSC->overlapDir = none;
+				}
+				else { //if L1 chunk partially overlaps an L2 SC
+					overlappedSC->overlapCount--;
+					if (overlappedSC->overlapCount == 0) {
+						overlappedSC->removeFace(faceDir);
+					//	parentSC->adj(overlapDir)->shrinkBoundary(faceDir);
+
+					}
+					parentSC->overlapDir = none;
+				}
+
+			}
+		}
+
 
 		chunk->live = true;
 		s--;
@@ -345,7 +377,7 @@ void CTerrain::advance(Tdirection dir) {
 
 	size_t inner = layers.size()-1;
 	//for (int l=inner;l>=0;l--) {
-	for (int l=0;l<=inner;l++) {
+	for (int l=0;l<=inner;l++) {  //from outer layer to inner
 			Tdirection outgoingDir = flipDir(dir);
 
 			//advance this layer
@@ -363,7 +395,7 @@ void CTerrain::advance(Tdirection dir) {
 				else {
 					layers[l].shifted[outgoingDir] = false;
 					if (l > 0) {
-						extend(l,dir);
+						extend(l,dir);  //extend normally resets it to 2
 						shortenOutgoing(l,outgoingDir);
 					}
 				}
@@ -416,8 +448,11 @@ void CTerrain::extend(int layerNo, Tdirection face) {
 	CSuperChunk* sc;
 	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
 		sc = layers[layerNo].faceGroup[face][scNo];
-		sc->extendBoundary(face);sc->extendBoundary(face);
+		if (sc == dbgSC)
+			int b = 0;
+		sc->extendBoundary(face);sc->extendBoundary(face); //brings it down from 2 to 0
 		sc->sizeInChunks[zAxis] += 1;
+		sc->chunksToSkin = 0;
 	
 		int zStart = sc->outerLayer(face); int zEnd = zStart+1;
 		if ((face == south) || (face == east)||(face == up)) {
@@ -430,15 +465,19 @@ void CTerrain::extend(int layerNo, Tdirection face) {
 				for (facePos.y=sc->outerLayer(yStart);facePos.y <= sc->outerLayer(yEnd);facePos.y++) {
 					i32vec3 realPos = rotateByDir(facePos,face);
 					vec3 samplePos = sc->nwSamplePos + (vec3(realPos) * (float)cubesPerChunkEdge * sc->LoDscale);
-				/*	if (chunkExists(samplePos,sc->LoD)) {	
-						newChunk = sc->createChunk(realPos); 
-						sc->chunkList.push_back(newChunk);
-						toSkin.push_back(newChunk);
-					}*/
-					sc->createChunkAsRequired(realPos,samplePos,sc->adj(face));
+					if (sc->LoD == 1 && face == north)
+						int b = 0;
+					if (sc->createChunkAsRequired(realPos,samplePos,sc))
+						sc->chunksToSkin++;
 				}
 			}
 		}
+		if (sc->chunkList.size() > 0) {
+			sc->overlapDir = face;
+			sc->adj(face)->overlapCount++;
+
+		}
+
 	}
 }
 
@@ -450,8 +489,8 @@ void CTerrain::shortenOutgoing(int layerNo, Tdirection face) {
 	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
 		sc = layers[layerNo].faceGroup[face][scNo];
 		//remove two outer layers
-		sc->removeFace(face);
-		sc->removeFace(face);
+	//	sc->removeFace(face);
+		//sc->removeFace(face);
 	}
 }
 
@@ -478,6 +517,16 @@ void CTerrain::replacementCheck(vec3& pos, Chunk* chunk, CSuperChunk* replacedSC
 
 		break;
 	}
+}
+
+/** If any chunks belonging to the innerLoD layer are overlapped by an outer layer chunk at
+	pos, remove them. */
+void CTerrain::handleSmallerChunkOverlap(glm::vec3 & pos, int innerLoD) {
+	int innerLayer = layers.size() - innerLoD;
+
+	//Chunk* smallerChunk = layers[innerLayer]->getChunkAt(pos);
+
+
 }
 
 
@@ -541,6 +590,11 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
 		}
+
+		//happens here!
+	
+
+		//shrinkboundary raises it to 2! but normally it's reduced again after. where?
 		superChunks[s]->shrinkBoundary(scrollDir); //shrink boundary where we've mode chunks out
 		superChunks[s]->extendBoundary(flipDir(scrollDir)); //extend boundary where we've moved chunks along
 		
@@ -551,7 +605,27 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	}
 
 	for (size_t s=0;s<superChunks.size();s++) {
+			
+		if (superChunks[s] == dbgSC)
+			int b = 0;
 		superChunks[s]->scroll(scrollVec);
 	}
+	int  f = 0;
+}
 
+/** Return the chunk of this layer, if any, at this position. */
+Chunk * CTerrainLayer::getChunkAt(glm::vec3 & pos) {
+	CSuperChunk* nearestSC = getNearestSC(pos); 
+
+	return nullptr;
+}
+
+/** Return the nearest superChunk to this position, clamping to the outer sides of the
+	layer 'shell'.*/
+CSuperChunk * CTerrainLayer::getNearestSC(glm::vec3 & pos) {
+	//find index for this position
+
+	//return SC for this index
+
+	return nullptr;
 }

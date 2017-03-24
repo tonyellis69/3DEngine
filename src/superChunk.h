@@ -11,10 +11,11 @@
 
 #include <vector>
 
+
+
+enum  TremoveOutgoing{ waitToRemove, freeToRemove};
+
 /** A class for creating and managing 3D terrain. */
-//#include "cnode.h"
-
-
 
 class CTerrain;
 class CSuperChunk {
@@ -40,8 +41,9 @@ public:
 	int firstEmptyLayer(Tdirection face);
 	int outerLayer(Tdirection face);
 	void flagFaceForRemoval(Tdirection face);
-	void createChunkAsRequired(glm::i32vec3& pos, glm::vec3& samplePos,CSuperChunk* replaceSC);
+	bool createChunkAsRequired(glm::i32vec3& pos, glm::vec3& samplePos,CSuperChunk* replaceSC);
 	void removeChunk(Chunk* chunk);
+	void removeOutscrolledChunks(Tdirection faceDir);
 
 	glm::i32vec3 sizeInChunks; ///<Width, height and depth in chunks.
 	int cubesPerChunkEdge; ///<Number of cubes per edge of a chunk.
@@ -75,6 +77,15 @@ public:
 	std::vector<Chunk*> chunkList; ///<Chunks currently owned.
 
 	int faceBoundary[6]; ///<Records the position of the current outermost layer of chunks on each face.
+
+
+	TremoveOutgoing removeOutgoingChunks; ///<Remove outgoing chunks or wait until we're told?
+
+	int chunksToSkin; ///<Number of chunks currently queued for skinning.
+
+	Tdirection overlapDir; ///<Direction of the SC overlapped by this one.
+
+	int overlapCount; ///<Number of smaller SCs now overlapping this one.
 
 private:
 	

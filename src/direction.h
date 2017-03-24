@@ -26,3 +26,7 @@ Tdirection getXstart(Tdirection dir);
 
 Tdirection getYstart(Tdirection dir);
 
+Tdirection getXdir(Tdirection dir);
+
+Tdirection getYdir(Tdirection dir);
+

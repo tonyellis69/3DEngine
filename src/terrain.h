@@ -11,6 +11,10 @@
 #include <vector>
 #include <set>
 
+//LOD counts down from the outmost layer towards the innermost, 1.
+//However, in the layers array 0 is the outermost
+//Maybe change this sometime?
+
 
 
 /** A class for creating and managing a terrain made out of superchunks. */
@@ -24,6 +28,8 @@ class CReplaceChunk;
 class CSkinningOrder;
 
 typedef std::vector<std::vector<std::vector<CSuperChunk*>>> T3dArray;
+
+extern CSuperChunk*  dbgSC;
 
 class CTerrain : public C3dObject  {
 public:
@@ -51,6 +57,7 @@ public:
 	void extend(int layerNo, Tdirection face);
 	void shortenOutgoing(int layerNo, Tdirection face);
 	void replacementCheck(glm::vec3& pos, Chunk* chunk,CSuperChunk* replacedSC); 
+	void handleSmallerChunkOverlap(glm::vec3& pos, int innerLoD);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -88,6 +95,8 @@ public:
 	CTerrainLayer();
 	bool advance(glm::i32vec3& scrollVec);
 	void scroll(glm::i32vec3& scrollVec);
+	Chunk* getChunkAt(glm::vec3& pos);
+	CSuperChunk* getNearestSC(glm::vec3& pos);
 	std::vector<CSuperChunk*> superChunks;
 	glm::vec3 nwLayerPos;
 	float cubeSize;
@@ -116,8 +125,9 @@ public:
 
 class CSkinningOrder {
 public:
-	CSuperChunk* replaceSC;
+	CSuperChunk* parentSC;
 	Chunk* chunk;
+	//CSuperChunk* overlappedSC;
 };
 
 

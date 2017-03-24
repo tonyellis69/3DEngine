@@ -89,7 +89,6 @@ int getYaxis(Tdirection dir) {
 }
 
 Tdirection getXstart(Tdirection dir) {
-
 	if ((dir == west) || (dir == east))
 		return north;
 	return west;
@@ -99,4 +98,16 @@ Tdirection getYstart(Tdirection dir) {
 	if ((dir == up) || (dir == down))
 		return north;
 	return down;
+}
+
+Tdirection getXdir(Tdirection dir) {
+	if ((dir == west) || (dir == east))
+		return south;
+	return east;
+}
+
+Tdirection getYdir(Tdirection dir) {
+	if ((dir == up) || (dir == down))
+		return south;
+	return up;
 }
