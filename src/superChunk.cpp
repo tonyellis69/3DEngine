@@ -16,7 +16,6 @@ using namespace std;
 CSuperChunk::CSuperChunk()  {
 	nSChunk = eSChunk = sSChunk = wSChunk = uSChunk = dSChunk = NULL;
 	LoD = 0;
-	removeOutgoingChunks = freeToRemove;
 	overlapDir = none;
 	overlapCount = 0;
 }
@@ -103,7 +102,7 @@ void CSuperChunk::scroll(i32vec3& scrollVec) {
 	else if (adj(outFace)->LoD > LoD)  { //we're outscrolling chunks into a superChunk of lower detail
 		;
 	} else if (adj(outFace)->LoD < LoD) { //we're outscrolling chunks into a superChunk of higher detail
-		flagFaceForRemoval(outFace);  //
+		shrinkIfEmpty(outFace);  //
 	}
 
 	if (adj(inFace) == NULL)	{	//if inface direction doesn't lead to another superchunk
@@ -184,19 +183,17 @@ void CSuperChunk::addFace(Tdirection faceDir) {
 	if (!adj(faceDir)) //catch SCs at very edge of terrain. 
 		return;
 
-	if (chunksToSkin) {
-		adj(faceDir)->removeOutgoingChunks = waitToRemove;
-		adj(faceDir)->adj(getXdir(faceDir))->removeOutgoingChunks = waitToRemove;
-		adj(faceDir)->adj(getYdir(faceDir))->removeOutgoingChunks = waitToRemove;
-		adj(faceDir)->adj(getYdir(faceDir))->adj(getXdir(faceDir))->removeOutgoingChunks = waitToRemove;
+	if (chunksToSkin) { //L1 neighbour must wait until this SC is skinned before removing its own chunks
 		overlapDir = faceDir;
 	}
-	else {
-		adj(faceDir)->removeOutgoingChunks = freeToRemove;
-		adj(faceDir)->adj(getXdir(faceDir))->removeOutgoingChunks = freeToRemove;
-		adj(faceDir)->adj(getYdir(faceDir))->removeOutgoingChunks = freeToRemove;
-		adj(faceDir)->adj(getYdir(faceDir))->adj(getXdir(faceDir))->removeOutgoingChunks = freeToRemove;
+	else { //edge case (maybe never happens?) no L2 chunks for L1 neighbour to wait on, but L1 has chunks
 		overlapDir = none;
+
+		Tdirection L1face = flipDir(faceDir);
+		adj(faceDir)->removeOutscrolledChunks(L1face);
+		adj(faceDir)->adj(getXdir(faceDir))->removeOutscrolledChunks(L1face);
+		adj(faceDir)->adj(getYdir(faceDir))->removeOutscrolledChunks(L1face);
+		adj(faceDir)->adj(getYdir(faceDir))->adj(getXdir(faceDir))->removeOutscrolledChunks(L1face);
 	}
 
 }
@@ -258,24 +255,18 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
 
 /** Extend the recogised position for outermost chunks in the face direction. */
 void CSuperChunk::extendBoundary(Tdirection face) {
-
 	if ((face == north)||(face == west) || (face == down))
 		faceBoundary[face] -= 1;
 	else
 		faceBoundary[face] += 1;
-	if (this == dbgSC)
-		int b = 0;
 }
 
 /** Shrink the recogised position for outermost chunks in the face direction. */
 void CSuperChunk::shrinkBoundary(Tdirection face) {
-	
 	if ((face == north)||(face == west) || (face == down))
 		faceBoundary[face] += 1;
 	else
 		faceBoundary[face] -= 1;
-	if (this == dbgSC)
-		int b = 0;
 }
 
 /** Return the position of the first layer beyond the outer, face layer of chunks in the given direction. */
@@ -288,37 +279,10 @@ int CSuperChunk:: outerLayer(Tdirection face) {
 	return faceBoundary[face];
 }
 
-void CSuperChunk::flagFaceForRemoval(Tdirection face) {
-
-//	removeFace(face);
-//	return;
-	//iterate through face chunks, adding them to removal list
-/*	int zAxis = getAxis(face);
-	int zPos = outerLayer(face);
-	for (size_t chunk=0;chunk < chunkList.size();chunk++) {
-		if (chunkList[chunk]->scIndex[zAxis] == zPos)  {
-			CReplaceChunk replaceChunk;
-			replaceChunk.oldChunk = chunkList[chunk];
-			replaceChunk.nwCorner = chunkList[chunk]->getPos();
-			replaceChunk.opCorner = replaceChunk.nwCorner + chunkSize;
-			replaceChunk.parentSC = this;
-			terrain->replaceChunks.push_back(replaceChunk);
-
-		}
-	} */
-
-	if (chunkList.size() > 0) {
-		removeOutgoingChunks = waitToRemove;
-		//overlapCount = 4;
-
-	}
-	else {
-		removeOutgoingChunks = freeToRemove;
+void CSuperChunk::shrinkIfEmpty(Tdirection face) {
+	if (chunkList.size() == 0) { 
 		shrinkBoundary(face);
 	}
-
-
-//	shrinkBoundary(face);
 }
 
 /** If a surface intersects the volume at the given sample position, create a chunk for it. */
@@ -329,14 +293,11 @@ bool CSuperChunk::createChunkAsRequired(i32vec3& pos, vec3& samplePos, CSuperChu
 		chunkList.push_back(newChunk);
 		CSkinningOrder order;
 		order.chunk = newChunk;
-		order.parentSC = replaceSC;
+		order.parentSC = this;
 		terrain->toSkin.push_back(order);
 		return true;
 	}
 	vec3 worldPos = nwWorldPos + (vec3(pos)*chunkSize);
-	//terrain->replacementCheck(worldPos,newChunk, replaceSC);
-	
-	terrain->handleSmallerChunkOverlap(worldPos, this->LoD - 1);
 	return false;
 }
 
@@ -349,13 +310,10 @@ void CSuperChunk::removeChunk(Chunk* chunk) {
 		}
 }
 
-/** Remove any chunks now outscrolled and replaced.*/
+/** Remove the two layers of chunks now outscrolled and replaced by an L2 scroll.*/
 void CSuperChunk::removeOutscrolledChunks(Tdirection faceDir) {
-	if (this == dbgSC)
-		 int h = 0;
 	removeFace(faceDir);
 	removeFace(faceDir);
-
 }
 
 CSuperChunk::~CSuperChunk() {

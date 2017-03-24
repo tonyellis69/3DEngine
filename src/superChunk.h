@@ -40,7 +40,7 @@ public:
 	void shrinkBoundary(Tdirection face);
 	int firstEmptyLayer(Tdirection face);
 	int outerLayer(Tdirection face);
-	void flagFaceForRemoval(Tdirection face);
+	void shrinkIfEmpty(Tdirection face);
 	bool createChunkAsRequired(glm::i32vec3& pos, glm::vec3& samplePos,CSuperChunk* replaceSC);
 	void removeChunk(Chunk* chunk);
 	void removeOutscrolledChunks(Tdirection faceDir);
@@ -79,8 +79,7 @@ public:
 	int faceBoundary[6]; ///<Records the position of the current outermost layer of chunks on each face.
 
 
-	TremoveOutgoing removeOutgoingChunks; ///<Remove outgoing chunks or wait until we're told?
-
+	
 	int chunksToSkin; ///<Number of chunks currently queued for skinning.
 
 	Tdirection overlapDir; ///<Direction of the SC overlapped by this one.

@@ -323,15 +323,11 @@ void CTerrain::update() {
 		Chunk* chunk = toSkin.back().chunk;
 		CSuperChunk* parentSC = toSkin.back().parentSC;
 		toSkin.pop_back(); //remove from list
-		if (parentSC == dbgSC && chunk->tag == 1572)
-			int h = 0;
 		//pass chunk to shade chunk func. Generates model and registers it.
 		createChunkMesh(*chunk);
 
 		//check if this chunk replaces another
 		if (parentSC) {
-			if (parentSC->tmpIndex == i32vec3(1, 2, 0) && parentSC->LoD == 2)
-				int r = 0;
 			parentSC->chunksToSkin--;
 			if (parentSC->chunksToSkin == 0 && parentSC->overlapDir != none) { //all chunks skinned for this SC
 				Tdirection overlapDir = parentSC->overlapDir;
@@ -348,8 +344,6 @@ void CTerrain::update() {
 					overlappedSC->overlapCount--;
 					if (overlappedSC->overlapCount == 0) {
 						overlappedSC->removeFace(faceDir);
-					//	parentSC->adj(overlapDir)->shrinkBoundary(faceDir);
-
 					}
 					parentSC->overlapDir = none;
 				}
@@ -368,7 +362,6 @@ void CTerrain::update() {
 void CTerrain::advance(Tdirection dir) {
 	if (dir == none) //TO DO: should not happen!
 		return;
-	cerr << "\n\nAdvance\n\n";
 	//find the axis along which we're scrolling 0=x,1=y,z=2, and the direction, 1 or -1.
 	int scrollAxis = getAxis(dir);
 	int scrollDir = dirToVec(dir)[scrollAxis];//-1 when scrolling-in from the north
@@ -395,8 +388,7 @@ void CTerrain::advance(Tdirection dir) {
 				else {
 					layers[l].shifted[outgoingDir] = false;
 					if (l > 0) {
-						extend(l,dir);  //extend normally resets it to 2
-						shortenOutgoing(l,outgoingDir);
+						addTwoIncomingLayers(l,dir);  
 					}
 				}
 			}
@@ -436,7 +428,7 @@ void CTerrain::freeChunkModel(CModel* chunk) {
 
 
 /** Extend the given layer of superChunks by two rows in the face direction. */
-void CTerrain::extend(int layerNo, Tdirection face) {
+void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 	int zAxis = getAxis(face);
 	i32vec3 facePos;
 	Chunk* newChunk;
@@ -448,8 +440,6 @@ void CTerrain::extend(int layerNo, Tdirection face) {
 	CSuperChunk* sc;
 	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
 		sc = layers[layerNo].faceGroup[face][scNo];
-		if (sc == dbgSC)
-			int b = 0;
 		sc->extendBoundary(face);sc->extendBoundary(face); //brings it down from 2 to 0
 		sc->sizeInChunks[zAxis] += 1;
 		sc->chunksToSkin = 0;
@@ -465,8 +455,6 @@ void CTerrain::extend(int layerNo, Tdirection face) {
 				for (facePos.y=sc->outerLayer(yStart);facePos.y <= sc->outerLayer(yEnd);facePos.y++) {
 					i32vec3 realPos = rotateByDir(facePos,face);
 					vec3 samplePos = sc->nwSamplePos + (vec3(realPos) * (float)cubesPerChunkEdge * sc->LoDscale);
-					if (sc->LoD == 1 && face == north)
-						int b = 0;
 					if (sc->createChunkAsRequired(realPos,samplePos,sc))
 						sc->chunksToSkin++;
 				}
@@ -481,53 +469,6 @@ void CTerrain::extend(int layerNo, Tdirection face) {
 	}
 }
 
-
-/** Snip the last two rows off the outfacing SCs in the given direction. */
-void CTerrain::shortenOutgoing(int layerNo, Tdirection face) {
-	//for each SC in the group
-	CSuperChunk* sc;
-	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
-		sc = layers[layerNo].faceGroup[face][scNo];
-		//remove two outer layers
-	//	sc->removeFace(face);
-		//sc->removeFace(face);
-	}
-}
-
-
-/** Check if this chunk partially replaces one on the replacement list; if it is totally repalaced,
-	remove it. */
-void CTerrain::replacementCheck(vec3& pos, Chunk* chunk, CSuperChunk* replacedSC) {
-	for (size_t chk=0;chk<replaceChunks.size();chk++) {
-		if ( replaceChunks[chk].parentSC != replacedSC) 
-			{ continue;}
-		if ( pos.x >= replaceChunks[chk].opCorner.x || pos.y >= replaceChunks[chk].opCorner.y 
-			|| pos.z >= replaceChunks[chk].opCorner.z) 
-			{continue;}
-		if ( pos.x < replaceChunks[chk].nwCorner.x || pos.y < replaceChunks[chk].nwCorner.y 
-			|| pos.z < replaceChunks[chk].nwCorner.z) 
-			{ continue;}
-		
-		replaceChunks[chk].subChunksFound++;
-		if (replaceChunks[chk].subChunksFound == 8) {
-			replaceChunks[chk].oldChunk->live = false;
-			replaceChunks[chk].parentSC->removeChunk(replaceChunks[chk].oldChunk);
-			replaceChunks.erase(replaceChunks.begin() + chk);
-		}
-
-		break;
-	}
-}
-
-/** If any chunks belonging to the innerLoD layer are overlapped by an outer layer chunk at
-	pos, remove them. */
-void CTerrain::handleSmallerChunkOverlap(glm::vec3 & pos, int innerLoD) {
-	int innerLayer = layers.size() - innerLoD;
-
-	//Chunk* smallerChunk = layers[innerLayer]->getChunkAt(pos);
-
-
-}
 
 
 CTerrain::~CTerrain() {
@@ -562,7 +503,6 @@ bool CTerrainLayer::advance(i32vec3& scrollVec) {
 	//starting position elsewhere
 	for (size_t s=0;s<superChunks.size();s++) {
 		superChunks[s]->shiftChunksBy1(vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
-		//MOVE nwWorldPos as well
 		superChunks[s]->nwWorldPos -= (vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
 	}
 	
@@ -591,14 +531,10 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
 		}
 
-		//happens here!
-	
 
-		//shrinkboundary raises it to 2! but normally it's reduced again after. where?
 		superChunks[s]->shrinkBoundary(scrollDir); //shrink boundary where we've mode chunks out
 		superChunks[s]->extendBoundary(flipDir(scrollDir)); //extend boundary where we've moved chunks along
 		
-		//MOVE nwWorldPos back in scroll direction
 		superChunks[s]->nwWorldPos += (vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize * LoDscale);
 
 		
@@ -610,7 +546,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 			int b = 0;
 		superChunks[s]->scroll(scrollVec);
 	}
-	int  f = 0;
+
 }
 
 /** Return the chunk of this layer, if any, at this position. */

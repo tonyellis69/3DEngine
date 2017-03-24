@@ -23,7 +23,7 @@ class CSuperChunk;
 
 class CTerrainLayer;
 
-class CReplaceChunk;
+
 
 class CSkinningOrder;
 
@@ -51,13 +51,9 @@ public:
 	void advance(Tdirection direction);
 	bool superChunkIsEmpty(glm::vec3& samplePos, int LoD);
 	bool chunkExists(glm::vec3& samplePos,int LoD);
-	float* getSampleData(glm::vec3& samplePos);
 	void createChunkMesh(Chunk& chunk);
 	void freeChunkModel(CModel* chunk);
-	void extend(int layerNo, Tdirection face);
-	void shortenOutgoing(int layerNo, Tdirection face);
-	void replacementCheck(glm::vec3& pos, Chunk* chunk,CSuperChunk* replacedSC); 
-	void handleSmallerChunkOverlap(glm::vec3& pos, int innerLoD);
+	void addTwoIncomingLayers(int layerNo, Tdirection face);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -85,7 +81,6 @@ public:
 
 	std::vector<CTerrainLayer> layers; ///<A simple list of all the layers of this terrain.
 
-	std::vector<CReplaceChunk> replaceChunks; ///<A list of all chunks scheduled for removal.
 
 	};
 
@@ -110,18 +105,6 @@ public:
 	std::vector<CSuperChunk*> faceGroup[6];
 };
 
-/** Records what higher detail chunks need to be complete before a lower-
-	detail chunk can be removed. */
-class CReplaceChunk {
-public:
-	CReplaceChunk()  {subChunksFound = 0; };
-	Chunk* oldChunk; ///<Chunk we're replacing.
-	glm::vec3 nwCorner; ///<nw lower corner of oldChunk's region of world space.
-	glm::vec3 opCorner; ///<se upprt corner of oldChunk's region of world space.
-	int subChunksFound; ///<Number of subchunks found occupying same space;
-	Chunk* newChunk[8]; ///<The chunks replacing this larger chunk.
-	CSuperChunk* parentSC;
-};
 
 class CSkinningOrder {
 public:
