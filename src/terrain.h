@@ -81,7 +81,7 @@ public:
 
 	std::vector<CTerrainLayer> layers; ///<A simple list of all the layers of this terrain.
 
-
+	glm::mat4 chunkOrigin; ///<Chunks are drawn relative to this point;
 	};
 
 /** Represents one of a terrain's concentric layers of superchunks. */

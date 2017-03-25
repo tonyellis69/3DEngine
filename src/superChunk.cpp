@@ -75,7 +75,7 @@ extern int uniTag = 0;
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
 	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale);
 	Chunk* newChunk = terrain->getFreeChunk();
-	newChunk->setPos(nwWorldPos + (vec3(gridPosition)*chunkSize));
+	newChunk->setPos(nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]));
 	newChunk->cubeSize = cubeSize;
 	newChunk->setSamplePos(samplePos);
 	newChunk->colour = genColour;
@@ -297,7 +297,7 @@ bool CSuperChunk::createChunkAsRequired(i32vec3& pos, vec3& samplePos, CSuperChu
 		terrain->toSkin.push_back(order);
 		return true;
 	}
-	vec3 worldPos = nwWorldPos + (vec3(pos)*chunkSize);
+	//vec3 worldPos = nwWorldPos + (vec3(pos)*chunkSize);
 	return false;
 }
 

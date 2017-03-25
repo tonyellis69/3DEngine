@@ -2,6 +2,9 @@
 #include <iostream> //for cerr
 #include <algorithm> //for find
 
+#include <glm/gtc/matrix_transform.hpp>	
+//#include <glm/gtc/matrix_access.hpp>
+
 using namespace glm;
 using namespace vBuf;
 using namespace std;
@@ -16,6 +19,7 @@ using namespace watch;
 
 CTerrain::CTerrain() : C3dObject() {
 	totalTris = 0;
+	chunkOrigin = glm::translate(glm::mat4(1), getPos());
 }
 
 /** Set the dimensions and building block sizes of this terrain. */
@@ -368,6 +372,11 @@ void CTerrain::advance(Tdirection dir) {
 	i32vec3 scrollVec(0,0,0);
 	scrollVec[scrollAxis] = scrollDir;
 
+
+
+	chunkOrigin = glm::translate(chunkOrigin, vec3(-scrollVec) * (float)cubesPerChunkEdge * LoD1cubeSize);
+
+
 	size_t inner = layers.size()-1;
 	//for (int l=inner;l>=0;l--) {
 	for (int l=0;l<=inner;l++) {  //from outer layer to inner
@@ -502,10 +511,11 @@ bool CTerrainLayer::advance(i32vec3& scrollVec) {
 	//jump all chunks along one chunk relative to terrain, to compensate for terrain being jumped back to
 	//starting position elsewhere
 	for (size_t s=0;s<superChunks.size();s++) {
-		superChunks[s]->shiftChunksBy1(vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
+		//superChunks[s]->shiftChunksBy1(vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
 		superChunks[s]->nwWorldPos -= (vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
 	}
-	
+	//superChunks[0]->terrain->chunkOrigin = glm::translate(superChunks[0]->terrain->chunkOrigin, vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize);
+	//TO DO: evil hack to get at terrain! Fix!
 
 	//If this layer has been advanced to its scrolling point, scroll it
 	int scrollAxis = getAxis(scrollVec);
