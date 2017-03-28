@@ -409,6 +409,7 @@ bool CIsoSurfer::marchingCube(float& x, float& y, float& z) {
 
 		pVertexBuffer +=3;
 		noVerts += 3; 
+		//TO DO - I tool noVerts out of CModel. CIsoSurface's vertexObj needs to be set with this
 	}
 
 	return true;

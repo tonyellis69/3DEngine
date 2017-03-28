@@ -1,12 +1,14 @@
 #include "chunk.h"
 
 Chunk::Chunk() {
-	nAttribs = 3;
+	noAttribs = 3;
+	
 	init();
 }
 
 void Chunk::init() {
  //TO DO: get rid of this?
+	noTris = 0;
 }
 
 /** Set the position in a space where this chunk starts sampling volumetric data. */

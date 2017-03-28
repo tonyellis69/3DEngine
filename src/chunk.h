@@ -22,6 +22,9 @@ public:
 
 	int tag;
 
+	int noAttribs;
+	int noTris;
+
 };
 
 

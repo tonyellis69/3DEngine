@@ -314,7 +314,8 @@ void CRenderer::storeVertexData(unsigned int& handle, glm::vec3* data,int size) 
 	glBindBuffer(GL_ARRAY_BUFFER, handle);
 	glBufferData(GL_ARRAY_BUFFER,  size, (void*)data, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	//glFinish(); //TO DO: temp!
+
+	
 }
 
 /** Store the given index data in a buffer and return a handle.*/
@@ -441,13 +442,16 @@ void CRenderer::setShader(int program) {
 
 void CRenderer::drawModel(CModel& model) {
 
-	glBindVertexArray(model.hVAO);
-	if (model.hIndex == 0)
-		glDrawArrays(model.drawMode, 0, model.noVerts);
-	else
-		glDrawElements(model.drawMode, model.indexSize, GL_UNSIGNED_SHORT, 0);
+	CVertexObj* vertObj = &getVertexObj(model.hVertexObj);
 
+	glBindVertexArray(vertObj->hVAO);
+	if (vertObj->hIndex == 0)
+		glDrawArrays(model.drawMode, 0, vertObj->noVerts);
+	else
+		glDrawElements(model.drawMode, vertObj->indexSize, GL_UNSIGNED_SHORT, 0);
+	
 	glBindVertexArray(0);
+	int error = glGetError();
 }
 
 float g_vertex_buffer_data[] = { 
@@ -678,6 +682,17 @@ unsigned int CRenderer::query() {
 	return primitives;
 }
 
+/** Create a vertex object, stored internally , and return a handle to it. */
+unsigned int CRenderer::createVertexObj() {
+	CVertexObj newObj;
+	vertexObjList.push_back(newObj);
+	return vertexObjList.size(); //Externally we use index+1 so that 0 = unassigned.
+}
+
+/** Return a reference to the given vertex object. */
+CVertexObj& CRenderer::getVertexObj(unsigned int index) {
+	return vertexObjList[index - 1];
+}
 
 
 

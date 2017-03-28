@@ -106,6 +106,7 @@
     <ClCompile Include="..\src\renderer\light.cpp" />
     <ClCompile Include="..\src\renderer\model.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
+    <ClCompile Include="..\src\renderer\vertexObj.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
     <ClCompile Include="..\Src\SoundLib.cpp" />
     <ClCompile Include="..\src\Sprite.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="..\src\renderer\light.h" />
     <ClInclude Include="..\src\renderer\model.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
+    <ClInclude Include="..\src\renderer\vertexObj.h" />
     <ClInclude Include="..\src\simplexnoise.h" />
     <ClInclude Include="..\src\smallsysf.h" />
     <ClInclude Include="..\Src\SOIL.h" />

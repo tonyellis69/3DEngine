@@ -313,7 +313,7 @@ void CTerrain::freeChunk(Chunk* chunk) {
 
 
 void CTerrain::update() {
-
+	//return;
 		watch::watch1 << "total tris: " << totalTris;
 		CSuperChunk *sc = layers[0].faceGroup[0][0];
 	
@@ -428,7 +428,7 @@ void CTerrain::createChunkMesh(Chunk& chunk) {
 
 /** Call an external function to release the memory used by this chunk when it was registed.*/
 void CTerrain::freeChunkModel(CModel* chunk) {
-	totalTris -= chunk->nTris;
+	totalTris -= ((Chunk*)chunk)->noTris;
 	EXTfreeChunkModel(chunk);
 
 }

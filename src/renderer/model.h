@@ -12,18 +12,20 @@ public:
 	CModel(glm::vec3& pos);
 	void init();
 
-	unsigned int hBuffer; ///<Handle referencing object's buffered vertex data.
-	int colourOffset; ///<Start of colour values in buffer.
-	int noVerts;///<Total vertices in this model.
-	int nAttribs; ///<Attributes per vertex.
-	unsigned int hVAO; ///<References vertex array object for rendering this model.
-	unsigned int hIndex; ///<Handle referencing index object for rendering this model.
-	int indexSize; ///<Number of indices.
-	int normOffset;
+	//unsigned int hBuffer; ///<Handle referencing object's buffered vertex data.
+	//int colourOffset; ///<Start of colour values in buffer.
+	//int noVerts;///<Total vertices in this model.
+	//int nAttribs; ///<Attributes per vertex.
+	//unsigned int hVAO; ///<References vertex array object for rendering this model.
+//	unsigned int hIndex; ///<Handle referencing index object for rendering this model.
+	//int indexSize; ///<Number of indices.
+	//int normOffset;
 
 	int drawMode; ///<Triangles, lines etc
 
-	int nTris; ///<Number of triangles
+//	int nTris; ///<Number of triangles
+
+	unsigned int hVertexObj; ///<The vertex object internally assigned to this model.
 
 private:
 

@@ -567,13 +567,16 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 
 
 
-	//tell the renderer: here is some data, please do whatever you do with it
-	//and give me a reference
-	Renderer.storeVertexData(cube->hBuffer,(glm::vec3*)v,24*sizeof(vBuf::T3Dvert));
-	Renderer.storeIndexData(cube->hIndex,index, sizeof(unsigned short) * indexSize);
-	cube->noVerts =8 ;
-	cube->indexSize =indexSize ;
-	Renderer.storeVertexLayout(cube->hVAO,cube->hBuffer,cube->hIndex,3);
+	
+
+	//cube->noVerts = 24;
+	//cube->indexSize = indexSize;
+	setVertexDetails(*cube, 1, indexSize, 24);
+	storeIndexedModel(cube, v, index);
+	CVertexObj* vertObj = &Renderer.getVertexObj(cube->hVertexObj);
+	//vertObj->indexSize = indexSize;
+	//vertObj->noVerts = 24;
+
 
 	modelList.push_back(cube);
 
@@ -584,12 +587,9 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 void CEngine::drawModels() {
 	setStandard3dShader();
 
-	int vCount = 0;
 	for (size_t m=0;m<modelList.size();m++) {
 		drawModelDefaultShader(*modelList[m]);
-		vCount += modelList[m]->noVerts;
 	}
-	//cerr << "\n no verts: " << vCount << " no models " << modelList.size();
 	Renderer.setShader(0); //for legacy compatibility
 }
 
@@ -688,9 +688,13 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	index[i++] = top; index[i++] =  top+finalSeg; index[i++] = bot+finalSeg;
 
 	CModel* cylinder = new CModel(pos);
-	cylinder->noVerts =noVerts;// noTriangles * 3;
-	cylinder->indexSize = i;
+//	cylinder->noVerts =noVerts;// noTriangles * 3;
+	//cylinder->indexSize = i;
+	setVertexDetails(*cylinder, 1, i, noVerts);
 	storeIndexedModel(cylinder,v, index );
+	CVertexObj* vertObj = &Renderer.getVertexObj(cylinder->hVertexObj);
+	//vertObj->indexSize = i;
+	//vertObj->noVerts = noVerts;
 
 	delete[] v;
 	delete[] index;
@@ -710,20 +714,29 @@ void CEngine::renderTo2DTexture(glm::vec2 size, int* buf) {
 }
 
 /** Send these vertices to the graphics hardware to be buffered, and register them with the given model. */
-void CEngine::storeModel(CModel* model, glm::vec3* verts ) {
-	Renderer.storeVertexData(model->hBuffer,verts,model->noVerts * model->nAttribs * sizeof(glm::vec3));
-	model->hIndex = 0;
-	Renderer.storeVertexLayout(model->hVAO,model->hBuffer,0,model->nAttribs);
+void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
+	if (!model->hVertexObj)
+		model->hVertexObj = Renderer.createVertexObj();
+	CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
+	vertObj->noVerts = noVerts;
+	Renderer.storeVertexData(vertObj->hBuffer,verts, noVerts * vertObj->nAttribs * sizeof(glm::vec3));
+	vertObj->hIndex = 0; //model->hIndex = 0;
+	//vertObj->hBuffer = model->hBuffer;
+	Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer,0, vertObj->nAttribs);
+	//vertObj->hVAO = model->hVAO;
+	//vertObj->nAttribs = model->nAttribs;
+	vertObj->indexSize = 0;
 }
 
 
 
 /** Free the various graphics memory buffers connected to this model.*/
 void CEngine::freeModel(CModel* model) {
-	Renderer.freeBuffer(model->hBuffer);
-	if (model->hIndex > 0)
-		Renderer.freeBuffer(model->hIndex);
-	Renderer.freeVAO(model->hVAO);
+	CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
+	Renderer.freeBuffer(vertObj->hBuffer);
+	if (vertObj->hIndex > 0)
+		Renderer.freeBuffer(vertObj->hIndex);
+	Renderer.freeVAO(vertObj->hVAO);
 	model->init();
 }
 
@@ -755,9 +768,23 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 
 /** Run geometry feedback on the given input model, and return with the thus-created model in destModel. */
 unsigned int CEngine::acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel) {
-	unsigned int noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, destModel.hBuffer);
-	destModel.noVerts = noPrimitives*3; //assuming primitives are triangles
-	Renderer.storeVertexLayout(destModel.hVAO,destModel.hBuffer,0,destModel.nAttribs);
+	if (!destModel.hVertexObj)
+		destModel.hVertexObj = Renderer.createVertexObj();
+	CVertexObj* dest = &Renderer.getVertexObj(destModel.hVertexObj);
+
+	unsigned int noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, dest->hBuffer);
+
+	
+
+	//destModel.noVerts = noPrimitives*3; //assuming primitives are triangles
+	dest->noVerts = noPrimitives * 3; //assuming primitives are triangles
+//	dest->hBuffer = destModel.hBuffer;
+
+	Renderer.storeVertexLayout(dest->hVAO,dest->hBuffer,0,dest->nAttribs);
+
+	//destModel.hVAO = dest->hVAO;
+
+	dest->nTris = noPrimitives;
 	return noPrimitives;
 }
 
@@ -766,6 +793,15 @@ unsigned int CEngine::drawModelCount(CModel& model) {
 	Renderer.initQuery();
 	Renderer.drawModel(model);
 	return Renderer.query();
+}
+
+void CEngine::setVertexDetails(CModel & model, int noAttribs, int noIndices, int noVerts) {
+	if (!model.hVertexObj)
+		model.hVertexObj = Renderer.createVertexObj();
+	CVertexObj* vertObj = &Renderer.getVertexObj(model.hVertexObj);
+	vertObj->nAttribs = noAttribs;
+	vertObj->noVerts = noVerts;
+	vertObj->indexSize = noIndices;
 }
 
 

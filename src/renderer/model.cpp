@@ -9,9 +9,10 @@ CModel::CModel() {
 }
 
 void CModel::init() {
+	hVertexObj = 0;
 	drawMode = GL_TRIANGLES;
-	hBuffer = 0;
-	hVAO = 0;
-	hIndex = 0;
-	nTris = 0;
+//	hBuffer = 0;
+//	hVAO = 0;
+//	hIndex = 0;
+//	nTris = 0;
 }

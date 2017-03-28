@@ -167,6 +167,9 @@
     <ClCompile Include="..\src\direction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\vertexObj.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -351,6 +354,9 @@
     </ClInclude>
     <ClInclude Include="..\src\direction.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\vertexObj.h">
+      <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

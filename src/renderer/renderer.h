@@ -8,6 +8,7 @@
 #include <wglew.h>
 #include <glm/glm.hpp>
 #include "model.h"
+#include "vertexObj.h"
 
 enum shaderType {vertex,frag,geometry };
 
@@ -65,6 +66,8 @@ public:
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	void initQuery();
 	unsigned int query();
+	unsigned int createVertexObj();
+	CVertexObj& getVertexObj(unsigned int index);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -84,6 +87,10 @@ public:
 
 	C2dRenderer rend2d; ///<2D renderer.
 
+	std::vector<CVertexObj> vertexObjList; ///<A list of vertex objects representing vertex buffers.
+
+
+
 private:
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 
@@ -93,5 +100,6 @@ private:
 	unsigned int  r2texTex;
 
 	GLuint primitivesQuery; ///<Used in primitives generated queries.
+
 
 };

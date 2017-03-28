@@ -46,7 +46,7 @@ public:
 	glm::vec4 colour; ///Colour volume will be shaded in.
 
 
-
+	int noVerts; ///<Originally in CModel but I took it out
 };
 
 // For any edge, if one vertex is inside of the surface and the other is outside of the surface
