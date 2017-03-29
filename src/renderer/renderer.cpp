@@ -685,6 +685,7 @@ unsigned int CRenderer::query() {
 /** Create a vertex object, stored internally , and return a handle to it. */
 unsigned int CRenderer::createVertexObj() {
 	CVertexObj newObj;
+	glGenBuffers(1, &newObj.hBuffer);
 	vertexObjList.push_back(newObj);
 	return vertexObjList.size(); //Externally we use index+1 so that 0 = unassigned.
 }

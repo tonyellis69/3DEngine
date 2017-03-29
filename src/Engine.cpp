@@ -565,21 +565,11 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 		21,20,23,21,23,22}; 
 
 
-
-
-	
-
-	//cube->noVerts = 24;
-	//cube->indexSize = indexSize;
 	setVertexDetails(*cube, 1, indexSize, 24);
 	storeIndexedModel(cube, v, index);
 	CVertexObj* vertObj = &Renderer.getVertexObj(cube->hVertexObj);
-	//vertObj->indexSize = indexSize;
-	//vertObj->noVerts = 24;
-
 
 	modelList.push_back(cube);
-
 	return cube;
 }
 
@@ -688,13 +678,9 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	index[i++] = top; index[i++] =  top+finalSeg; index[i++] = bot+finalSeg;
 
 	CModel* cylinder = new CModel(pos);
-//	cylinder->noVerts =noVerts;// noTriangles * 3;
-	//cylinder->indexSize = i;
+
 	setVertexDetails(*cylinder, 1, i, noVerts);
 	storeIndexedModel(cylinder,v, index );
-	CVertexObj* vertObj = &Renderer.getVertexObj(cylinder->hVertexObj);
-	//vertObj->indexSize = i;
-	//vertObj->noVerts = noVerts;
 
 	delete[] v;
 	delete[] index;
@@ -732,6 +718,8 @@ void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
 
 /** Free the various graphics memory buffers connected to this model.*/
 void CEngine::freeModel(CModel* model) {
+	if (!model->hVertexObj)
+		return;
 	CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
 	Renderer.freeBuffer(vertObj->hBuffer);
 	if (vertObj->hIndex > 0)
@@ -796,7 +784,7 @@ unsigned int CEngine::drawModelCount(CModel& model) {
 }
 
 void CEngine::setVertexDetails(CModel & model, int noAttribs, int noIndices, int noVerts) {
-	if (!model.hVertexObj)
+	if (!model.hVertexObj) 
 		model.hVertexObj = Renderer.createVertexObj();
 	CVertexObj* vertObj = &Renderer.getVertexObj(model.hVertexObj);
 	vertObj->nAttribs = noAttribs;

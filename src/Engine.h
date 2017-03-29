@@ -117,21 +117,14 @@ public:
 	/** Send these indexed vertices to the graphics hardware to be buffered, and register them with the given model. */
 	template <typename T>
 	void storeIndexedModel(CModel* model, T* verts,unsigned short* index) {
-		//create a buffer and assign it to the model
-		if (!model->hVertexObj)
-			model->hVertexObj = Renderer.createVertexObj();
-
 		CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
 		Renderer.storeVertexData(vertObj->hBuffer,(glm::vec3*)verts, vertObj->noVerts * sizeof(T));
-	//	Renderer.getVertexObj(model->hVertexObj).hBuffer = model->hBuffer;
 
 		Renderer.storeIndexData(vertObj->hIndex,index, sizeof(unsigned short) * vertObj->indexSize);
-		//Renderer.getVertexObj(model->hVertexObj).hIndex = model->hIndex;
 
 		int nAttributes = sizeof(T) / sizeof(glm::vec3);
-		Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer, vertObj->hIndex,/*model->nAttribs*/sizeof(T) / sizeof(glm::vec3));
+		Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer, vertObj->hIndex,sizeof(T) / sizeof(glm::vec3));
 		Renderer.getVertexObj(model->hVertexObj).nAttribs = nAttributes;
-		//Renderer.getVertexObj(model->hVertexObj).hVAO = model->hVAO;
 	}
 	void freeModel(CModel* model);
 	unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf);
