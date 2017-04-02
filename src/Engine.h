@@ -14,6 +14,7 @@
 #include "renderer\model.h"
 #include "renderer\light.h"
 #include "isoSurface.h"
+#include "terrain.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -103,11 +104,7 @@ public:
 	void setShaderValue(int handle,T& value) {
 		Renderer.setShaderValue(handle,value);
 	}
-	/*void setShaderValue(int vecHandle,glm::vec4& vector);
-	void setShaderValue(int intHandle,int value);
-	void setShaderValue(int floatHandle, float value);
-	void setShaderValue(int matrixHandle,glm::mat4& value);
-	void setShaderValue(int matrixHandle,glm::mat3& value); */
+
 	void acquireDataLocations(int progam);
 	void setCurrentShader(int program);
 	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
@@ -135,6 +132,9 @@ public:
 	unsigned int acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel& model, int noAttribs, int noIndices, int noVerts);
+	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices, int bufSize);
+	CModel* createModel();
+	CTerrain* createTerrain();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -181,6 +181,7 @@ public:
 	CRegisteredSpriteList RegisteredSpriteList;
 	std::vector<CCamera*> cameraList; ///<Tracks engine-created cameras.
 	std::vector<CModel*> modelList; ///<Tracks engine-created models.
+	//TO DO: scrap above and use name
 	
 	public:
 	C2DVector userScale; ///<Scaling factor applied to user drawing, every frame.
@@ -191,6 +192,8 @@ public:
 	unsigned int rNormalModelToCameraMatrix;
 	unsigned int rMVPmatrix; ///<Handle to the standard shader combined MVP matrix.
 	
+
+	std::vector<CRenderModel*> renderModelList; ///<Tracks engine-created models.
 };
 
 const int NoCursor = -1;

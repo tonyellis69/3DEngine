@@ -12,6 +12,9 @@
 
 using namespace std;
 
+//int totalbufsize = 0;
+//int totalchunks = 0;
+
 /** Initialise the high-level renderer. */
 CRenderer::CRenderer() {
 	myhRC = NULL;
@@ -451,7 +454,6 @@ void CRenderer::drawModel(CModel& model) {
 		glDrawElements(model.drawMode, vertObj->indexSize, GL_UNSIGNED_SHORT, 0);
 	
 	glBindVertexArray(0);
-	int error = glGetError();
 }
 
 float g_vertex_buffer_data[] = { 
@@ -596,6 +598,10 @@ unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPe
 //	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, size, buffer);
 
 	int outSize = primitives * vertsPerPrimitive * sizeof(glm::vec4);
+	cerr << "/nchunk size " << outSize;
+	totalbufsize += outSize;
+	totalchunks++;
+
 	GLuint dest;
 	glGenBuffers(1, &dest);
 	glBindBuffer(GL_COPY_WRITE_BUFFER , dest);
@@ -694,6 +700,8 @@ unsigned int CRenderer::createVertexObj() {
 CVertexObj& CRenderer::getVertexObj(unsigned int index) {
 	return vertexObjList[index - 1];
 }
+
+
 
 
 

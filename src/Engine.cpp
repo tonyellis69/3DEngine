@@ -521,7 +521,10 @@ CCamera* CEngine::createCamera(glm::vec3& pos) {
 
 /** Create a cube model. */
 CModel* CEngine::createCube(glm::vec3& pos,float size) {
-	CModel* cube = new CModel(pos);
+	//CModel* cube = new CModel(pos);
+
+	CModel* cube = createModel();
+	cube->setPos(pos);
 
 	float r = size/2.0f;
 	glm::vec3 A(-r,r,r);
@@ -565,9 +568,10 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 		21,20,23,21,23,22}; 
 
 
-	setVertexDetails(*cube, 1, indexSize, 24);
-	storeIndexedModel(cube, v, index);
-	CVertexObj* vertObj = &Renderer.getVertexObj(cube->hVertexObj);
+	//setVertexDetails(*cube, 1, indexSize, 24);
+	//storeIndexedModel(cube, v, index);
+	
+	cube->storeIndexed(3, v, 24, index, indexSize);
 
 	modelList.push_back(cube);
 	return cube;
@@ -593,7 +597,9 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 	//TO DO: create a MVP matrix and send that instead
 	setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
 
-	Renderer.drawModel(model);
+	model.drawNew();
+
+	//Renderer.drawModel(model);
 }
 
 void CEngine::drawModel(CModel& model) {
@@ -677,10 +683,14 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	index[i++] = bot+finalSeg; index[i++] =  bot; index[i++] = top;
 	index[i++] = top; index[i++] =  top+finalSeg; index[i++] = bot+finalSeg;
 
-	CModel* cylinder = new CModel(pos);
+	//CModel* cylinder = new CModel(pos);
+	CModel* cylinder = createModel();
+	cylinder->setPos(pos);
 
-	setVertexDetails(*cylinder, 1, i, noVerts);
-	storeIndexedModel(cylinder,v, index );
+
+//	setVertexDetails(*cylinder, 1, i, noVerts);
+//	storeIndexedModel(cylinder,v, index );
+	cylinder->storeIndexed(3, v, noVerts, index, i);
 
 	delete[] v;
 	delete[] index;
@@ -701,16 +711,11 @@ void CEngine::renderTo2DTexture(glm::vec2 size, int* buf) {
 
 /** Send these vertices to the graphics hardware to be buffered, and register them with the given model. */
 void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
-	if (!model->hVertexObj)
-		model->hVertexObj = Renderer.createVertexObj();
 	CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
 	vertObj->noVerts = noVerts;
 	Renderer.storeVertexData(vertObj->hBuffer,verts, noVerts * vertObj->nAttribs * sizeof(glm::vec3));
-	vertObj->hIndex = 0; //model->hIndex = 0;
-	//vertObj->hBuffer = model->hBuffer;
+	vertObj->hIndex = 0; 
 	Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer,0, vertObj->nAttribs);
-	//vertObj->hVAO = model->hVAO;
-	//vertObj->nAttribs = model->nAttribs;
 	vertObj->indexSize = 0;
 }
 
@@ -756,8 +761,7 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 
 /** Run geometry feedback on the given input model, and return with the thus-created model in destModel. */
 unsigned int CEngine::acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel) {
-	if (!destModel.hVertexObj)
-		destModel.hVertexObj = Renderer.createVertexObj();
+
 	CVertexObj* dest = &Renderer.getVertexObj(destModel.hVertexObj);
 
 	unsigned int noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, dest->hBuffer);
@@ -783,6 +787,7 @@ unsigned int CEngine::drawModelCount(CModel& model) {
 	return Renderer.query();
 }
 
+/** Set the details the renderer needs to store the vertices of this model in graphics memory. */
 void CEngine::setVertexDetails(CModel & model, int noAttribs, int noIndices, int noVerts) {
 	if (!model.hVertexObj) 
 		model.hVertexObj = Renderer.createVertexObj();
@@ -792,11 +797,42 @@ void CEngine::setVertexDetails(CModel & model, int noAttribs, int noIndices, int
 	vertObj->indexSize = noIndices;
 }
 
+/** Set the details the renderer needs to store the vertices of this multidraw model in graphics memory. */
+void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices, int bufSize) {
+	//set usual vertex details
+	setVertexDetails(model, noAttribs, noIndices, 0);
+
+	//reserve the requested block of graphics memory
+	//have to ask renderer to do this, because it's OpenGL related. It may as well have a wrapper class to
+	//handle all the issues. Rest of engine can refer to it via a handle.
+	//We ask the render to create an instance of this multibuffer
+	//and reserve the graphics memory at the same time
+}
+
+/**	Create a CModel (subclassed to CRenderModel) and return a pointer to it. */
+CModel * CEngine::createModel() {
+	CRenderModel* model = new CRenderModel();
+	model->pRenderer = &Renderer;
+	renderModelList.push_back(model);
+	return model;
+}
+
+/**	Create a CTerrain (subclassed to CRenderTerrain) and return a pointer to it. */
+CTerrain * CEngine::createTerrain() {
+	CRenderTerrain* terrain = new CRenderTerrain();
+	terrain->pRenderer = &Renderer;
+	//renderModelList.push_back(model);
+	return terrain;
+}
+
+
 
 CEngine::~CEngine(void) {
 	for (size_t c=0;c<cameraList.size();c++)
 		delete cameraList[c];
 	for (size_t m=0;m<modelList.size();m++)
 		delete modelList[m];
+	for (size_t m = 0; m < renderModelList.size(); m++)
+		;// delete renderModelList[m];
 	Renderer.detachWindow();
 }

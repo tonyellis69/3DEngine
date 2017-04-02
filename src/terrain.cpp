@@ -17,7 +17,10 @@ using namespace watch;
 
   CSuperChunk*  dbgSC = NULL;
 
-CTerrain::CTerrain() : C3dObject() {
+ int totalbufsize = 0;
+ int totalchunks = 1;
+
+CTerrain::CTerrain() : CModelMulti() {
 	totalTris = 0;
 	chunkOrigin = glm::translate(glm::mat4(1), getPos());
 }
@@ -314,7 +317,12 @@ void CTerrain::freeChunk(Chunk* chunk) {
 
 void CTerrain::update() {
 	//return;
-		watch::watch1 << "total tris: " << totalTris;
+		//watch::watch1 << "total tris: " << totalTris;
+	watch::watch1 << "tot buf " << totalbufsize;
+	watch::watch1 << " cnks " << totalchunks;
+	watch::watch1 << " avg " << (totalbufsize/totalchunks);
+
+
 		CSuperChunk *sc = layers[0].faceGroup[0][0];
 	
 	//Skin the next chunk on the list that needs it, if any. */
@@ -368,7 +376,7 @@ void CTerrain::advance(Tdirection dir) {
 		return;
 	//find the axis along which we're scrolling 0=x,1=y,z=2, and the direction, 1 or -1.
 	int scrollAxis = getAxis(dir);
-	int scrollDir = dirToVec(dir)[scrollAxis];//-1 when scrolling-in from the north
+	int scrollDir = (int)dirToVec(dir)[scrollAxis];//-1 when scrolling-in from the north
 	i32vec3 scrollVec(0,0,0);
 	scrollVec[scrollAxis] = scrollDir;
 
@@ -498,6 +506,14 @@ CTerrain::~CTerrain() {
 }
 
 
+/** Create a multidraw buffer of the requested size. */
+void CRenderTerrain::setMultiBufferSize(unsigned int bufSize,unsigned int noObjects) {
+	pRenderer->storeVertexData(multiBuf.hBuffer, 0, bufSize);
+	multiBuf.setMultiBufferSize(bufSize, noObjects);
+}
+
+
+
 CTerrainLayer::CTerrainLayer() {
 	scrollState = i32vec3(0);
 	shifted[0] = shifted[1] = shifted[2] = shifted[3] = shifted[4] = shifted[5] = false;
@@ -510,9 +526,9 @@ bool CTerrainLayer::advance(i32vec3& scrollVec) {
 
 	//jump all chunks along one chunk relative to terrain, to compensate for terrain being jumped back to
 	//starting position elsewhere
+	vec3 step = vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize;
 	for (size_t s=0;s<superChunks.size();s++) {
-		//superChunks[s]->shiftChunksBy1(vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
-		superChunks[s]->nwWorldPos -= (vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize );
+		superChunks[s]->nwWorldPos -= step;
 	}
 	//superChunks[0]->terrain->chunkOrigin = glm::translate(superChunks[0]->terrain->chunkOrigin, vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize);
 	//TO DO: evil hack to get at terrain! Fix!
@@ -536,6 +552,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	int scrollAxis = getAxis(scrollVec);
 
 	float LoDscale = (float) (1 << (LoD-1));
+	vec3 step = vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize * LoDscale;
 	for (size_t s=0;s<superChunks.size();s++) { 
 		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
@@ -545,7 +562,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 		superChunks[s]->shrinkBoundary(scrollDir); //shrink boundary where we've mode chunks out
 		superChunks[s]->extendBoundary(flipDir(scrollDir)); //extend boundary where we've moved chunks along
 		
-		superChunks[s]->nwWorldPos += (vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize * LoDscale);
+		superChunks[s]->nwWorldPos += step;
 
 		
 	}

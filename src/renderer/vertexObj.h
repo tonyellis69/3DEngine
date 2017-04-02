@@ -19,8 +19,6 @@ public:
 	int indexSize; ///<Number of indices used by buffer.
 	int normOffset; ///<Start of normal values in buffer
 
-
-
 	unsigned int nTris; ///<Number of triangles
 };
 

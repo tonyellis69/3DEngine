@@ -2,6 +2,10 @@
 
 #include "3dobject.h"
 #include <glew.h>//for GL_TRIANGLES
+#include "../vertBufs.h"
+#include "multiBuf.h"
+
+//class CRenderer;
 
 /** Class for 3d polygon models. 
 	NB: because vertices are ultimately stored with the graphics hardware,
@@ -11,15 +15,8 @@ public:
 	CModel();
 	CModel(glm::vec3& pos);
 	void init();
-
-	//unsigned int hBuffer; ///<Handle referencing object's buffered vertex data.
-	//int colourOffset; ///<Start of colour values in buffer.
-	//int noVerts;///<Total vertices in this model.
-	//int nAttribs; ///<Attributes per vertex.
-	//unsigned int hVAO; ///<References vertex array object for rendering this model.
-//	unsigned int hIndex; ///<Handle referencing index object for rendering this model.
-	//int indexSize; ///<Number of indices.
-	//int normOffset;
+	virtual void storeIndexed(int noAttribs, vBuf::T3Dvert *verts, unsigned int noVerts, unsigned short* index, int noIndices) {};
+	virtual void drawNew() {};
 
 	int drawMode; ///<Triangles, lines etc
 
@@ -29,4 +26,25 @@ public:
 
 private:
 
+};
+
+class CRenderer;
+
+class CRenderModel : public CModel {
+public:
+	CRenderModel();
+	void storeIndexed(int noAttribs, vBuf::T3Dvert* verts, unsigned int noVerts, unsigned short* index, int noIndices);
+	void drawNew();
+
+	CRenderer* pRenderer; ///<Lets models talk to renderer.
+};
+
+
+class CModelMulti : public CModel {
+public:
+	CModelMulti() : CModel() {};
+	CModelMulti(glm::vec3& pos) : CModel(pos) {};
+	virtual void setMultiBufferSize(unsigned int bufSize, unsigned int noObjects) {};
+
+	CMultiBuf multiBuf;
 };

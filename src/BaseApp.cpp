@@ -289,17 +289,17 @@ void CBaseApp::exit() {
 
 
 void CBaseApp::initWatches() {
-	wLabel1 = new CGUIlabel(800,100,300,50);
+	wLabel1 = new CGUIlabel(800,100,400,50);
 	wLabel1->txtColour = UIwhite;
 	wLabel1->TextFont = 0;
 	GUIroot.Add(wLabel1);
 
-	wLabel2 = new CGUIlabel(800,150,300,50);
+	wLabel2 = new CGUIlabel(800,150,400,50);
 	wLabel2->txtColour = UIwhite;
 	wLabel2->TextFont = 0;
 	GUIroot.Add(wLabel2);
 
-	wLabel3 = new CGUIlabel(800,200,300,50);
+	wLabel3 = new CGUIlabel(800,200,400,50);
 	wLabel3->txtColour = UIwhite;
 	wLabel3->TextFont = 0;
 	GUIroot.Add(wLabel3);

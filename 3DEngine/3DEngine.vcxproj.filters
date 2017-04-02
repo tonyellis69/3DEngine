@@ -170,6 +170,9 @@
     <ClCompile Include="..\src\renderer\vertexObj.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\multiBuf.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -356,6 +359,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\vertexObj.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\multiBuf.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>

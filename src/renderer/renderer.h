@@ -14,7 +14,10 @@ enum shaderType {vertex,frag,geometry };
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 
+extern int totalbufsize;
+extern int totalchunks;
 
+class CModel;
 
 /** The high-level renderer class. */
 class CRenderer {

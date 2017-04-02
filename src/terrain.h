@@ -5,7 +5,7 @@
 #include "Delegate.h"
 #include <glm/glm.hpp>
 #include "chunk.h"
-//#include "cnode.h"
+#include "renderer/renderer.h"
 #include "direction.h"
 
 #include <vector>
@@ -25,13 +25,14 @@ class CTerrainLayer;
 
 
 
+
 class CSkinningOrder;
 
 typedef std::vector<std::vector<std::vector<CSuperChunk*>>> T3dArray;
 
 extern CSuperChunk*  dbgSC;
 
-class CTerrain : public C3dObject  {
+class CTerrain : public CModelMulti  {
 public:
 	CTerrain();
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
@@ -82,7 +83,11 @@ public:
 	std::vector<CTerrainLayer> layers; ///<A simple list of all the layers of this terrain.
 
 	glm::mat4 chunkOrigin; ///<Chunks are drawn relative to this point;
+
+	
 	};
+
+
 
 /** Represents one of a terrain's concentric layers of superchunks. */
 class CTerrainLayer {
@@ -100,7 +105,7 @@ public:
 	
 	bool shifted[6];
 	float LoD1cubeSize;
-	float cubesPerChunkEdge;
+	int cubesPerChunkEdge;
 
 	std::vector<CSuperChunk*> faceGroup[6];
 };
@@ -110,7 +115,21 @@ class CSkinningOrder {
 public:
 	CSuperChunk* parentSC;
 	Chunk* chunk;
-	//CSuperChunk* overlappedSC;
 };
 
+class CRenderer;
 
+class CRenderTerrain: public CTerrain {
+public:
+	
+	/** Create a multidraw buffer of the requested size. */
+	void setMultiBufferSize(unsigned int bufSize, unsigned int noObjects);
+
+
+
+
+	CRenderer* pRenderer; ///<Lets terrain talk to renderer.
+	unsigned int hBuffer; ///<Handle for the (OpenGL) multidraw buffer.
+	unsigned int freeMem; ///<Offset into the buffer at which free memory starts;
+
+};
