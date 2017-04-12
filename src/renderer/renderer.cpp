@@ -15,6 +15,7 @@ using namespace std;
 //int totalbufsize = 0;
 //int totalchunks = 0;
 
+
 /** Initialise the high-level renderer. */
 CRenderer::CRenderer() {
 	myhRC = NULL;
@@ -311,14 +312,11 @@ unsigned int CRenderer::attachShaders() {
 /** Store the given vertex data in a buffer and return a handle.*/
 void CRenderer::storeVertexData(unsigned int& handle, glm::vec3* data,int size) {
 	if (handle ==0) {
-		//glGenBuffers(1, &vertexBufferObject); //TO DO: generate buffer name *only* if it's still 0
 		glGenBuffers(1, &handle); //TO DO: generate buffer name *only* if it's still 0
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, handle);
-	glBufferData(GL_ARRAY_BUFFER,  size, (void*)data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER,  size, (void*)data, GL_DYNAMIC_DRAW); //was static
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	
 }
 
 /** Store the given index data in a buffer and return a handle.*/
@@ -328,7 +326,7 @@ void CRenderer::storeIndexData(unsigned int& hIndex, unsigned short* data,int si
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, (void*)data, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	//glFinish(); //TO DO: temp!
+
 	
 }
 
@@ -443,16 +441,12 @@ void CRenderer::setShader(int program) {
 
 }
 
-void CRenderer::drawModel(CModel& model) {
-
-	CVertexObj* vertObj = &getVertexObj(model.hVertexObj);
-
-	glBindVertexArray(vertObj->hVAO);
-	if (vertObj->hIndex == 0)
-		glDrawArrays(model.drawMode, 0, vertObj->noVerts);
+void CRenderer::drawModel(CRenderModel& model) {
+	glBindVertexArray(model.buf.hVAO);
+	if (model.buf.hIndex == 0)
+		glDrawArrays(model.drawMode, 0, model.buf.noVerts);
 	else
-		glDrawElements(model.drawMode, vertObj->indexSize, GL_UNSIGNED_SHORT, 0);
-	
+		glDrawElements(model.drawMode, model.buf.indexSize, GL_UNSIGNED_SHORT, 0);
 	glBindVertexArray(0);
 }
 
@@ -560,9 +554,12 @@ void CRenderer::renderTo2DTexture(int shader, int w, int h, int* buf) {
 }
 
 
-/** Draw the model with the given shader, offscreen, and store the returned vertex data
+/** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf) {	
+//TO DO: returns the data in the user-supplied buffer (repurpose CVertexObj as the single buffer to multibuf's multibuf. Down to the user to
+//provide a buffer big enough
+unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf,unsigned int multiBufferOffset) {
+
 	glEnable(GL_RASTERIZER_DISCARD);
 
 	GLuint tbo;
@@ -583,8 +580,10 @@ unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPe
 
 
 	glBeginTransformFeedback(GL_TRIANGLES);
-	drawModel(model);
+	//drawModel(model);
+	model.drawNew();
 	glEndTransformFeedback();
+
 
 //	glEndQuery(GL_TIME_ELAPSED);
 	glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
@@ -593,23 +592,41 @@ unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPe
 	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
 //	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
 	
+	if (primitives == 0) {
+
+		glDisable(GL_RASTERIZER_DISCARD);
+
+		//empty the internal buffer
+		freeBuffer(tbo);
+		return 0; //TO DO fix should not happen
+	}
 
 	
-//	glGetBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, 0, size, buffer);
-
-	int outSize = primitives * vertsPerPrimitive * sizeof(glm::vec4);
-	cerr << "/nchunk size " << outSize;
+	int outSize = primitives * 3 * sizeof(vBuf::T3Dvert);
 	totalbufsize += outSize;
 	totalchunks++;
 
-	GLuint dest;
-	glGenBuffers(1, &dest);
-	glBindBuffer(GL_COPY_WRITE_BUFFER , dest);
-	glBufferData(GL_COPY_WRITE_BUFFER , outSize, NULL, GL_STATIC_READ);
+	
 
-	glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, outSize);
-	hFeedBackBuf = dest;
+	if (multiBufferOffset > 0) {
 
+
+		glBindBuffer(GL_COPY_WRITE_BUFFER, hFeedBackBuf);
+		
+		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0,  multiBufferOffset-1, outSize);
+	}
+	else { 
+		GLuint dest;
+		glGenBuffers(1, &dest);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, dest);
+		glBufferData(GL_COPY_WRITE_BUFFER, outSize, NULL, GL_STATIC_READ);
+
+
+		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, outSize);
+		hFeedBackBuf = dest;
+	}
+	glBindBuffer(GL_COPY_WRITE_BUFFER,0);
+	
 	glDisable(GL_RASTERIZER_DISCARD);
 
 	//empty the internal buffer
@@ -688,17 +705,95 @@ unsigned int CRenderer::query() {
 	return primitives;
 }
 
-/** Create a vertex object, stored internally , and return a handle to it. */
-unsigned int CRenderer::createVertexObj() {
-	CVertexObj newObj;
-	glGenBuffers(1, &newObj.hBuffer);
-	vertexObjList.push_back(newObj);
-	return vertexObjList.size(); //Externally we use index+1 so that 0 = unassigned.
-}
 
-/** Return a reference to the given vertex object. */
-CVertexObj& CRenderer::getVertexObj(unsigned int index) {
-	return vertexObjList[index - 1];
+
+void CRenderer::drawMultiModel(CModelMulti & model) {
+	
+	//glBindVertexArray(0);
+	//for (int object = 0; object < 84 /*model.multiBuf.currentObjects */; object++) {
+	//int object = 84;
+	
+		//glDrawArrays(GL_TRIANGLES, model.multiBuf.first[object], model.multiBuf.count[object]);
+	//	glDrawArrays(GL_TRIANGLES, 63828, 3435);
+
+	
+	//	drawModel(tmpChunk);
+	//	glDrawArrays(GL_TRIANGLES, 0, 3435);
+	//}	
+		
+		//CVertexObj* obj2 = &getVertexObj(tmpBig.hVertexObj);
+	
+
+		//glBindBuffer(GL_COPY_READ_BUFFER, obj->hBuffer);
+	//glBindBuffer(GL_COPY_WRITE_BUFFER, model.multiBuf.hBuffer);
+
+	//glBindBuffer(GL_COPY_READ_BUFFER, model.multiBuf.hBuffer);
+	//glBindBuffer(GL_COPY_WRITE_BUFFER, tmpBig->multiBuf.hBuffer);
+
+	//glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 200000000);
+	unsigned int err = glGetError();
+
+	glBindVertexArray(model.multiBuf.hVAO);
+
+	int c = 0;
+	for (int object = 0; object < model.multiBuf.currentObjects; object++) {
+		c++;
+		if (c == 40) {
+
+			glBindVertexArray(model.multiBuf.hVAO);
+			c = 0;
+		}
+		glDrawArrays(GL_TRIANGLES, model.multiBuf.first[object], model.multiBuf.count[object]);
+	
+		
+	}
+//	drawModel(tmpChunk);
+	//glBindVertexArray(0);
+	
+	//glMultiDrawArrays(GL_TRIANGLES, model.multiBuf.first, model.multiBuf.count, model.multiBuf.currentObjects);
+		//glDrawArrays(GL_TRIANGLES, 0, 3435*2000);
+		//glDrawArrays(GL_TRIANGLES, 0, 3435);
+		
+		//glDrawArrays(GL_TRIANGLES, 63828, 3435);
+	
+
+
+
+
+
+
+
+
+
+
+
+	
+
+//	glDrawArrays(GL_TRIANGLES, 63828 + tmpV, 5);
+
+//	tmpV++;
+//	if (tmpV > 3425)
+	//	tmpV = 0;
+
+
+
+//glDrawArrays(GL_TRIANGLES, 66015, 5);
+
+	/*if (tmp) {
+		vBuf::T3Dvert* tmpPtr;
+		tmpPtr = new vBuf::T3Dvert[20000000];
+		glBindBuffer(GL_ARRAY_BUFFER, model.multiBuf.hBuffer);
+		
+		glGetBufferSubData(GL_ARRAY_BUFFER, (63828+355) * model.multiBuf.elemSize, 20000000, tmpPtr);
+		cerr << "\n***********************************************";
+		for (int count = 0; count < (model.multiBuf.count[84]); count++) {
+			cerr << "\n" << tmpPtr[count].v.x; cerr << " " << tmpPtr[count].v.y; cerr << " " << tmpPtr[count].v.z;
+			cerr << " " << tmpPtr[count].colour.r; cerr << " " << tmpPtr[count].colour.g; cerr << " " << tmpPtr[count].colour.b;
+			cerr << " " << tmpPtr[count].normal.x; cerr << " " << tmpPtr[count].normal.y; cerr << " " << tmpPtr[count].normal.z;
+		}
+		tmp = false;
+	}*/
+
 }
 
 

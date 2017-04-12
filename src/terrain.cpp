@@ -507,9 +507,24 @@ CTerrain::~CTerrain() {
 
 
 /** Create a multidraw buffer of the requested size. */
-void CRenderTerrain::setMultiBufferSize(unsigned int bufSize,unsigned int noObjects) {
+void CRenderTerrain::setMultiBufferSize(unsigned int bufSize,unsigned int maxObjects, int noAttribs, int elemSize) {
 	pRenderer->storeVertexData(multiBuf.hBuffer, 0, bufSize);
-	multiBuf.setMultiBufferSize(bufSize, noObjects);
+	multiBuf.setMultiBufferSize(bufSize, maxObjects);
+	multiBuf.nAttribs = noAttribs;
+	multiBuf.elemSize = elemSize;
+	pRenderer->storeVertexLayout(multiBuf.hVAO, multiBuf.hBuffer, 0, noAttribs);
+
+	//multiBuf.ptr = new vBuf::T3Dvert[maxObjects * elemSize];
+}
+
+
+void CRenderTerrain::reserveBuf(unsigned int elementsUsed) {
+	multiBuf.reserve(elementsUsed);
+
+}
+
+unsigned int CRenderTerrain::getBuffer() {
+	return multiBuf.hBuffer;
 }
 
 

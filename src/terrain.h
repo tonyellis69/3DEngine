@@ -123,13 +123,13 @@ class CRenderTerrain: public CTerrain {
 public:
 	
 	/** Create a multidraw buffer of the requested size. */
-	void setMultiBufferSize(unsigned int bufSize, unsigned int noObjects);
-
-
+	void setMultiBufferSize(unsigned int bufSize, unsigned int noObjects, int noAttribs, int elemSize);
+	void reserveBuf(unsigned int size);
+	unsigned int getBuffer();
 
 
 	CRenderer* pRenderer; ///<Lets terrain talk to renderer.
 	unsigned int hBuffer; ///<Handle for the (OpenGL) multidraw buffer.
 	unsigned int freeMem; ///<Offset into the buffer at which free memory starts;
-
+	
 };

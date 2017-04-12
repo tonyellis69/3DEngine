@@ -78,6 +78,7 @@ void C2dRenderer::drawToTextBuffer(TRect* rect,float x, float y) {
 
 /** Draw the contents of the text buffer. */
 void C2dRenderer::drawTextBuffer() {
+	glBindVertexArray(0);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	//set up pointers

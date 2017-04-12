@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 #include "model.h"
 #include "vertexObj.h"
+#include "..\terrain.h"
 
 enum shaderType {vertex,frag,geometry };
 
@@ -16,6 +17,9 @@ enum renderTextureFormat {floatTex,intTex, uintTex};
 
 extern int totalbufsize;
 extern int totalchunks;
+
+
+class CRenderTerrain;
 
 class CModel;
 
@@ -57,20 +61,19 @@ public:
 	void setShaderValue(int intHandle,int value);
 	void setShaderValue(int floatHandle, float value);
 	void setShader(int program);
-	void drawModel(CModel& model);
+	void drawModel(CRenderModel& model);
 	void initRenderToTextureBufs();
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
-	unsigned int getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf);
+	unsigned int getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
 	unsigned int createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	void initQuery();
 	unsigned int query();
-	unsigned int createVertexObj();
-	CVertexObj& getVertexObj(unsigned int index);
+	void drawMultiModel(CModelMulti& model);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -90,8 +93,7 @@ public:
 
 	C2dRenderer rend2d; ///<2D renderer.
 
-	std::vector<CVertexObj> vertexObjList; ///<A list of vertex objects representing vertex buffers.
-
+	
 
 
 private:

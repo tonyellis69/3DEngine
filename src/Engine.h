@@ -113,28 +113,35 @@ public:
 	void storeModel(CModel* model, glm::vec3* verts, int noVerts);
 	/** Send these indexed vertices to the graphics hardware to be buffered, and register them with the given model. */
 	template <typename T>
-	void storeIndexedModel(CModel* model, T* verts,unsigned short* index) {
-		CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
-		Renderer.storeVertexData(vertObj->hBuffer,(glm::vec3*)verts, vertObj->noVerts * sizeof(T));
+	void storeIndexedModel(CModel* model, T* verts, unsigned int noVerts,  unsigned short* index) {
+		//CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
+		//Renderer.storeVertexData(vertObj->hBuffer,(glm::vec3*)verts, noVerts * sizeof(T));
+		model->storeVertexData(verts, noVerts, sizeof(T));
 
-		Renderer.storeIndexData(vertObj->hIndex,index, sizeof(unsigned short) * vertObj->indexSize);
-
+		//Renderer.storeIndexData(vertObj->hIndex,index, sizeof(unsigned short) * vertObj->indexSize);
+		model->storeIndexedData(index);
+	
 		int nAttributes = sizeof(T) / sizeof(glm::vec3);
-		Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer, vertObj->hIndex,sizeof(T) / sizeof(glm::vec3));
-		Renderer.getVertexObj(model->hVertexObj).nAttribs = nAttributes;
+		//Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer, vertObj->hIndex,sizeof(T) / sizeof(glm::vec3));
+		model->storeVertexLayout(((CRenderModel*)model)->buf.hIndex);
+
+		//Renderer.getVertexObj(model->hVertexObj).nAttribs = nAttributes;
+		((CRenderModel*)model)->buf.nAttribs = nAttributes;
 	}
 	void freeModel(CModel* model);
-	unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf);
+	unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
 	unsigned int createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	unsigned int acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel);
+	unsigned int acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel);
 	unsigned int drawModelCount(CModel& model);
-	void setVertexDetails(CModel& model, int noAttribs, int noIndices, int noVerts);
-	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices, int bufSize);
+	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
+	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);
 	CModel* createModel();
 	CTerrain* createTerrain();
+	void drawMultiModel(CModelMulti& model);
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;

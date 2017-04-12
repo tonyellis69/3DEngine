@@ -603,7 +603,7 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 }
 
 void CEngine::drawModel(CModel& model) {
-	Renderer.drawModel(model);
+	Renderer.drawModel((CRenderModel&)model);
 }
 
 
@@ -711,33 +711,25 @@ void CEngine::renderTo2DTexture(glm::vec2 size, int* buf) {
 
 /** Send these vertices to the graphics hardware to be buffered, and register them with the given model. */
 void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
-	CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
-	vertObj->noVerts = noVerts;
-	Renderer.storeVertexData(vertObj->hBuffer,verts, noVerts * vertObj->nAttribs * sizeof(glm::vec3));
-	vertObj->hIndex = 0; 
-	Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer,0, vertObj->nAttribs);
-	vertObj->indexSize = 0;
+	//Renderer.storeVertexData(vertObj->hBuffer,verts, noVerts * vertObj->nAttribs * sizeof(glm::vec3));
+	model->storeVertexData(verts, noVerts, sizeof(glm::vec3));
+	//Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer,0, vertObj->nAttribs);
+	model->storeVertexLayout(0);
 }
 
 
 
 /** Free the various graphics memory buffers connected to this model.*/
 void CEngine::freeModel(CModel* model) {
-	if (!model->hVertexObj)
-		return;
-	CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
-	Renderer.freeBuffer(vertObj->hBuffer);
-	if (vertObj->hIndex > 0)
-		Renderer.freeBuffer(vertObj->hIndex);
-	Renderer.freeVAO(vertObj->hVAO);
+	model->freeBuffers();
 	model->init();
 }
 
 
 /** Draw the model with the given shader, offscreen, and store the returned vertex data
 	in the buffer. */
-unsigned int CEngine::getGeometryFeedback(CModel& model, int size,int vertsPerPrimitive, unsigned int& hFeedBackBuf) {
-	return Renderer.getGeometryFeedback(model,size, vertsPerPrimitive,hFeedBackBuf);
+unsigned int CEngine::getGeometryFeedback(CModel& model, int size,int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset) {
+	return Renderer.getGeometryFeedback(model,size, vertsPerPrimitive,hFeedBackBuf, multiBufferOffset);
 }
 
 
@@ -761,46 +753,61 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 
 /** Run geometry feedback on the given input model, and return with the thus-created model in destModel. */
 unsigned int CEngine::acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel) {
+	//TO DO: messy! should simply pass destModel to getGeometryFeedback...
+	unsigned int hBuffer = destModel.getBuffer();
+	unsigned int noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, hBuffer,0);
 
-	CVertexObj* dest = &Renderer.getVertexObj(destModel.hVertexObj);
-
-	unsigned int noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, dest->hBuffer);
+	unsigned int noVerts = noPrimitives * 3; //assuming primitives are triangles
 
 	
 
-	//destModel.noVerts = noPrimitives*3; //assuming primitives are triangles
-	dest->noVerts = noPrimitives * 3; //assuming primitives are triangles
-//	dest->hBuffer = destModel.hBuffer;
+	//Renderer.storeVertexLayout(dest->hVAO,dest->hBuffer,0,dest->nAttribs);
+	destModel.setVertexDetails(3, noVerts, 0);//....making this redundant
 
-	Renderer.storeVertexLayout(dest->hVAO,dest->hBuffer,0,dest->nAttribs);
+	//dest->nTris = noPrimitives;
+	return noPrimitives;
+}
 
-	//destModel.hVAO = dest->hVAO;
+/** Run geometry feedback on the given input model, and place the vertices created in a free portion of the buffer of the given multimodel.*/
+unsigned int CEngine::acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel) {
 
-	dest->nTris = noPrimitives;
+
+	unsigned int hBuffer = destModel.getBuffer();
+
+	unsigned int multiBufferOffset = destModel.getFreeMem();
+	unsigned int noPrimitives =0;
+
+	noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, hBuffer, multiBufferOffset + 1);
+	
+	if (noPrimitives == 0)
+		return 0;
+	
+	
+	unsigned int elementsUsed = noPrimitives * 3; //3 verts per triangle
+
+	destModel.reserveBuf(elementsUsed);
+
+
+	//dest->nTris = noPrimitives;
 	return noPrimitives;
 }
 
 
 unsigned int CEngine::drawModelCount(CModel& model) {
 	Renderer.initQuery();
-	Renderer.drawModel(model);
+	model.drawNew();
 	return Renderer.query();
 }
 
 /** Set the details the renderer needs to store the vertices of this model in graphics memory. */
-void CEngine::setVertexDetails(CModel & model, int noAttribs, int noIndices, int noVerts) {
-	if (!model.hVertexObj) 
-		model.hVertexObj = Renderer.createVertexObj();
-	CVertexObj* vertObj = &Renderer.getVertexObj(model.hVertexObj);
-	vertObj->nAttribs = noAttribs;
-	vertObj->noVerts = noVerts;
-	vertObj->indexSize = noIndices;
+void CEngine::setVertexDetails(CModel * model, int noAttribs, int noIndices, int noVerts) {
+	model->setVertexDetails(noAttribs, noIndices, noVerts);
 }
 
 /** Set the details the renderer needs to store the vertices of this multidraw model in graphics memory. */
-void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices, int bufSize) {
+void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices, unsigned int bufSize) {
 	//set usual vertex details
-	setVertexDetails(model, noAttribs, noIndices, 0);
+	setVertexDetails(&model, noAttribs, noIndices, 0);
 
 	//reserve the requested block of graphics memory
 	//have to ask renderer to do this, because it's OpenGL related. It may as well have a wrapper class to
@@ -823,6 +830,10 @@ CTerrain * CEngine::createTerrain() {
 	terrain->pRenderer = &Renderer;
 	//renderModelList.push_back(model);
 	return terrain;
+}
+
+void CEngine::drawMultiModel(CModelMulti& model) {
+	Renderer.drawMultiModel(model);
 }
 
 
