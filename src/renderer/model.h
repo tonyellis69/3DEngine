@@ -4,7 +4,7 @@
 #include <glew.h>//for GL_TRIANGLES
 #include "../vertBufs.h"
 #include "multiBuf.h"
-#include "vertexObj.h"
+#include "buf.h"
 
 //class CRenderer;
 
@@ -25,6 +25,9 @@ public:
 	virtual void storeVertexLayout(unsigned int hIndex) {};
 	virtual void storeIndexedData(unsigned short* index) {};
 	virtual void freeBuffers() {};
+	virtual void storeVertexes(void* verts, unsigned int size, unsigned int nVerts) {};
+	virtual void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices) {};
+	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 
 	int drawMode; ///<Triangles, lines etc
 
@@ -50,10 +53,14 @@ public:
 	void storeVertexLayout(unsigned int hIndex);
 	void storeIndexedData(unsigned short* index);
 	void freeBuffers();
+	void storeVertexes(void* verts, unsigned int size, unsigned int nVerts);
+	void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices);
+	void storeLayout(int attr1, int attr2, int attr3, int attr4);
+
 
 
 	CRenderer* pRenderer; ///<Lets models talk to renderer.
-	CVertexObj buf; ///<Holds the details of this model's vertex buffer.
+	CBuf buf; ///<Holds the details of this model's vertex buffer.
 };
 
 

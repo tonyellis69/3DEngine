@@ -1,7 +1,8 @@
 #include "renderer.h"
 #include <windows.h> 
 //#include <gl/gl.h>
-
+#include <glew.h>
+#include <wglew.h>
 #include "..\Macros.h"
 #include <iostream>
 #include <fstream>
@@ -446,7 +447,7 @@ void CRenderer::drawModel(CRenderModel& model) {
 	if (model.buf.hIndex == 0)
 		glDrawArrays(model.drawMode, 0, model.buf.noVerts);
 	else
-		glDrawElements(model.drawMode, model.buf.indexSize, GL_UNSIGNED_SHORT, 0);
+		glDrawElements(model.drawMode, model.buf.noIndices, GL_UNSIGNED_SHORT, 0);
 	glBindVertexArray(0);
 }
 
@@ -556,7 +557,7 @@ void CRenderer::renderTo2DTexture(int shader, int w, int h, int* buf) {
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-//TO DO: returns the data in the user-supplied buffer (repurpose CVertexObj as the single buffer to multibuf's multibuf. Down to the user to
+//TO DO: returns the data in the user-supplied buffer (repurpose CBuf as the single buffer to multibuf's multibuf. Down to the user to
 //provide a buffer big enough
 unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf,unsigned int multiBufferOffset) {
 
@@ -632,6 +633,93 @@ unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPe
 	//empty the internal buffer
 	freeBuffer(tbo);
 	
+	//	cerr << "\nChunk took: " << elapsed << " by query timer";
+
+	return primitives;
+}
+
+unsigned int CRenderer::getGeometryFeedback2(CModel& model, unsigned int maxSize, CBaseBuf& destBuf) {
+
+	glEnable(GL_RASTERIZER_DISCARD);
+
+	CBuf tmpBuf;
+	tmpBuf.setSize(maxSize);
+
+//	GLuint tbo;
+//	glGenBuffers(1, &tbo);
+//	glBindBuffer(GL_ARRAY_BUFFER, tbo);
+//	glBufferData(GL_ARRAY_BUFFER, bufSize, NULL, GL_STATIC_READ);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+	GLint elapsed = 0;
+	GLuint query, speedQuery, primitives;
+	glGenQueries(1, &query);
+	//glGenQueries(1, &speedQuery);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tmpBuf.hBuffer);
+
+	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
+	//glBeginQuery(GL_TIME_ELAPSED, speedQuery);
+
+
+	glBeginTransformFeedback(GL_TRIANGLES);
+	//drawModel(model);
+	model.drawNew();
+	glEndTransformFeedback();
+
+
+	//	glEndQuery(GL_TIME_ELAPSED);
+	glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
+
+
+	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
+	//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
+
+	if (primitives == 0) {
+
+		glDisable(GL_RASTERIZER_DISCARD);
+
+		//empty the internal buffer
+		//freeBuffer(tbo);
+		return 0; //TO DO fix should not happen
+	}
+
+
+	int outSize = primitives * 3 * sizeof(vBuf::T3Dvert);
+	totalbufsize += outSize;
+	totalchunks++;
+
+
+	//verts are in our temporary feedback buffer. Now we want to copy them to the user-supplied buffer, which may or may not be a multibuffer
+	//if it is a multibuffer, we want to say "here's this block of verts, find a space for it." So, some kind of copyBuffer method.
+	destBuf.copyBuf(tmpBuf,outSize);
+
+	/*
+
+	if (multiBufferOffset > 0) {
+
+
+		glBindBuffer(GL_COPY_WRITE_BUFFER, hFeedBackBuf);
+
+		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, multiBufferOffset - 1, outSize);
+	}
+	else {
+		GLuint dest;
+		glGenBuffers(1, &dest);
+		glBindBuffer(GL_COPY_WRITE_BUFFER, dest);
+		glBufferData(GL_COPY_WRITE_BUFFER, outSize, NULL, GL_STATIC_READ);
+
+
+		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, outSize);
+		hFeedBackBuf = dest;
+	}
+	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
+*/
+	glDisable(GL_RASTERIZER_DISCARD);
+
+	//empty the internal buffer
+	//freeBuffer(tbo);
+
 	//	cerr << "\nChunk took: " << elapsed << " by query timer";
 
 	return primitives;
@@ -721,7 +809,7 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 	//	glDrawArrays(GL_TRIANGLES, 0, 3435);
 	//}	
 		
-		//CVertexObj* obj2 = &getVertexObj(tmpBig.hVertexObj);
+		//CBuf* obj2 = &getVertexObj(tmpBig.hVertexObj);
 	
 
 		//glBindBuffer(GL_COPY_READ_BUFFER, obj->hBuffer);

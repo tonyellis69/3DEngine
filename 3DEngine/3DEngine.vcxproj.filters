@@ -167,10 +167,13 @@
     <ClCompile Include="..\src\direction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\vertexObj.cpp">
+    <ClCompile Include="..\src\renderer\multiBuf.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\multiBuf.cpp">
+    <ClCompile Include="..\src\renderer\buf.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\baseBuf.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -358,10 +361,13 @@
     <ClInclude Include="..\src\direction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\vertexObj.h">
+    <ClInclude Include="..\src\renderer\multiBuf.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\multiBuf.h">
+    <ClInclude Include="..\src\renderer\buf.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\baseBuf.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>

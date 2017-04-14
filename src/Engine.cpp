@@ -571,7 +571,10 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 	//setVertexDetails(*cube, 1, indexSize, 24);
 	//storeIndexedModel(cube, v, index);
 	
-	cube->storeIndexed(3, v, 24, index, indexSize);
+	//cube->storeIndexed(3, v, 24, index, indexSize);
+	cube->storeVertexes(v, sizeof(v), 24);
+	cube->storeIndex(index, sizeof(index), indexSize);
+	cube->storeLayout(3, 4, 3, 0);
 
 	modelList.push_back(cube);
 	return cube;
@@ -690,7 +693,12 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 
 //	setVertexDetails(*cylinder, 1, i, noVerts);
 //	storeIndexedModel(cylinder,v, index );
-	cylinder->storeIndexed(3, v, noVerts, index, i);
+	//cylinder->storeIndexed(3, v, noVerts, index, i);
+
+
+	cylinder->storeVertexes(v, sizeof(vBuf::T3Dvert) * noVerts, noVerts);
+	cylinder->storeIndex(index, sizeof(unsigned short) * i, i);
+	cylinder->storeLayout(3, 4, 3, 0);
 
 	delete[] v;
 	delete[] index;
@@ -792,6 +800,16 @@ unsigned int CEngine::acquireFeedbackModelMulti(CModel& srcModel, int feedbackBu
 	return noPrimitives;
 }
 
+// pass a CBaseBuf and get it back full of feedback verts
+unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, unsigned int maxSize, CBaseBuf& destBuf) {
+
+	unsigned int noPrimitives = 0;
+
+	noPrimitives = Renderer.getGeometryFeedback2(srcModel, maxSize,destBuf);
+
+	return noPrimitives;
+}
+
 
 unsigned int CEngine::drawModelCount(CModel& model) {
 	Renderer.initQuery();
@@ -834,6 +852,10 @@ CTerrain * CEngine::createTerrain() {
 
 void CEngine::drawMultiModel(CModelMulti& model) {
 	Renderer.drawMultiModel(model);
+}
+
+CBaseBuf * CEngine::createBuffer() {
+	return new CBuf();
 }
 
 

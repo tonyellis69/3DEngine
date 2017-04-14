@@ -15,6 +15,7 @@
 #include "renderer\light.h"
 #include "isoSurface.h"
 #include "terrain.h"
+#include "renderer\baseBuf.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -114,7 +115,7 @@ public:
 	/** Send these indexed vertices to the graphics hardware to be buffered, and register them with the given model. */
 	template <typename T>
 	void storeIndexedModel(CModel* model, T* verts, unsigned int noVerts,  unsigned short* index) {
-		//CVertexObj* vertObj = &Renderer.getVertexObj(model->hVertexObj);
+		//CBuf* vertObj = &Renderer.getVertexObj(model->hVertexObj);
 		//Renderer.storeVertexData(vertObj->hBuffer,(glm::vec3*)verts, noVerts * sizeof(T));
 		model->storeVertexData(verts, noVerts, sizeof(T));
 
@@ -136,12 +137,14 @@ public:
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	unsigned int acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel);
 	unsigned int acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel);
+	unsigned int acquireFeedbackVerts(CModel& srcModel, unsigned int maxSize, CBaseBuf& destBuf);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
 	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);
 	CModel* createModel();
 	CTerrain* createTerrain();
 	void drawMultiModel(CModelMulti& model);
+	CBaseBuf* createBuffer();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;

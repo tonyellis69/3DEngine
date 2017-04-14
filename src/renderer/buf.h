@@ -1,13 +1,22 @@
 #pragma once
+#include "baseBuf.h"
 #include <glew.h>
+#include <glm/glm.hpp>
 
 /** Holds all the data necessary to use a buffer of vertices uploaded to the 
 	graphics card.*/
-class CVertexObj
+class CBuf : public CBaseBuf
 {
 public:
-	CVertexObj();
-	~CVertexObj();
+	CBuf();
+	~CBuf();
+	void storeVertexes(void* verts, unsigned int size, unsigned int nVerts);
+	void storeIndex(unsigned short * indices, unsigned int size, unsigned int nIndices);
+	void storeLayout(int attr1, int attr2, int attr3, int attr4);
+	void setSize(unsigned int size);
+	void copyBuf(CBaseBuf& srcBuf, unsigned int size);
+	unsigned int getBufHandle();
+	unsigned int getBufSize();
 
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
@@ -16,9 +25,11 @@ public:
 	int nAttribs; ///<Attributes per vertex.
 	GLuint hVAO; ///<Handle referencing vertex array object for this buffer.
 	GLuint hIndex; ///<Handle referencing index object for this buffer.
-	int indexSize; ///<Number of indices used by buffer.
+	unsigned int noIndices; ///<Number of indices used by buffer.
 	int normOffset; ///<Start of normal values in buffer
 
 	unsigned int nTris; ///<Number of triangles
+
+	unsigned int bufSize; ///<Size of vertex data in bytes.
 };
 

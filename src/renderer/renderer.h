@@ -4,11 +4,9 @@
 #include <windows.h> 
 #include <string>
 #include <vector>
-#include <glew.h>
-#include <wglew.h>
-#include <glm/glm.hpp>
+
 #include "model.h"
-#include "vertexObj.h"
+#include "buf.h"
 #include "..\terrain.h"
 
 enum shaderType {vertex,frag,geometry };
@@ -67,6 +65,8 @@ public:
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
 	unsigned int getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
+	unsigned int getGeometryFeedback2(CModel& model, unsigned int bufSize, CBaseBuf& destBuf);
+
 	unsigned int createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);

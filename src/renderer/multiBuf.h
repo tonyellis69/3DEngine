@@ -1,12 +1,12 @@
 #pragma once
 
 #include "glew.h"
-//#include "renderer.h"
-#include "..\vertBufs.h" //temp!
+#include "buf.h"
+
 class CRenderer;
 
 /** Manages a renderer-based buffer for multidraw drawing. */
-class CMultiBuf {
+class CMultiBuf : public CBuf {
 public:
 	CMultiBuf();
 	~CMultiBuf();
@@ -15,6 +15,7 @@ public:
 	void reserve(unsigned int size);
 	GLint* getFirstArray();
 	GLsizei* getCountArray();
+	void copyBuf(CBaseBuf& srcBuf, unsigned int size);
 
 	GLint* first;
 	GLsizei* count;
@@ -24,18 +25,18 @@ public:
 	unsigned int currentObjects;
 
 
-	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
-	int colourOffset; ///<Start of colour values in buffer.
-	unsigned int noVerts;///<Total vertices in buffer.
-	int nAttribs; ///<Attributes per vertex.
-	GLuint hVAO; ///<Handle referencing vertex array object for this buffer.
-	GLuint hIndex; ///<Handle referencing index object for this buffer.
-	int indexSize; ///<Number of indices used by buffer.
-	int normOffset; ///<Start of normal values in buffer
+	//GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
+	//int colourOffset; ///<Start of colour values in buffer.
+///	unsigned int noVerts;///<Total vertices in buffer.
+	//int nAttribs; ///<Attributes per vertex.
+	//GLuint hVAO; ///<Handle referencing vertex array object for this buffer.
+	//GLuint hIndex; ///<Handle referencing index object for this buffer.
+	//int indexSize; ///<Number of indices used by buffer.
+	//int normOffset; ///<Start of normal values in buffer
 
 	int elemSize;
 
-	unsigned int nTris; ///<Number of triangles
+//	unsigned int nTris; ///<Number of triangles
 
 
 	//vBuf::T3Dvert* ptr; ///TEMP!!!!

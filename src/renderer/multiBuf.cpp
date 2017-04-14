@@ -39,6 +39,21 @@ GLsizei * CMultiBuf::getCountArray()
 	return nullptr;
 }
 
+/** Copy the given buffer data into free memory. */
+void CMultiBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
+	GLuint hSrcBuf = srcBuf.getBufHandle();
+	glBindBuffer(GL_COPY_READ_BUFFER, hSrcBuf);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, hBuffer);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, freeMem, size);
+
+	freeMem += size;
+
+	if (currentObjects > 0)
+		first[currentObjects] = first[currentObjects - 1] + count[currentObjects - 1];
+	count[currentObjects] = size / elemSize; //how many sequential elements to use from each array
+	currentObjects++;
+}
+
 
 CMultiBuf::~CMultiBuf() {
 	delete first;
