@@ -14,9 +14,11 @@ public:
 	void storeIndex(unsigned short * indices, unsigned int size, unsigned int nIndices);
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
 	void setSize(unsigned int size);
+	void createBuf(unsigned int size);
 	void copyBuf(CBaseBuf& srcBuf, unsigned int size);
 	unsigned int getBufHandle();
 	unsigned int getBufSize();
+	void freeMem();
 
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.

@@ -6,7 +6,7 @@ extern int uniTag;
 
 
 /** A class for regular cubes of terrain geometry. */
-class Chunk :  public CModel  {
+class Chunk /*:  public CModel */ {
 public:
 	Chunk();
 	void setSamplePos(glm::vec3& pos);
@@ -25,6 +25,9 @@ public:
 	int noAttribs;
 	int noTris;
 
+	glm::vec3 terrainPos;
+
+	unsigned int id;
 };
 
 

@@ -81,6 +81,7 @@
     <Lib>
       <AdditionalDependencies>OpenGL32.lib;soil.lib;sfml-audio-s.lib;sfml-system-s.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>D:\projects\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)..\lib\$(ProjectName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

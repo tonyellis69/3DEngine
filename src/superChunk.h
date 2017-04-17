@@ -29,7 +29,6 @@ public:
 	void setView(glm::vec3& pos); 
 	void draw();
 	void scroll(glm::i32vec3& scrollVec);
-	void shiftChunksBy1(glm::vec3 tVec);
 	void removeFace(Tdirection faceDir);
 	void addFace(Tdirection faceDir);
 	void removeSClayer(CSuperChunk& superChunk, Tdirection faceDir);

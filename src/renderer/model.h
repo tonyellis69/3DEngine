@@ -68,11 +68,12 @@ class CModelMulti : public CModel {
 public:
 	CModelMulti() : CModel() {};
 	CModelMulti(glm::vec3& pos) : CModel(pos) {};
-	virtual void setMultiBufferSize(unsigned int bufSize, unsigned int noObjects, int noAttribs, int elemSize) {};
+	void setMultiBufferSize(unsigned int bufSize);
 	unsigned int getFreeMem();
 	virtual int getElementSize() { return 0; };
 	virtual GLint* getFirstArray() { return 0; };
 	virtual GLsizei* getCountArray() { return 0; };
+	void storeLayout(int attr1, int attr2, int attr3, int attr4);
 
 	virtual void reserveBuf(unsigned int elementsUsed) {};
 	

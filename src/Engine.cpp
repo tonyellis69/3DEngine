@@ -736,9 +736,9 @@ void CEngine::freeModel(CModel* model) {
 
 /** Draw the model with the given shader, offscreen, and store the returned vertex data
 	in the buffer. */
-unsigned int CEngine::getGeometryFeedback(CModel& model, int size,int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset) {
-	return Renderer.getGeometryFeedback(model,size, vertsPerPrimitive,hFeedBackBuf, multiBufferOffset);
-}
+//unsigned int CEngine::getGeometryFeedback(CModel& model, int size,int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset) {
+//	return Renderer.getGeometryFeedback(model,size, vertsPerPrimitive,hFeedBackBuf, multiBufferOffset);
+//}
 
 
 unsigned int CEngine::createDataTexture(renderTextureFormat dataType, int w, int h, const void* data) {
@@ -759,7 +759,7 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 }
 
 
-/** Run geometry feedback on the given input model, and return with the thus-created model in destModel. */
+/** Run geometry feedback on the given input model, and return with the thus-created model in destModel. 
 unsigned int CEngine::acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel) {
 	//TO DO: messy! should simply pass destModel to getGeometryFeedback...
 	unsigned int hBuffer = destModel.getBuffer();
@@ -774,9 +774,9 @@ unsigned int CEngine::acquireFeedbackModel(CModel& srcModel, int feedbackBufSize
 
 	//dest->nTris = noPrimitives;
 	return noPrimitives;
-}
+} */
 
-/** Run geometry feedback on the given input model, and place the vertices created in a free portion of the buffer of the given multimodel.*/
+/** Run geometry feedback on the given input model, and place the vertices created in a free portion of the buffer of the given multimodel.
 unsigned int CEngine::acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel) {
 
 
@@ -798,14 +798,14 @@ unsigned int CEngine::acquireFeedbackModelMulti(CModel& srcModel, int feedbackBu
 
 	//dest->nTris = noPrimitives;
 	return noPrimitives;
-}
+} */
 
 // pass a CBaseBuf and get it back full of feedback verts
-unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, unsigned int maxSize, CBaseBuf& destBuf) {
+unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
 
 	unsigned int noPrimitives = 0;
 
-	noPrimitives = Renderer.getGeometryFeedback2(srcModel, maxSize,destBuf);
+	noPrimitives = Renderer.getGeometryFeedback2(srcModel, tmpBuf,destBuf);
 
 	return noPrimitives;
 }

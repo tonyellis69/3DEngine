@@ -130,14 +130,14 @@ public:
 		((CRenderModel*)model)->buf.nAttribs = nAttributes;
 	}
 	void freeModel(CModel* model);
-	unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
+	//unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
 	unsigned int createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
-	unsigned int acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel);
-	unsigned int acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel);
-	unsigned int acquireFeedbackVerts(CModel& srcModel, unsigned int maxSize, CBaseBuf& destBuf);
+	//unsigned int acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel);
+	//unsigned int acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel);
+	unsigned int acquireFeedbackVerts(CModel& srcModel, CBaseBuf&  tmpBuf, CBaseBuf& destBuf);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
 	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);

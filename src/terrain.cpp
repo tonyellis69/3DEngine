@@ -310,7 +310,7 @@ Chunk* CTerrain::getFreeChunk() {
 /** Return the given chunk to the spareChunks list. */
 void CTerrain::freeChunk(Chunk* chunk) {
 	chunk->live = false;
-	freeChunkModel(chunk);
+//	freeChunkModel(chunk);
 	spareChunks.push_back(chunk);
 }
 
@@ -506,16 +506,7 @@ CTerrain::~CTerrain() {
 }
 
 
-/** Create a multidraw buffer of the requested size. */
-void CRenderTerrain::setMultiBufferSize(unsigned int bufSize,unsigned int maxObjects, int noAttribs, int elemSize) {
-	pRenderer->storeVertexData(multiBuf.hBuffer, 0, bufSize);
-	multiBuf.setMultiBufferSize(bufSize, maxObjects);
-	multiBuf.nAttribs = noAttribs;
-	multiBuf.elemSize = elemSize;
-	pRenderer->storeVertexLayout(multiBuf.hVAO, multiBuf.hBuffer, 0, noAttribs);
 
-	//multiBuf.ptr = new vBuf::T3Dvert[maxObjects * elemSize];
-}
 
 
 void CRenderTerrain::reserveBuf(unsigned int elementsUsed) {

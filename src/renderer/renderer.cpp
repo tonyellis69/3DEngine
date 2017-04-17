@@ -178,6 +178,11 @@ void CRenderer::init() {
 
 	 glEnable(GL_PRIMITIVE_RESTART);
 	 glPrimitiveRestartIndex(65535);
+
+
+
+
+
 }
 
 
@@ -638,25 +643,24 @@ unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPe
 	return primitives;
 }
 
-unsigned int CRenderer::getGeometryFeedback2(CModel& model, unsigned int maxSize, CBaseBuf& destBuf) {
+unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
 
 	glEnable(GL_RASTERIZER_DISCARD);
 
-	CBuf tmpBuf;
-	tmpBuf.setSize(maxSize);
-
-//	GLuint tbo;
-//	glGenBuffers(1, &tbo);
-//	glBindBuffer(GL_ARRAY_BUFFER, tbo);
-//	glBufferData(GL_ARRAY_BUFFER, bufSize, NULL, GL_STATIC_READ);
-//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//CBuf tmpBuf;
+//	tmpBuf.setSize(maxSize);
+	//TO DO: messy to keep creating and destroying this buffer. Leave it to the user to create one, resuable buffer.
 
 
 	GLint elapsed = 0;
 	GLuint query, speedQuery, primitives;
+
+	
+
 	glGenQueries(1, &query);
 	//glGenQueries(1, &speedQuery);
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tmpBuf.hBuffer);
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tmpBuf.getBufHandle());
+	//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, hDestBuf);
 
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
 	//glBeginQuery(GL_TIME_ELAPSED, speedQuery);
@@ -681,6 +685,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, unsigned int maxSize
 
 		//empty the internal buffer
 		//freeBuffer(tbo);
+	//	tmpBuf.freeMem();
 		return 0; //TO DO fix should not happen
 	}
 
@@ -694,34 +699,12 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, unsigned int maxSize
 	//if it is a multibuffer, we want to say "here's this block of verts, find a space for it." So, some kind of copyBuffer method.
 	destBuf.copyBuf(tmpBuf,outSize);
 
-	/*
-
-	if (multiBufferOffset > 0) {
-
-
-		glBindBuffer(GL_COPY_WRITE_BUFFER, hFeedBackBuf);
-
-		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, multiBufferOffset - 1, outSize);
-	}
-	else {
-		GLuint dest;
-		glGenBuffers(1, &dest);
-		glBindBuffer(GL_COPY_WRITE_BUFFER, dest);
-		glBufferData(GL_COPY_WRITE_BUFFER, outSize, NULL, GL_STATIC_READ);
-
-
-		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, outSize);
-		hFeedBackBuf = dest;
-	}
-	glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
-*/
+	
 	glDisable(GL_RASTERIZER_DISCARD);
 
-	//empty the internal buffer
-	//freeBuffer(tbo);
 
 	//	cerr << "\nChunk took: " << elapsed << " by query timer";
-
+	//tmpBuf.freeMem();
 	return primitives;
 }
 
@@ -796,92 +779,36 @@ unsigned int CRenderer::query() {
 
 
 void CRenderer::drawMultiModel(CModelMulti & model) {
-	
-	//glBindVertexArray(0);
-	//for (int object = 0; object < 84 /*model.multiBuf.currentObjects */; object++) {
-	//int object = 84;
-	
-		//glDrawArrays(GL_TRIANGLES, model.multiBuf.first[object], model.multiBuf.count[object]);
-	//	glDrawArrays(GL_TRIANGLES, 63828, 3435);
 
-	
-	//	drawModel(tmpChunk);
-	//	glDrawArrays(GL_TRIANGLES, 0, 3435);
-	//}	
+
+	glBindVertexArray(model.multiBuf.childBufs[0].hVAO);
+	CChildBuf* childBuf; 
+	for (int child = 0; child <  model.multiBuf.noChildBufs ; child++) {
+		childBuf = &model.multiBuf.childBufs[child];
 		
-		//CBuf* obj2 = &getVertexObj(tmpBig.hVertexObj);
 	
 
-		//glBindBuffer(GL_COPY_READ_BUFFER, obj->hBuffer);
-	//glBindBuffer(GL_COPY_WRITE_BUFFER, model.multiBuf.hBuffer);
+		glBindVertexArray(model.multiBuf.childBufs[child].hVAO);
+	
 
-	//glBindBuffer(GL_COPY_READ_BUFFER, model.multiBuf.hBuffer);
-	//glBindBuffer(GL_COPY_WRITE_BUFFER, tmpBig->multiBuf.hBuffer);
+		
+		for (int object = 0; object < childBuf->objCount ; object++) {
 
-	//glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, 200000000);
-	unsigned int err = glGetError();
+			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
+	
+			//glDrawArrays(GL_TRIANGLES,0, 5000);
 
-	glBindVertexArray(model.multiBuf.hVAO);
 
-	int c = 0;
-	for (int object = 0; object < model.multiBuf.currentObjects; object++) {
-		c++;
-		if (c == 40) {
-
-			glBindVertexArray(model.multiBuf.hVAO);
-			c = 0;
 		}
-		glDrawArrays(GL_TRIANGLES, model.multiBuf.first[object], model.multiBuf.count[object]);
-	
-		
+
+
 	}
-//	drawModel(tmpChunk);
-	//glBindVertexArray(0);
-	
-	//glMultiDrawArrays(GL_TRIANGLES, model.multiBuf.first, model.multiBuf.count, model.multiBuf.currentObjects);
-		//glDrawArrays(GL_TRIANGLES, 0, 3435*2000);
-		//glDrawArrays(GL_TRIANGLES, 0, 3435);
-		
-		//glDrawArrays(GL_TRIANGLES, 63828, 3435);
+			
 	
 
 
 
-
-
-
-
-
-
-
-
 	
-
-//	glDrawArrays(GL_TRIANGLES, 63828 + tmpV, 5);
-
-//	tmpV++;
-//	if (tmpV > 3425)
-	//	tmpV = 0;
-
-
-
-//glDrawArrays(GL_TRIANGLES, 66015, 5);
-
-	/*if (tmp) {
-		vBuf::T3Dvert* tmpPtr;
-		tmpPtr = new vBuf::T3Dvert[20000000];
-		glBindBuffer(GL_ARRAY_BUFFER, model.multiBuf.hBuffer);
-		
-		glGetBufferSubData(GL_ARRAY_BUFFER, (63828+355) * model.multiBuf.elemSize, 20000000, tmpPtr);
-		cerr << "\n***********************************************";
-		for (int count = 0; count < (model.multiBuf.count[84]); count++) {
-			cerr << "\n" << tmpPtr[count].v.x; cerr << " " << tmpPtr[count].v.y; cerr << " " << tmpPtr[count].v.z;
-			cerr << " " << tmpPtr[count].colour.r; cerr << " " << tmpPtr[count].colour.g; cerr << " " << tmpPtr[count].colour.b;
-			cerr << " " << tmpPtr[count].normal.x; cerr << " " << tmpPtr[count].normal.y; cerr << " " << tmpPtr[count].normal.z;
-		}
-		tmp = false;
-	}*/
-
 }
 
 

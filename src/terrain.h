@@ -123,7 +123,6 @@ class CRenderTerrain: public CTerrain {
 public:
 	
 	/** Create a multidraw buffer of the requested size. */
-	void setMultiBufferSize(unsigned int bufSize, unsigned int noObjects, int noAttribs, int elemSize);
 	void reserveBuf(unsigned int size);
 	unsigned int getBuffer();
 

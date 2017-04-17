@@ -17,7 +17,7 @@ void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
 		glGenBuffers(1, &hBuffer);
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-	glBufferData(GL_ARRAY_BUFFER, size, (void*)verts, GL_DYNAMIC_DRAW); //was static
+	glBufferData(GL_ARRAY_BUFFER, size, (void*)verts, GL_STATIC_DRAW); //was static
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	noVerts = nVerts;
 	bufSize = size;
@@ -27,17 +27,20 @@ void CBuf::storeIndex(unsigned short * indices, unsigned int size, unsigned int 
 	if (hIndex == 0)
 		glGenBuffers(1, &hIndex);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, (void*)indices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, (void*)indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	noIndices = nIndices;
 }
 
 void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
-	if (hVAO == 0)
-		glGenVertexArrays(1, &hVAO);
-	glBindVertexArray(hVAO);
+	if (hVAO != 0)
+		glDeleteVertexArrays(1, &hVAO);
+
+	glGenVertexArrays(1, &hVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+	glBindVertexArray(hVAO);
+
 
 	unsigned int stride = (attr1 * sizeof(float)) + (attr2 * sizeof(float)) + (attr3 * sizeof(float))
 		+ (attr4 * sizeof(float));
@@ -75,13 +78,20 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 	glBindVertexArray(0);
 }
 
+/** Create a OGL buffer of the requested size. Note that this will erase any existing buffer attached to this CBuf.*/
 void CBuf::setSize(unsigned int size) {
-	if (hBuffer == 0) 
-		glGenBuffers(1, &hBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_READ);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	freeMem();
+	createBuf(size);
 	bufSize = size;
+}
+
+void CBuf::createBuf(unsigned int size) {	
+	if (hBuffer)
+		glDeleteBuffers(1, &hBuffer);
+	glGenBuffers(1, &hBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW);  //READ IS DEADLY
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void CBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
@@ -100,10 +110,18 @@ unsigned int CBuf::getBufSize() {
 	return bufSize;
 }
 
+void CBuf::freeMem() {
+	if (hBuffer != 0) {
+		glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+		glDeleteBuffers(1,&hBuffer);
+	}
+	if (hVAO != 0) {
+		glDeleteVertexArrays(1,&hVAO);
+	}
+}
+
 
 
 CBuf::~CBuf() {
-	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-
-	glDeleteBuffers(1, &hBuffer);
+//	freeMem();
 }

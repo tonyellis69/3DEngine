@@ -75,7 +75,7 @@ extern int uniTag = 0;
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
 	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale);
 	Chunk* newChunk = terrain->getFreeChunk();
-	newChunk->setPos(nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]));
+	newChunk->terrainPos = vec3(nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]));
 	newChunk->cubeSize = cubeSize;
 	newChunk->setSamplePos(samplePos);
 	newChunk->colour = genColour;
@@ -123,13 +123,6 @@ void CSuperChunk::scroll(i32vec3& scrollVec) {
 }
 
 
-
-/** Move all existing chunks one chunk along in the given direction in worldspace.*/
-void CSuperChunk::shiftChunksBy1(vec3 tVec) {  
-	vec3 shiftDist = tVec;
-	for (int c=0;c<chunkList.size();c++)
-		chunkList[c]->translate(-shiftDist);
-}
 
 /** Remove the out layer of chunks from this superChunk corresponding to the given face. */
 void CSuperChunk::removeFace(Tdirection faceDir) {
