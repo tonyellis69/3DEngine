@@ -645,11 +645,8 @@ unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPe
 
 unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
 
+	
 	glEnable(GL_RASTERIZER_DISCARD);
-
-	//CBuf tmpBuf;
-//	tmpBuf.setSize(maxSize);
-	//TO DO: messy to keep creating and destroying this buffer. Leave it to the user to create one, resuable buffer.
 
 
 	GLint elapsed = 0;
@@ -667,8 +664,10 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 
 
 	glBeginTransformFeedback(GL_TRIANGLES);
+
 	//drawModel(model);
 	model.drawNew();
+
 	glEndTransformFeedback();
 
 
@@ -678,6 +677,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 
 	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
 	//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
+
 
 	if (primitives == 0) {
 

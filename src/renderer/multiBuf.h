@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <map>
 #include "glew.h"
 #include "buf.h"
 
@@ -18,9 +19,12 @@ public:
 class CChildBlock {
 public:
 	unsigned int id;
-	unsigned int start;
-	unsigned int size;
-
+	unsigned int arrayFirst;
+	unsigned int arrayCount;
+	unsigned int blockStart;
+	unsigned int blockSize;
+	unsigned int blockIdx;
+	bool free;
 
 };
 
@@ -41,6 +45,8 @@ public:
 	unsigned int getBufHandle();
 	void setMinSize(unsigned int minSize);
 	unsigned int getLastId();
+	void draw();
+	void deleteBlock(unsigned int id);
 	
 
 	GLint* first;
@@ -58,6 +64,15 @@ public:
 
 	int attr[4]; ///<Keeps track of the user-supplied vertex attributes;
 
-	std::vector<CChildBlock> blocks;
+	std::map<unsigned int, CChildBlock> blocks;
 	unsigned int lastId; ///<Most recently assigned id number.
+
+	std::multimap<unsigned int, unsigned int> freeBlocks;
+
+private:
+	unsigned int getFreeBlock(unsigned int size);
+	void copyToFreeBlock(unsigned int hSrcBuf, unsigned int freeBlock, unsigned int size);
+	void copyToNewBlock(unsigned int hSrcBuf, unsigned int size);
+
+	int tmp;
 };

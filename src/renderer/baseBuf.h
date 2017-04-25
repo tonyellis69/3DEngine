@@ -15,4 +15,6 @@ public:
 	virtual void  storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 	virtual void reserve(unsigned int size) {};
 	virtual unsigned int getLastId() { return 0; };
+	virtual void draw() {};
+	virtual void deleteBlock(unsigned int id) {};
 };

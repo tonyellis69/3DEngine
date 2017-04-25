@@ -9,6 +9,7 @@
 #include "direction.h"
 
 #include <vector>
+#include <deque>
 #include <set>
 
 //LOD counts down from the outmost layer towards the innermost, 1.
@@ -31,6 +32,15 @@ class CSkinningOrder;
 typedef std::vector<std::vector<std::vector<CSuperChunk*>>> T3dArray;
 
 extern CSuperChunk*  dbgSC;
+
+
+class CNewChunkRequest {
+public:
+	CNewChunkRequest() {};
+	glm::vec3 samplePos;
+	CSuperChunk* parentSC;
+	glm::i32vec3 index;
+};
 
 class CTerrain : public CModelMulti  {
 public:
@@ -55,6 +65,8 @@ public:
 	void createChunkMesh(Chunk& chunk);
 	void freeChunkModel(CModel* chunk);
 	void addTwoIncomingLayers(int layerNo, Tdirection face);
+	void newChunkRequest(glm::vec3& samplePos, CSuperChunk* parentSC, glm::i32vec3& index);
+	void handleNextChunkRequest();
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -82,9 +94,13 @@ public:
 
 	std::vector<CTerrainLayer> layers; ///<A simple list of all the layers of this terrain.
 
-	glm::mat4 chunkOrigin; ///<Chunks are drawn relative to this point;
+	glm::mat4 chunkOrigin; ///<Chunks are drawn relative to this point.
+	glm::vec3 scrollTriggerPoint; ///<Tracks how close terrain is to scrolling in any direction.
+	glm::i32vec3 chunkOriginInt;
 
+	std::vector<CNewChunkRequest> newChunkRequests;
 	
+	float chunkProcessDelay;
 	};
 
 

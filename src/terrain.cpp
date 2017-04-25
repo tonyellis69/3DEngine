@@ -23,6 +23,9 @@ using namespace watch;
 CTerrain::CTerrain() : CModelMulti() {
 	totalTris = 0;
 	chunkOrigin = glm::translate(glm::mat4(1), getPos());
+	scrollTriggerPoint = vec3(0);
+	chunkOriginInt = i32vec3(0);
+	chunkProcessDelay = 0;
 }
 
 /** Set the dimensions and building block sizes of this terrain. */
@@ -310,28 +313,28 @@ Chunk* CTerrain::getFreeChunk() {
 /** Return the given chunk to the spareChunks list. */
 void CTerrain::freeChunk(Chunk* chunk) {
 	chunk->live = false;
+	if (chunk->id) //TO DO: fix! We only have empty chunks because chunkExists fails for some reason
+		multiBuf.deleteBlock(chunk->id);
 //	freeChunkModel(chunk);
 	spareChunks.push_back(chunk);
 }
 
 
 void CTerrain::update() {
-	//return;
-		//watch::watch1 << "total tris: " << totalTris;
-	watch::watch1 << "tot buf " << totalbufsize;
-	watch::watch1 << " cnks " << totalchunks;
-	watch::watch1 << " avg " << (totalbufsize/totalchunks);
-
-
-		CSuperChunk *sc = layers[0].faceGroup[0][0];
+	
 	
 	//Skin the next chunk on the list that needs it, if any. */
 	double startT = watch::pTimer->milliseconds();
 
 	size_t s = toSkin.size();
-	while ((watch::pTimer->milliseconds() - startT) < 75) {
+	while ((watch::pTimer->milliseconds() - startT) < 30) { //was 75
+
+
+	watch::watch1 << s;
 		if (s == 0)
 			return;
+		//if (startT - chunkProcessDelay > 1) {
+		//	chunkProcessDelay = startT;
 		Chunk* chunk = toSkin.back().chunk;
 		CSuperChunk* parentSC = toSkin.back().parentSC;
 		toSkin.pop_back(); //remove from list
@@ -367,6 +370,7 @@ void CTerrain::update() {
 		chunk->live = true;
 		s--;
 	}
+
 }
 
 
@@ -382,7 +386,7 @@ void CTerrain::advance(Tdirection dir) {
 
 
 
-	chunkOrigin = glm::translate(chunkOrigin, vec3(-scrollVec) * (float)cubesPerChunkEdge * LoD1cubeSize);
+	//chunkOrigin = glm::translate(chunkOrigin, vec3(-scrollVec) * (float)cubesPerChunkEdge * LoD1cubeSize);
 
 
 	size_t inner = layers.size()-1;
@@ -486,12 +490,37 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 	}
 }
 
+void CTerrain::newChunkRequest(glm::vec3 & samplePos, CSuperChunk * parentSC, glm::i32vec3 & index) {
+	CNewChunkRequest request;
+	request.samplePos = samplePos;
+	request.parentSC = parentSC;
+	request.index = index;
+	newChunkRequests.push_back(request);
+}
+
+void CTerrain::handleNextChunkRequest() {
+	CNewChunkRequest* req = &newChunkRequests.front();
+	
+	if (chunkExists(req->samplePos, req->parentSC->LoD)) {
+		Chunk* newChunk = req->parentSC->createChunk(req->index);
+		CSkinningOrder order;
+		order.chunk = newChunk;
+		order.parentSC = req->parentSC;
+		req->parentSC->chunkList.push_back(newChunk);
+		toSkin.push_back(order);
+		req->parentSC->chunksToSkin++;
+	}
+	//newChunkRequests.pop_front();
+		newChunkRequests.erase(newChunkRequests.begin());
+
+}
+
 
 
 CTerrain::~CTerrain() {
 	for (size_t c=0;c<spareChunks.size();c++) {
 		
-		freeChunkModel((CModel*)spareChunks[c]);
+		//freeChunkModel(spareChunks[c]);
 		delete spareChunks[c];
 	}
 	
@@ -536,8 +565,7 @@ bool CTerrainLayer::advance(i32vec3& scrollVec) {
 	for (size_t s=0;s<superChunks.size();s++) {
 		superChunks[s]->nwWorldPos -= step;
 	}
-	//superChunks[0]->terrain->chunkOrigin = glm::translate(superChunks[0]->terrain->chunkOrigin, vec3(scrollVec) * cubesPerChunkEdge * LoD1cubeSize);
-	//TO DO: evil hack to get at terrain! Fix!
+	
 
 	//If this layer has been advanced to its scrolling point, scroll it
 	int scrollAxis = getAxis(scrollVec);
@@ -574,9 +602,6 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	}
 
 	for (size_t s=0;s<superChunks.size();s++) {
-			
-		if (superChunks[s] == dbgSC)
-			int b = 0;
 		superChunks[s]->scroll(scrollVec);
 	}
 

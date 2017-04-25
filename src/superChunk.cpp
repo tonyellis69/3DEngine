@@ -62,7 +62,8 @@ void CSuperChunk::createChunks() {
 					order.chunk = chunk;
 					order.parentSC = NULL;
 					terrain->toSkin.push_back(order);
-				}
+				} 
+				//terrain->newChunkRequest(samplePos, NULL, i32vec3(x, y, z));
 			}
 		} 
 	}
@@ -106,7 +107,7 @@ void CSuperChunk::scroll(i32vec3& scrollVec) {
 	}
 
 	if (adj(inFace) == NULL)	{	//if inface direction doesn't lead to another superchunk
-			addFace(inFace);
+		 addFace(inFace);
 	}
 	else if (adj(inFace)->LoD > LoD) { //we're inscrolling chunks from a superChunk of lower detail
 		//NB this stage now handled by ;
@@ -159,16 +160,17 @@ void CSuperChunk::addFace(Tdirection faceDir) {
 		for (facePos.y=outerLayer(yStart);facePos.y<=outerLayer(yEnd);facePos.y++) {
 			i32vec3 realPos = rotateByDir(facePos,faceDir);
 			vec3 samplePos = nwSamplePos + (vec3(realPos) * (float)cubesPerChunkEdge * LoDscale);
-			if (terrain->chunkExists(samplePos,LoD)) {	
-				newChunk = createChunk(realPos); 
+			//create a newchunk request, stating samplePos,parentSC, realPos/index
+			//push it on the newChunkRequest list
+			if (terrain->chunkExists(samplePos, LoD)) {
+				newChunk = createChunk(realPos);
+				chunkList.push_back(newChunk);
 				CSkinningOrder order;
 				order.chunk = newChunk;
 				order.parentSC = this;
-				chunkList.push_back(newChunk);
 				terrain->toSkin.push_back(order);
-				chunksToSkin++;
 			}
-
+			//terrain->newChunkRequest(samplePos, this, realPos);
 		}
 	}
 	extendBoundary(faceDir);//because we've added a layer of chunks to this face
@@ -281,7 +283,10 @@ void CSuperChunk::shrinkIfEmpty(Tdirection face) {
 /** If a surface intersects the volume at the given sample position, create a chunk for it. */
 bool CSuperChunk::createChunkAsRequired(i32vec3& pos, vec3& samplePos, CSuperChunk* replaceSC) {
 	Chunk* newChunk = NULL;
+	
 	if (terrain->chunkExists(samplePos,LoD)) {	
+		//terrain->newChunkRequest(samplePos, this, pos);
+	
 		newChunk = createChunk(pos); 
 		chunkList.push_back(newChunk);
 		CSkinningOrder order;

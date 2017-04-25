@@ -804,7 +804,6 @@ unsigned int CEngine::acquireFeedbackModelMulti(CModel& srcModel, int feedbackBu
 unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
 
 	unsigned int noPrimitives = 0;
-
 	noPrimitives = Renderer.getGeometryFeedback2(srcModel, tmpBuf,destBuf);
 
 	return noPrimitives;
