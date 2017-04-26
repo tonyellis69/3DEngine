@@ -23,8 +23,8 @@ public:
 	CSuperChunk();
 	~CSuperChunk();
 	void setSizes(glm::i32vec3& _sizeInChunks, int _cubesPerChunkEdge, float _cubeSize);
-	void setSamplePos(glm::vec3 pos);
-	void createChunks();
+	void setSamplePos(glm::vec3& pos);
+	void createAllChunks();
 	Chunk* createChunk(glm::i32vec3& chunkPosition);
 	void setView(glm::vec3& pos); 
 	void draw();
@@ -40,9 +40,12 @@ public:
 	int firstEmptyLayer(Tdirection face);
 	int outerLayer(Tdirection face);
 	void shrinkIfEmpty(Tdirection face);
-	bool createChunkAsRequired(glm::i32vec3& pos, glm::vec3& samplePos,CSuperChunk* replaceSC);
 	void removeChunk(Chunk* chunk);
 	void removeOutscrolledChunks(Tdirection faceDir);
+	void setOverlapDir(Tdirection dir);
+	void addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Tdirection yStart);
+	void skinChunk(Chunk* chunk);
+	void incrementOverlap(Tdirection faceDir);
 
 	glm::i32vec3 sizeInChunks; ///<Width, height and depth in chunks.
 	int cubesPerChunkEdge; ///<Number of cubes per edge of a chunk.
@@ -81,12 +84,12 @@ public:
 	
 	int chunksToSkin; ///<Number of chunks currently queued for skinning.
 
-	Tdirection overlapDir; ///<Direction of the SC overlapped by this one.
-
+	
 	int overlapCount; ///<Number of smaller SCs now overlapping this one.
 
-private:
-	
+//private:
+	Tdirection overlapDir; ///<Direction of the SC overlapped by this one.
+
 
 };
 

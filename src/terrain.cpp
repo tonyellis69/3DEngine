@@ -132,7 +132,7 @@ void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int lay
 void CTerrain::createAllChunks() {
 	for (size_t l=0;l<layers.size();l++) {
 		for (size_t s=0;s<layers[l].superChunks.size();s++)
-			layers[l].superChunks[s]->createChunks();
+			layers[l].superChunks[s]->createAllChunks();
 	}
 }
 
@@ -327,22 +327,22 @@ void CTerrain::update() {
 	double startT = watch::pTimer->milliseconds();
 
 	size_t s = toSkin.size();
-	while ((watch::pTimer->milliseconds() - startT) < 30) { //was 75
-
+	while ((watch::pTimer->milliseconds() - startT) < 30) { //75 brings judder back, eats too many cycles
+						//NB 30 can cause glitches for very fast alternation of north/west scrolling - not real life
 
 	watch::watch1 << s;
 		if (s == 0)
 			return;
-		//if (startT - chunkProcessDelay > 1) {
-		//	chunkProcessDelay = startT;
-		Chunk* chunk = toSkin.back().chunk;
-		CSuperChunk* parentSC = toSkin.back().parentSC;
+
+		Chunk* chunk = toSkin.back();
+		CSuperChunk* parentSC = NULL;//// toSkin.back().parentSC;
 		toSkin.pop_back(); //remove from list
 		//pass chunk to shade chunk func. Generates model and registers it.
-		createChunkMesh(*chunk);
+		//createChunkMesh(*chunk);
+		chunk->getSkinned();
 
 		//check if this chunk replaces another
-		if (parentSC) {
+	/*	if (parentSC) {
 			parentSC->chunksToSkin--;
 			if (parentSC->chunksToSkin == 0 && parentSC->overlapDir != none) { //all chunks skinned for this SC
 				Tdirection overlapDir = parentSC->overlapDir;
@@ -364,10 +364,10 @@ void CTerrain::update() {
 				}
 
 			}
-		}
+		} 
 
 
-		chunk->live = true;
+		chunk->live = true; */
 		s--;
 	}
 
@@ -461,7 +461,10 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 	CSuperChunk* sc;
 	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
 		sc = layers[layerNo].faceGroup[face][scNo];
-		sc->extendBoundary(face);sc->extendBoundary(face); //brings it down from 2 to 0
+
+		sc->addTwoIncomingLayers(face, xStart, yStart);
+
+	/*	sc->extendBoundary(face);sc->extendBoundary(face); 
 		sc->sizeInChunks[zAxis] += 1;
 		sc->chunksToSkin = 0;
 	
@@ -485,35 +488,14 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 			sc->overlapDir = face;
 			sc->adj(face)->overlapCount++;
 
-		}
+		}*/
 
-	}
+	} 
 }
 
-void CTerrain::newChunkRequest(glm::vec3 & samplePos, CSuperChunk * parentSC, glm::i32vec3 & index) {
-	CNewChunkRequest request;
-	request.samplePos = samplePos;
-	request.parentSC = parentSC;
-	request.index = index;
-	newChunkRequests.push_back(request);
-}
 
-void CTerrain::handleNextChunkRequest() {
-	CNewChunkRequest* req = &newChunkRequests.front();
-	
-	if (chunkExists(req->samplePos, req->parentSC->LoD)) {
-		Chunk* newChunk = req->parentSC->createChunk(req->index);
-		CSkinningOrder order;
-		order.chunk = newChunk;
-		order.parentSC = req->parentSC;
-		req->parentSC->chunkList.push_back(newChunk);
-		toSkin.push_back(order);
-		req->parentSC->chunksToSkin++;
-	}
-	//newChunkRequests.pop_front();
-		newChunkRequests.erase(newChunkRequests.begin());
 
-}
+
 
 
 

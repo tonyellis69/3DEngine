@@ -25,22 +25,14 @@ class CSuperChunk;
 class CTerrainLayer;
 
 
+class Chunk;
 
 
-class CSkinningOrder;
 
 typedef std::vector<std::vector<std::vector<CSuperChunk*>>> T3dArray;
 
-extern CSuperChunk*  dbgSC;
 
 
-class CNewChunkRequest {
-public:
-	CNewChunkRequest() {};
-	glm::vec3 samplePos;
-	CSuperChunk* parentSC;
-	glm::i32vec3 index;
-};
 
 class CTerrain : public CModelMulti  {
 public:
@@ -85,7 +77,7 @@ public:
 	float chunkSize;///<Size of a chunk in world space, ie, cubesPerEdge * cubeSize.
 	int totalChunks; ///<Maximum possible chunks in the chunk array
 
-	std::vector<CSkinningOrder> toSkin; ///<List of chunks that need a mesh created.
+	std::vector<Chunk*> toSkin; ///<List of chunks that need a mesh created.
 
 
 	int totalTris;
@@ -98,7 +90,7 @@ public:
 	glm::vec3 scrollTriggerPoint; ///<Tracks how close terrain is to scrolling in any direction.
 	glm::i32vec3 chunkOriginInt;
 
-	std::vector<CNewChunkRequest> newChunkRequests;
+
 	
 	float chunkProcessDelay;
 	};
@@ -127,11 +119,6 @@ public:
 };
 
 
-class CSkinningOrder {
-public:
-	CSuperChunk* parentSC;
-	Chunk* chunk;
-};
 
 class CRenderer;
 
