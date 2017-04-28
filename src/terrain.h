@@ -90,9 +90,11 @@ public:
 	glm::vec3 scrollTriggerPoint; ///<Tracks how close terrain is to scrolling in any direction.
 	glm::i32vec3 chunkOriginInt;
 
-
+	float sampleScale; ///<ratio of sample space to world space, eg, sample space units to metres.
 	
 	float chunkProcessDelay;
+
+	glm::vec3 tmp;
 	};
 
 

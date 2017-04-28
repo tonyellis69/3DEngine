@@ -67,7 +67,12 @@ void CMultiBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
 	}
 
 
-	
+/*	cerr << "\nNumber of childbufs " << childBufs.size();
+	cerr << " blocks " << blocks.size();
+	cerr << " free blocks " << freeBlocks.size(); */
+//	Useful stats. Freeblocks eventually settles at about 1/7 of the total blocks, a little high,  but since 
+//	total blocks eventually stops rising anyway it's not a huge concern. An optimisation would be to 
+//	consolidate adjacent empty blocks periodically, which would require resizing the blocks map.
 }
 
 /** Set the initial size of this multibuffer. This creates its initial child buffer. */
@@ -146,6 +151,8 @@ void CMultiBuf::draw() {
 }
 
 void CMultiBuf::deleteBlock(unsigned int id) {
+
+
 	
 //	unsigned short childBufNo = id >> 16;
 //	unsigned short blockId = id & 0xFF;

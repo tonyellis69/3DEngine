@@ -61,7 +61,7 @@ void CSuperChunk::createAllChunks() {
 extern int uniTag = 0;
 /** Return a pointer to a chunk that has been positioned at the given chunk position and initialised for skinning.*/
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
-	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale);
+	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale) * terrain->sampleScale;
 	Chunk* newChunk = terrain->getFreeChunk();
 	newChunk->terrainPos = vec3(nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]));
 	newChunk->cubeSize = cubeSize;
@@ -70,6 +70,7 @@ Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
 	newChunk->LoD = LoD;
 	newChunk->scIndex = gridPosition;
 	newChunk->tag = uniTag++;
+
 
 	newChunk->setCreatorSC(this);
 	chunkList.push_back(newChunk);
@@ -82,7 +83,7 @@ Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
 /** Scroll by one chunk in the given direction. */
 void CSuperChunk::scroll(i32vec3& scrollVec) {
 	//when we scroll, superchunks stay where they are but their sample point changes
-	nwSamplePos += vec3(scrollVec) * (float)cubesPerChunkEdge * LoDscale;
+	nwSamplePos += vec3(scrollVec) * (float)cubesPerChunkEdge * LoDscale * terrain->sampleScale;
 	
 	//find which face is being scrolled out, and the opposite 'in' face receiving a new layer of nodes.
 	//NB if scrolling in new terrain from north, dir is -1
@@ -93,7 +94,7 @@ void CSuperChunk::scroll(i32vec3& scrollVec) {
 	if (adj(outFace) == NULL) //if outface direction doesn't lead to another superchunk
 		removeFace(outFace);
 	 else if (adj(outFace)->LoD < LoD) { //we're outscrolling chunks into a superChunk of higher detail
-		shrinkIfEmpty(outFace);  //
+		 ;// shrinkIfEmpty(outFace);  //
 	}
 
 	if (adj(inFace) == NULL || adj(inFace)->LoD < LoD) { //we're inscrolling chunks from outside terrain or a superChunk of higher detail
@@ -216,12 +217,18 @@ void CSuperChunk::extendBoundary(Tdirection face) {
 		faceBoundary[face] += 1;
 }
 
+extern CSuperChunk* dbgSC;
+
 /** Shrink the recogised position for outermost chunks in the face direction. */
 void CSuperChunk::shrinkBoundary(Tdirection face) {
+
 	if ((face == north)||(face == west) || (face == down))
 		faceBoundary[face] += 1;
 	else
 		faceBoundary[face] -= 1;
+
+	if (dbgSC == this && face == south && faceBoundary[2] == 2)
+		int b = 0;
 }
 
 /** Return the position of the first layer beyond the outer, face layer of chunks in the given direction. */
@@ -328,6 +335,14 @@ void CSuperChunk::incrementOverlap(Tdirection faceDir) {
 		removeFace(faceDir);
 		overlapCount = 4;
 	}
+}
+
+void CSuperChunk::removeAllChunks() {
+	/*for (int c = 0; c < chunkList.size(); c++) {
+		int id = chunkList[c]->id;
+		terrain->multiBuf.deleteBlock(id);
+	}*/
+	terrain->multiBuf.deleteBlock(655362);
 }
 
 

@@ -15,8 +15,6 @@ using namespace watch;
 
 #include "colour.h"
 
-  CSuperChunk*  dbgSC = NULL;
-
  int totalbufsize = 0;
  int totalchunks = 1;
 
@@ -26,6 +24,7 @@ CTerrain::CTerrain() : CModelMulti() {
 	scrollTriggerPoint = vec3(0);
 	chunkOriginInt = i32vec3(0);
 	chunkProcessDelay = 0;
+	sampleScale = 0.002f;
 }
 
 /** Set the dimensions and building block sizes of this terrain. */
@@ -50,7 +49,7 @@ void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int lay
 	vec3 nwLayerPos = vec3(baseLayerSize) * -0.5f;
 
 	int cubesPerSCedge =  chunksPerSChunkEdge * cubesPerChunkEdge;
-	int baseLayerSampleSize = (int)(superChunksPerTerrainEdge * cubesPerSCedge * currentLoDscale );
+	int baseLayerSampleSize = (int)(superChunksPerTerrainEdge * cubesPerSCedge * currentLoDscale *sampleScale );
 	vec3 nwLayerSamplePos(baseLayerSampleSize/2.0f);
 	nwLayerSamplePos = vec3(0) - nwLayerSamplePos;
 
@@ -93,7 +92,7 @@ void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int lay
 		superChunksPerLayerEdge = (superChunksPerLayerEdge - (outerLayerThickness * 2))  * 2;
 		resize3dArray(*innerArray,i32vec3(superChunksPerLayerEdge));
 
-		nwLayerSamplePos += vec3(outerLayerThickness * cubesPerChunkEdge * outerLoDScale * chunksPerSChunkEdge);
+		nwLayerSamplePos += vec3(outerLayerThickness * cubesPerChunkEdge * outerLoDScale * chunksPerSChunkEdge * sampleScale);
 
 		layers[layerNo].nwLayerPos = nwLayerPos += vec3(outerLayerThickness * outerlayerSCsize);
 		layers[layerNo].cubeSize = currentLoDcubeSize;
@@ -161,14 +160,15 @@ void CTerrain::createSuperChunks(T3dArray &scArray, vector<CSuperChunk*>& parent
 	}
 }
 
+extern CSuperChunk* dbgSC = NULL;
+
 /** Initialise the given 3d array of superchunks with the correct position, size, lod, etc. */
 void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSamplePos, i32vec3& _sizeInChunks) {
-	//float thisSuperChunkSize = layers[layerNo].cubeSize * cubesPerChunkEdge  *chunksPerSChunkEdge ;
 	vec3 thisSuperChunkSize(_sizeInChunks);
 	thisSuperChunkSize *= layers[layerNo].cubeSize * cubesPerChunkEdge ;
 	float LoDscale = float(1 << (layers[layerNo].LoD-1));
 	int cubesPerSCedge =  chunksPerSChunkEdge * cubesPerChunkEdge;
-	float layerSCsampleRange = cubesPerSCedge * LoDscale; 
+	float layerSCsampleRange = cubesPerSCedge * LoDscale * sampleScale; 
 
 	for (size_t x=0; x<scArray.size(); ++x) {
 		for (size_t y=0; y<scArray[0].size(); ++y) {
@@ -180,9 +180,9 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				sChunk->LoDscale = LoDscale;
 				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layerSCsampleRange));
 				sChunk->tmpIndex = i32vec3(x,y,z);
+				//if (x == 1 && y == 1 && z == 0 && layerNo == 1)
+					//dbgSC = sChunk;
 				sChunk->genColour = vec4(col::randHue(),1);
-				if (sChunk->tmpIndex == i32vec3(0, 2, 0) && sChunk->LoD == 1)
-					dbgSC = sChunk;
 			}
 		}
 	}
@@ -327,48 +327,22 @@ void CTerrain::update() {
 	double startT = watch::pTimer->milliseconds();
 
 	size_t s = toSkin.size();
-	while ((watch::pTimer->milliseconds() - startT) < 30) { //75 brings judder back, eats too many cycles
+	while ((watch::pTimer->milliseconds() - startT) < 75) { //75 brings judder back, eats too many cycles
 						//NB 30 can cause glitches for very fast alternation of north/west scrolling - not real life
 
-	watch::watch1 << s;
+	
 		if (s == 0)
 			return;
 
 		Chunk* chunk = toSkin.back();
-		CSuperChunk* parentSC = NULL;//// toSkin.back().parentSC;
-		toSkin.pop_back(); //remove from list
-		//pass chunk to shade chunk func. Generates model and registers it.
-		//createChunkMesh(*chunk);
+		CSuperChunk* parentSC = NULL;
+		toSkin.pop_back(); 
 		chunk->getSkinned();
-
-		//check if this chunk replaces another
-	/*	if (parentSC) {
-			parentSC->chunksToSkin--;
-			if (parentSC->chunksToSkin == 0 && parentSC->overlapDir != none) { //all chunks skinned for this SC
-				Tdirection overlapDir = parentSC->overlapDir;
-				Tdirection faceDir = flipDir(overlapDir);
-				CSuperChunk* overlappedSC = parentSC->adj(overlapDir);
-				if (overlappedSC->LoD < chunk->LoD) { //if this new L2 chunk overlaps a cluster of smaller, L1 SCs...
-					overlappedSC->removeOutscrolledChunks(faceDir);
-					overlappedSC->adj(getXdir(overlapDir))->removeOutscrolledChunks(faceDir); //////
-					overlappedSC->adj(getYdir(overlapDir))->removeOutscrolledChunks(faceDir);
-					overlappedSC->adj(getYdir(overlapDir))->adj(getXdir(overlapDir))->removeOutscrolledChunks(faceDir);
-					parentSC->overlapDir = none;
-				}
-				else { //if L1 chunk partially overlaps an L2 SC
-					overlappedSC->overlapCount--;
-					if (overlappedSC->overlapCount == 0) {
-						overlappedSC->removeFace(faceDir);
-					}
-					parentSC->overlapDir = none;
-				}
-
-			}
-		} 
-
-
-		chunk->live = true; */
 		s--;
+
+		
+
+
 	}
 
 }
@@ -383,11 +357,6 @@ void CTerrain::advance(Tdirection dir) {
 	int scrollDir = (int)dirToVec(dir)[scrollAxis];//-1 when scrolling-in from the north
 	i32vec3 scrollVec(0,0,0);
 	scrollVec[scrollAxis] = scrollDir;
-
-
-
-	//chunkOrigin = glm::translate(chunkOrigin, vec3(-scrollVec) * (float)cubesPerChunkEdge * LoD1cubeSize);
-
 
 	size_t inner = layers.size()-1;
 	//for (int l=inner;l>=0;l--) {
@@ -463,32 +432,6 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 		sc = layers[layerNo].faceGroup[face][scNo];
 
 		sc->addTwoIncomingLayers(face, xStart, yStart);
-
-	/*	sc->extendBoundary(face);sc->extendBoundary(face); 
-		sc->sizeInChunks[zAxis] += 1;
-		sc->chunksToSkin = 0;
-	
-		int zStart = sc->outerLayer(face); int zEnd = zStart+1;
-		if ((face == south) || (face == east)||(face == up)) {
-			zEnd = sc->outerLayer(face); zStart = zEnd-1;
-		}
-	
-		for ( facePos.z =zStart;facePos.z <= zEnd;facePos.z++) {
-			//for each potential chunk space
-			for (facePos.x=sc->outerLayer(xStart);facePos.x <= sc->outerLayer(xEnd);facePos.x++) {
-				for (facePos.y=sc->outerLayer(yStart);facePos.y <= sc->outerLayer(yEnd);facePos.y++) {
-					i32vec3 realPos = rotateByDir(facePos,face);
-					vec3 samplePos = sc->nwSamplePos + (vec3(realPos) * (float)cubesPerChunkEdge * sc->LoDscale);
-					if (sc->createChunkAsRequired(realPos,samplePos,sc))
-						sc->chunksToSkin++;
-				}
-			}
-		}
-		if (sc->chunkList.size() > 0) {
-			sc->overlapDir = face;
-			sc->adj(face)->overlapCount++;
-
-		}*/
 
 	} 
 }

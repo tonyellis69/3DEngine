@@ -46,6 +46,7 @@ public:
 	void addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Tdirection yStart);
 	void skinChunk(Chunk* chunk);
 	void incrementOverlap(Tdirection faceDir);
+	void removeAllChunks();
 
 	glm::i32vec3 sizeInChunks; ///<Width, height and depth in chunks.
 	int cubesPerChunkEdge; ///<Number of cubes per edge of a chunk.
