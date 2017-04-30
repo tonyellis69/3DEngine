@@ -180,8 +180,8 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				sChunk->LoDscale = LoDscale;
 				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layerSCsampleRange));
 				sChunk->tmpIndex = i32vec3(x,y,z);
-				//if (x == 1 && y == 1 && z == 0 && layerNo == 1)
-					//dbgSC = sChunk;
+				if (x == 3 && y == 1 && z == 0 && layerNo == 1)
+					dbgSC = sChunk;
 				sChunk->genColour = vec4(col::randHue(),1);
 			}
 		}
@@ -305,46 +305,51 @@ Chunk* CTerrain::getFreeChunk() {
 		allChunks.push_back(chunk);
 	}
 	chunk->init();
-	chunk->live = false;
 	return chunk;
 
 }
 
-/** Return the given chunk to the spareChunks list. */
-void CTerrain::freeChunk(Chunk* chunk) {
-	chunk->live = false;
-	if (chunk->id) //TO DO: fix! We only have empty chunks because chunkExists fails for some reason
-		multiBuf.deleteBlock(chunk->id);
-//	freeChunkModel(chunk);
-	spareChunks.push_back(chunk);
+/** List the given chunk for re-use. */
+void CTerrain::prepareToFree(Chunk* chunk) {
+	toFree.push_back(chunk);
+	//that's all. Don't try to change its status.
+
+	return;
 }
 
 
 void CTerrain::update() {
 	
-	
 	//Skin the next chunk on the list that needs it, if any. */
 	double startT = watch::pTimer->milliseconds();
+	Chunk* chunk;
+
+	
+
 
 	size_t s = toSkin.size();
 	while ((watch::pTimer->milliseconds() - startT) < 75) { //75 brings judder back, eats too many cycles
 						//NB 30 can cause glitches for very fast alternation of north/west scrolling - not real life
-
-	
 		if (s == 0)
-			return;
-
-		Chunk* chunk = toSkin.back();
-		CSuperChunk* parentSC = NULL;
-		toSkin.pop_back(); 
+			break;
+		
+		chunk = toSkin.front();
+		toSkin.pop_front(); 
 		chunk->getSkinned();
 		s--;
-
-		
-
-
 	}
 
+	
+
+	for (auto it = toFree.begin(); it != toFree.end();) {
+		chunk = *it;
+		if (chunk->status == chSkinned || chunk->status == chRemoveOnAlert) {
+			freeChunk(*chunk);
+			it = toFree.erase(it);
+		}
+		else
+			++it;
+	}
 }
 
 
@@ -442,6 +447,13 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 
 
 
+void CTerrain::freeChunk(Chunk & chunk) {
+	if (chunk.id)
+		multiBuf.deleteBlock(chunk.id);
+	chunk.status = chFree;
+	spareChunks.push_back(&chunk);
+}
+
 CTerrain::~CTerrain() {
 	for (size_t c=0;c<spareChunks.size();c++) {
 		
@@ -511,19 +523,16 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	int scrollAxis = getAxis(scrollVec);
 
 	float LoDscale = (float) (1 << (LoD-1));
-	vec3 step = vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize * LoDscale;
+	vec3 sampleStep = vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize * LoDscale;
 	for (size_t s=0;s<superChunks.size();s++) { 
 		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
 		}
-
-
 		superChunks[s]->shrinkBoundary(scrollDir); //shrink boundary where we've mode chunks out
 		superChunks[s]->extendBoundary(flipDir(scrollDir)); //extend boundary where we've moved chunks along
 		
-		superChunks[s]->nwWorldPos += step;
-
-		
+		//Change the sample position of each SC - actually a v important act that ensures we scroll in fresh terrain.
+		superChunks[s]->nwWorldPos += sampleStep;
 	}
 
 	for (size_t s=0;s<superChunks.size();s++) {

@@ -14,8 +14,7 @@ using namespace std;
 CSuperChunk::CSuperChunk()  {
 	nSChunk = eSChunk = sSChunk = wSChunk = uSChunk = dSChunk = NULL;
 	LoD = 0;
-	overlapDir = none;
-	overlapCount = 4;
+	overlapCount = 0;
 	chunksToSkin = 0;
 }
 
@@ -43,7 +42,6 @@ void CSuperChunk::setSamplePos(vec3& pos) {
 /** Create all the chunks for this superchunk where they are intersected by the isosurface. Each chunk is put on the list for
 	skinning*/
 void CSuperChunk::createAllChunks() {
-	setOverlapDir(none);
 	//first, rule out this superChunk altogether if possible
 	if (terrain->superChunkIsEmpty(nwSamplePos,LoD))
 		return;
@@ -51,7 +49,7 @@ void CSuperChunk::createAllChunks() {
 	for (int x=0;x<sizeInChunks.x;x++) {
 		for (int y=0;y<sizeInChunks.y;y++) {
 			for (int z=0;z<sizeInChunks.z;z++) {
-				createChunk(i32vec3(x,y,z));
+				createChunk(i32vec3(x,y,z),none);
 			}
 		} 
 	}
@@ -60,7 +58,7 @@ void CSuperChunk::createAllChunks() {
 
 extern int uniTag = 0;
 /** Return a pointer to a chunk that has been positioned at the given chunk position and initialised for skinning.*/
-Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
+Chunk* CSuperChunk::createChunk(i32vec3& gridPosition, Tdirection overlap) {
 	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale) * terrain->sampleScale;
 	Chunk* newChunk = terrain->getFreeChunk();
 	newChunk->terrainPos = vec3(nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]));
@@ -71,11 +69,11 @@ Chunk* CSuperChunk::createChunk(i32vec3& gridPosition) {
 	newChunk->scIndex = gridPosition;
 	newChunk->tag = uniTag++;
 
-
+	newChunk->overlapDir = overlap;
 	newChunk->setCreatorSC(this);
 	chunkList.push_back(newChunk);
-	chunksToSkin++;
 	terrain->toSkin.push_back(newChunk);
+	newChunk->status = chToSkin;
 	return newChunk;
 }
 
@@ -116,7 +114,7 @@ void CSuperChunk::removeFace(Tdirection faceDir) {
 	vector<Chunk*>::iterator it;
 	for (it = chunkList.begin();it != chunkList.end();) {
 		if ((*it)->scIndex[zAxis] == zPos) {
-			terrain->freeChunk(*it);
+			terrain->prepareToFree(*it);
 			it = chunkList.erase(it);	
 		}
 		else
@@ -139,21 +137,26 @@ void CSuperChunk::addFace(Tdirection faceDir) {
 	xStart = getXstart(faceDir); xEnd = flipDir(xStart);
 	yStart = getYstart(faceDir); yEnd = flipDir(yStart);
 
+	Tdirection overlap;
+	if (adj(faceDir)) //catch SCs at very edge of terrain. 
+		overlap = faceDir;
+	else
+		overlap = none;
+
+	int chunkCount = 0;
 	facePos.z = firstEmptyLayer(faceDir);
 	for (facePos.x=outerLayer(xStart);facePos.x<=outerLayer(xEnd);facePos.x++) {
 		for (facePos.y=outerLayer(yStart);facePos.y<=outerLayer(yEnd);facePos.y++) {
 			i32vec3 realPos = rotateByDir(facePos,faceDir);
-			createChunk(realPos);
+			createChunk(realPos,overlap);
+			chunkCount++;
 		}
 	}
 	extendBoundary(faceDir);//because we've added a layer of chunks to this face
 
-	if (adj(faceDir)) //catch SCs at very edge of terrain. 
-		setOverlapDir(faceDir);
-	else
-		setOverlapDir(none);
+	if (overlap != none)
+		adj(faceDir)->raiseOverlapCount(chunkCount,flipDir(faceDir));
 }
-
 
 
 /** Return the adjacent superchunk in the given direction, if any.*/
@@ -196,7 +199,7 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
 	//for each chunk in the giver's out face...
 	vector<Chunk*>::iterator it;
 	for (it = giver->chunkList.begin();it != giver->chunkList.end();) {
-		if (((*it)->scIndex[zAxis] == outFaceZ)/*||( giver->sizeInChunks[zAxis] == 1 )*/) {
+		if (((*it)->scIndex[zAxis] == outFaceZ) && (*it)->status != chRemoveOnAlert) {
 			(*it)->scIndex[zAxis] = inFaceZ;
 			chunkList.push_back((*it));
 			it = giver->chunkList.erase(it);	
@@ -227,7 +230,7 @@ void CSuperChunk::shrinkBoundary(Tdirection face) {
 	else
 		faceBoundary[face] -= 1;
 
-	if (dbgSC == this && face == south && faceBoundary[2] == 2)
+	if (dbgSC == this && face == south && faceBoundary[2] == 3)
 		int b = 0;
 }
 
@@ -249,11 +252,11 @@ void CSuperChunk::shrinkIfEmpty(Tdirection face) {
 	}
 }
 
-/** Remove the given chunk from this superChunk's control. */
+/** Find and remove the given chunk from this superChunk's control. */
 void CSuperChunk::removeChunk(Chunk* chunk) {
 	for (size_t chk=0;chk<chunkList.size();chk++)
 		if (chunkList[chk] == chunk) {
-			terrain->freeChunk(chunk);
+			terrain->prepareToFree(chunk);
 			chunkList.erase(chunkList.begin() + chk);
 			break;
 		}
@@ -265,10 +268,7 @@ void CSuperChunk::removeOutscrolledChunks(Tdirection faceDir) {
 	removeFace(faceDir);
 }
 
-/** Set the direction in which the chunks this superchunk potentially overlap the chunks of another superChunk, ie, at layer borders during scrolling. */
-void CSuperChunk::setOverlapDir(Tdirection dir) {
-	overlapDir = dir;
-}
+
 
 /** Create two new layers of chunks on the given face. This happens when the superChunk has scrolled and we want to replace the lower-LoD chunks of the 
 	adjacent next-layer superChunk, which are currently intruding into our space. */
@@ -276,7 +276,7 @@ void CSuperChunk::addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Td
 	int zAxis = getAxis(faceDir);
 	extendBoundary(faceDir); extendBoundary(faceDir);
 	sizeInChunks[zAxis] += 1;
-	chunksToSkin = 0;
+	int chunkCount = 0;
 
 	int zStart = outerLayer(faceDir); int zEnd = zStart + 1;
 	if ((faceDir == south) || (faceDir == east) || (faceDir == up)) {
@@ -291,58 +291,78 @@ void CSuperChunk::addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Td
 		for (facePos.x = outerLayer(xStart); facePos.x <= outerLayer(xEnd); facePos.x++) {
 			for (facePos.y = outerLayer(yStart); facePos.y <= outerLayer(yEnd); facePos.y++) {
 				i32vec3 realPos = rotateByDir(facePos, faceDir);
-				createChunk(realPos);
+				createChunk(realPos,faceDir);
+				chunkCount++;
 			}
 		}
 	}
-	setOverlapDir(faceDir);
+	adj(faceDir)->raiseOverlapCount(chunkCount, flipDir(faceDir));
 }
 
 /**	Attempt to create a block of terrain geometry for this chunk. If the terrain surface doesn't pass through it, it's empty and we can discard it.
 	When all the chunks of this SC have been processed, we deal with any neighbour SC that may now be overlapped. */
 void CSuperChunk::skinChunk(Chunk * chunk) {
-	terrain->createChunkMesh(*chunk);
+	if (chunk->status == chToSkin)
+		terrain->createChunkMesh(*chunk);
+	//else
+	//	chunk->id = 0;
 	if (chunk->id == 0)
 		removeChunk(chunk);
-	else
-		chunk->live = true;
+//	else
+//		chunk->live = true;
 
 
 	//do the overlapped-neighbour notification as needed
-	chunksToSkin--;
-	if (chunksToSkin == 0 && overlapDir != none) {
-		CSuperChunk* overlappedNeighbour = adj(overlapDir);
-		Tdirection faceDir = flipDir(overlapDir);
-		if (overlappedNeighbour->LoD > LoD) //we're a smaller SC partially overlapping a larger
-			overlappedNeighbour->incrementOverlap(faceDir);
-		else { //we're a larger SC overlapping four smaller ones
-			overlappedNeighbour->removeOutscrolledChunks(faceDir);
-			overlappedNeighbour->adj(getXdir(overlapDir))->removeOutscrolledChunks(faceDir); 
-			overlappedNeighbour->adj(getYdir(overlapDir))->removeOutscrolledChunks(faceDir);
-			overlappedNeighbour->adj(getYdir(overlapDir))->adj(getXdir(overlapDir))->removeOutscrolledChunks(faceDir);
-		}
+	if (chunk->overlapDir != none) {
+		adj(chunk->overlapDir)->overlapAlert(chunk->overlapDir);
+
+
 	}
-	if (chunksToSkin == 0)
-		overlapDir = none;
 	
 }
 
-/** Increase the tally of how many small superChunks now potentially overlap this one with their chunks. When the count is four, we know the scrolled-out
-	chunks of this SC have now been replaced and can be removed. */
-void CSuperChunk::incrementOverlap(Tdirection faceDir) {
-	overlapCount--;
-	if (overlapCount == 0) {
-		removeFace(faceDir);
-		overlapCount = 4;
-	}
-}
+
 
 void CSuperChunk::removeAllChunks() {
-	/*for (int c = 0; c < chunkList.size(); c++) {
+	for (int c = 0; c < chunkList.size(); c++) {
 		int id = chunkList[c]->id;
-		terrain->multiBuf.deleteBlock(id);
-	}*/
-	terrain->multiBuf.deleteBlock(655362);
+		if (id)
+			terrain->multiBuf.deleteBlock(id);
+	}
+	
+}
+
+void CSuperChunk::raiseOverlapCount(int chunks, Tdirection faceDir) {
+	if (overlapCount == 0) {
+		int zAxis = getAxis(faceDir);
+		int zPos = outerLayer(faceDir);
+		vector<Chunk*>::iterator it;
+		for (int ch = 0; ch < chunkList.size(); ch++) {
+			if (chunkList[ch]->scIndex[zAxis] == zPos) {
+				chunkList[ch]->status = chRemoveOnAlert;
+			}
+		}
+	}
+
+	overlapCount += chunks;
+}
+
+void CSuperChunk::overlapAlert(Tdirection overlap) {
+	overlapCount--;
+	if (dbgSC == this)
+		cerr << "\nreceiving an alert directed " << overlap << " my overlap count is now " << overlapCount;
+	if (overlapCount == 0) { //any overlaping SC is now fully drawn
+		Tdirection overlapDir = flipDir(overlap);
+		int overlapLoD = adj(overlapDir)->LoD;
+		if (overlapLoD < LoD) //we're a large SC overlapped by smaller SCs
+			removeFace(overlapDir);
+		else { //we're one of 4 smaller SCs overlapped by a larger
+			removeOutscrolledChunks(overlapDir);
+			adj(getXdir(overlapDir))->removeOutscrolledChunks(overlapDir);
+			adj(getYdir(overlapDir))->removeOutscrolledChunks(overlapDir);
+			adj(getYdir(overlapDir))->adj(getXdir(overlapDir))->removeOutscrolledChunks(overlapDir);
+		}
+	}
 }
 
 

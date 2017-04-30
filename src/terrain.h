@@ -49,7 +49,7 @@ public:
 	void insertLayer(T3dArray &outerArray, T3dArray& innerArray, int outerLayerThickness);
 	void hollowLayer(T3dArray &layerArray, int layerNo, int depth);
 	Chunk* getFreeChunk();
-	void freeChunk(Chunk* chunk);
+	void prepareToFree(Chunk* chunk);
 	void update();
 	void advance(Tdirection direction);
 	bool superChunkIsEmpty(glm::vec3& samplePos, int LoD);
@@ -59,6 +59,7 @@ public:
 	void addTwoIncomingLayers(int layerNo, Tdirection face);
 	void newChunkRequest(glm::vec3& samplePos, CSuperChunk* parentSC, glm::i32vec3& index);
 	void handleNextChunkRequest();
+	void freeChunk(Chunk& chunk);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -77,7 +78,7 @@ public:
 	float chunkSize;///<Size of a chunk in world space, ie, cubesPerEdge * cubeSize.
 	int totalChunks; ///<Maximum possible chunks in the chunk array
 
-	std::vector<Chunk*> toSkin; ///<List of chunks that need a mesh created.
+	std::deque<Chunk*> toSkin; ///<List of chunks that need a mesh created.
 
 
 	int totalTris;
@@ -95,6 +96,9 @@ public:
 	float chunkProcessDelay;
 
 	glm::vec3 tmp;
+
+	std::vector<Chunk*> toFree; ///<List of chunks to be taken out of play.
+
 	};
 
 

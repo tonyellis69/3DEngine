@@ -10,6 +10,8 @@ void Chunk::init() {
 	noTris = 0;
 	id = 0;
 	creatorSC = NULL;
+	overlapDir = none;
+	status = chFree;
 }
 
 void Chunk::setCreatorSC(CSuperChunk * creator) {
@@ -19,6 +21,10 @@ void Chunk::setCreatorSC(CSuperChunk * creator) {
 void Chunk::getSkinned() {
 	creatorSC->skinChunk(this);
 
+}
+
+void Chunk::setOverlap(Tdirection overlap) {
+	overlapDir = overlap;
 }
 
 /** Set the position in a space where this chunk starts sampling volumetric data. */
