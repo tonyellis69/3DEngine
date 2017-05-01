@@ -120,8 +120,24 @@ void CSuperChunk::removeFace(Tdirection faceDir) {
 		else
 			++it;
 	}
+	shrinkBoundary(faceDir); 
+}
+
+/** Remove the out layer of chunks from this superChunk corresponding to the given face. */
+void CSuperChunk::removeTaggedFaceChunks(Tdirection faceDir) {
+	vector<Chunk*>::iterator it;
+	for (it = chunkList.begin(); it != chunkList.end();) {
+		if ((*it)->status == chRemoveOnAlert) {
+			terrain->prepareToFree(*it);
+			it = chunkList.erase(it);
+		}
+		else
+			++it;
+	}
 	shrinkBoundary(faceDir); ///////////////////////////////////////////
 }
+
+
 
 
 /**	Add a layer of new chunks to the face indicated. */
@@ -154,8 +170,11 @@ void CSuperChunk::addFace(Tdirection faceDir) {
 	}
 	extendBoundary(faceDir);//because we've added a layer of chunks to this face
 
-	if (overlap != none)
-		adj(faceDir)->raiseOverlapCount(chunkCount,flipDir(faceDir));
+
+	if (overlap == none)
+		return;
+	Tdirection overlapedFace = flipDir(faceDir);
+	adj(faceDir)->raiseOverlapCount(chunkCount, overlapedFace);
 }
 
 
@@ -190,25 +209,26 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
 	 Tdirection outFace = flipDir(inFace);
 
 	 //get a pointer to the adjacent superchunk
-	CSuperChunk* giver = adj(inFace);
+	 CSuperChunk* giver = adj(inFace);
 
-	int zAxis = getAxis(inFace);
-	int outFaceZ = giver->outerLayer(outFace);
-	int inFaceZ = firstEmptyLayer(inFace);
+	 int zAxis = getAxis(inFace);
+	 int outFaceZ = giver->outerLayer(outFace);
+	 int inFaceZ = firstEmptyLayer(inFace);
 
-	//for each chunk in the giver's out face...
-	vector<Chunk*>::iterator it;
-	for (it = giver->chunkList.begin();it != giver->chunkList.end();) {
-		if (((*it)->scIndex[zAxis] == outFaceZ) && (*it)->status != chRemoveOnAlert) {
-			(*it)->scIndex[zAxis] = inFaceZ;
-			chunkList.push_back((*it));
-			it = giver->chunkList.erase(it);	
-		}
-		else
-			++it;
-		}	
-	extendBoundary(inFace);
-	giver->shrinkBoundary(outFace);
+		 //for each chunk in the giver's out face...
+		 vector<Chunk*>::iterator it;
+		 for (it = giver->chunkList.begin(); it != giver->chunkList.end();) {
+			 if (((*it)->scIndex[zAxis] == outFaceZ) && (*it)->status != chRemoveOnAlert) {
+				 (*it)->scIndex[zAxis] = inFaceZ;
+				 chunkList.push_back((*it));
+				 it = giver->chunkList.erase(it);
+			 }
+			 else
+				 ++it;
+		 }
+		 extendBoundary(inFace);
+		 giver->shrinkBoundary(outFace);
+	 
  }
 
 
@@ -349,12 +369,11 @@ void CSuperChunk::raiseOverlapCount(int chunks, Tdirection faceDir) {
 
 void CSuperChunk::overlapAlert(Tdirection overlap) {
 	overlapCount--;
-	if (dbgSC == this)
-		cerr << "\nreceiving an alert directed " << overlap << " my overlap count is now " << overlapCount;
-	if (overlapCount == 0) { //any overlaping SC is now fully drawn
+	if (overlapCount == 0) { //any overlaping SC is now fully drawn - this SC is fully overlapped
 		Tdirection overlapDir = flipDir(overlap);
 		int overlapLoD = adj(overlapDir)->LoD;
 		if (overlapLoD < LoD) //we're a large SC overlapped by smaller SCs
+			//	removeTaggedFaceChunks(overlapDir);
 			removeFace(overlapDir);
 		else { //we're one of 4 smaller SCs overlapped by a larger
 			removeOutscrolledChunks(overlapDir);

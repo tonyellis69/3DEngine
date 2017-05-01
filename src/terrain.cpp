@@ -311,8 +311,10 @@ Chunk* CTerrain::getFreeChunk() {
 
 /** List the given chunk for re-use. */
 void CTerrain::prepareToFree(Chunk* chunk) {
-	toFree.push_back(chunk);
+	//toFree.push_back(chunk);
 	//that's all. Don't try to change its status.
+
+	freeChunk(*chunk);
 
 	return;
 }

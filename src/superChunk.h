@@ -30,6 +30,7 @@ public:
 	void draw();
 	void scroll(glm::i32vec3& scrollVec);
 	void removeFace(Tdirection faceDir);
+	void removeTaggedFaceChunks(Tdirection faceDir);
 	void addFace(Tdirection faceDir);
 	void removeSClayer(CSuperChunk& superChunk, Tdirection faceDir);
 	CSuperChunk*& adj(const Tdirection dir);
@@ -87,6 +88,8 @@ public:
 
 	
 	int overlapCount; ///<Number of smaller SCs now overlapping this one.
+
+
 
 private:
 	//Tdirection overlapDir; ///<Direction of the SC overlapped by this one.
