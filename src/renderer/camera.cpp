@@ -7,13 +7,13 @@
 
 CCamera::CCamera() : C3dObject() {
 	//set up some default perspective settings
-	zNear = 0.3f; zFar = 5000.0f; Fov = 45.0f;
+	zNear = 0.1f; zFar = 5000.0f; Fov = 45.0f;
 	setAspectRatio(800,600);
 }
 	
 CCamera::CCamera(glm::vec3& pos) : C3dObject(pos) {
 	//set up some default perspective settings
-	zNear = 0.3f; zFar = 50000.0f; Fov = 45.0f;
+	zNear =  0.3f; zFar = 50000.0f; Fov = 45.0f;
 	setAspectRatio(800,600);
 }
 

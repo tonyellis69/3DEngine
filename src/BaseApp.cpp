@@ -3,6 +3,8 @@
 #include <iostream> //for cerr
 #include <Windowsx.h> //for get_mouse_x etc
 
+#include <glm/glm.hpp>
+
 #include "watch.h"
 
 using namespace watch;
@@ -169,32 +171,47 @@ void CBaseApp::AppTasks() {
 
 	Engine.clearFrame();
 
+	
+
 	Time = Engine.Time.milliseconds();
 	dT = Time - LastTime;
 	Engine.dT = dT;
 	LastTime = Time;
-	getMousePos(mouseX,mouseY);
+	getMousePos(mouseX, mouseY);
 	keyCheck();
-	
+
 	//TO DO: mouseCheck, which calls user with last reported mouse position.
 	if (!Paused) {
 		Engine.updateRegisteredSprites(dT);
 		Update();
 	}
-		
+
+
+	if (Engine.skyDome) {
+		drawSkyDome();
+	}
+
+
 	Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed
 
 	Engine.drawModels();
+	
 	Engine.drawSceneLayers();
 	Engine.drawRegisteredSprites();
 	draw(); //Do user drawing
+
+	
 
 	Engine.removeUserScale();
 
 	updateWatches();
 	DrawUI(); 
 
+
+
 	Engine.showFrame();
+
+
 }
 
 void CBaseApp::FullScreen() {
@@ -242,6 +259,20 @@ void CBaseApp::RegisterUIfunctors() {
 	drawFuncs->setScale.Set(&UIeng,&CGUIengine::setScale);
 
 	GUIroot.setDrawFuncs(drawFuncs);
+}
+
+void CBaseApp::drawSkyDome() {
+	
+	Engine.Renderer.setDepthTest(false);
+
+	Engine.skyDome->dome->setPos(Engine.currentCamera->getPos() + glm::vec3(0, -0.5f, 0));
+	glm::mat4 mvp = Engine.currentCamera->clipMatrix * Engine.skyDome->dome->worldMatrix;
+	Engine.setCurrentShader(Engine.skyDome->hSkyDomeProg);
+	Engine.setShaderValue(Engine.skyDome->hMVPmatrix, mvp);
+	Engine.setShaderValue(Engine.skyDome->hSkyDomeHeightColours, 4, Engine.skyDome->heightColours[0]);
+	Engine.skyDome->dome->drawNew();
+
+	Engine.Renderer.setDepthTest(true);
 }
 
 

@@ -92,6 +92,15 @@ void CRenderModel::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 	buf.storeLayout(attr1, attr2, attr3, attr4);
 }
 
+void CRenderModel::setDrawMode(TdrawMode iDrawMode) {
+	if (iDrawMode == drawPoints)
+		drawMode = GL_POINTS;
+	if (iDrawMode == drawLines)
+		drawMode = GL_LINES;
+	if (iDrawMode == drawTris)
+		drawMode = GL_TRIANGLES;
+}
+
 void CModelMulti::setMultiBufferSize(unsigned int bufSize) {
 	multiBuf.setMultiBufferSize(bufSize);
 }

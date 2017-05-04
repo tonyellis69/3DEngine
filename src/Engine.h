@@ -16,6 +16,7 @@
 #include "isoSurface.h"
 #include "terrain.h"
 #include "renderer\baseBuf.h"
+#include "skyDome.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -103,12 +104,17 @@ public:
 	int getShaderDataHandle(std::string varName);
 	template <typename T>
 	void setShaderValue(int handle,T& value) {
-		Renderer.setShaderValue(handle,value);
+		Renderer.setShaderValue(handle,1,value);
+	}
+	template <typename T>
+	void setShaderValue(int handle, int elements, T& value) {
+		Renderer.setShaderValue(handle, elements, value);
 	}
 
 	void acquireDataLocations(int progam);
 	void setCurrentShader(int program);
 	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
+	CModel* createHemisphere(glm::vec3& pos, float radius, int steps);
 	void renderTo3DTexture(glm::vec3 vol, float* buf);
 	void renderTo2DTexture(glm::vec2 size, int* buf);
 	void storeModel(CModel* model, glm::vec3* verts, int noVerts);
@@ -145,6 +151,7 @@ public:
 	CTerrain* createTerrain();
 	void drawMultiModel(CModelMulti& model);
 	CBaseBuf* createBuffer();
+	CSkyDome* createSkyDome();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -204,6 +211,8 @@ public:
 	
 
 	std::vector<CRenderModel*> renderModelList; ///<Tracks engine-created models.
+
+	CSkyDome* skyDome;
 };
 
 const int NoCursor = -1;

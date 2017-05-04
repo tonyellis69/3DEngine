@@ -111,6 +111,7 @@
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
+    <ClCompile Include="..\src\skyDome.cpp" />
     <ClCompile Include="..\Src\SoundLib.cpp" />
     <ClCompile Include="..\src\Sprite.cpp" />
     <ClCompile Include="..\src\superChunk.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="..\src\renderer\multiBuf.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
     <ClInclude Include="..\src\simplexnoise.h" />
+    <ClInclude Include="..\src\skyDome.h" />
     <ClInclude Include="..\src\smallsysf.h" />
     <ClInclude Include="..\Src\SOIL.h" />
     <ClInclude Include="..\Src\SoundLib.h" />

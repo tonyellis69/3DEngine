@@ -26,6 +26,7 @@ CEngine::CEngine() {
 	userScale.set(1,1);
 	p2dR = &Renderer.rend2d;
 	ambientLight = glm::vec4(0.2f,0.2f,0.2f,1);
+	skyDome = NULL;
 }
 
 /** Low level initialisation. */
@@ -611,12 +612,13 @@ void CEngine::drawModel(CModel& model) {
 
 
 /** Set up the standard 3D shader. */
+//TO DO, do set values using Engine. calls
 void CEngine::setStandard3dShader() {
 	setCurrentShader(defaultProgram);
-	Renderer.setShaderValue(Renderer.cameraToClipMatrix,currentCamera->clipMatrix);
-	Renderer.setShaderValue(Renderer.lightDirection,light1.direction);
-	Renderer.setShaderValue(Renderer.lightIntensity,light1.intensity);
-	Renderer.setShaderValue(Renderer.ambientLight,ambientLight);
+	Renderer.setShaderValue(Renderer.cameraToClipMatrix,1,currentCamera->clipMatrix);
+	Renderer.setShaderValue(Renderer.lightDirection,1,light1.direction);
+	Renderer.setShaderValue(Renderer.lightIntensity,1,light1.intensity);
+	Renderer.setShaderValue(Renderer.ambientLight,1, ambientLight);
 }
 
 /** Ensure the renderer has the right data locations for this shader program. */
@@ -686,14 +688,9 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	index[i++] = bot+finalSeg; index[i++] =  bot; index[i++] = top;
 	index[i++] = top; index[i++] =  top+finalSeg; index[i++] = bot+finalSeg;
 
-	//CModel* cylinder = new CModel(pos);
 	CModel* cylinder = createModel();
 	cylinder->setPos(pos);
 
-
-//	setVertexDetails(*cylinder, 1, i, noVerts);
-//	storeIndexedModel(cylinder,v, index );
-	//cylinder->storeIndexed(3, v, noVerts, index, i);
 
 
 	cylinder->storeVertexes(v, sizeof(vBuf::T3Dvert) * noVerts, noVerts);
@@ -704,6 +701,71 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	delete[] index;
 	modelList.push_back(cylinder);
 	return cylinder;
+}
+
+CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
+	float ringStep = 360.0f / steps;
+	const int noRings = steps / 4;
+	const int noVerts = (steps * noRings) + 1;
+	vBuf::T3Dvert* v = new vBuf::T3Dvert[noVerts];
+	int vNo = 0;
+
+	//for each climb of theta
+	//create a ring of points
+	float theta = 0; float rTheta;
+	float lambda = 0; float rLambda;
+	for (int ring = 0; ring < noRings; ring++) {
+		rTheta = glm::radians(theta);
+		for (int seg = 0; seg < steps; seg++) {
+			rLambda = glm::radians(lambda);
+			v[vNo].v = glm::vec3(sin(rLambda) * cos(rTheta), sin(rTheta), cos(rLambda) * cos(rTheta)) * radius;
+			v[vNo].normal = glm::vec3(sin(rLambda) * cos(rTheta), sin(rTheta), cos(rLambda) * cos(rTheta)) * -1.0f;
+			v[vNo].colour = glm::vec4(0,0,0.93,1);
+			vNo++;
+			lambda += ringStep;
+		}
+		theta += ringStep;
+	}
+
+	v[vNo].v = glm::vec3(0.0f, radius, 0.0f); //apex
+	v[vNo].normal = glm::vec3(0.0f, -1, 0.0f);
+	v[vNo].colour = glm::vec4(0, 0, 0.9, 1);
+
+	const int noTriangles = (steps * 2 * (noRings - 1)) + steps;
+	unsigned short* index = new unsigned short[noTriangles * 3];
+	//for each ring except the last, use its verts to make two triangles
+	int baseRing, topRing; int i = 0; int seg;
+	for (int ring = 0; ring < noRings - 1; ring++) {
+		baseRing = ring * steps; topRing = baseRing + steps;
+		for (seg = 0; seg < steps-1; seg++) {
+			//index[i++] = baseRing + seg; index[i++] = baseRing + seg+1; index[i++] = topRing + seg;
+			index[i++] = topRing + seg; index[i++] = baseRing + seg + 1; index[i++] = baseRing + seg;
+			//index[i++] = topRing + seg; index[i++] = baseRing + seg + 1; index[i++] = topRing + seg+1;
+			index[i++] = topRing + seg + 1; index[i++] = baseRing + seg + 1; index[i++] = topRing + seg;
+		}
+		index[i++] = topRing + seg; index[i++] = baseRing; index[i++] = baseRing + seg;
+		index[i++] = topRing; index[i++] = baseRing ; index[i++] = topRing + seg;
+	}
+
+	//cap
+	for (seg = 0; seg < steps - 1; seg++) {
+		index[i++] = vNo; index[i++] = topRing + seg +1; index[i++] = topRing + seg;
+	}
+	index[i++] = vNo; index[i++] = topRing ; index[i++] = topRing + seg;
+	
+	CModel* dome = createModel();
+	dome->setPos(pos);
+
+	dome->storeVertexes(v, sizeof(vBuf::T3Dvert) * noVerts, noVerts);
+	dome->storeIndex(index, sizeof(unsigned short) * i, i);
+	dome->storeLayout(3, 4, 3, 0);
+	dome->setDrawMode(drawTris);
+
+	delete[] v;
+	delete[] index;
+	//modelList.push_back(dome);
+
+	return dome;
 }
 
 /** Render a 3D block of pixels of the given volume to a buffer, one pixel-layer after another. */
@@ -719,9 +781,7 @@ void CEngine::renderTo2DTexture(glm::vec2 size, int* buf) {
 
 /** Send these vertices to the graphics hardware to be buffered, and register them with the given model. */
 void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
-	//Renderer.storeVertexData(vertObj->hBuffer,verts, noVerts * vertObj->nAttribs * sizeof(glm::vec3));
-	model->storeVertexData(verts, noVerts, sizeof(glm::vec3));
-	//Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer,0, vertObj->nAttribs);
+	model->storeVertexes(verts,  sizeof(glm::vec3), noVerts);
 	model->storeVertexLayout(0);
 }
 
@@ -857,6 +917,27 @@ CBaseBuf * CEngine::createBuffer() {
 	return new CBuf();
 }
 
+CSkyDome * CEngine::createSkyDome() {
+	if (skyDome != NULL) {
+		cerr << "\nAttemp to create skydome when it already exists.";
+		return NULL;
+	}
+
+	CModel* dome = createHemisphere(glm::vec3(0, 0, 0), 1, 25);
+	skyDome = new CSkyDome();
+	skyDome->setModel(dome);
+
+	//load skyDome shader
+	loadShader(vertex, dataPath + "skyDome.vert");
+	loadShader(frag, dataPath + "skyDome.frag");
+	skyDome->hSkyDomeProg = linkShaders();
+	setCurrentShader(skyDome->hSkyDomeProg);
+	skyDome->hMVPmatrix = getShaderDataHandle("mvpMatrix");
+	skyDome->hSkyDomeHeightColours = getShaderDataHandle("heightColour");
+
+	return skyDome;
+}
+
 
 
 CEngine::~CEngine(void) {
@@ -866,5 +947,7 @@ CEngine::~CEngine(void) {
 		delete modelList[m];
 	for (size_t m = 0; m < renderModelList.size(); m++)
 		;// delete renderModelList[m];
+	if (skyDome)
+		delete skyDome;
 	Renderer.detachWindow();
 }

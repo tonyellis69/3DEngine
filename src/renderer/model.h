@@ -6,7 +6,7 @@
 #include "multiBuf.h"
 #include "buf.h"
 
-//class CRenderer;
+enum  TdrawMode { drawPoints, drawLines, drawTris};
 
 /** Class for 3d polygon models. 
 	NB: because vertices are ultimately stored with the graphics hardware,
@@ -28,6 +28,7 @@ public:
 	virtual void storeVertexes(void* verts, unsigned int size, unsigned int nVerts) {};
 	virtual void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices) {};
 	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
+	virtual void setDrawMode(TdrawMode drawMode) {};
 
 	int drawMode; ///<Triangles, lines etc
 
@@ -56,7 +57,7 @@ public:
 	void storeVertexes(void* verts, unsigned int size, unsigned int nVerts);
 	void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices);
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
-
+	void setDrawMode(TdrawMode drawMode);
 
 
 	CRenderer* pRenderer; ///<Lets models talk to renderer.

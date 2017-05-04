@@ -176,6 +176,9 @@
     <ClCompile Include="..\src\renderer\baseBuf.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\skyDome.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -369,6 +372,9 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\baseBuf.h">
       <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\skyDome.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

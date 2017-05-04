@@ -415,28 +415,28 @@ int CRenderer::getShaderDataHandle(int program, std::string varName) {
 
 
 /** Use the given matrix as directed with the current shader. */
-void  CRenderer::setShaderValue(int matrixHandle,glm::mat4& matrix) {
-	glUniformMatrix4fv(matrixHandle, 1, GL_FALSE, glm::value_ptr(matrix));
+void  CRenderer::setShaderValue(int matrixHandle, int elements, glm::mat4& matrix) {
+	glUniformMatrix4fv(matrixHandle, elements, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void CRenderer::setShaderValue(int matrixHandle,glm::mat3& matrix) {
-	glUniformMatrix3fv(matrixHandle, 1, GL_FALSE, glm::value_ptr(matrix));
+void CRenderer::setShaderValue(int matrixHandle, int elements, glm::mat3& matrix) {
+	glUniformMatrix3fv(matrixHandle, elements, GL_FALSE, glm::value_ptr(matrix));
 }
 
 
 /** Use the given uniform vector with the current shader. */
-void  CRenderer::setShaderValue(int vecHandle,glm::vec3& vector) {
-	glUniform3fv(vecHandle, 1, glm::value_ptr(vector));
+void  CRenderer::setShaderValue(int vecHandle, int elements, glm::vec3& vector) {
+	glUniform3fv(vecHandle, elements, glm::value_ptr(vector));
 }
-void  CRenderer::setShaderValue(int vecHandle,glm::vec4& vector) {
-	glUniform4fv(vecHandle, 1, glm::value_ptr(vector));
+void  CRenderer::setShaderValue(int vecHandle, int elements, glm::vec4& vector) {
+	glUniform4fv(vecHandle, elements, glm::value_ptr(vector));
 }
 
-void  CRenderer::setShaderValue(int intHandle,int value) {
+void  CRenderer::setShaderValue(int intHandle, int elements, int value) {
 	glUniform1i(intHandle,value);
 }
 
-void CRenderer::setShaderValue(int floatHandle, float value) {
+void CRenderer::setShaderValue(int floatHandle, int elements, float value) {
 	glUniform1f(floatHandle,value);
 }
 
@@ -809,6 +809,25 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 
 
 	
+}
+
+void CRenderer::setDepthTest(bool on) {
+	
+	
+	if (on) {
+	//	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
+	//	glDepthFunc(GL_LEQUAL);
+	//glClear(GL_DEPTH_BUFFER_BIT);
+
+	}
+	else {
+//glClear(GL_DEPTH_BUFFER_BIT);
+	//glDepthMask(GL_FALSE) ;
+		glDisable(GL_DEPTH_TEST);
+	//	glClear(GL_DEPTH_BUFFER_BIT);
+		//glDepthFunc(GL_NEVER);
+	}
 }
 
 

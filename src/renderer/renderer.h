@@ -51,13 +51,13 @@ public:
 	void freeVAO(unsigned int hVAO);
 	void acquireDataLocations(int program);
 	int getShaderDataHandle(int program, std::string varName);
-	void setShaderValue(int matrixHandle,glm::mat4& matrix); 
-	void setShaderValue(int matrixHandle,glm::mat3& matrix); 
+	void setShaderValue(int matrixHandle,int elements, glm::mat4& matrix); 
+	void setShaderValue(int matrixHandle, int elements, glm::mat3& matrix);
 
-	void setShaderValue(int vecHandle,glm::vec3& vector);
-	void setShaderValue(int vecHandle,glm::vec4& vector);
-	void setShaderValue(int intHandle,int value);
-	void setShaderValue(int floatHandle, float value);
+	void setShaderValue(int vecHandle, int elements, glm::vec3& vector);
+	void setShaderValue(int vecHandle, int elements, glm::vec4& vector);
+	void setShaderValue(int intHandle, int elements, int value);
+	void setShaderValue(int floatHandle, int elements, float value);
 	void setShader(int program);
 	void drawModel(CRenderModel& model);
 	void initRenderToTextureBufs();
@@ -74,6 +74,7 @@ public:
 	void initQuery();
 	unsigned int query();
 	void drawMultiModel(CModelMulti& model);
+	void setDepthTest(bool on);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view

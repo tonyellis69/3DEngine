@@ -53,6 +53,7 @@ public:
 	void DrawUI();
 	void RegisterUIfunctors();
 	virtual void onStart() {};
+	void drawSkyDome();
 	
 	void initWatches();
 	void updateWatches();
