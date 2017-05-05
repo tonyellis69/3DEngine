@@ -176,12 +176,7 @@ void CRenderer::init() {
 
 	initRenderToTextureBufs();
 
-	 glEnable(GL_PRIMITIVE_RESTART);
 	 glPrimitiveRestartIndex(65535);
-
-
-
-
 
 }
 
@@ -403,6 +398,7 @@ void CRenderer::acquireDataLocations(int program) {
 	lightDirection = glGetUniformLocation(program, "lightDirection");
 	lightIntensity = glGetUniformLocation(program, "lightIntensity");
 	ambientLight = glGetUniformLocation(program, "ambientLight");
+	hColour = glGetUniformLocation(program, "colour");
 }
 /** Get a handle for the given variable used in the given shader. */
 int CRenderer::getShaderDataHandle(int program, std::string varName) {
@@ -562,92 +558,11 @@ void CRenderer::renderTo2DTexture(int shader, int w, int h, int* buf) {
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-//TO DO: returns the data in the user-supplied buffer (repurpose CBuf as the single buffer to multibuf's multibuf. Down to the user to
-//provide a buffer big enough
-unsigned int CRenderer::getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf,unsigned int multiBufferOffset) {
-
-	glEnable(GL_RASTERIZER_DISCARD);
-
-	GLuint tbo;
-	glGenBuffers(1, &tbo);
-	glBindBuffer(GL_ARRAY_BUFFER, tbo);
-	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_READ);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	
-	GLint elapsed = 0;
-	GLuint query, speedQuery,primitives;
-	glGenQueries(1, &query);
-	//glGenQueries(1, &speedQuery);
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tbo);
-
-	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
-	//glBeginQuery(GL_TIME_ELAPSED, speedQuery);
-
-
-	glBeginTransformFeedback(GL_TRIANGLES);
-	//drawModel(model);
-	model.drawNew();
-	glEndTransformFeedback();
-
-
-//	glEndQuery(GL_TIME_ELAPSED);
-	glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
-
-	
-	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
-//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
-	
-	if (primitives == 0) {
-
-		glDisable(GL_RASTERIZER_DISCARD);
-
-		//empty the internal buffer
-		freeBuffer(tbo);
-		return 0; //TO DO fix should not happen
-	}
-
-	
-	int outSize = primitives * 3 * sizeof(vBuf::T3Dvert);
-	totalbufsize += outSize;
-	totalchunks++;
-
-	
-
-	if (multiBufferOffset > 0) {
-
-
-		glBindBuffer(GL_COPY_WRITE_BUFFER, hFeedBackBuf);
-		
-		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0,  multiBufferOffset-1, outSize);
-	}
-	else { 
-		GLuint dest;
-		glGenBuffers(1, &dest);
-		glBindBuffer(GL_COPY_WRITE_BUFFER, dest);
-		glBufferData(GL_COPY_WRITE_BUFFER, outSize, NULL, GL_STATIC_READ);
-
-
-		glCopyBufferSubData(GL_TRANSFORM_FEEDBACK_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, outSize);
-		hFeedBackBuf = dest;
-	}
-	glBindBuffer(GL_COPY_WRITE_BUFFER,0);
-	
-	glDisable(GL_RASTERIZER_DISCARD);
-
-	//empty the internal buffer
-	freeBuffer(tbo);
-	
-	//	cerr << "\nChunk took: " << elapsed << " by query timer";
-
-	return primitives;
-}
-
 unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
 
 	
 	glEnable(GL_RASTERIZER_DISCARD);
-
+	glEnable(GL_PRIMITIVE_RESTART);
 
 	GLint elapsed = 0;
 	GLuint query, speedQuery, primitives;
@@ -678,7 +593,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
 	//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
 
-
+	glDisable(GL_PRIMITIVE_RESTART);
 	if (primitives == 0) {
 
 		glDisable(GL_RASTERIZER_DISCARD);
@@ -690,7 +605,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 	}
 
 
-	int outSize = primitives * 3 * sizeof(vBuf::T3Dvert);
+	int outSize = primitives * 3 * sizeof(vBuf::T3DnormVert);
 	totalbufsize += outSize;
 	totalchunks++;
 

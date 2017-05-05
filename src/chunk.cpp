@@ -1,7 +1,7 @@
 #include "chunk.h"
 
 Chunk::Chunk() {
-	noAttribs = 3;
+	noAttribs = 2;
 	init();
 }
 

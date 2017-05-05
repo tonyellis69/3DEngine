@@ -12,6 +12,7 @@ public:
 	unsigned short getNextId();
 	std::vector<GLint> first;
 	std::vector<GLsizei> count;
+	std::vector<glm::vec4> colour;
 	unsigned int objCount;
 	unsigned short nextId;
 };
@@ -23,7 +24,7 @@ public:
 	unsigned int arrayCount;
 	unsigned int blockStart;
 	unsigned int blockSize;
-	unsigned int blockIdx;
+	unsigned int blockIdx;	
 	bool free;
 
 };
@@ -36,8 +37,6 @@ public:
 	void setMultiBufferSize(unsigned int bufSize);
 	int getElementSize();
 	void reserve(unsigned int size);
-	GLint* getFirstArray();
-	GLsizei* getCountArray();
 	void copyBuf(CBaseBuf& srcBuf, unsigned int size);
 	void setSize(unsigned int size);
 	void createChildBuf();
@@ -47,6 +46,7 @@ public:
 	unsigned int getLastId();
 	void draw();
 	void deleteBlock(unsigned int id);
+	void setBlockColour(unsigned int id, tmpRGBAtype& colour);
 	
 
 	GLint* first;
@@ -54,7 +54,6 @@ public:
 	unsigned int freeMem;
 	unsigned int maxBufSize;
 	unsigned int minBufSize; ///<Minimum space that should always be available.
-	unsigned int maxObjects;
 	unsigned int currentObjects;
 
 	int elemSize;

@@ -39,6 +39,11 @@ struct T3Dvert {
 	glm::vec3 normal;
 };
 
+struct T3DnormVert {
+	glm::vec3 v; 
+	glm::vec3 normal;
+};
+
 struct T3DcolTri {
 public:
 	void setTri(glm::vec3& aTri, glm::vec3& bTri, glm::vec3& cTri); 

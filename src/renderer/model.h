@@ -6,6 +6,7 @@
 #include "multiBuf.h"
 #include "buf.h"
 
+
 enum  TdrawMode { drawPoints, drawLines, drawTris};
 
 /** Class for 3d polygon models. 
@@ -29,8 +30,10 @@ public:
 	virtual void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices) {};
 	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 	virtual void setDrawMode(TdrawMode drawMode) {};
+	virtual void setColour(glm::vec4 newColour) {};
 
 	int drawMode; ///<Triangles, lines etc
+	glm::vec4 colour;
 
 //	int nTris; ///<Number of triangles
 
@@ -58,6 +61,7 @@ public:
 	void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices);
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
 	void setDrawMode(TdrawMode drawMode);
+	void setColour(glm::vec4 newColour);
 
 
 	CRenderer* pRenderer; ///<Lets models talk to renderer.
@@ -75,9 +79,11 @@ public:
 	virtual GLint* getFirstArray() { return 0; };
 	virtual GLsizei* getCountArray() { return 0; };
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
+	void drawNew();
 
 	virtual void reserveBuf(unsigned int elementsUsed) {};
 	
+	CRenderer* pRenderer; ///<Lets models talk to renderer.
 	CMultiBuf multiBuf;
 
 };

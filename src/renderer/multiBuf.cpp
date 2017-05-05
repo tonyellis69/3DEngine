@@ -17,7 +17,6 @@ CMultiBuf::CMultiBuf() {
 void CMultiBuf::setMultiBufferSize(unsigned int bufSize) {
 	setSize(bufSize);
 	maxBufSize = bufSize;
-	CMultiBuf::maxObjects = 2000;
 	freeMem = 0;
 	lastId = 0;
 }
@@ -45,15 +44,6 @@ void CMultiBuf::reserve(unsigned int size) {
 		createChildBuf();
 }
 
-GLint * CMultiBuf::getFirstArray()
-{
-	return nullptr;
-}
-
-GLsizei * CMultiBuf::getCountArray()
-{
-	return nullptr;
-}
 
 /** Copy the given buffer data into free memory. */
 void CMultiBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
@@ -66,10 +56,11 @@ void CMultiBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
 		copyToNewBlock(hSrcBuf, size);
 	}
 
+//	setBlockColour(lastId, glm::vec4(0.5f, 0.5f, 0.5f, 1));
 
-/*	cerr << "\nNumber of childbufs " << childBufs.size();
-	cerr << " blocks " << blocks.size();
-	cerr << " free blocks " << freeBlocks.size(); */
+//	cerr << "\nNumber of childbufs " << childBufs.size();
+//	cerr << " blocks " << blocks.size();
+//	cerr << " free blocks " << freeBlocks.size(); 
 //	Useful stats. Freeblocks eventually settles at about 1/7 of the total blocks, a little high,  but since 
 //	total blocks eventually stops rising anyway it's not a huge concern. An optimisation would be to 
 //	consolidate adjacent empty blocks periodically, which would require resizing the blocks map.
@@ -145,6 +136,7 @@ void CMultiBuf::draw() {
 		childBuf = &childBufs[child];
 		glBindVertexArray(childBufs[child].hVAO);
 		for (int object = 0; object < childBuf->objCount; object++) {
+			
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
 		}
 	}
@@ -187,6 +179,16 @@ void CMultiBuf::deleteBlock(unsigned int id) {
 	block->free = true;
 	freeBlocks.insert(pair<unsigned int,unsigned int>(block->blockSize,id));
 	
+}
+
+void CMultiBuf::setBlockColour(unsigned int id, tmpRGBAtype & colour) {
+	//find buf
+	CChildBlock* block = &blocks[id];
+	unsigned short childBufNo = (id >> 16) - 1;
+	unsigned short blockIdx = block->blockIdx;
+	CChildBuf* childBuf = &childBufs[childBufNo];
+	//set colour;
+	childBuf->colour[blockIdx] = glm::vec4(colour.r, colour.g, colour.b, colour.a);
 }
 
 /** Return the id of the nearest larger block than size, or zero. */
@@ -239,20 +241,14 @@ void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 
 	CChildBuf* currentChild = &childBufs.back();
 	unsigned int objCount = currentChild->objCount;
-	/*if (objCount > 0)
-		currentChild->first.push_back(currentChild->first[objCount - 1] + currentChild->count[objCount - 1]);
-	else
-		currentChild->first.push_back(0);*/
+
 	currentChild->first.push_back(freeMem / elemSize);
 	currentChild->count.push_back(size / elemSize);
-
+	currentChild->colour.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1));
 
 	//record on blocks list
 	CChildBlock newBlock;
 	newBlock.id = (childBufs.size() << 16) + currentChild->getNextId();
-
-	if (newBlock.id == 1114132)
-		int b = 0;
 
 	newBlock.arrayFirst = currentChild->first.back();
 	newBlock.arrayCount = currentChild->count.back();

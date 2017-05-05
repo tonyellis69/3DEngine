@@ -543,7 +543,7 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 
 	const int indexSize = 36;
 
-	vBuf::T3Dvert v[24];
+	vBuf::T3DnormVert v[24];
 	v[0].v=A;v[1].v=B;v[2].v=C;v[3].v=D;//front face
 	v[0].normal = v[1].normal = v[2].normal = v[3].normal=glm::vec3(0,0,1);
 	v[4].v=B;v[5].v=F;v[6].v=G;v[7].v=C;//right face
@@ -556,10 +556,9 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 	v[16].normal = v[17].normal = v[18].normal = v[19].normal=glm::vec3(0,1,0);
 	v[20].v=D;v[21].v=C;v[22].v=G;v[23].v=H;//bottom face
 	v[20].normal = v[21].normal = v[22].normal = v[23].normal=glm::vec3(0,-1,0);
-	glm::vec4 colour = glm::vec4(col::randHue(),1);
-	for (int x=0;x<24;x++)
-		v[x].colour = colour;
-
+	
+	cube->setColour(glm::vec4(col::randHue(),1));
+	
 	//fill index with indices
 	unsigned short index[indexSize] = {1,0,3,1,3,2,
 		5,4,7,5,7,6,
@@ -575,7 +574,7 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 	//cube->storeIndexed(3, v, 24, index, indexSize);
 	cube->storeVertexes(v, sizeof(v), 24);
 	cube->storeIndex(index, sizeof(index), indexSize);
-	cube->storeLayout(3, 4, 3, 0);
+	cube->storeLayout(3, 3, 0, 0);
 
 	modelList.push_back(cube);
 	return cube;
@@ -600,7 +599,7 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 	//TO DO can't we just use worldMatrix inside shader?
 	//TO DO: create a MVP matrix and send that instead
 	setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
-
+	setShaderValue(Renderer.hColour, 1, model.colour);
 	model.drawNew();
 
 	//Renderer.drawModel(model);
@@ -648,7 +647,7 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	const int noVerts = (s * 4) + 2;
 	const int topDisc = 0; const int botDisc = s;const int top = s*2;
 	const int bot = s*3; const int topCent = s*4; const int botCent = topCent+1;
-	vBuf::T3Dvert* v = new vBuf::T3Dvert[noVerts];
+	vBuf::T3DnormVert* v = new vBuf::T3DnormVert[noVerts];
 	//rotate through the segments, and create 4 rings of vertices:
 	//top, where all the norms point up, base where they all point down,
 	//and 2 for the body where they point out,
@@ -668,9 +667,7 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	}
 	v[topCent].v = glm::vec3(0,h,0); v[topCent].normal = glm::vec3(0,1,0);
 	v[botCent].v = glm::vec3(0,0,0); v[botCent].normal = glm::vec3(0,-1,0);
-	glm::vec4 colour = glm::vec4(col::randHue(),1);
-	for (int c=0;c<noVerts;c++)
-		v[c].colour = colour;
+
 
 	const int noTriangles = s*4;
 	unsigned short* index = new unsigned short[noTriangles * 3];
@@ -690,12 +687,14 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 
 	CModel* cylinder = createModel();
 	cylinder->setPos(pos);
+	cylinder->setColour(glm::vec4(col::randHue(), 1));
+
 
 
 
 	cylinder->storeVertexes(v, sizeof(vBuf::T3Dvert) * noVerts, noVerts);
 	cylinder->storeIndex(index, sizeof(unsigned short) * i, i);
-	cylinder->storeLayout(3, 4, 3, 0);
+	cylinder->storeLayout(3, 3,0, 0);
 
 	delete[] v;
 	delete[] index;
@@ -707,7 +706,7 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	float ringStep = 360.0f / steps;
 	const int noRings = steps / 4;
 	const int noVerts = (steps * noRings) + 1;
-	vBuf::T3Dvert* v = new vBuf::T3Dvert[noVerts];
+	vBuf::T3DnormVert* v = new vBuf::T3DnormVert[noVerts];
 	int vNo = 0;
 
 	//for each climb of theta
@@ -720,7 +719,7 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 			rLambda = glm::radians(lambda);
 			v[vNo].v = glm::vec3(sin(rLambda) * cos(rTheta), sin(rTheta), cos(rLambda) * cos(rTheta)) * radius;
 			v[vNo].normal = glm::vec3(sin(rLambda) * cos(rTheta), sin(rTheta), cos(rLambda) * cos(rTheta)) * -1.0f;
-			v[vNo].colour = glm::vec4(0,0,0.93,1);
+	
 			vNo++;
 			lambda += ringStep;
 		}
@@ -729,7 +728,7 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 
 	v[vNo].v = glm::vec3(0.0f, radius, 0.0f); //apex
 	v[vNo].normal = glm::vec3(0.0f, -1, 0.0f);
-	v[vNo].colour = glm::vec4(0, 0, 0.9, 1);
+	
 
 	const int noTriangles = (steps * 2 * (noRings - 1)) + steps;
 	unsigned short* index = new unsigned short[noTriangles * 3];
@@ -755,10 +754,11 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	
 	CModel* dome = createModel();
 	dome->setPos(pos);
+	dome->setColour(glm::vec4(0, 0, 0.93, 1));
 
-	dome->storeVertexes(v, sizeof(vBuf::T3Dvert) * noVerts, noVerts);
+	dome->storeVertexes(v, sizeof(vBuf::T3DnormVert) * noVerts, noVerts);
 	dome->storeIndex(index, sizeof(unsigned short) * i, i);
-	dome->storeLayout(3, 4, 3, 0);
+	dome->storeLayout(3, 3, 0, 0);
 	dome->setDrawMode(drawTris);
 
 	delete[] v;

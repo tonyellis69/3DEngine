@@ -1,6 +1,8 @@
 #pragma once
 
-
+typedef struct {
+	float r, g, b, a;
+} tmpRGBAtype;
 
 class CBaseBuf {	
 public:
@@ -17,4 +19,5 @@ public:
 	virtual unsigned int getLastId() { return 0; };
 	virtual void draw() {};
 	virtual void deleteBlock(unsigned int id) {};
+	virtual void setBlockColour(unsigned int id, tmpRGBAtype& colour) {};
 };

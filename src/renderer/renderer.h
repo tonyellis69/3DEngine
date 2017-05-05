@@ -86,6 +86,7 @@ public:
 	GLuint lightDirection; ///<Handle to standard shader light vector.
 	GLuint lightIntensity; 
 	GLuint ambientLight;
+	GLuint hColour;
 
 	HDC myhDC; ///<Handle for the window device context we're using.
 	HGLRC myhRC; ///<Handle for the window rendering context we're using.

@@ -136,7 +136,7 @@ public:
 	unsigned int getBuffer();
 
 
-	CRenderer* pRenderer; ///<Lets terrain talk to renderer.
+//	CRenderer* pRenderer; ///<Lets terrain talk to renderer.
 	unsigned int hBuffer; ///<Handle for the (OpenGL) multidraw buffer.
 	unsigned int freeMem; ///<Offset into the buffer at which free memory starts;
 	
