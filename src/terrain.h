@@ -111,6 +111,8 @@ public:
 	void scroll(glm::i32vec3& scrollVec);
 	Chunk* getChunkAt(glm::vec3& pos);
 	CSuperChunk* getNearestSC(glm::vec3& pos);
+	bool resetCheck(glm::i32vec3& scrollVec);
+
 	std::vector<CSuperChunk*> superChunks;
 	glm::vec3 nwLayerPos;
 	float cubeSize;
@@ -122,6 +124,7 @@ public:
 	int cubesPerChunkEdge;
 
 	std::vector<CSuperChunk*> faceGroup[6];
+	glm::i32vec3 resetState; ///<Tracks how close layer is to returning to its reset position.
 };
 
 

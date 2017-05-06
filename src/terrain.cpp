@@ -174,7 +174,7 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 		for (size_t y=0; y<scArray[0].size(); ++y) {
 			for (size_t z=0;z<scArray[0][0].size(); ++z) {
 				CSuperChunk* sChunk = scArray[x][y][z];
-				sChunk->nwWorldPos = layers[layerNo].nwLayerPos + vec3(x,y,z) * thisSuperChunkSize;
+				sChunk->nwWorldPos = vec3(x,y,z) * thisSuperChunkSize;
 				sChunk->setSizes(_sizeInChunks,cubesPerChunkEdge,layers[layerNo].cubeSize);		
 				sChunk->LoD = layers[layerNo].LoD;
 				sChunk->LoDscale = LoDscale;
@@ -183,6 +183,7 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				if (x == 3 && y == 1 && z == 0 && layerNo == 1)
 					dbgSC = sChunk;
 				sChunk->genColour = vec4(col::randHue(),1);
+				sChunk->layerNo = layerNo;
 			}
 		}
 	}
@@ -357,40 +358,23 @@ void CTerrain::update() {
 
 /** Advance the terrain in the given direction. */
 void CTerrain::advance(Tdirection dir) {
-	if (dir == none) //TO DO: should not happen!
-		return;
-	//find the axis along which we're scrolling 0=x,1=y,z=2, and the direction, 1 or -1.
-	int scrollAxis = getAxis(dir);
-	int scrollDir = (int)dirToVec(dir)[scrollAxis];//-1 when scrolling-in from the north
-	i32vec3 scrollVec(0,0,0);
-	scrollVec[scrollAxis] = scrollDir;
+	i32vec3 scrollVec = dirToVec(dir);
 
 	size_t inner = layers.size()-1;
 	//for (int l=inner;l>=0;l--) {
-	for (int l=0;l<=inner;l++) {  //from outer layer to inner
+	for (int layerNo=0; layerNo <= inner; layerNo++) {  //from outer layer to inner
 			Tdirection outgoingDir = flipDir(dir);
 
-			//advance this layer
-			bool scrolled = layers[l].advance(scrollVec); 
-			//this will move all chunks along by the size of LoD1, and may trigger the layer's scroll action.
-		
-			if (scrolled) {
-				if (!layers[l].shifted[outgoingDir]) {
-					if (!layers[l].shifted[dir]) {
-						layers[l].shifted[outgoingDir] = true;
-					}
-					else
-						layers[l].shifted[dir] = false;
-				}
-				else {
-					layers[l].shifted[outgoingDir] = false;
-					if (l > 0) {
-						addTwoIncomingLayers(l,dir);  
-					}
+			//Move all chunks along by the size of LoD1, and maybe trigger the layer's scroll action.
+			bool layerScrolled = layers[layerNo].advance(scrollVec); 
+			
+			//Check if this layer has now scrolled twice and thus reset 
+			if (layerScrolled && layers[layerNo].resetCheck(scrollVec)) {
+				if (layerNo > 0) {
+					addTwoIncomingLayers(layerNo, dir);
 				}
 			}
 	}
-
 }
 
 
@@ -437,15 +421,9 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 	CSuperChunk* sc;
 	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
 		sc = layers[layerNo].faceGroup[face][scNo];
-
 		sc->addTwoIncomingLayers(face, xStart, yStart);
-
 	} 
 }
-
-
-
-
 
 
 
@@ -458,18 +436,13 @@ void CTerrain::freeChunk(Chunk & chunk) {
 
 CTerrain::~CTerrain() {
 	for (size_t c=0;c<spareChunks.size();c++) {
-		
-		//freeChunkModel(spareChunks[c]);
 		delete spareChunks[c];
 	}
 	
-	
-
 	for (size_t l=0;l<layers.size();l++) {
 		for (size_t s=0;s<layers[l].superChunks.size();s++) {
 			delete layers[l].superChunks[s];
 		}
-
 	}
 }
 
@@ -491,6 +464,7 @@ unsigned int CRenderTerrain::getBuffer() {
 CTerrainLayer::CTerrainLayer() {
 	scrollState = i32vec3(0);
 	shifted[0] = shifted[1] = shifted[2] = shifted[3] = shifted[4] = shifted[5] = false;
+	resetState = i32vec3(0);
 }
 
 /** Advance the terrain of this layer in a given direction, scrolling as necessary. Returns true if a scroll
@@ -498,23 +472,17 @@ CTerrainLayer::CTerrainLayer() {
 bool CTerrainLayer::advance(i32vec3& scrollVec) {
 	scrollState += scrollVec;
 
-	//jump all chunks along one chunk relative to terrain, to compensate for terrain being jumped back to
-	//starting position elsewhere
-	vec3 step = vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize;
-	for (size_t s=0;s<superChunks.size();s++) {
-		superChunks[s]->nwWorldPos -= step;
-	}
-	
+	nwLayerPos -= vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize; //Move whole layer in response to this advance
 
 	//If this layer has been advanced to its scrolling point, scroll it
 	int scrollAxis = getAxis(scrollVec);
 	int scrollPoint = 1 << (int)LoD-1;
 	if ( (abs(scrollState.x) == scrollPoint) || (abs(scrollState.y) == scrollPoint) || (abs(scrollState.z) == scrollPoint) ) {
-		
 		scrollState[scrollAxis] = 0;
 		scroll(scrollVec);
 		return true;
 	}
+
 	return false;
 }
 
@@ -532,15 +500,14 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 		}
 		superChunks[s]->shrinkBoundary(scrollDir); //shrink boundary where we've mode chunks out
 		superChunks[s]->extendBoundary(flipDir(scrollDir)); //extend boundary where we've moved chunks along
-		
-		//Change the sample position of each SC - actually a v important act that ensures we scroll in fresh terrain.
-		superChunks[s]->nwWorldPos += sampleStep;
 	}
+
+	//we're going to scroll this layer, so return it to its initial position first.
+	nwLayerPos += sampleStep; 
 
 	for (size_t s=0;s<superChunks.size();s++) {
 		superChunks[s]->scroll(scrollVec);
 	}
-
 }
 
 /** Return the chunk of this layer, if any, at this position. */
@@ -558,4 +525,14 @@ CSuperChunk * CTerrainLayer::getNearestSC(glm::vec3 & pos) {
 	//return SC for this index
 
 	return nullptr;
+}
+
+bool CTerrainLayer::resetCheck(glm::i32vec3 & scrollVec) {
+	int scrollAxis = getAxis(scrollVec);
+	resetState += scrollVec;
+	if (abs(resetState[scrollAxis]) > 1) {
+		resetState[scrollAxis] = 0;
+		return true;
+	}
+	return false;
 }

@@ -61,7 +61,8 @@ extern int uniTag = 0;
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition, Tdirection overlap) {
 	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale) * terrain->sampleScale;
 	Chunk* newChunk = terrain->getFreeChunk();
-	newChunk->terrainPos = vec3(nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]));
+	vec3 layerPos = terrain->layers[layerNo].nwLayerPos;
+	newChunk->terrainPos = layerPos + nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]);
 	newChunk->cubeSize = cubeSize;
 	newChunk->setSamplePos(samplePos);
 	newChunk->colour = genColour;

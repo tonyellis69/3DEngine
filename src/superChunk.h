@@ -89,7 +89,7 @@ public:
 	
 	int overlapCount; ///<Number of smaller SCs now overlapping this one.
 
-
+	int layerNo;
 
 private:
 	//Tdirection overlapDir; ///<Direction of the SC overlapped by this one.
