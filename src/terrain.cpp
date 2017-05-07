@@ -321,14 +321,10 @@ void CTerrain::prepareToFree(Chunk* chunk) {
 }
 
 
-void CTerrain::update() {
-	
+void CTerrain::update() {	
 	//Skin the next chunk on the list that needs it, if any. */
 	double startT = watch::pTimer->milliseconds();
 	Chunk* chunk;
-
-	
-
 
 	size_t s = toSkin.size();
 	while ((watch::pTimer->milliseconds() - startT) < 75) { //75 brings judder back, eats too many cycles
@@ -342,9 +338,7 @@ void CTerrain::update() {
 		s--;
 	}
 
-	
-
-	for (auto it = toFree.begin(); it != toFree.end();) {
+/*	for (auto it = toFree.begin(); it != toFree.end();) {
 		chunk = *it;
 		if (chunk->status == chSkinned || chunk->status == chRemoveOnAlert) {
 			freeChunk(*chunk);
@@ -352,7 +346,7 @@ void CTerrain::update() {
 		}
 		else
 			++it;
-	}
+	} */
 }
 
 
@@ -372,6 +366,8 @@ void CTerrain::advance(Tdirection dir) {
 			if (layerScrolled && layers[layerNo].resetCheck(scrollVec)) {
 				if (layerNo > 0) {
 					addTwoIncomingLayers(layerNo, dir);
+					//remove opposite outgoing layers
+					removeTwoOutgoingLayers(layerNo, outgoingDir);
 				}
 			}
 	}
@@ -423,6 +419,16 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 		sc = layers[layerNo].faceGroup[face][scNo];
 		sc->addTwoIncomingLayers(face, xStart, yStart);
 	} 
+}
+
+
+void CTerrain::removeTwoOutgoingLayers(int layerNo, Tdirection face) {
+	CSuperChunk* sc;
+	for (size_t scNo = 0; scNo<layers[layerNo].faceGroup[face].size(); scNo++) { //for each face SC...
+		sc = layers[layerNo].faceGroup[face][scNo];
+		sc->removeOutscrolledChunks(face);
+	}
+
 }
 
 

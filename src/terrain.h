@@ -57,6 +57,7 @@ public:
 	void createChunkMesh(Chunk& chunk);
 	void freeChunkModel(CModel* chunk);
 	void addTwoIncomingLayers(int layerNo, Tdirection face);
+	void removeTwoOutgoingLayers(int layerNo, Tdirection face);
 	void newChunkRequest(glm::vec3& samplePos, CSuperChunk* parentSC, glm::i32vec3& index);
 	void handleNextChunkRequest();
 	void freeChunk(Chunk& chunk);

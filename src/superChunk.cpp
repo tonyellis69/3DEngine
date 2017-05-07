@@ -93,7 +93,8 @@ void CSuperChunk::scroll(i32vec3& scrollVec) {
 	if (adj(outFace) == NULL) //if outface direction doesn't lead to another superchunk
 		removeFace(outFace);
 	 else if (adj(outFace)->LoD < LoD) { //we're outscrolling chunks into a superChunk of higher detail
-		 ;// shrinkIfEmpty(outFace);  //
+		 // shrinkIfEmpty(outFace);  //
+		 removeFace(outFace);
 	}
 
 	if (adj(inFace) == NULL || adj(inFace)->LoD < LoD) { //we're inscrolling chunks from outside terrain or a superChunk of higher detail
@@ -113,6 +114,8 @@ void CSuperChunk::removeFace(Tdirection faceDir) {
 	Chunk* chunk;
 	initFaceWalk(faceDir);
 	while (faceWalkNextChunk(chunk)) {
+		tmpRGBAtype tmp = { 1.0f, 1.0f, 1.0f, 1.0f };
+		terrain->multiBuf.setBlockColour(chunk->id, tmp);
 		terrain->prepareToFree(chunk);
 	}
 
@@ -324,8 +327,8 @@ void CSuperChunk::addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Td
 void CSuperChunk::skinChunk(Chunk * chunk) {
 	if (chunk->status == chToSkin)
 		terrain->createChunkMesh(*chunk);
-	//else
-	//	chunk->id = 0;
+	else
+		chunk->id = 0;
 	if (chunk->id == 0)
 		removeChunk(chunk);
 //	else
@@ -335,8 +338,6 @@ void CSuperChunk::skinChunk(Chunk * chunk) {
 	//do the overlapped-neighbour notification as needed
 	if (chunk->overlapDir != none) {
 		adj(chunk->overlapDir)->overlapAlert(chunk->overlapDir);
-
-
 	}
 	
 }
@@ -369,6 +370,11 @@ void CSuperChunk::raiseOverlapCount(int chunks, Tdirection faceDir) {
 
 void CSuperChunk::overlapAlert(Tdirection overlap) {
 	overlapCount--;
+	return;
+	//////////////////////temporarily disabling remove-on-overlap
+
+
+
 	if (overlapCount == 0) { //any overlaping SC is now fully drawn - this SC is fully overlapped
 		Tdirection overlapDir = flipDir(overlap);
 		int overlapLoD = adj(overlapDir)->LoD;
