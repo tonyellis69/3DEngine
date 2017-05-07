@@ -463,7 +463,6 @@ unsigned int CRenderTerrain::getBuffer() {
 
 CTerrainLayer::CTerrainLayer() {
 	scrollState = i32vec3(0);
-	shifted[0] = shifted[1] = shifted[2] = shifted[3] = shifted[4] = shifted[5] = false;
 	resetState = i32vec3(0);
 }
 
@@ -477,7 +476,7 @@ bool CTerrainLayer::advance(i32vec3& scrollVec) {
 	//If this layer has been advanced to its scrolling point, scroll it
 	int scrollAxis = getAxis(scrollVec);
 	int scrollPoint = 1 << (int)LoD-1;
-	if ( (abs(scrollState.x) == scrollPoint) || (abs(scrollState.y) == scrollPoint) || (abs(scrollState.z) == scrollPoint) ) {
+	if (abs(scrollState[scrollAxis]) == scrollPoint ) {
 		scrollState[scrollAxis] = 0;
 		scroll(scrollVec);
 		return true;
@@ -498,13 +497,12 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
 		}
-		superChunks[s]->shrinkBoundary(scrollDir); //shrink boundary where we've mode chunks out
-		superChunks[s]->extendBoundary(flipDir(scrollDir)); //extend boundary where we've moved chunks along
+		superChunks[s]->retractChunkSpace(scrollDir); //shrink boundary where we've moved chunks out
+		superChunks[s]->extendChunkSpace(flipDir(scrollDir)); //extend boundary where we've pushed chunks along
 	}
 
 	//we're going to scroll this layer, so return it to its initial position first.
 	nwLayerPos += sampleStep; 
-
 	for (size_t s=0;s<superChunks.size();s++) {
 		superChunks[s]->scroll(scrollVec);
 	}

@@ -30,17 +30,19 @@ public:
 	void draw();
 	void scroll(glm::i32vec3& scrollVec);
 	void removeFace(Tdirection faceDir);
-	void removeTaggedFaceChunks(Tdirection faceDir);
+
 	void addFace(Tdirection faceDir);
+	void initFaceWalk(Tdirection faceDir);
+	bool faceWalkNextSpace(glm::i32vec3& index);
+	bool faceWalkNextChunk(Chunk* &chunk);
 	void removeSClayer(CSuperChunk& superChunk, Tdirection faceDir);
 	CSuperChunk*& adj(const Tdirection dir);
 	CSuperChunk*&op(const Tdirection dir);
 	void acquireChunks(Tdirection inFace);
-	void extendBoundary(Tdirection face);
-	void shrinkBoundary(Tdirection face);
+	void extendChunkSpace(Tdirection face);
+	void retractChunkSpace(Tdirection face);
 	int firstEmptyLayer(Tdirection face);
 	int outerLayer(Tdirection face);
-	void shrinkIfEmpty(Tdirection face);
 	void removeChunk(Chunk* chunk);
 	void removeOutscrolledChunks(Tdirection faceDir);
 	void addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Tdirection yStart);
@@ -92,8 +94,8 @@ public:
 	int layerNo;
 
 private:
-	//Tdirection overlapDir; ///<Direction of the SC overlapped by this one.
-
-
+	glm::i32vec3 faceWalkPos, faceWalkStart, faceWalkEnd;
+	Tdirection faceWalkDir;
+	std::vector<Chunk*>::iterator faceWalkIt;
 };
 

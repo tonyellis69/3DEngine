@@ -119,7 +119,6 @@ public:
 	int LoD;
 	glm::i32vec3 scrollState; ///<Tracks how close layer is to scrolling in any direction.
 	
-	bool shifted[6];
 	float LoD1cubeSize;
 	int cubesPerChunkEdge;
 

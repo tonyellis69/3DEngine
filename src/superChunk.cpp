@@ -110,33 +110,15 @@ void CSuperChunk::scroll(i32vec3& scrollVec) {
 
 /** Remove the out layer of chunks from this superChunk corresponding to the given face. */
 void CSuperChunk::removeFace(Tdirection faceDir) {
-	int zAxis = getAxis(faceDir);
-	int zPos = outerLayer(faceDir);
-	vector<Chunk*>::iterator it;
-	for (it = chunkList.begin();it != chunkList.end();) {
-		if ((*it)->scIndex[zAxis] == zPos) {
-			terrain->prepareToFree(*it);
-			it = chunkList.erase(it);	
-		}
-		else
-			++it;
+	Chunk* chunk;
+	initFaceWalk(faceDir);
+	while (faceWalkNextChunk(chunk)) {
+		terrain->prepareToFree(chunk);
 	}
-	shrinkBoundary(faceDir); 
+
+	retractChunkSpace(faceDir); 
 }
 
-/** Remove the out layer of chunks from this superChunk corresponding to the given face. */
-void CSuperChunk::removeTaggedFaceChunks(Tdirection faceDir) {
-	vector<Chunk*>::iterator it;
-	for (it = chunkList.begin(); it != chunkList.end();) {
-		if ((*it)->status == chRemoveOnAlert) {
-			terrain->prepareToFree(*it);
-			it = chunkList.erase(it);
-		}
-		else
-			++it;
-	}
-	shrinkBoundary(faceDir); ///////////////////////////////////////////
-}
 
 
 
@@ -144,15 +126,6 @@ void CSuperChunk::removeTaggedFaceChunks(Tdirection faceDir) {
 /**	Add a layer of new chunks to the face indicated. */
 void CSuperChunk::addFace(Tdirection faceDir) {
 	chunksToSkin = 0;
-	//for every potenitial chunk position in the 'in' face, check for a chunk.
-	i32vec3 facePos(0); 
-
-	int xAxis = getXaxis(faceDir);
-	int yAxis = getYaxis(faceDir);
-
-	Tdirection xStart,xEnd,yStart,yEnd;
-	xStart = getXstart(faceDir); xEnd = flipDir(xStart);
-	yStart = getYstart(faceDir); yEnd = flipDir(yStart);
 
 	Tdirection overlap;
 	if (adj(faceDir)) //catch SCs at very edge of terrain. 
@@ -161,22 +134,62 @@ void CSuperChunk::addFace(Tdirection faceDir) {
 		overlap = none;
 
 	int chunkCount = 0;
-	facePos.z = firstEmptyLayer(faceDir);
-	for (facePos.x=outerLayer(xStart);facePos.x<=outerLayer(xEnd);facePos.x++) {
-		for (facePos.y=outerLayer(yStart);facePos.y<=outerLayer(yEnd);facePos.y++) {
-			i32vec3 realPos = rotateByDir(facePos,faceDir);
-			createChunk(realPos,overlap);
-			chunkCount++;
-		}
+	i32vec3 index;
+	initFaceWalk(faceDir);
+	while (faceWalkNextSpace(index)) {
+		createChunk(index, overlap);
+		chunkCount++;
 	}
-	extendBoundary(faceDir);//because we've added a layer of chunks to this face
 
+	extendChunkSpace(faceDir);//because we've added a layer of chunks to this face
 
 	if (overlap == none)
 		return;
 	Tdirection overlapedFace = flipDir(faceDir);
 	adj(faceDir)->raiseOverlapCount(chunkCount, overlapedFace);
 }
+
+void CSuperChunk::initFaceWalk(Tdirection faceDir) {
+	Tdirection xStart, xEnd, yStart, yEnd;
+	xStart = getXstart(faceDir); xEnd = flipDir(xStart);
+	yStart = getYstart(faceDir); yEnd = flipDir(yStart);
+
+	faceWalkStart.x = outerLayer(xStart); faceWalkStart.y = outerLayer(yStart);
+	faceWalkEnd.x = outerLayer(xEnd); faceWalkEnd.y = outerLayer(yEnd);
+	faceWalkDir = faceDir;
+	faceWalkPos = faceWalkStart;
+	faceWalkPos.z = firstEmptyLayer(faceWalkDir);
+	faceWalkIt = chunkList.begin();
+}
+
+bool CSuperChunk::faceWalkNextSpace(i32vec3& index) {
+	index = rotateByDir(faceWalkPos, faceWalkDir);
+	if (faceWalkPos.y > faceWalkEnd.y)
+		return false;
+	faceWalkPos.x++;
+	if (faceWalkPos.x > faceWalkEnd.x) {
+		faceWalkPos.x = faceWalkStart.x;
+		faceWalkPos.y++;
+	}
+	return true;
+}
+
+bool CSuperChunk::faceWalkNextChunk(Chunk* &chunk) {
+	if (faceWalkIt == chunkList.end()) 
+		return false;
+	int zAxis = getAxis(faceWalkDir);
+	int zPos = outerLayer(faceWalkDir);
+	while ((*faceWalkIt)->scIndex[zAxis] != zPos) {
+		faceWalkIt++;
+		if (faceWalkIt == chunkList.end())
+			return false;
+	}
+	chunk = *faceWalkIt;
+	faceWalkIt = chunkList.erase(faceWalkIt);
+	return true;
+}
+
+
 
 
 /** Return the adjacent superchunk in the given direction, if any.*/
@@ -227,14 +240,13 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
 			 else
 				 ++it;
 		 }
-		 extendBoundary(inFace);
-		 giver->shrinkBoundary(outFace);
-	 
+		 extendChunkSpace(inFace);
+		 giver->retractChunkSpace(outFace);
  }
 
 
 /** Extend the recogised position for outermost chunks in the face direction. */
-void CSuperChunk::extendBoundary(Tdirection face) {
+void CSuperChunk::extendChunkSpace(Tdirection face) {
 	if ((face == north)||(face == west) || (face == down))
 		faceBoundary[face] -= 1;
 	else
@@ -244,15 +256,12 @@ void CSuperChunk::extendBoundary(Tdirection face) {
 extern CSuperChunk* dbgSC;
 
 /** Shrink the recogised position for outermost chunks in the face direction. */
-void CSuperChunk::shrinkBoundary(Tdirection face) {
+void CSuperChunk::retractChunkSpace(Tdirection face) {
 
 	if ((face == north)||(face == west) || (face == down))
 		faceBoundary[face] += 1;
 	else
 		faceBoundary[face] -= 1;
-
-	if (dbgSC == this && face == south && faceBoundary[2] == 3)
-		int b = 0;
 }
 
 /** Return the position of the first layer beyond the outer, face layer of chunks in the given direction. */
@@ -265,13 +274,7 @@ int CSuperChunk:: outerLayer(Tdirection face) {
 	return faceBoundary[face];
 }
 
-/** Ensure empty SCs have their boundary reshrunk - this happens automatically for SCs with chunkst to scroll. */
-//TO DO: bit of a fudge, maybe ensure all shrinkage happens in the same place?
-void CSuperChunk::shrinkIfEmpty(Tdirection face) {
-	if (chunkList.size() == 0) { 
-		shrinkBoundary(face);
-	}
-}
+
 
 /** Find and remove the given chunk from this superChunk's control. */
 void CSuperChunk::removeChunk(Chunk* chunk) {
@@ -294,29 +297,25 @@ void CSuperChunk::removeOutscrolledChunks(Tdirection faceDir) {
 /** Create two new layers of chunks on the given face. This happens when the superChunk has scrolled and we want to replace the lower-LoD chunks of the 
 	adjacent next-layer superChunk, which are currently intruding into our space. */
 void CSuperChunk::addTwoIncomingLayers(Tdirection faceDir, Tdirection xStart, Tdirection yStart) {
-	int zAxis = getAxis(faceDir);
-	extendBoundary(faceDir); extendBoundary(faceDir);
-	sizeInChunks[zAxis] += 1;
+
 	int chunkCount = 0;
 
-	int zStart = outerLayer(faceDir); int zEnd = zStart + 1;
-	if ((faceDir == south) || (faceDir == east) || (faceDir == up)) {
-		zEnd = outerLayer(faceDir); zStart = zEnd - 1;
-	}
-
 	i32vec3 facePos;
-	Tdirection xEnd = flipDir(xStart);
-	Tdirection yEnd = flipDir(yStart);
-	for (facePos.z = zStart; facePos.z <= zEnd; facePos.z++) {
-		//for each potential chunk space
-		for (facePos.x = outerLayer(xStart); facePos.x <= outerLayer(xEnd); facePos.x++) {
-			for (facePos.y = outerLayer(yStart); facePos.y <= outerLayer(yEnd); facePos.y++) {
-				i32vec3 realPos = rotateByDir(facePos, faceDir);
-				createChunk(realPos,faceDir);
-				chunkCount++;
-			}
-		}
+	initFaceWalk(faceDir);
+	while (faceWalkNextSpace(facePos)) {
+		createChunk(facePos, faceDir);
+		chunkCount++;
 	}
+	extendChunkSpace(faceDir);
+
+	initFaceWalk(faceDir);
+	while (faceWalkNextSpace(facePos)) {
+		createChunk(facePos, faceDir);
+		chunkCount++;
+	}
+	extendChunkSpace(faceDir);
+	//sizeInChunks[zAxis] += 1;
+
 	adj(faceDir)->raiseOverlapCount(chunkCount, flipDir(faceDir));
 }
 
