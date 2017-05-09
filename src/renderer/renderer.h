@@ -5,8 +5,13 @@
 #include <string>
 #include <vector>
 
+#include "..\soil.h"
+
 #include "model.h"
+#include "modelMulti.h"
+#include "renderModel.h"
 #include "buf.h"
+#include "texManager.h"
 #include "..\terrain.h"
 
 enum shaderType {vertex,frag,geometry };
@@ -20,6 +25,7 @@ extern int totalchunks;
 class CRenderTerrain;
 
 class CModel;
+class CRenderModel;
 
 /** The high-level renderer class. */
 class CRenderer {
@@ -64,7 +70,7 @@ public:
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
-	unsigned int getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
+//	unsigned int getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
 	unsigned int getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf);
 
 	unsigned int createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
@@ -75,6 +81,7 @@ public:
 	unsigned int query();
 	void drawMultiModel(CModelMulti& model);
 	void setDepthTest(bool on);
+	void createTextureFromImageFile(std::string filename);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -95,9 +102,8 @@ public:
 
 	C2dRenderer rend2d; ///<2D renderer.
 
+	CTextureManagerOGL textureManager;
 
-
-	GLsync fence;
 private:
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 

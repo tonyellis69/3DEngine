@@ -17,6 +17,7 @@
 #include "terrain.h"
 #include "renderer\baseBuf.h"
 #include "skyDome.h"
+#include "renderer\material.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -115,6 +116,7 @@ public:
 	void setCurrentShader(int program);
 	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
 	CModel* createHemisphere(glm::vec3& pos, float radius, int steps);
+	CModel* createPlane(glm::vec3& pos, float width, float height, int steps);
 	void renderTo3DTexture(glm::vec3 vol, float* buf);
 	void renderTo2DTexture(glm::vec2 size, int* buf);
 	void storeModel(CModel* model, glm::vec3* verts, int noVerts);
@@ -152,6 +154,8 @@ public:
 	void drawMultiModel(CModelMulti& model);
 	CBaseBuf* createBuffer();
 	CSkyDome* createSkyDome();
+	CMaterial* createMaterial(std::string filename);
+	CMaterial * createMaterial();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -213,6 +217,10 @@ public:
 	std::vector<CRenderModel*> renderModelList; ///<Tracks engine-created models.
 
 	CSkyDome* skyDome;
+
+	//TO DO: make a new image manager or resource manager for this kind of stuff:
+	std::vector<CMaterial*> materialList; ///<Simple list to track all engine-created materials.
+	CMaterial* defaultMaterial;
 };
 
 const int NoCursor = -1;

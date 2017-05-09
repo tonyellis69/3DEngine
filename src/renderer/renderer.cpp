@@ -745,6 +745,13 @@ void CRenderer::setDepthTest(bool on) {
 	}
 }
 
+void CRenderer::createTextureFromImageFile(std::string filename) {
+	int width, height, channels;
+	unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO); //load it to get the width, height, etc
+
+
+}
+
 
 
 

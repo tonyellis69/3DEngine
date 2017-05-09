@@ -7,7 +7,7 @@
 #include "vertBufs.h"
 #include <glm/gtx/color_space.hpp>
 #include "colour.h"
-
+#include "renderer\renderMaterial.h"
 
 
 //using namespace glm;
@@ -50,6 +50,8 @@ void CEngine::init(HWND& hWnd) {
 	loadShader(frag,dataPath + "default.frag");
 	currentProgram = defaultProgram = linkShaders();
 	acquireDataLocations(currentProgram);
+
+	defaultMaterial = createMaterial();
 
 }
 
@@ -557,7 +559,8 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 	v[20].v=D;v[21].v=C;v[22].v=G;v[23].v=H;//bottom face
 	v[20].normal = v[21].normal = v[22].normal = v[23].normal=glm::vec3(0,-1,0);
 	
-	cube->setColour(glm::vec4(col::randHue(),1));
+
+	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 	
 	//fill index with indices
 	unsigned short index[indexSize] = {1,0,3,1,3,2,
@@ -599,7 +602,8 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 	//TO DO can't we just use worldMatrix inside shader?
 	//TO DO: create a MVP matrix and send that instead
 	setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
-	setShaderValue(Renderer.hColour, 1, model.colour);
+	//setShaderValue(Renderer.hColour, 1, model.colour);
+	model.assignMaterial();
 	model.drawNew();
 
 	//Renderer.drawModel(model);
@@ -687,12 +691,11 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 
 	CModel* cylinder = createModel();
 	cylinder->setPos(pos);
-	cylinder->setColour(glm::vec4(col::randHue(), 1));
+	cylinder->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 
 
 
-
-	cylinder->storeVertexes(v, sizeof(vBuf::T3Dvert) * noVerts, noVerts);
+	cylinder->storeVertexes(v, sizeof(vBuf::T3DnormVert) * noVerts, noVerts);
 	cylinder->storeIndex(index, sizeof(unsigned short) * i, i);
 	cylinder->storeLayout(3, 3,0, 0);
 
@@ -737,9 +740,7 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	for (int ring = 0; ring < noRings - 1; ring++) {
 		baseRing = ring * steps; topRing = baseRing + steps;
 		for (seg = 0; seg < steps-1; seg++) {
-			//index[i++] = baseRing + seg; index[i++] = baseRing + seg+1; index[i++] = topRing + seg;
 			index[i++] = topRing + seg; index[i++] = baseRing + seg + 1; index[i++] = baseRing + seg;
-			//index[i++] = topRing + seg; index[i++] = baseRing + seg + 1; index[i++] = topRing + seg+1;
 			index[i++] = topRing + seg + 1; index[i++] = baseRing + seg + 1; index[i++] = topRing + seg;
 		}
 		index[i++] = topRing + seg; index[i++] = baseRing; index[i++] = baseRing + seg;
@@ -754,7 +755,7 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	
 	CModel* dome = createModel();
 	dome->setPos(pos);
-	dome->setColour(glm::vec4(0, 0, 0.93, 1));
+	dome->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 
 	dome->storeVertexes(v, sizeof(vBuf::T3DnormVert) * noVerts, noVerts);
 	dome->storeIndex(index, sizeof(unsigned short) * i, i);
@@ -766,6 +767,52 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	//modelList.push_back(dome);
 
 	return dome;
+}
+
+CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int steps) {
+	//calculate the number of verts
+	const int noVerts = (steps + 1) * (steps + 1);
+	const float  xStep = width / steps; 
+	const float  zStep = depth / steps;
+	const float  texStep = 1.0f / (steps + 1);
+	vBuf::T3DtexVert* v = new vBuf::T3DtexVert[noVerts];
+
+	//create them
+	int vNo = 0;
+	for (int x = 0; x <= steps; x++) {
+		for (int z = 0; z <= steps; z++) {
+			v[vNo].v = glm::vec3(x * xStep, 0, z * zStep);
+			v[vNo++].tex = glm::vec2(x * texStep, z * texStep);
+		}
+	}
+
+	//create indices
+	const int noTriangles = (steps * steps) * 2;
+	unsigned short* index = new unsigned short[noTriangles * 3];
+	int i = 0;
+	const int nextRow = steps + 1;
+
+	for (int x = 0; x < steps; x++) {
+		for (int z = 0; z < steps; z++) {
+			index[i++] = x + (z * (nextRow)); index[i++] = x + ((z + 1) * (nextRow)); index[i++] = x + ((z + 1) * (nextRow)) + 1;
+			index[i++] = x + ((z + 1) * (nextRow)) + 1; index[i++] = x + (z * (nextRow)) + 1; index[i++] = x + (z * (nextRow));
+		}
+	}
+
+	CModel* plane = createModel();
+	plane->setPos(pos);
+	plane->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
+
+	plane->storeVertexes(v, sizeof(vBuf::T3DtexVert) * noVerts, noVerts);
+	plane->storeIndex(index, sizeof(unsigned short) * i, i);
+	plane->storeLayout(3, 2, 0, 0);
+	plane->setDrawMode(drawTris);
+
+	delete[] v;
+	delete[] index;
+	modelList.push_back(plane);
+
+	return plane;
 }
 
 /** Render a 3D block of pixels of the given volume to a buffer, one pixel-layer after another. */
@@ -897,6 +944,8 @@ void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noInd
 CModel * CEngine::createModel() {
 	CRenderModel* model = new CRenderModel();
 	model->pRenderer = &Renderer;
+	CMaterial* material = createMaterial();
+	model->setMaterial(*material);
 	renderModelList.push_back(model);
 	return model;
 }
@@ -938,6 +987,19 @@ CSkyDome * CEngine::createSkyDome() {
 	return skyDome;
 }
 
+CMaterial * CEngine::createMaterial(std::string filename) {
+	CMaterial* material = createMaterial();
+	material->setTexure(filename);
+	return material;
+}
+
+CMaterial * CEngine::createMaterial() {
+	CRenderMaterial* material = new CRenderMaterial();
+	material->pRenderer = &Renderer;
+	materialList.push_back(material);
+	return material;
+}
+
 
 
 CEngine::~CEngine(void) {
@@ -949,5 +1011,7 @@ CEngine::~CEngine(void) {
 		;// delete renderModelList[m];
 	if (skyDome)
 		delete skyDome;
+	for (size_t m = 0; m<materialList.size(); m++)
+		delete materialList[m];
 	Renderer.detachWindow();
 }
