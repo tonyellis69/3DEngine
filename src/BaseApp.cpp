@@ -272,6 +272,8 @@ void CBaseApp::drawSkyDome() {
 	Engine.setShaderValue(Engine.skyDome->hSkyDomeHeightColours, 4, Engine.skyDome->heightColours[0]);
 	Engine.skyDome->dome->drawNew();
 
+	//draw cloud plane here
+
 	Engine.Renderer.setDepthTest(true);
 }
 

@@ -56,14 +56,15 @@ public:
 	void freeBuffer(unsigned int buffer);
 	void freeVAO(unsigned int hVAO);
 	void acquireDataLocations(int program);
-	int getShaderDataHandle(int program, std::string varName);
-	void setShaderValue(int matrixHandle,int elements, glm::mat4& matrix); 
-	void setShaderValue(int matrixHandle, int elements, glm::mat3& matrix);
+	unsigned int getShaderDataHandle(int program, std::string varName);
+	void setShaderValue(unsigned int matrixHandle,int elements, glm::mat4& matrix);
+	void setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix);
 
-	void setShaderValue(int vecHandle, int elements, glm::vec3& vector);
-	void setShaderValue(int vecHandle, int elements, glm::vec4& vector);
-	void setShaderValue(int intHandle, int elements, int value);
-	void setShaderValue(int floatHandle, int elements, float value);
+	void setShaderValue(unsigned int vecHandle, int elements, glm::vec2& vector);
+	void setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector);
+	void setShaderValue(unsigned int vecHandle, int elements, glm::vec4& vector);
+	void setShaderValue(unsigned int intHandle, int elements, int value);
+	void setShaderValue(unsigned int floatHandle, int elements, float value);
 	void setShader(int program);
 	void drawModel(CRenderModel& model);
 	void initRenderToTextureBufs();
@@ -82,6 +83,7 @@ public:
 	void drawMultiModel(CModelMulti& model);
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
+	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -94,6 +96,10 @@ public:
 	GLuint lightIntensity; 
 	GLuint ambientLight;
 	GLuint hColour;
+
+	GLuint hTextureUnit[16]; ///<Handle to standard texture shader texture units;
+	GLuint hTile[16]; ///<Handle to standard texture shader texture tiling
+	GLuint hOffset[16]; ///<Handle to standard texture shader texture tiling
 
 	HDC myhDC; ///<Handle for the window device context we're using.
 	HGLRC myhRC; ///<Handle for the window rendering context we're using.

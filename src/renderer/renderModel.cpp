@@ -25,6 +25,8 @@ void CRenderModel::storeIndexed(int noAttribs, vBuf::T3Dvert* verts, unsigned in
 
 void CRenderModel::drawNew() {
 
+	material->assign();
+
 	pRenderer->drawModel(*this);
 
 }

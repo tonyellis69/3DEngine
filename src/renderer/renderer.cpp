@@ -401,9 +401,9 @@ void CRenderer::acquireDataLocations(int program) {
 	hColour = glGetUniformLocation(program, "colour");
 }
 /** Get a handle for the given variable used in the given shader. */
-int CRenderer::getShaderDataHandle(int program, std::string varName) {
+unsigned int CRenderer::getShaderDataHandle(int program, std::string varName) {
 	GLuint error = 0;
-	int x =  glGetUniformLocation(program, varName.c_str());
+	unsigned int x =  glGetUniformLocation(program, varName.c_str());
 	error = glGetError();
 	return x;
 }
@@ -411,28 +411,32 @@ int CRenderer::getShaderDataHandle(int program, std::string varName) {
 
 
 /** Use the given matrix as directed with the current shader. */
-void  CRenderer::setShaderValue(int matrixHandle, int elements, glm::mat4& matrix) {
+void  CRenderer::setShaderValue(unsigned int matrixHandle, int elements, glm::mat4& matrix) {
 	glUniformMatrix4fv(matrixHandle, elements, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void CRenderer::setShaderValue(int matrixHandle, int elements, glm::mat3& matrix) {
+void CRenderer::setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix) {
 	glUniformMatrix3fv(matrixHandle, elements, GL_FALSE, glm::value_ptr(matrix));
 }
 
 
+void CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec2 & vector){
+	glUniform2fv(vecHandle, elements, glm::value_ptr(vector));
+}
+
 /** Use the given uniform vector with the current shader. */
-void  CRenderer::setShaderValue(int vecHandle, int elements, glm::vec3& vector) {
+void  CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector) {
 	glUniform3fv(vecHandle, elements, glm::value_ptr(vector));
 }
-void  CRenderer::setShaderValue(int vecHandle, int elements, glm::vec4& vector) {
+void  CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec4& vector) {
 	glUniform4fv(vecHandle, elements, glm::value_ptr(vector));
 }
 
-void  CRenderer::setShaderValue(int intHandle, int elements, int value) {
+void  CRenderer::setShaderValue(unsigned int intHandle, int elements, int value) {
 	glUniform1i(intHandle,value);
 }
 
-void CRenderer::setShaderValue(int floatHandle, int elements, float value) {
+void CRenderer::setShaderValue(unsigned int floatHandle, int elements, float value) {
 	glUniform1f(floatHandle,value);
 }
 
@@ -750,6 +754,11 @@ void CRenderer::createTextureFromImageFile(std::string filename) {
 	unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO); //load it to get the width, height, etc
 
 
+}
+
+void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, hTexture);
 }
 
 

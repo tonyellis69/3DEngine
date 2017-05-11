@@ -51,8 +51,6 @@ void CEngine::init(HWND& hWnd) {
 	currentProgram = defaultProgram = linkShaders();
 	acquireDataLocations(currentProgram);
 
-	defaultMaterial = createMaterial();
-
 }
 
 
@@ -599,14 +597,11 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 	setShaderValue(Renderer.mvpMatrix,mvp);
 
 	glm::mat3 normMatrix(model.worldMatrix); //converting 4m to m3. TO DO: inefficient?
-	//TO DO can't we just use worldMatrix inside shader?
-	//TO DO: create a MVP matrix and send that instead
+
 	setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
 	//setShaderValue(Renderer.hColour, 1, model.colour);
 	model.assignMaterial();
 	model.drawNew();
-
-	//Renderer.drawModel(model);
 }
 
 void CEngine::drawModel(CModel& model) {
@@ -639,7 +634,7 @@ void CEngine::setCurrentShader(int program) {
 }
 
 /** Get a handle for thie given variable used in the current shader. */
-int CEngine::getShaderDataHandle(std::string varName) {
+unsigned int CEngine::getShaderDataHandle(std::string varName) {
 	return Renderer.getShaderDataHandle(currentProgram,varName);
 }
 
@@ -775,14 +770,16 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 	const float  xStep = width / steps; 
 	const float  zStep = depth / steps;
 	const float  texStep = 1.0f / (steps + 1);
+	const float xOffset = width * -0.5f; const float zOffset = width * -0.5f;
+
 	vBuf::T3DtexVert* v = new vBuf::T3DtexVert[noVerts];
 
 	//create them
 	int vNo = 0;
 	for (int x = 0; x <= steps; x++) {
 		for (int z = 0; z <= steps; z++) {
-			v[vNo].v = glm::vec3(x * xStep, 0, z * zStep);
-			v[vNo++].tex = glm::vec2(x * texStep, z * texStep);
+			v[vNo].v = glm::vec3(x * xStep + xOffset, 0, z * zStep + zOffset);
+			v[vNo++].tex = glm::vec2(x * texStep , z * texStep );
 		}
 	}
 
@@ -810,7 +807,7 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 
 	delete[] v;
 	delete[] index;
-	modelList.push_back(plane);
+//	modelList.push_back(plane);
 
 	return plane;
 }
@@ -989,7 +986,7 @@ CSkyDome * CEngine::createSkyDome() {
 
 CMaterial * CEngine::createMaterial(std::string filename) {
 	CMaterial* material = createMaterial();
-	material->setTexure(filename);
+	material->addImage(filename);
 	return material;
 }
 

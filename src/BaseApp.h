@@ -111,5 +111,9 @@ public:
 	CGUIlabel* consoleLbl;
 
 
+	unsigned int hTextureShader;
+	unsigned int hTexture;
+	unsigned int hTextureMVP;
+
 	};
 

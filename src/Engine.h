@@ -102,13 +102,13 @@ public:
 	void drawModelDefaultShader(CModel& model);
 	void drawModel(CModel& model);
 	void setStandard3dShader();
-	int getShaderDataHandle(std::string varName);
+	unsigned int getShaderDataHandle(std::string varName);
 	template <typename T>
-	void setShaderValue(int handle,T& value) {
+	void setShaderValue(unsigned int handle,T& value) {
 		Renderer.setShaderValue(handle,1,value);
 	}
 	template <typename T>
-	void setShaderValue(int handle, int elements, T& value) {
+	void setShaderValue(unsigned int handle, int elements, T& value) {
 		Renderer.setShaderValue(handle, elements, value);
 	}
 
@@ -220,7 +220,9 @@ public:
 
 	//TO DO: make a new image manager or resource manager for this kind of stuff:
 	std::vector<CMaterial*> materialList; ///<Simple list to track all engine-created materials.
-	CMaterial* defaultMaterial;
+
+	
+
 };
 
 const int NoCursor = -1;
