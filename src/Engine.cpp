@@ -8,6 +8,7 @@
 #include <glm/gtx/color_space.hpp>
 #include "colour.h"
 #include "renderer\renderMaterial.h"
+#include "renderer\renderShader.h"
 
 
 //using namespace glm;
@@ -377,27 +378,6 @@ void CEngine::setClip(int x, int y, int width, int height) {
 }
 
 
-/** Draw the given grid object. */
-void CEngine::drawGrid(CGrid& grid) {
-	if (!grid.enabled)
-		return;
-	Renderer.setTextureMode(false);
-	p2dR->setDrawColour((rgba&)grid.colour);
-	float xExtent = Renderer.Width/userScale.x;
-	float yExtent = Renderer.Height/userScale.y;
-	for (float y=grid.yOffset;y<yExtent;y+=grid.size)
-		p2dR->drawLine(0,y,xExtent,y);
-	for (float x=grid.xOffset;x<xExtent;x+=grid.size)
-		p2dR->drawLine(x,0,x,yExtent);
-	if (grid.axesOn) {
-		p2dR->setDrawColour((rgba&)grid.xColour);
-		p2dR->drawLine(0,grid.origin.y,xExtent,grid.origin.y);
-		p2dR->setDrawColour((rgba&)grid.yColour);
-		p2dR->drawLine(grid.origin.x,0,grid.origin.x,yExtent);
-	}
-	Renderer.setTextureMode(true);	
-
-}
 
 /** Set all subsequent drawing to be scaled by the previously saved factor, normally 1,1. */
 void CEngine::removeUserScale() {
@@ -583,7 +563,7 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 
 /** Draw all the models on the model list. */
 void CEngine::drawModels() {
-	setStandard3dShader();
+	//setStandard3dShader();
 
 	for (size_t m=0;m<modelList.size();m++) {
 		drawModelDefaultShader(*modelList[m]);
@@ -592,13 +572,15 @@ void CEngine::drawModels() {
 }
 
 void CEngine::drawModelDefaultShader(CModel& model) {
-	setShaderValue(Renderer.modelToWorldMatrix,model.worldMatrix);
+	Renderer.setShader(Renderer.phongShader);
 	glm::mat4 mvp = currentCamera->clipMatrix * model.worldMatrix;
-	setShaderValue(Renderer.mvpMatrix,mvp);
+	Renderer.phongShader->setMVP(mvp);
 
 	glm::mat3 normMatrix(model.worldMatrix); //converting 4m to m3. TO DO: inefficient?
 
-	setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
+	//setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
+	Renderer.phongShader->setNormalModelToCameraMatrix(normMatrix);
+
 	//setShaderValue(Renderer.hColour, 1, model.colour);
 	model.assignMaterial();
 	model.drawNew();
@@ -970,16 +952,26 @@ CSkyDome * CEngine::createSkyDome() {
 	}
 
 	CModel* dome = createHemisphere(glm::vec3(0, 0, 0), 1, 25);
+
 	skyDome = new CSkyDome();
 	skyDome->setModel(dome);
 
 	//load skyDome shader
-	loadShader(vertex, dataPath + "skyDome.vert");
-	loadShader(frag, dataPath + "skyDome.frag");
-	skyDome->hSkyDomeProg = linkShaders();
-	setCurrentShader(skyDome->hSkyDomeProg);
-	skyDome->hMVPmatrix = getShaderDataHandle("mvpMatrix");
-	skyDome->hSkyDomeHeightColours = getShaderDataHandle("heightColour");
+	skyDome->skyShader = (CSkyShader*)createShader(dataPath + "skyDome");
+	skyDome->skyShader->getShaderHandles();
+	skyDome->skyShader->setType(userShader);
+	dome->getMaterial()->setShader(skyDome->skyShader);
+
+	//cloud plane:
+	skyDome->plane = createPlane(glm::vec3(0, 450, -4), 10000, 10000, 5);
+
+	//create cloud material
+	skyDome->cloud = createMaterial(dataPath + "cloud001.png");
+	skyDome->cloud->setShader(Renderer.texShader);
+	skyDome->cloud->setTile(0, glm::vec2(2));
+	skyDome->cloud->addImage(dataPath + "cloud002.png");
+	skyDome->cloud->setTile(1, glm::vec2(2));
+	skyDome->plane->setMaterial(*skyDome->cloud);
 
 	return skyDome;
 }
@@ -993,8 +985,22 @@ CMaterial * CEngine::createMaterial(std::string filename) {
 CMaterial * CEngine::createMaterial() {
 	CRenderMaterial* material = new CRenderMaterial();
 	material->pRenderer = &Renderer;
+	material->setShader(Renderer.phongShader);
 	materialList.push_back(material);
 	return material;
+}
+
+CShader * CEngine::createShader(std::string name) {
+	CShader* shader = createShader();
+	shader->create(name);
+	return shader;
+}
+
+CShader * CEngine::createShader() {
+	CRenderShader* shader = new CRenderShader();
+	shader->pRenderer = &Renderer;
+	shaderList.push_back(shader);
+	return shader;
 }
 
 

@@ -38,9 +38,6 @@
     <ClCompile Include="..\Src\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\grid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -87,9 +84,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUItextbox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\handonLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\ImageLib.cpp">
@@ -194,6 +188,21 @@
     <ClCompile Include="..\src\renderer\renderMaterial.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\shader.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\renderShader.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\texShader.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\phongShader.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\skyShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -227,9 +236,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIbase.h">
@@ -284,9 +290,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUItextbox.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\handonLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\ImageLib.h">
@@ -405,6 +408,21 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\renderMaterial.h">
       <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\shader.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\renderShader.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\texShader.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\phongShader.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\skyShader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

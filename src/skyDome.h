@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "skyShader.h"
 #include "renderer\model.h"
 
 enum TSkyDomeRange {skyHorizon,skyNearHorizon,skyLowerThird,skyDominant};
@@ -19,9 +20,14 @@ public:
 	CModel* dome;
 	glm::vec3 heightColours[4];
 	float levels[4];
-
 	
-	unsigned int hSkyDomeProg;
-	unsigned int hMVPmatrix;
-	unsigned int hSkyDomeHeightColours;
+//	unsigned int hSkyDomeProg;
+//	unsigned int hMVPmatrix;
+//	unsigned int hSkyDomeHeightColours;
+
+	CModel* plane;
+	CMaterial* cloud;
+	glm::vec2 cloudOffset;
+
+	CSkyShader* skyShader;
 };

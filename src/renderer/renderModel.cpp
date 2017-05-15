@@ -27,7 +27,14 @@ void CRenderModel::drawNew() {
 
 	material->assign();
 
+
+	//	pRenderer->setShaderValue(hMVP, 1, viewMatrix * worldMatrix);
+
+
 	pRenderer->drawModel(*this);
+	
+
+	material->free();
 
 }
 
@@ -96,6 +103,8 @@ void CRenderModel::setColour(glm::vec4 newColour) {
 
 void CRenderModel::setMaterial(CMaterial & iMaterial) {
 	material = &iMaterial;
+	if (material->getShader() ) //TO DO 
+		hMVP = material->getShader()->getMVPhandle();
 }
 
 void CRenderModel::assignMaterial() {
@@ -105,3 +114,8 @@ void CRenderModel::assignMaterial() {
 CMaterial * CRenderModel::getMaterial() {
 	return material;
 }
+
+void CRenderModel::setViewMatrix(glm::mat4 & matrix) {
+	viewMatrix = matrix;
+}
+

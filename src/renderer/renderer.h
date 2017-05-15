@@ -7,14 +7,15 @@
 
 #include "..\soil.h"
 
-#include "model.h"
+//#include "model.h"
 #include "modelMulti.h"
 #include "renderModel.h"
 #include "buf.h"
 #include "texManager.h"
 #include "..\terrain.h"
 
-enum shaderType {vertex,frag,geometry };
+#include "texShader.h"
+#include "phongShader.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 
@@ -24,13 +25,14 @@ extern int totalchunks;
 
 class CRenderTerrain;
 
-class CModel;
-class CRenderModel;
+//class CModel;
+//class CRenderModel;
 
 /** The high-level renderer class. */
 class CRenderer {
 public:
 	CRenderer();
+	~CRenderer();
 	void attachWindow(HWND& hWnd);
 	void getGLinfo();
 	void detachWindow();
@@ -66,6 +68,7 @@ public:
 	void setShaderValue(unsigned int intHandle, int elements, int value);
 	void setShaderValue(unsigned int floatHandle, int elements, float value);
 	void setShader(int program);
+	void setShader(CShader* shader);
 	void drawModel(CRenderModel& model);
 	void initRenderToTextureBufs();
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
@@ -84,6 +87,8 @@ public:
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
+	void createStandardTexShader();
+	void createStandardPhongShader();
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -110,6 +115,10 @@ public:
 
 	CTextureManagerOGL textureManager;
 
+	CTexShader* texShader; ///<The standard texture shader
+	CPhongShader* phongShader; ///<The standard phong shader
+
+	std::string dataPath;
 private:
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 

@@ -23,6 +23,7 @@ CBaseApp::CBaseApp(void)  {
 	initWatches();
 
 	Engine.dataPath = homeDir + "Data\\";
+	Engine.Renderer.dataPath = homeDir + "Data\\";
 	
 	//Set up our handlers for window events
 	RegisterHandlers();
@@ -262,17 +263,21 @@ void CBaseApp::RegisterUIfunctors() {
 }
 
 void CBaseApp::drawSkyDome() {
-	
 	Engine.Renderer.setDepthTest(false);
 
 	Engine.skyDome->dome->setPos(Engine.currentCamera->getPos() + glm::vec3(0, -0.5f, 0));
 	glm::mat4 mvp = Engine.currentCamera->clipMatrix * Engine.skyDome->dome->worldMatrix;
-	Engine.setCurrentShader(Engine.skyDome->hSkyDomeProg);
-	Engine.setShaderValue(Engine.skyDome->hMVPmatrix, mvp);
-	Engine.setShaderValue(Engine.skyDome->hSkyDomeHeightColours, 4, Engine.skyDome->heightColours[0]);
+	Engine.Renderer.setShader(Engine.skyDome->skyShader);
+	Engine.skyDome->skyShader->setMVP(mvp);
+	Engine.skyDome->skyShader->setHeightColours(Engine.skyDome->heightColours);
 	Engine.skyDome->dome->drawNew();
 
-	//draw cloud plane here
+	//draw cloud plane
+	Engine.Renderer.setShader(Engine.Renderer.texShader);
+	Engine.skyDome->plane->setViewMatrix(Engine.currentCamera->clipMatrix);
+	mvp = Engine.currentCamera->clipMatrix * Engine.skyDome->plane->worldMatrix;
+	Engine.Renderer.texShader->setMVP(mvp);
+	Engine.skyDome->plane->drawNew();
 
 	Engine.Renderer.setDepthTest(true);
 }

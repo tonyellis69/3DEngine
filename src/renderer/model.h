@@ -9,7 +9,7 @@
 
 enum  TdrawMode { drawPoints, drawLines, drawTris};
 
-class CMaterial;
+//class CMaterial;
 
 /** Class for 3d polygon models. 
 	NB: because vertices are ultimately stored with the graphics hardware,
@@ -36,9 +36,12 @@ public:
 	virtual void setMaterial(CMaterial& material) {};
 	virtual void assignMaterial() {};
 	virtual CMaterial* getMaterial() { return NULL; };
+	virtual void setViewMatrix(glm::mat4& matrix) {};
 
 	int drawMode; ///<Triangles, lines etc
-	glm::vec4 colour;
+	glm::vec4 colour; //TO DO: scrap??
+
+	glm::mat4 viewMatrix;
 
 //	int nTris; ///<Number of triangles
 

@@ -9,7 +9,6 @@
 #include "2DPolygon.h"
 #include "TileLayer.h"
 #include "Config.h"
-#include "grid.h"
 #include "renderer\camera.h"
 #include "renderer\model.h"
 #include "renderer\light.h"
@@ -71,7 +70,6 @@ public:
 	void setSecondaryDrawColour(const rgba& colour);
 	void setClip(int x, int y, int width, int height);
 
-	void drawGrid(CGrid& grid);
 	void removeUserScale();
 	void applyUserScale();
 	void setUserScale(float x, float y);
@@ -156,6 +154,8 @@ public:
 	CSkyDome* createSkyDome();
 	CMaterial* createMaterial(std::string filename);
 	CMaterial * createMaterial();
+	CShader* createShader(std::string name);
+	CShader* createShader();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -213,7 +213,7 @@ public:
 	unsigned int rNormalModelToCameraMatrix;
 	unsigned int rMVPmatrix; ///<Handle to the standard shader combined MVP matrix.
 	
-
+	//TO DO: try to make CModel*, hide implementation
 	std::vector<CRenderModel*> renderModelList; ///<Tracks engine-created models.
 
 	CSkyDome* skyDome;
@@ -221,8 +221,9 @@ public:
 	//TO DO: make a new image manager or resource manager for this kind of stuff:
 	std::vector<CMaterial*> materialList; ///<Simple list to track all engine-created materials.
 
-	
+	std::vector<CShader*> shaderList; ///<Tracks engine-created shaders
 
+	CShader* pTexShader; ///<Temporary? convenience pointer
 };
 
 const int NoCursor = -1;
