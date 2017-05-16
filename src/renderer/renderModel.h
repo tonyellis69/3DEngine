@@ -28,6 +28,5 @@ public:
 
 	CRenderer* pRenderer; ///<Lets models talk to renderer.
 	CBuf buf; ///<Holds the details of this model's vertex buffer.
-	CMaterial* material; ///<Points to the material definition for this model.
-	unsigned int hMVP;
+		unsigned int hMVP;
 };

@@ -90,6 +90,7 @@
     <ClCompile Include="..\Src\BaseApp.cpp" />
     <ClCompile Include="..\src\BBox.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
+    <ClCompile Include="..\src\chunkShader.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\src\dynBuf.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="..\Src\BaseApp.h" />
     <ClInclude Include="..\src\BBox.h" />
     <ClInclude Include="..\src\chunk.h" />
+    <ClInclude Include="..\src\chunkShader.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\Delegate.h" />

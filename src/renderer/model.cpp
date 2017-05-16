@@ -16,4 +16,10 @@ void CModel::init() {
 
 }
 
+void CModel::setMaterial(CMaterial & iMaterial) {
+	material = &iMaterial;
+}
 
+CMaterial * CModel::getMaterial() {
+	return material;
+}

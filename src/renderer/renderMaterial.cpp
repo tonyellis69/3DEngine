@@ -32,7 +32,7 @@ void CRenderMaterial::assign() {
 	if (currentShaderType == standardTex) {
 		CTexShader* subShader = (CTexShader*)shader->getThisShader();
 
-		//if we have te0txures, assign them
+		//if we have textures, assign them
 		for (size_t texNo = 0; texNo < textures.size(); texNo++) {
 			pRenderer->attachTexture(texNo, textures[texNo].hTexture);
 

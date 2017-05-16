@@ -15,6 +15,8 @@ public:
 	~CShader() {};
 	virtual void load(shaderType shader, std::string shaderFile) {};
 	virtual void create(std::string shaderName) {};
+	virtual void attach() {};
+	virtual void setFeedbackData(int nVars, const char** strings) {};
 	virtual void link() {};
 	virtual void getDataHandles() {};
 	virtual unsigned int getShaderHandle() { return 0; };

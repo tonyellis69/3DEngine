@@ -827,7 +827,7 @@ void CEngine::freeModel(CModel* model) {
 //}
 
 
-unsigned int CEngine::createDataTexture(renderTextureFormat dataType, int w, int h, const void* data) {
+CBaseTexture* CEngine::createDataTexture(renderTextureFormat dataType, int w, int h, const void* data) {
 
 	return Renderer.createDataTexture(dataType,w,h,data);
 }
@@ -933,6 +933,8 @@ CModel * CEngine::createModel() {
 CTerrain * CEngine::createTerrain() {
 	CRenderTerrain* terrain = new CRenderTerrain();
 	terrain->pRenderer = &Renderer;
+	CMaterial* material = createMaterial();
+	terrain->setMaterial(*material);
 	//renderModelList.push_back(model);
 	return terrain;
 }
@@ -957,7 +959,10 @@ CSkyDome * CEngine::createSkyDome() {
 	skyDome->setModel(dome);
 
 	//load skyDome shader
-	skyDome->skyShader = (CSkyShader*)createShader(dataPath + "skyDome");
+	skyDome->skyShader = new CSkyShader();
+	skyDome->skyShader->pRenderer = &Renderer;
+	skyDome->skyShader->create(dataPath + "skyDome");
+
 	skyDome->skyShader->getShaderHandles();
 	skyDome->skyShader->setType(userShader);
 	dome->getMaterial()->setShader(skyDome->skyShader);
@@ -1016,5 +1021,8 @@ CEngine::~CEngine(void) {
 		delete skyDome;
 	for (size_t m = 0; m<materialList.size(); m++)
 		delete materialList[m];
+	for (size_t s = 0; s<shaderList.size(); s++)
+		delete shaderList[s];
+
 	Renderer.detachWindow();
 }

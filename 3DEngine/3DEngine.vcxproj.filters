@@ -203,6 +203,9 @@
     <ClCompile Include="..\src\skyShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\chunkShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -422,6 +425,9 @@
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\skyShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\chunkShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -19,6 +19,8 @@ public:
 	CModel();
 	CModel(glm::vec3& pos);
 	void init();
+	void setMaterial(CMaterial & iMaterial);
+	CMaterial * getMaterial();
 	virtual void storeIndexed(int noAttribs, vBuf::T3Dvert *verts, unsigned int noVerts, unsigned short* index, int noIndices) {};
 	virtual void drawNew() {};
 	virtual unsigned int getBuffer() { return 0; };
@@ -33,9 +35,7 @@ public:
 	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 	virtual void setDrawMode(TdrawMode drawMode) {};
 	virtual void setColour(glm::vec4 newColour) {};
-	virtual void setMaterial(CMaterial& material) {};
 	virtual void assignMaterial() {};
-	virtual CMaterial* getMaterial() { return NULL; };
 	virtual void setViewMatrix(glm::mat4& matrix) {};
 
 	int drawMode; ///<Triangles, lines etc
@@ -43,9 +43,7 @@ public:
 
 	glm::mat4 viewMatrix;
 
-//	int nTris; ///<Number of triangles
-
-	//unsigned int hVertexObj; ///<The vertex object internally assigned to this model.
+	CMaterial* material; ///<Points to the material definition for this model.
 
 
 

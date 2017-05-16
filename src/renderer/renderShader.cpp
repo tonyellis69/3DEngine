@@ -24,11 +24,20 @@ void CRenderShader::create(std::string shaderName) {
 		load(frag, fileName);
 	}
 
+	attach();
 	link();
 }
 
+void CRenderShader::attach() {
+	hShader = pRenderer->attachShaders();
+}
+
+void CRenderShader::setFeedbackData(int nVars, const char ** strings) {
+	pRenderer->setFeedbackData(hShader, nVars, strings);
+}
+
 void CRenderShader::link() {
-	hShader = pRenderer->linkShaders();
+	hShader = pRenderer->linkShaders(hShader);
 }
 
 unsigned int CRenderShader::getShaderHandle() {

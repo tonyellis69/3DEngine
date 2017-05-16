@@ -137,7 +137,7 @@ public:
 	}
 	void freeModel(CModel* model);
 	//unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
-	unsigned int createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
+	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);

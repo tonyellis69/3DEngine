@@ -11,6 +11,8 @@ public:
 	CRenderShader() {};
 	void load(shaderType shader, std::string shaderFile);
 	void create(std::string shaderName);
+	void attach();
+	void setFeedbackData(int nVars, const char** strings);
 	void link();
 	void getDataHandles();
 	CShader * getThisShader();

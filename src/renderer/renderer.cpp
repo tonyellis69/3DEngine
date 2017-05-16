@@ -594,7 +594,8 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 	glBeginTransformFeedback(GL_TRIANGLES);
 
 	//drawModel(model);
-	model.drawNew();
+	//model.drawNew();
+	drawModel((CRenderModel&)model);
 
 	glEndTransformFeedback();
 
@@ -643,9 +644,14 @@ void CRenderer::uploadDataTexture(int hShader, int hTexture) {
 }
 
 
-unsigned int CRenderer::createDataTexture(renderTextureFormat dataType, int w, int h, const void* data) {
-	GLuint tex;
-	glGenTextures(1, &tex);
+CBaseTexture* CRenderer::createDataTexture(renderTextureFormat dataType, int w, int h, const void* data) {
+	CRenderTexture* dataTexture = (CRenderTexture*) textureManager.createTextureObject();
+
+	//NEXT: return an agnostic reference to the data texture for the  user
+	//index no? Pointer? String?
+	//user uses this to upload data texture to shader
+
+
 	//glActiveTexture(GL_TEXTURE0);
 
 	/* TO DO: this is a fudge. To use more than one data texture at once, glActiveTexture(GL_TEXTUREn) is needed,
@@ -656,7 +662,7 @@ unsigned int CRenderer::createDataTexture(renderTextureFormat dataType, int w, i
 	can be handled there to avoid repetition. */
 
 
-	glBindTexture(GL_TEXTURE_2D, tex);
+	glBindTexture(GL_TEXTURE_2D, dataTexture->handle);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -672,7 +678,7 @@ unsigned int CRenderer::createDataTexture(renderTextureFormat dataType, int w, i
 
 
 
-	return tex;
+	return dataTexture;
 }
 
 
@@ -685,7 +691,9 @@ void CRenderer::setDataTexture(unsigned int textureHandle) {
 }
 
 void CRenderer::setFeedbackData(int shader, int nVars, const char** strings) {
+	
 	glTransformFeedbackVaryings(shader, nVars, strings, GL_INTERLEAVED_ATTRIBS);
+
 }
 
 /** Prepare to run a query such as number of primitives generated. */
@@ -707,36 +715,17 @@ unsigned int CRenderer::query() {
 
 
 void CRenderer::drawMultiModel(CModelMulti & model) {
-
-
 	glBindVertexArray(model.multiBuf.childBufs[0].hVAO);
 	CChildBuf* childBuf; 
 	for (int child = 0; child <  model.multiBuf.noChildBufs ; child++) {
 		childBuf = &model.multiBuf.childBufs[child];
-		
-	
-
 		glBindVertexArray(model.multiBuf.childBufs[child].hVAO);
-	
-
-		
 		for (int object = 0; object < childBuf->objCount ; object++) {
-
+			//setShaderValue(hColour, 1, childBuf->colour[object]);
+			phongShader->setColour(childBuf->colour[object]);
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
-	
-			//glDrawArrays(GL_TRIANGLES,0, 5000);
-
-
 		}
-
-
-	}
-			
-	
-
-
-
-	
+	}	
 }
 
 void CRenderer::setDepthTest(bool on) {
