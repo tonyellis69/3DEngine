@@ -11,6 +11,7 @@
 #include "renderer\renderShader.h"
 
 
+
 //using namespace glm;
 using namespace vBuf;
 
@@ -26,7 +27,6 @@ CEngine::CEngine() {
 	tmpCursorPos = -1;
 	userScale.set(1,1);
 	p2dR = &Renderer.rend2d;
-	ambientLight = glm::vec4(0.2f,0.2f,0.2f,1);
 	skyDome = NULL;
 }
 
@@ -39,19 +39,13 @@ void CEngine::init(HWND& hWnd) {
 	//TO DO: get icons.png built in
 	UIicons = loadSpritesheet(dataPath+ "icons.png",32,32);
 
-	
 	Renderer.init();
 	Renderer.setBackColour(engineTurquiose);
 
-
 	currentCamera = defaultCamera = createCamera(glm::vec3(0,2,4));
 
-	
-	loadShader(vertex,dataPath + "default.vert");
-	loadShader(frag,dataPath + "default.frag");
-	currentProgram = defaultProgram = linkShaders();
-	acquireDataLocations(currentProgram);
-
+	createStandardTexShader();
+	createStandardPhongShader();
 }
 
 
@@ -557,7 +551,7 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 	cube->storeIndex(index, sizeof(index), indexSize);
 	cube->storeLayout(3, 3, 0, 0);
 
-	modelList.push_back(cube);
+	//modelList.push_back(cube);
 	return cube;
 }
 
@@ -565,23 +559,21 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 void CEngine::drawModels() {
 	//setStandard3dShader();
 
-	for (size_t m=0;m<modelList.size();m++) {
-		drawModelDefaultShader(*modelList[m]);
+	for (size_t m=0;m<modelDrawList.size();m++) {
+		drawModelDefaultShader(*modelDrawList[m]);
 	}
 	Renderer.setShader(0); //for legacy compatibility
 }
 
 void CEngine::drawModelDefaultShader(CModel& model) {
-	Renderer.setShader(Renderer.phongShader);
+	Renderer.setShader(phongShader);
 	glm::mat4 mvp = currentCamera->clipMatrix * model.worldMatrix;
-	Renderer.phongShader->setMVP(mvp);
+	phongShader->setMVP(mvp);
 
 	glm::mat3 normMatrix(model.worldMatrix); //converting 4m to m3. TO DO: inefficient?
 
-	//setShaderValue(Renderer.normalModelToCameraMatrix,normMatrix);
-	Renderer.phongShader->setNormalModelToCameraMatrix(normMatrix);
+	phongShader->setNormalModelToCameraMatrix(normMatrix);
 
-	//setShaderValue(Renderer.hColour, 1, model.colour);
 	model.assignMaterial();
 	model.drawNew();
 }
@@ -590,25 +582,6 @@ void CEngine::drawModel(CModel& model) {
 	Renderer.drawModel((CRenderModel&)model);
 }
 
-
-/** Set up the standard 3D shader. */
-//TO DO, do set values using Engine. calls
-void CEngine::setStandard3dShader() {
-	setCurrentShader(defaultProgram);
-	Renderer.setShaderValue(Renderer.cameraToClipMatrix,1,currentCamera->clipMatrix);
-	Renderer.setShaderValue(Renderer.lightDirection,1,light1.direction);
-	Renderer.setShaderValue(Renderer.lightIntensity,1,light1.intensity);
-	Renderer.setShaderValue(Renderer.ambientLight,1, ambientLight);
-}
-
-/** Ensure the renderer has the right data locations for this shader program. */
-void CEngine::acquireDataLocations(int program) {
-	Renderer.acquireDataLocations(program);
-	//copy some of these so that the user can use them
-	rNormalModelToCameraMatrix = Renderer.normalModelToCameraMatrix;
-	rMVPmatrix = Renderer.mvpMatrix;
-
-}
 
 void CEngine::setCurrentShader(int program) {
 	currentProgram = program;
@@ -678,7 +651,7 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 
 	delete[] v;
 	delete[] index;
-	modelList.push_back(cylinder);
+//	modelList.push_back(cylinder);
 	return cylinder;
 }
 
@@ -753,14 +726,24 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 	const float  zStep = depth / steps;
 	const float  texStep = 1.0f / (steps + 1);
 	const float xOffset = width * -0.5f; const float zOffset = width * -0.5f;
+	const float height = width * 0.05f;
 
 	vBuf::T3DtexVert* v = new vBuf::T3DtexVert[noVerts];
 
 	//create them
-	int vNo = 0;
+	const float maxDist = glm::length(glm::vec2(xOffset , zOffset)) * 0.25f;
+	int vNo = 0; float dist, xPos, zPos, yPos;
 	for (int x = 0; x <= steps; x++) {
 		for (int z = 0; z <= steps; z++) {
-			v[vNo].v = glm::vec3(x * xStep + xOffset, 0, z * zStep + zOffset);
+			xPos = x * xStep + xOffset;
+			zPos = z * zStep + zOffset;
+			dist = glm::length(glm::vec2(xPos, zPos));
+			//dist = max(glm::abs(xPos), abs(zPos));
+			dist = (dist/ maxDist  );
+			if (dist > 1)
+				dist = 1;
+			yPos = height - (height * dist);
+			v[vNo].v = glm::vec3(xPos, yPos, zPos);
 			v[vNo++].tex = glm::vec2(x * texStep , z * texStep );
 		}
 	}
@@ -845,46 +828,6 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 }
 
 
-/** Run geometry feedback on the given input model, and return with the thus-created model in destModel. 
-unsigned int CEngine::acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel) {
-	//TO DO: messy! should simply pass destModel to getGeometryFeedback...
-	unsigned int hBuffer = destModel.getBuffer();
-	unsigned int noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, hBuffer,0);
-
-	unsigned int noVerts = noPrimitives * 3; //assuming primitives are triangles
-
-	
-
-	//Renderer.storeVertexLayout(dest->hVAO,dest->hBuffer,0,dest->nAttribs);
-	destModel.setVertexDetails(3, noVerts, 0);//....making this redundant
-
-	//dest->nTris = noPrimitives;
-	return noPrimitives;
-} */
-
-/** Run geometry feedback on the given input model, and place the vertices created in a free portion of the buffer of the given multimodel.
-unsigned int CEngine::acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel) {
-
-
-	unsigned int hBuffer = destModel.getBuffer();
-
-	unsigned int multiBufferOffset = destModel.getFreeMem();
-	unsigned int noPrimitives =0;
-
-	noPrimitives = Renderer.getGeometryFeedback(srcModel, feedbackBufSize, vertsPerPrimitive, hBuffer, multiBufferOffset + 1);
-	
-	if (noPrimitives == 0)
-		return 0;
-	
-	
-	unsigned int elementsUsed = noPrimitives * 3; //3 verts per triangle
-
-	destModel.reserveBuf(elementsUsed);
-
-
-	//dest->nTris = noPrimitives;
-	return noPrimitives;
-} */
 
 // pass a CBaseBuf and get it back full of feedback verts
 unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
@@ -925,7 +868,7 @@ CModel * CEngine::createModel() {
 	model->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
 	model->setMaterial(*material);
-	renderModelList.push_back(model);
+	modelList.push_back(model);
 	return model;
 }
 
@@ -935,7 +878,6 @@ CTerrain * CEngine::createTerrain() {
 	terrain->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
 	terrain->setMaterial(*material);
-	//renderModelList.push_back(model);
 	return terrain;
 }
 
@@ -960,22 +902,24 @@ CSkyDome * CEngine::createSkyDome() {
 
 	//load skyDome shader
 	skyDome->skyShader = new CSkyShader();
+	shaderList.push_back(skyDome->skyShader);
 	skyDome->skyShader->pRenderer = &Renderer;
 	skyDome->skyShader->create(dataPath + "skyDome");
+	
 
 	skyDome->skyShader->getShaderHandles();
 	skyDome->skyShader->setType(userShader);
 	dome->getMaterial()->setShader(skyDome->skyShader);
 
 	//cloud plane:
-	skyDome->plane = createPlane(glm::vec3(0, 450, -4), 10000, 10000, 5);
+	skyDome->plane = createPlane(glm::vec3(0, 450, -4), 10000, 10000, 20);
 
 	//create cloud material
 	skyDome->cloud = createMaterial(dataPath + "cloud001.png");
-	skyDome->cloud->setShader(Renderer.texShader);
-	skyDome->cloud->setTile(0, glm::vec2(2));
+	skyDome->cloud->setShader(texShader);
+	skyDome->cloud->setTile(0, glm::vec2(20));
 	skyDome->cloud->addImage(dataPath + "cloud002.png");
-	skyDome->cloud->setTile(1, glm::vec2(2));
+	skyDome->cloud->setTile(1, glm::vec2(20));
 	skyDome->plane->setMaterial(*skyDome->cloud);
 
 	return skyDome;
@@ -990,7 +934,7 @@ CMaterial * CEngine::createMaterial(std::string filename) {
 CMaterial * CEngine::createMaterial() {
 	CRenderMaterial* material = new CRenderMaterial();
 	material->pRenderer = &Renderer;
-	material->setShader(Renderer.phongShader);
+	material->setShader(phongShader);
 	materialList.push_back(material);
 	return material;
 }
@@ -1008,15 +952,38 @@ CShader * CEngine::createShader() {
 	return shader;
 }
 
+void CEngine::createStandardTexShader() {
+	texShader = new CTexShader();
+	texShader->pRenderer = &Renderer;
+	texShader->create(dataPath + "texture");
+	texShader->getShaderHandles();
+	texShader->setType(standardTex);
+	shaderList.push_back(texShader);
+}
+
+void CEngine::createStandardPhongShader() {
+	phongShader = new CPhongShader();
+	phongShader->pRenderer = &Renderer;
+	phongShader->create(dataPath + "default");
+	phongShader->getShaderHandles();
+	phongShader->setType(standardPhong);
+	shaderList.push_back(phongShader);
+
+	Renderer.setShader(phongShader);
+	phongShader->setLightDirection(glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
+	phongShader->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	phongShader->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	phongShader->setColour(glm::vec4(1));
+}
+
+
 
 
 CEngine::~CEngine(void) {
 	for (size_t c=0;c<cameraList.size();c++)
 		delete cameraList[c];
-	for (size_t m=0;m<modelList.size();m++)
-		delete modelList[m];
-	for (size_t m = 0; m < renderModelList.size(); m++)
-		;// delete renderModelList[m];
+	for (size_t m = 0; m < modelList.size(); m++)
+		 delete modelList[m];
 	if (skyDome)
 		delete skyDome;
 	for (size_t m = 0; m<materialList.size(); m++)

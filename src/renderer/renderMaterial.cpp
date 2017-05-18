@@ -64,7 +64,7 @@ void CRenderMaterial::setTile(int texNo, glm::vec2 & tile) {
 	textures[texNo].tile = tile;
 }
 
-void CRenderMaterial::free() {
+void CRenderMaterial::unAssign() {
 	pRenderer->setShader(0);
 	pRenderer->attachTexture(0, 0);
 	//for some reason need the above, I'm guessing legacy code in data textures

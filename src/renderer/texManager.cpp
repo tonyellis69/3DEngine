@@ -5,9 +5,10 @@ using namespace std;
 #include "texManager.h"
 #include "..\SOIL.h"
 
+
 CTextureManagerOGL::~CTextureManagerOGL() {
 	for (size_t tex = 0; tex < textures.size(); tex++)
-		delete textures[tex];
+			delete textures[tex];
 }
 
 GLuint CTextureManagerOGL::getTexture(std::string filename) {
@@ -43,7 +44,6 @@ CBaseTexture* CTextureManagerOGL::createTextureObject() {
 	glGenTextures(1, &newTexture->handle);
 	string ident = "texObj"; ident += std::to_string(internalID);
 	addTexture(newTexture, ident);
-	textureStrings[ident] = newTexture;
 	internalID++;
 	return newTexture;
 }

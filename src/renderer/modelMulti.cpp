@@ -30,6 +30,6 @@ void CModelMulti::drawNew() {
 
 	pRenderer->drawMultiModel(*this);
 
-	material->free();
+	material->unAssign();
 }
 

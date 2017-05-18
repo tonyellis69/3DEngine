@@ -11,6 +11,7 @@
 
 #include "../watch.h"
 
+
 using namespace std;
 
 //int totalbufsize = 0;
@@ -26,8 +27,7 @@ CRenderer::CRenderer() {
 }
 
 CRenderer::~CRenderer() {
-	delete texShader;
-	delete phongShader;
+	
 }
 
 /** Attach the given window to the renderer, so it can be drawn to. */
@@ -181,8 +181,7 @@ void CRenderer::init() {
 
 	glPrimitiveRestartIndex(65535);
 
-	createStandardTexShader();
-	createStandardPhongShader();
+
 }
 
 
@@ -394,17 +393,7 @@ void CRenderer::freeVAO(unsigned int hVAO){
 	glDeleteVertexArrays(1,&hVAO);
 }
 
-/** Prepare the given shader for use as a standard drawing shader.*/
-void CRenderer::acquireDataLocations(int program) {
-	modelToWorldMatrix  = glGetUniformLocation(program, "modelToWorldMatrix");
-	cameraToClipMatrix = glGetUniformLocation(program, "cameraToClipMatrix");
-	normalModelToCameraMatrix = glGetUniformLocation(program, "normalModelToCameraMatrix");
-	mvpMatrix = glGetUniformLocation(program, "mvpMatrix");
-	lightDirection = glGetUniformLocation(program, "lightDirection");
-	lightIntensity = glGetUniformLocation(program, "lightIntensity");
-	ambientLight = glGetUniformLocation(program, "ambientLight");
-	hColour = glGetUniformLocation(program, "colour");
-}
+
 /** Get a handle for the given variable used in the given shader. */
 unsigned int CRenderer::getShaderDataHandle(int program, std::string varName) {
 	GLuint error = 0;
@@ -715,6 +704,8 @@ unsigned int CRenderer::query() {
 
 
 void CRenderer::drawMultiModel(CModelMulti & model) {
+	CPhongShader* shader = (CPhongShader* ) model.getMaterial()->getShader()->getThisShader();
+	//TO DO: kill the above, it's only there so we can colour-in chunks
 	glBindVertexArray(model.multiBuf.childBufs[0].hVAO);
 	CChildBuf* childBuf; 
 	for (int child = 0; child <  model.multiBuf.noChildBufs ; child++) {
@@ -722,7 +713,8 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 		glBindVertexArray(model.multiBuf.childBufs[child].hVAO);
 		for (int object = 0; object < childBuf->objCount ; object++) {
 			//setShaderValue(hColour, 1, childBuf->colour[object]);
-			phongShader->setColour(childBuf->colour[object]);
+			shader->setColour(childBuf->colour[object]);
+			
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
 		}
 	}	
@@ -758,29 +750,6 @@ void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, hTexture);
 }
-
-void CRenderer::createStandardTexShader() {
-	texShader = new CTexShader();
-	texShader->pRenderer = this;
-	texShader->create(dataPath + "texture");
-	texShader->getShaderHandles();
-	texShader->setType(standardTex);
-}
-
-void CRenderer::createStandardPhongShader() {
-	phongShader = new CPhongShader();
-	phongShader->pRenderer = this;
-	phongShader->create(dataPath + "default");
-	phongShader->getShaderHandles();
-	phongShader->setType(standardPhong);
-
-	setShader(phongShader);
-	phongShader->setLightDirection(glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
-	phongShader->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f,1));
-	phongShader->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
-	phongShader->setColour(glm::vec4(1));
-}
-
 
 
 

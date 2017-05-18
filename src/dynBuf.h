@@ -41,7 +41,7 @@ public:
 	void reserve(int nIndices, NT* &verts, unsigned short* &index, int& offset);
 	void reserve(int nVerts, NT* &verts);
 
-	void free();
+	void freeMem();
 
 	float vertsPerIndex; ///<Ratio of vertices to indices.
 	std::vector<CVertBuf<NT>*> bufList; ///<The buffers this class owns.

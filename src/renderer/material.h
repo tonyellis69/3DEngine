@@ -18,7 +18,7 @@ public:
 	virtual void setShader(CShader* shader) {};
 	virtual void setOffset(int texNo, glm::vec2& offset) {};
 	virtual void setTile(int texNo, glm::vec2& tile) {};
-	virtual void free() {};
+	virtual void unAssign() {};
 	virtual CShader* getShader() { return 0; };
 
 	TStandardShaderType currentShaderType;

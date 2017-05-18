@@ -17,6 +17,8 @@
 #include "renderer\baseBuf.h"
 #include "skyDome.h"
 #include "renderer\material.h"
+#include "renderer\renderMaterial.h"
+
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -99,7 +101,6 @@ public:
 	void drawModels();
 	void drawModelDefaultShader(CModel& model);
 	void drawModel(CModel& model);
-	void setStandard3dShader();
 	unsigned int getShaderDataHandle(std::string varName);
 	template <typename T>
 	void setShaderValue(unsigned int handle,T& value) {
@@ -110,7 +111,6 @@ public:
 		Renderer.setShaderValue(handle, elements, value);
 	}
 
-	void acquireDataLocations(int progam);
 	void setCurrentShader(int program);
 	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
 	CModel* createHemisphere(glm::vec3& pos, float radius, int steps);
@@ -121,28 +121,17 @@ public:
 	/** Send these indexed vertices to the graphics hardware to be buffered, and register them with the given model. */
 	template <typename T>
 	void storeIndexedModel(CModel* model, T* verts, unsigned int noVerts,  unsigned short* index) {
-		//CBuf* vertObj = &Renderer.getVertexObj(model->hVertexObj);
-		//Renderer.storeVertexData(vertObj->hBuffer,(glm::vec3*)verts, noVerts * sizeof(T));
 		model->storeVertexData(verts, noVerts, sizeof(T));
-
-		//Renderer.storeIndexData(vertObj->hIndex,index, sizeof(unsigned short) * vertObj->indexSize);
 		model->storeIndexedData(index);
-	
 		int nAttributes = sizeof(T) / sizeof(glm::vec3);
-		//Renderer.storeVertexLayout(vertObj->hVAO, vertObj->hBuffer, vertObj->hIndex,sizeof(T) / sizeof(glm::vec3));
 		model->storeVertexLayout(((CRenderModel*)model)->buf.hIndex);
-
-		//Renderer.getVertexObj(model->hVertexObj).nAttribs = nAttributes;
 		((CRenderModel*)model)->buf.nAttribs = nAttributes;
 	}
 	void freeModel(CModel* model);
-	//unsigned int getGeometryFeedback(CModel& model,  int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
-	//unsigned int acquireFeedbackModel(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModel& destModel);
-	//unsigned int acquireFeedbackModelMulti(CModel& srcModel, int feedbackBufSize, int vertsPerPrimitive, CModelMulti& destModel);
 	unsigned int acquireFeedbackVerts(CModel& srcModel, CBaseBuf&  tmpBuf, CBaseBuf& destBuf);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
@@ -156,6 +145,8 @@ public:
 	CMaterial * createMaterial();
 	CShader* createShader(std::string name);
 	CShader* createShader();
+	void createStandardTexShader();
+	void createStandardPhongShader();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -183,8 +174,6 @@ public:
 
 	~CEngine(void);
 
-	//	C2dRenderer* p2dR; ///<Convenience pointer to the 2d renderer.
-//private:
 	CRenderer Renderer;
 	C2dRenderer* p2dR; ///<Convenience pointer to the 2d renderer.
 
@@ -201,8 +190,9 @@ public:
 	
 	CRegisteredSpriteList RegisteredSpriteList;
 	std::vector<CCamera*> cameraList; ///<Tracks engine-created cameras.
-	std::vector<CModel*> modelList; ///<Tracks engine-created models.
+	std::vector<CModel*> modelDrawList; ///<Models to be draw automatically.
 	//TO DO: scrap above and use name
+	std::vector<CModel*> modelList;///<Engine-created models to delete at closedowm.
 	
 	public:
 	C2DVector userScale; ///<Scaling factor applied to user drawing, every frame.
@@ -213,17 +203,17 @@ public:
 	unsigned int rNormalModelToCameraMatrix;
 	unsigned int rMVPmatrix; ///<Handle to the standard shader combined MVP matrix.
 	
-	//TO DO: try to make CModel*, hide implementation
-	std::vector<CRenderModel*> renderModelList; ///<Tracks engine-created models.
 
 	CSkyDome* skyDome;
 
 	//TO DO: make a new image manager or resource manager for this kind of stuff:
-	std::vector<CMaterial*> materialList; ///<Simple list to track all engine-created materials.
+	std::vector<CRenderMaterial*> materialList; ///<Simple list to track all engine-created materials.
 
 	std::vector<CShader*> shaderList; ///<Tracks engine-created shaders
 
-	CShader* pTexShader; ///<Temporary? convenience pointer
+	
+	CTexShader* texShader; ///<The standard texture shader
+	CPhongShader* phongShader; ///<The standard phong shader
 };
 
 const int NoCursor = -1;

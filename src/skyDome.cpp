@@ -22,8 +22,9 @@ CSkyDome::CSkyDome() {
 }
 
 CSkyDome::~CSkyDome() {
-	if (dome != NULL)
-		delete dome;
+//	if (dome != NULL)
+	//	delete dome;
+
 }
 
 void CSkyDome::setHorizonColour(glm::vec3 & colour) {

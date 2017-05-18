@@ -21,7 +21,7 @@ public:
 	void setShader(CShader* shader);
 	void setOffset(int texNo, glm::vec2& offset);
 	void setTile(int texNo, glm::vec2& tile);
-	void free();
+	void unAssign();
 	CShader* getShader();
 
 	CRenderer* pRenderer;

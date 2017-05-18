@@ -25,7 +25,7 @@ public:
 	unsigned int blockStart;
 	unsigned int blockSize;
 	unsigned int blockIdx;	
-	bool free;
+	bool unAssign;
 
 };
 

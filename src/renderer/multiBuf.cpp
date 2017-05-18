@@ -176,7 +176,7 @@ void CMultiBuf::deleteBlock(unsigned int id) {
 
 	CChildBuf* childBuf = &childBufs[childBufNo];
 	childBuf->count[blockIdx] = 0;
-	block->free = true;
+	block->unAssign = true;
 	freeBlocks.insert(pair<unsigned int,unsigned int>(block->blockSize,id));
 	
 }
@@ -218,7 +218,7 @@ void CMultiBuf::copyToFreeBlock(unsigned int hSrcBuf, unsigned int freeBlock, un
 
 	childBuf->count[blockIdx] = size / elemSize;
 	//childBuf->objCount++;
-	block->free = false;
+	block->unAssign = false;
 
 	block->arrayCount = childBuf->count[blockIdx];
 //	block->blockStart = freeMem;
@@ -255,7 +255,7 @@ void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 	newBlock.blockStart = freeMem;
 	newBlock.blockSize = size;
 	newBlock.blockIdx = currentChild->objCount;
-	newBlock.free = false;
+	newBlock.unAssign = false;
 
 	blocks[newBlock.id] = newBlock;
 	lastId = newBlock.id;

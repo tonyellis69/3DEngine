@@ -10,7 +10,11 @@
 using namespace watch;
 
 
+
 CBaseApp::CBaseApp(void)  {
+	
+
+
 	homeDir = Window.getExePath();
 #ifdef _DEBUG
 	homeDir += "..\\";
@@ -273,10 +277,10 @@ void CBaseApp::drawSkyDome() {
 	Engine.skyDome->dome->drawNew();
 
 	//draw cloud plane
-	Engine.Renderer.setShader(Engine.Renderer.texShader);
-	Engine.skyDome->plane->setViewMatrix(Engine.currentCamera->clipMatrix);
+	Engine.skyDome->plane->setPos(Engine.currentCamera->getPos() + glm::vec3(0,-400.0f, 0));
+	Engine.Renderer.setShader(Engine.texShader);
 	mvp = Engine.currentCamera->clipMatrix * Engine.skyDome->plane->worldMatrix;
-	Engine.Renderer.texShader->setMVP(mvp);
+	Engine.texShader->setMVP(mvp);
 	Engine.skyDome->plane->drawNew();
 
 	Engine.Renderer.setDepthTest(true);

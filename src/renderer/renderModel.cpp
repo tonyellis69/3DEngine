@@ -29,7 +29,7 @@ void CRenderModel::drawNew() {
 
 	pRenderer->drawModel(*this);
 	
-	material->free();
+	material->unAssign();
 
 }
 

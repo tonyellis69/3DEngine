@@ -68,7 +68,7 @@ void CDynBuf<NT>::reserve(int nVerts, NT* &verts) {
 
 /** Free up all memory used.*/
 template <class NT>
-void CDynBuf<NT>::free() {
+void CDynBuf<NT>::freeMem() {
 
 
 }

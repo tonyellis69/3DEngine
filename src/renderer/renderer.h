@@ -57,7 +57,6 @@ public:
 	void storeVertexLayout(unsigned int& hVAO,unsigned int bufferObj, unsigned int hIndex,int nAttributes);
 	void freeBuffer(unsigned int buffer);
 	void freeVAO(unsigned int hVAO);
-	void acquireDataLocations(int program);
 	unsigned int getShaderDataHandle(int program, std::string varName);
 	void setShaderValue(unsigned int matrixHandle,int elements, glm::mat4& matrix);
 	void setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix);
@@ -74,7 +73,6 @@ public:
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
-//	unsigned int getGeometryFeedback(CModel& model, int size, int vertsPerPrimitive, unsigned int& hFeedBackBuf, unsigned int multiBufferOffset);
 	unsigned int getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf);
 
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
@@ -93,19 +91,6 @@ public:
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
 
-	GLuint modelToWorldMatrix; ///<Handle to standard shader matrix location.
-	GLuint cameraToClipMatrix; ///<Handle to standard shader matrix location.
-	GLuint normalModelToCameraMatrix;
-	GLuint mvpMatrix; ///<Handle to standard shader matrix location.
-	GLuint lightDirection; ///<Handle to standard shader light vector.
-	GLuint lightIntensity; 
-	GLuint ambientLight;
-	GLuint hColour;
-
-	GLuint hTextureUnit[16]; ///<Handle to standard texture shader texture units;
-	GLuint hTile[16]; ///<Handle to standard texture shader texture tiling
-	GLuint hOffset[16]; ///<Handle to standard texture shader texture tiling
-
 	HDC myhDC; ///<Handle for the window device context we're using.
 	HGLRC myhRC; ///<Handle for the window rendering context we're using.
 
@@ -115,8 +100,7 @@ public:
 
 	CTextureManagerOGL textureManager;
 
-	CTexShader* texShader; ///<The standard texture shader
-	CPhongShader* phongShader; ///<The standard phong shader
+
 
 	std::string dataPath;
 private:
