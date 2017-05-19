@@ -147,6 +147,7 @@ public:
 	CShader* createShader();
 	void createStandardTexShader();
 	void createStandardPhongShader();
+	void createStandardWireShader();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -214,6 +215,7 @@ public:
 	
 	CTexShader* texShader; ///<The standard texture shader
 	CPhongShader* phongShader; ///<The standard phong shader
+	CWireShader* wireShader;
 };
 
 const int NoCursor = -1;

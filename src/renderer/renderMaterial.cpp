@@ -16,14 +16,8 @@ unsigned int CRenderMaterial::getTexture(int texNo) {
 }
 
 void CRenderMaterial::assign() {
-	
-
-
 	pRenderer->setShader(shader);
 
-
-	//TO DO: need to ask shader what kind it is
-	//Better: do it when shader is attached, so we only do it once
 	if (currentShaderType == standardPhong) {
 		CPhongShader* subShader = (CPhongShader*)shader->getThisShader();
 		subShader->setColour(colour);
@@ -41,7 +35,6 @@ void CRenderMaterial::assign() {
 			subShader->setOffset(texNo, textures[texNo].offset);
 		}
 	}
-
 }
 
 
@@ -50,7 +43,6 @@ void CRenderMaterial::setColour(glm::vec4 & iColour) {
 }
 
 void CRenderMaterial::setShader(CShader* shader) {
-	//hShader = shader->getShaderHandle();
 	CRenderMaterial::shader = shader;
 	currentShaderType = shader->getType();
 }
@@ -65,10 +57,10 @@ void CRenderMaterial::setTile(int texNo, glm::vec2 & tile) {
 }
 
 void CRenderMaterial::unAssign() {
-	pRenderer->setShader(0);
-	pRenderer->attachTexture(0, 0);
-	//for some reason need the above, I'm guessing legacy code in data textures
-	//see if we still need this once everything's working the new way
+	//pRenderer->setShader(0); //turned this off as there's a performance hit
+	
+	//pRenderer->attachTexture(0, 0);
+	//Don't seem to need the above any more, either.
 	for (size_t texNo = 0; texNo < textures.size(); texNo++) {
 		//pRenderer->attachTexture(texNo, 0);
 	}

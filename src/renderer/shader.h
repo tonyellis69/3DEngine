@@ -4,14 +4,14 @@
 
 enum shaderType { vertex, frag, geometry };
 
-enum TStandardShaderType { standardTex, standardPhong, userShader};
+enum TStandardShaderType { standardTex, standardPhong, standardWire, userShader};
 
 /**	Encapsulates a shader, to conveniently gather the various data handles it needs
 	and also hide OpenGL specifics from user. */
 
 class CShader {
 public:
-	CShader() {};
+	CShader() { ident = userShader; };
 	~CShader() {};
 	virtual void load(shaderType shader, std::string shaderFile) {};
 	virtual void create(std::string shaderName) {};

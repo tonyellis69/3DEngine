@@ -15,15 +15,13 @@ public:
 	void setLowerThirdColour(glm::vec3& colour);
 	void setDominantColour(glm::vec3& colour);
 	void setModel(CModel* model);
+	void update(double& dT);
 
 
 	CModel* dome;
 	glm::vec3 heightColours[4];
 	float levels[4];
 	
-//	unsigned int hSkyDomeProg;
-//	unsigned int hMVPmatrix;
-//	unsigned int hSkyDomeHeightColours;
 
 	CModel* plane;
 	CMaterial* cloud;

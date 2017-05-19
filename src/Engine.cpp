@@ -46,6 +46,7 @@ void CEngine::init(HWND& hWnd) {
 
 	createStandardTexShader();
 	createStandardPhongShader();
+	createStandardWireShader();
 }
 
 
@@ -974,6 +975,16 @@ void CEngine::createStandardPhongShader() {
 	phongShader->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f, 1));
 	phongShader->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
 	phongShader->setColour(glm::vec4(1));
+}
+
+void CEngine::createStandardWireShader()
+{
+	wireShader = new CWireShader();
+	wireShader->pRenderer = &Renderer;
+	wireShader->create(dataPath + "wire");
+	wireShader->getShaderHandles();
+	wireShader->setType(standardWire);
+	shaderList.push_back(wireShader);
 }
 
 

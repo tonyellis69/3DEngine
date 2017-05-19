@@ -16,6 +16,7 @@
 
 #include "texShader.h"
 #include "phongShader.h"
+#include "wireShader.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 
@@ -85,8 +86,7 @@ public:
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
-	void createStandardTexShader();
-	void createStandardPhongShader();
+
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
