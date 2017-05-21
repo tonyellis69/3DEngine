@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include "skyShader.h"
 #include "renderer\model.h"
+#include "renderer\billboard.h"
 
 enum TSkyDomeRange {skyHorizon,skyNearHorizon,skyLowerThird,skyDominant};
 
@@ -28,4 +29,7 @@ public:
 	glm::vec2 cloudOffset;
 
 	CSkyShader* skyShader;
+
+	CBillboard* sunBoard;
+	CMaterial* sunMat;
 };

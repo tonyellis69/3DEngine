@@ -42,11 +42,14 @@ void CEngine::init(HWND& hWnd) {
 	Renderer.init();
 	Renderer.setBackColour(engineTurquiose);
 
-	currentCamera = defaultCamera = createCamera(glm::vec3(0,2,4));
+	defaultCamera = createCamera(glm::vec3(0,2,4));
+	setCurrentCamera(defaultCamera);
 
 	createStandardTexShader();
 	createStandardPhongShader();
 	createStandardWireShader();
+	createStandardMultiTexShader();
+	createStandardBillboardShader();
 }
 
 
@@ -497,8 +500,6 @@ CCamera* CEngine::createCamera(glm::vec3& pos) {
 
 /** Create a cube model. */
 CModel* CEngine::createCube(glm::vec3& pos,float size) {
-	//CModel* cube = new CModel(pos);
-
 	CModel* cube = createModel();
 	cube->setPos(pos);
 
@@ -543,16 +544,12 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 		16,19,18,18,17,16,
 		21,20,23,21,23,22}; 
 
-
-	//setVertexDetails(*cube, 1, indexSize, 24);
-	//storeIndexedModel(cube, v, index);
-	
-	//cube->storeIndexed(3, v, 24, index, indexSize);
 	cube->storeVertexes(v, sizeof(v), 24);
 	cube->storeIndex(index, sizeof(index), indexSize);
 	cube->storeLayout(3, 3, 0, 0);
 
 	//modelList.push_back(cube);
+	modelDrawList.push_back(cube);
 	return cube;
 }
 
@@ -653,6 +650,7 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 	delete[] v;
 	delete[] index;
 //	modelList.push_back(cylinder);
+	modelDrawList.push_back(cylinder);
 	return cylinder;
 }
 
@@ -917,12 +915,17 @@ CSkyDome * CEngine::createSkyDome() {
 
 	//create cloud material
 	skyDome->cloud = createMaterial(dataPath + "cloud001.png");
-	skyDome->cloud->setShader(texShader);
+	skyDome->cloud->setShader(multiTexShader);
 	skyDome->cloud->setTile(0, glm::vec2(20));
 	skyDome->cloud->addImage(dataPath + "cloud002.png");
 	skyDome->cloud->setTile(1, glm::vec2(20));
 	skyDome->plane->setMaterial(*skyDome->cloud);
 
+	//create sun billboard
+	skyDome->sunBoard = createBillboard(glm::vec3(0, 400, -400), glm::vec2(50, 50));
+	skyDome->sunMat = createMaterial(dataPath + "sun3.png");
+	skyDome->sunMat->setShader(billboardShader);
+	skyDome->sunBoard->setMaterial(*skyDome->sunMat);
 	return skyDome;
 }
 
@@ -962,6 +965,15 @@ void CEngine::createStandardTexShader() {
 	shaderList.push_back(texShader);
 }
 
+void CEngine::createStandardMultiTexShader() {
+	multiTexShader = new CMultiTexShader();
+	multiTexShader->pRenderer = &Renderer;
+	multiTexShader->create(dataPath + "multiTexture");
+	multiTexShader->getShaderHandles();
+	multiTexShader->setType(standardMultiTex);
+	shaderList.push_back(multiTexShader);
+}
+
 void CEngine::createStandardPhongShader() {
 	phongShader = new CPhongShader();
 	phongShader->pRenderer = &Renderer;
@@ -985,6 +997,37 @@ void CEngine::createStandardWireShader()
 	wireShader->getShaderHandles();
 	wireShader->setType(standardWire);
 	shaderList.push_back(wireShader);
+}
+
+void CEngine::createStandardBillboardShader() {
+	billboardShader = new CBillboardShader();
+	billboardShader->pRenderer = &Renderer;
+	billboardShader->create(dataPath + "billboard");
+	billboardShader->getShaderHandles();
+	billboardShader->setType(standardBillboard);
+	shaderList.push_back(billboardShader);
+}
+
+CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
+	//create the object
+	CBillboard* billboard = new CBillboard(pos, size);
+	billboard->pRenderer = &Renderer;
+	CMaterial* material = createMaterial();
+	material->setShader(texShader);
+	billboard->setMaterial(*material);
+	modelList.push_back(billboard);
+		 
+	//return it
+	return billboard;
+}
+
+void CEngine::setCurrentCamera(CCamera * camera) {
+	currentCamera = camera;
+	Renderer.currentCamera = camera;
+}
+
+CCamera * CEngine::getCurrentCamera() {
+	return currentCamera;
 }
 
 

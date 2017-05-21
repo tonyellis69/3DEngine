@@ -104,6 +104,8 @@
     <ClCompile Include="..\src\renderer\3d.cpp" />
     <ClCompile Include="..\src\renderer\3dobject.cpp" />
     <ClCompile Include="..\src\renderer\baseBuf.cpp" />
+    <ClCompile Include="..\src\renderer\billboard.cpp" />
+    <ClCompile Include="..\src\renderer\billboardShader.cpp" />
     <ClCompile Include="..\src\renderer\buf.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
@@ -111,6 +113,7 @@
     <ClCompile Include="..\src\renderer\model.cpp" />
     <ClCompile Include="..\src\renderer\modelMulti.cpp" />
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
+    <ClCompile Include="..\src\renderer\multiTexShader.cpp" />
     <ClCompile Include="..\src\renderer\phongShader.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
     <ClCompile Include="..\src\renderer\renderMaterial.cpp" />
@@ -175,6 +178,8 @@
     <ClInclude Include="..\src\renderer\3d.h" />
     <ClInclude Include="..\src\renderer\3dobject.h" />
     <ClInclude Include="..\src\renderer\baseBuf.h" />
+    <ClInclude Include="..\src\renderer\billboard.h" />
+    <ClInclude Include="..\src\renderer\billboardShader.h" />
     <ClInclude Include="..\src\renderer\buf.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
     <ClInclude Include="..\src\renderer\light.h" />
@@ -182,6 +187,7 @@
     <ClInclude Include="..\src\renderer\model.h" />
     <ClInclude Include="..\src\renderer\modelMulti.h" />
     <ClInclude Include="..\src\renderer\multiBuf.h" />
+    <ClInclude Include="..\src\renderer\multiTexShader.h" />
     <ClInclude Include="..\src\renderer\phongShader.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
     <ClInclude Include="..\src\renderer\renderMaterial.h" />

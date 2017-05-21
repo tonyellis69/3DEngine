@@ -4,7 +4,7 @@
 
 enum shaderType { vertex, frag, geometry };
 
-enum TStandardShaderType { standardTex, standardPhong, standardWire, userShader};
+enum TStandardShaderType { standardTex, standardPhong, standardWire, standardMultiTex, standardBillboard, userShader};
 
 /**	Encapsulates a shader, to conveniently gather the various data handles it needs
 	and also hide OpenGL specifics from user. */

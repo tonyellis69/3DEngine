@@ -269,18 +269,26 @@ void CBaseApp::RegisterUIfunctors() {
 void CBaseApp::drawSkyDome() {
 	Engine.Renderer.setDepthTest(false);
 
-	Engine.skyDome->dome->setPos(Engine.currentCamera->getPos() + glm::vec3(0, -0.5f, 0));
-	glm::mat4 mvp = Engine.currentCamera->clipMatrix * Engine.skyDome->dome->worldMatrix;
+	CCamera* currentCamera = Engine.getCurrentCamera();
+	Engine.skyDome->dome->setPos(currentCamera->getPos() + glm::vec3(0, -0.5f, 0));
+	glm::mat4 mvp = currentCamera->clipMatrix * Engine.skyDome->dome->worldMatrix;
 	Engine.Renderer.setShader(Engine.skyDome->skyShader);
 	Engine.skyDome->skyShader->setMVP(mvp);
 	Engine.skyDome->skyShader->setHeightColours(Engine.skyDome->heightColours);
 	Engine.skyDome->dome->drawNew();
 
+	Engine.skyDome->sunBoard->setPos(currentCamera->getPos() + glm::vec3(0,200, -400));
+	mvp = currentCamera->clipMatrix * Engine.skyDome->sunBoard->worldMatrix;
+	Engine.Renderer.setShader(Engine.billboardShader);
+	Engine.billboardShader->setMVP(mvp);
+	Engine.skyDome->sunBoard->drawNew();
+
+
 	//draw cloud plane
-	Engine.skyDome->plane->setPos(Engine.currentCamera->getPos() + glm::vec3(0,-400.0f, 0));
-	Engine.Renderer.setShader(Engine.texShader);
-	mvp = Engine.currentCamera->clipMatrix * Engine.skyDome->plane->worldMatrix;
-	Engine.texShader->setMVP(mvp);
+	Engine.skyDome->plane->setPos(currentCamera->getPos() + glm::vec3(0,-400.0f, 0));
+	Engine.Renderer.setShader(Engine.multiTexShader);
+	mvp = currentCamera->clipMatrix * Engine.skyDome->plane->worldMatrix;
+	Engine.multiTexShader->setMVP(mvp);
 	Engine.skyDome->plane->drawNew();
 
 	Engine.Renderer.setDepthTest(true);

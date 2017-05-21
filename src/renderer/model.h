@@ -34,14 +34,12 @@ public:
 	virtual void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices) {};
 	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 	virtual void setDrawMode(TdrawMode drawMode) {};
-	virtual void setColour(glm::vec4 newColour) {};
 	virtual void assignMaterial() {};
-	virtual void setViewMatrix(glm::mat4& matrix) {};
 
 	int drawMode; ///<Triangles, lines etc
-	glm::vec4 colour; //TO DO: scrap??
 
-	glm::mat4 viewMatrix;
+
+
 
 	CMaterial* material; ///<Points to the material definition for this model.
 

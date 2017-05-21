@@ -8,6 +8,7 @@
 #include "..\soil.h"
 
 //#include "model.h"
+#include "camera.h"
 #include "modelMulti.h"
 #include "renderModel.h"
 #include "buf.h"
@@ -15,8 +16,10 @@
 #include "..\terrain.h"
 
 #include "texShader.h"
+#include "multiTexShader.h"
 #include "phongShader.h"
 #include "wireShader.h"
+#include "billboardShader.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 
@@ -100,7 +103,7 @@ public:
 
 	CTextureManagerOGL textureManager;
 
-
+	CCamera* currentCamera;
 
 	std::string dataPath;
 private:

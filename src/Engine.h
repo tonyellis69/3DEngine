@@ -18,7 +18,7 @@
 #include "skyDome.h"
 #include "renderer\material.h"
 #include "renderer\renderMaterial.h"
-
+#include "renderer\billboard.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -146,8 +146,13 @@ public:
 	CShader* createShader(std::string name);
 	CShader* createShader();
 	void createStandardTexShader();
+	void createStandardMultiTexShader();
 	void createStandardPhongShader();
 	void createStandardWireShader();
+	void createStandardBillboardShader();
+	CBillboard* createBillboard(glm::vec3& pos, glm::vec2 size);
+	void setCurrentCamera(CCamera* camera);
+	CCamera* getCurrentCamera();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -158,7 +163,6 @@ public:
 	int currentProgram;///<Handle for the shader program currently in use.
 	int defaultProgram;
 
-	CCamera* currentCamera; ///<In-use camera for clipping.
 	CCamera* defaultCamera; ///<Initially available camera.
 
 	CTexFont* sysFont;  ///<Points to the default system font.
@@ -214,8 +218,14 @@ public:
 
 	
 	CTexShader* texShader; ///<The standard texture shader
+	CMultiTexShader* multiTexShader; ///<The standard multi-texture shader
 	CPhongShader* phongShader; ///<The standard phong shader
 	CWireShader* wireShader;
+	CBillboardShader* billboardShader;
+
+private:
+	CCamera* currentCamera; ///<In-use camera for clipping.
+
 };
 
 const int NoCursor = -1;

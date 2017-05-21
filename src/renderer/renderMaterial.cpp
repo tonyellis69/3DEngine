@@ -23,8 +23,8 @@ void CRenderMaterial::assign() {
 		subShader->setColour(colour);
 	}
 	
-	if (currentShaderType == standardTex) {
-		CTexShader* subShader = (CTexShader*)shader->getThisShader();
+	else if (currentShaderType == standardMultiTex) {
+		CMultiTexShader* subShader = (CMultiTexShader*)shader->getThisShader();
 
 		//if we have textures, assign them
 		for (size_t texNo = 0; texNo < textures.size(); texNo++) {
@@ -35,6 +35,25 @@ void CRenderMaterial::assign() {
 			subShader->setOffset(texNo, textures[texNo].offset);
 		}
 	}
+	else if (currentShaderType == standardTex) {
+		CTexShader* subShader = (CTexShader*)shader->getThisShader();
+
+			pRenderer->attachTexture(0, textures[0].hTexture);
+
+			subShader->setTextureUnit(0);
+			subShader->setTiling(textures[0].tile);
+			subShader->setOffset(textures[0].offset);
+	}
+	else if (currentShaderType == standardBillboard) {
+		CBillboardShader* subShader = (CBillboardShader*)shader->getThisShader();
+
+		pRenderer->attachTexture(0, textures[0].hTexture);
+
+		subShader->setTextureUnit(0);
+		subShader->setTiling(textures[0].tile);
+		subShader->setOffset(textures[0].offset);
+	}
+
 }
 
 
