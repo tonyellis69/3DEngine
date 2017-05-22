@@ -28,6 +28,7 @@ int CMultiBuf::getElementSize() {
 
 /** Preserve the previous size bytes of current storage so they can't be overwritten. This is useful when the storage has
 	been written to directly. */
+/* Deprecated, not updated. */
 void CMultiBuf::reserve(unsigned int size) {
 	freeMem += size;
 
@@ -105,6 +106,8 @@ unsigned int CMultiBuf::getBufHandle() {
 	return childBufs.back().hBuffer;
 }
 
+/** Only need to set this if we're using the reserve method - to ensure enough memory is available after
+	the reservation. */
 void CMultiBuf::setMinSize(unsigned int minSize) {
 	minBufSize = minSize;
 }

@@ -77,7 +77,7 @@ public:
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
-	unsigned int getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf);
+	unsigned int getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedbackBuf, CBaseBuf& destBuf);
 
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);

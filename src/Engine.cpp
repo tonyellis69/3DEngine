@@ -829,10 +829,10 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 
 
 // pass a CBaseBuf and get it back full of feedback verts
-unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
+unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, CBaseBuf& tempFeedbackBuf, CBaseBuf& destBuf) {
 
 	unsigned int noPrimitives = 0;
-	noPrimitives = Renderer.getGeometryFeedback2(srcModel, tmpBuf,destBuf);
+	noPrimitives = Renderer.getGeometryFeedback2(srcModel, tempFeedbackBuf,destBuf);
 
 	return noPrimitives;
 }
@@ -885,7 +885,9 @@ void CEngine::drawMultiModel(CModelMulti& model) {
 }
 
 CBaseBuf * CEngine::createBuffer() {
-	return new CBuf();
+	CBuf* newBuf = new CBuf();
+	bufferList.push_back(newBuf);
+	return newBuf;
 }
 
 CSkyDome * CEngine::createSkyDome() {
@@ -923,7 +925,7 @@ CSkyDome * CEngine::createSkyDome() {
 
 	//create sun billboard
 	skyDome->sunBoard = createBillboard(glm::vec3(0, 400, -400), glm::vec2(50, 50));
-	skyDome->sunMat = createMaterial(dataPath + "sun3.png");
+	skyDome->sunMat = createMaterial(dataPath + "sun.png");
 	skyDome->sunMat->setShader(billboardShader);
 	skyDome->sunBoard->setMaterial(*skyDome->sunMat);
 	return skyDome;
@@ -1044,6 +1046,7 @@ CEngine::~CEngine(void) {
 		delete materialList[m];
 	for (size_t s = 0; s<shaderList.size(); s++)
 		delete shaderList[s];
-
+	for (size_t b = 0; b<bufferList.size(); b++)
+		delete bufferList[b];
 	Renderer.detachWindow();
 }

@@ -560,7 +560,7 @@ void CRenderer::renderTo2DTexture(int shader, int w, int h, int* buf) {
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CBaseBuf& destBuf) {
+unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedbackBuf, CBaseBuf& destBuf) {
 
 	
 	glEnable(GL_RASTERIZER_DISCARD);
@@ -573,7 +573,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 
 	glGenQueries(1, &query);
 	//glGenQueries(1, &speedQuery);
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tmpBuf.getBufHandle());
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tempFeedbackBuf.getBufHandle());
 	//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, hDestBuf);
 
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
@@ -615,7 +615,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tmpBuf, CB
 
 	//verts are in our temporary feedback buffer. Now we want to copy them to the user-supplied buffer, which may or may not be a multibuffer
 	//if it is a multibuffer, we want to say "here's this block of verts, find a space for it." So, some kind of copyBuffer method.
-	destBuf.copyBuf(tmpBuf,outSize);
+	destBuf.copyBuf(tempFeedbackBuf,outSize);
 
 	
 	glDisable(GL_RASTERIZER_DISCARD);

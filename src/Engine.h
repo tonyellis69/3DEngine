@@ -132,7 +132,7 @@ public:
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
-	unsigned int acquireFeedbackVerts(CModel& srcModel, CBaseBuf&  tmpBuf, CBaseBuf& destBuf);
+	unsigned int acquireFeedbackVerts(CModel& srcModel, CBaseBuf&  tempFeedbackBuf, CBaseBuf& destBuf);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
 	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);
@@ -202,12 +202,8 @@ public:
 	public:
 	C2DVector userScale; ///<Scaling factor applied to user drawing, every frame.
 	TSpriteSheet* CurrentTileSet; ///<Points to the last-used SpriteSheet.
-	CLight light1; ///<Primary lightsource for 3D rendering.
-	glm::vec4 ambientLight; ///<Ambient light for standard shader.
-
-	unsigned int rNormalModelToCameraMatrix;
-	unsigned int rMVPmatrix; ///<Handle to the standard shader combined MVP matrix.
 	
+	std::vector<CBuf*> bufferList; ///<Kill list of engine-created buffers.
 
 	CSkyDome* skyDome;
 
