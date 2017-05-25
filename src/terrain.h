@@ -38,6 +38,7 @@ class CTerrain : public CModelMulti  {
 public:
 	CTerrain();
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
+	void createLayers2(float terrainSize, float LoD1extent, int steps);
 	void createLayers(int layerSize, int noLayers, int layerThickness);
 	void createAllChunks();
 	void resize3dArray(T3dArray &scArray, glm::i32vec3& size);
@@ -119,8 +120,7 @@ public:
 	int LoD;
 	glm::i32vec3 scrollState; ///<Tracks how close layer is to scrolling in any direction.
 	
-	float LoD1cubeSize;
-	int cubesPerChunkEdge;
+	static float LoD1chunkSize;
 
 	std::vector<CSuperChunk*> faceGroup[6];
 	glm::i32vec3 resetState; ///<Tracks how close layer is to returning to its reset position.

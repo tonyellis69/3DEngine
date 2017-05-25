@@ -38,6 +38,89 @@ void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float 
 	totalTris = 0;
 }
 
+
+void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
+	//precalculate layer sizes
+	//innermost layer sizes:
+	float layerExtent = LoD1extent;
+	float layerCubeSize = LoD1cubeSize;
+	deque<float> layerSCsize = { layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge };
+	deque<float> layerSize = { LoD1extent * 2 };
+	deque<int> superChunksPerLayerEdge = {int(layerSize[0] / layerSCsize[0]) };
+	std::cerr << "\nlayer size " << layerSize.front() << " SCs per edge: " << superChunksPerLayerEdge.front();
+	int noLayers = 1;
+	//See how many more layers we can fit
+	while (layerSize.front() < terrainSize ) {
+		
+		layerCubeSize *= 2;
+		layerSCsize.push_front(layerSCsize.front() * 2);
+		layerExtent = layerExtent * 2;
+		int currentLayerSize = layerExtent * 2;
+		int SCsPerLayerEdge = currentLayerSize / layerSCsize.front();
+		if (SCsPerLayerEdge % 2 != 0) {
+			SCsPerLayerEdge += 1;
+			currentLayerSize = SCsPerLayerEdge * layerSCsize.front();
+			layerExtent = currentLayerSize / 2.0f;
+		}
+		superChunksPerLayerEdge.push_front(SCsPerLayerEdge);
+		layerSize.push_front(currentLayerSize);
+		noLayers++;
+		std::cerr << "\nlayer size " << currentLayerSize << " SCs per edge: " << SCsPerLayerEdge;
+	}
+
+	//assume we iterated out, we should now have enough info to create the SC layers
+	T3dArray array3d1, array3d2;
+	T3dArray* outerArray = &array3d1;
+	T3dArray* innerArray = &array3d2;
+
+	layers.resize(noLayers);
+	CTerrainLayer::LoD1chunkSize = LoD1cubeSize * cubesPerChunkEdge;
+
+	int currentLoD = noLayers;
+
+	//create initial, outermost layer
+	vec3 nwLayerPos = vec3(layerSize.front()) * -0.5f;
+	float baseLayerSampleSize = layerSize.front() / 1280; // = 1 for small terrains
+	
+	vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
+
+	for (int layerNo = 0; layerNo < noLayers; layerNo++) {
+		float currentLoDscale = (float)(1 << (currentLoD - 1));
+		resize3dArray(*outerArray, i32vec3(superChunksPerLayerEdge[layerNo]));
+		layers[layerNo].nwLayerPos = vec3(layerSize[layerNo]) * -0.5f;;
+		layers[layerNo].cubeSize = LoD1cubeSize * currentLoDscale;;
+		layers[layerNo].LoD = currentLoD;
+
+		createSuperChunks(*outerArray, layers[layerNo].superChunks);
+		initSuperChunks(*outerArray, layerNo, nwLayerSamplePos, i32vec3(chunksPerSChunkEdge));
+		connectSuperChunks(*outerArray);
+		findLayerFaces(*outerArray, layerNo);
+
+		nwLayerSamplePos += vec3(cubesPerChunkEdge * currentLoDscale * chunksPerSChunkEdge * sampleScale);
+
+
+		currentLoD = currentLoD - 1;
+
+		if (layerNo > 0) { //stitch this layer into outer layer
+			float gapBetweenLayers = abs(layers[layerNo - 1].nwLayerPos.x - layers[layerNo].nwLayerPos.x);
+			int SCsBetweenLayers = gapBetweenLayers / layerSCsize[layerNo-1];
+			//insertLayer(*outerArray, *innerArray, SCsBetweenLayers);
+			insertLayer(*innerArray, *outerArray, SCsBetweenLayers);
+
+			//remove redundant superChunks from outer layer
+			//hollowLayer(*outerArray, layerNo - 1, SCsBetweenLayers);
+			hollowLayer(*innerArray, layerNo - 1, SCsBetweenLayers);
+		}
+			
+		//maker inner layer the next outer layer
+		if (innerArray == &array3d1) {
+			innerArray = &array3d2; outerArray = &array3d1;
+		} else {
+			innerArray = &array3d1; outerArray = &array3d2;
+		}
+	}
+}
+
 /** Create each nested layer of superchunks. */
 void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int layerThickness) {
 	T3dArray array3d1, array3d2;
@@ -69,8 +152,8 @@ void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int lay
 	layers[layerNo].nwLayerPos = nwLayerPos;
 	layers[layerNo].cubeSize = currentLoDcubeSize;
 	layers[layerNo].LoD = currentLoD ;
-	layers[layerNo].LoD1cubeSize = LoD1cubeSize;
-	layers[layerNo].cubesPerChunkEdge = cubesPerChunkEdge;
+
+	CTerrainLayer::LoD1chunkSize = LoD1cubeSize * cubesPerChunkEdge;
 
 
 	createSuperChunks(*outerArray,layers[layerNo].superChunks);
@@ -99,8 +182,7 @@ void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int lay
 		layers[layerNo].nwLayerPos = nwLayerPos += vec3(outerLayerThickness * outerlayerSCsize);
 		layers[layerNo].cubeSize = currentLoDcubeSize;
 		layers[layerNo].LoD = currentLoD;
-		layers[layerNo].LoD1cubeSize = LoD1cubeSize;
-		layers[layerNo].cubesPerChunkEdge = cubesPerChunkEdge;
+
 		createSuperChunks(*innerArray,layers[layerNo].superChunks); 
 		initSuperChunks(*innerArray,layerNo,nwLayerSamplePos,i32vec3(chunksPerSChunkEdge)); 
 		connectSuperChunks(*innerArray);
@@ -108,8 +190,7 @@ void CTerrain::createLayers(int superChunksPerTerrainEdge, int noLayers, int lay
 
 		//stitch inner layer into outer layer
 		insertLayer(*outerArray,*innerArray,outerLayerThickness);
-		///TO DO: can probably get rid of all that crap, currently there's no reason to connect SCs of one layer to
-		///the SCs of another.
+	
 
 		//remove redundant superChunks from outer layer
 		hollowLayer(*outerArray,layerNo-1,outerLayerThickness);
@@ -468,12 +549,14 @@ CTerrainLayer::CTerrainLayer() {
 	resetState = i32vec3(0);
 }
 
+
+
 /** Advance the terrain of this layer in a given direction, scrolling as necessary. Returns true if a scroll
 	occurs. */
 bool CTerrainLayer::advance(i32vec3& scrollVec) {
 	scrollState += scrollVec;
 
-	nwLayerPos -= vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize; //Move whole layer in response to this advance
+	nwLayerPos -= vec3(scrollVec) * LoD1chunkSize; //Move whole layer in response to this advance
 
 	//If this layer has been advanced to its scrolling point, scroll it
 	int scrollAxis = getAxis(scrollVec);
@@ -494,7 +577,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	int scrollAxis = getAxis(scrollVec);
 
 	float LoDscale = (float) (1 << (LoD-1));
-	vec3 sampleStep = vec3(scrollVec * cubesPerChunkEdge) * LoD1cubeSize * LoDscale;
+	vec3 sampleStep = vec3(scrollVec ) * LoD1chunkSize * LoDscale;
 	for (size_t s=0;s<superChunks.size();s++) { 
 		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
@@ -536,3 +619,5 @@ bool CTerrainLayer::resetCheck(glm::i32vec3 & scrollVec) {
 	}
 	return false;
 }
+
+float CTerrainLayer::LoD1chunkSize = 0;
