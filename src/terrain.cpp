@@ -84,6 +84,12 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	
 	vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
 
+	float gapBetweenLayers = 0;
+	int SCsBetweenLayers = 0;
+	float prevLayerSize = layerSize.front();
+	int prevSCsize = layerSCsize.front();
+	float prevLoDscale = 0;
+
 	for (int layerNo = 0; layerNo < noLayers; layerNo++) {
 		float currentLoDscale = (float)(1 << (currentLoD - 1));
 		resize3dArray(*outerArray, i32vec3(superChunksPerLayerEdge[layerNo]));
@@ -91,33 +97,39 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layers[layerNo].cubeSize = LoD1cubeSize * currentLoDscale;;
 		layers[layerNo].LoD = currentLoD;
 
+		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
+		SCsBetweenLayers = gapBetweenLayers / prevSCsize;
+		nwLayerSamplePos += vec3(SCsBetweenLayers * cubesPerChunkEdge * prevLoDscale * chunksPerSChunkEdge * sampleScale);
+
 		createSuperChunks(*outerArray, layers[layerNo].superChunks);
 		initSuperChunks(*outerArray, layerNo, nwLayerSamplePos, i32vec3(chunksPerSChunkEdge));
 		connectSuperChunks(*outerArray);
 		findLayerFaces(*outerArray, layerNo);
 
-		nwLayerSamplePos += vec3(cubesPerChunkEdge * currentLoDscale * chunksPerSChunkEdge * sampleScale);
-
-
+	
 		currentLoD = currentLoD - 1;
 
 		if (layerNo > 0) { //stitch this layer into outer layer
-			float gapBetweenLayers = abs(layers[layerNo - 1].nwLayerPos.x - layers[layerNo].nwLayerPos.x);
-			int SCsBetweenLayers = gapBetweenLayers / layerSCsize[layerNo-1];
-			//insertLayer(*outerArray, *innerArray, SCsBetweenLayers);
+			gapBetweenLayers = abs(layers[layerNo - 1].nwLayerPos.x - layers[layerNo].nwLayerPos.x);
+			SCsBetweenLayers = gapBetweenLayers / layerSCsize[layerNo-1];
+		
 			insertLayer(*innerArray, *outerArray, SCsBetweenLayers);
 
 			//remove redundant superChunks from outer layer
-			//hollowLayer(*outerArray, layerNo - 1, SCsBetweenLayers);
 			hollowLayer(*innerArray, layerNo - 1, SCsBetweenLayers);
 		}
 			
-		//maker inner layer the next outer layer
+		//maker this layer the next outer layer
 		if (innerArray == &array3d1) {
 			innerArray = &array3d2; outerArray = &array3d1;
 		} else {
 			innerArray = &array3d1; outerArray = &array3d2;
 		}
+
+		prevLayerSize = layerSize[layerNo];
+		prevSCsize = layerSCsize[layerNo];
+	    prevLoDscale = currentLoDscale;
+
 	}
 }
 
