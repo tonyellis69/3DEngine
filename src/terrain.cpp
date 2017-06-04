@@ -40,31 +40,48 @@ void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float 
 
 
 void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
-	//precalculate layer sizes
-	//innermost layer sizes:
+	//calculate dimensions of the innermost layer:
+	int LoDscale = 1;
 	float layerExtent = LoD1extent;
 	float layerCubeSize = LoD1cubeSize;
-	deque<float> layerSCsize = { layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge };
-	deque<float> layerSize = { LoD1extent * 2 };
-	deque<int> superChunksPerLayerEdge = {int(layerSize[0] / layerSCsize[0]) };
+	float LoD1SCsize = layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge;
+	deque<float> layerSize = { layerExtent * 2 };
+	deque<int> superChunksPerLayerEdge = {int(layerSize.front() / LoD1SCsize) };
 	std::cerr << "\nlayer size " << layerSize.front() << " SCs per edge: " << superChunksPerLayerEdge.front();
 	int noLayers = 1;
-	//See how many more layers we can fit
+	float layerSuperchunkSize;
+	float layerGrowth = 2.0f; //4.0f
+	int currentStep = 0;
+
+	//Expanding, see how many more layers we can fit into the remaining terain space
 	while (layerSize.front() < terrainSize ) {
-		
-		layerCubeSize *= 2;
-		layerSCsize.push_front(layerSCsize.front() * 2);
-		layerExtent = layerExtent * 2;
+		LoDscale *= 2; //halve the level of detail by doubling the size of the building blocks
+		layerCubeSize = LoD1cubeSize * LoDscale;
+		layerSuperchunkSize = LoD1SCsize * LoDscale;
+
+		layerExtent = layerExtent * layerGrowth;
 		int currentLayerSize = layerExtent * 2;
-		int SCsPerLayerEdge = currentLayerSize / layerSCsize.front();
-		if (SCsPerLayerEdge % 2 != 0) {
+		int SCsPerLayerEdge = currentLayerSize / layerSuperchunkSize;
+		if (SCsPerLayerEdge % 2 != 0) { //can't have an odd number of SCs on an edge
 			SCsPerLayerEdge += 1;
-			currentLayerSize = SCsPerLayerEdge * layerSCsize.front();
-			layerExtent = currentLayerSize / 2.0f;
+			currentLayerSize = SCsPerLayerEdge * layerSuperchunkSize;
+			layerExtent = currentLayerSize / 2;
 		}
+
+		//If we have no more steps, expand this layer to fit the total terrain size
+		if (currentStep == steps) {
+			while (currentLayerSize < terrainSize) {
+				SCsPerLayerEdge += 2;
+				currentLayerSize = SCsPerLayerEdge * layerSuperchunkSize;
+				layerExtent = currentLayerSize / 2;
+			}
+
+		}
+
 		superChunksPerLayerEdge.push_front(SCsPerLayerEdge);
 		layerSize.push_front(currentLayerSize);
 		noLayers++;
+		currentStep++;
 		std::cerr << "\nlayer size " << currentLayerSize << " SCs per edge: " << SCsPerLayerEdge;
 	}
 
@@ -78,7 +95,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 
 	int currentLoD = noLayers;
 
-	//create initial, outermost layer
+	//create layers, working in from the outside
 	vec3 nwLayerPos = vec3(layerSize.front()) * -0.5f;
 	float baseLayerSampleSize = layerSize.front() / 1280; // = 1 for small terrains
 	
@@ -87,14 +104,13 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;
 	float prevLayerSize = layerSize.front();
-	int prevSCsize = layerSCsize.front();
+	int prevSCsize =  layerSuperchunkSize;
 	float prevLoDscale = 0;
 
 	for (int layerNo = 0; layerNo < noLayers; layerNo++) {
-		float currentLoDscale = (float)(1 << (currentLoD - 1));
 		resize3dArray(*outerArray, i32vec3(superChunksPerLayerEdge[layerNo]));
-		layers[layerNo].nwLayerPos = vec3(layerSize[layerNo]) * -0.5f;;
-		layers[layerNo].cubeSize = LoD1cubeSize * currentLoDscale;;
+		layers[layerNo].nwLayerPos = vec3(layerSize[layerNo]) * -0.5f;
+		layers[layerNo].cubeSize = LoD1cubeSize * LoDscale;;
 		layers[layerNo].LoD = currentLoD;
 
 		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
@@ -109,9 +125,9 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	
 		currentLoD = currentLoD - 1;
 
-		if (layerNo > 0) { //stitch this layer into outer layer
+		if (layerNo > 0) { //stitch this layer into previous, outer layer
 			gapBetweenLayers = abs(layers[layerNo - 1].nwLayerPos.x - layers[layerNo].nwLayerPos.x);
-			SCsBetweenLayers = gapBetweenLayers / layerSCsize[layerNo-1];
+			SCsBetweenLayers = gapBetweenLayers / prevSCsize;// layerSCsize[layerNo - 1];
 		
 			insertLayer(*innerArray, *outerArray, SCsBetweenLayers);
 
@@ -127,9 +143,9 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		}
 
 		prevLayerSize = layerSize[layerNo];
-		prevSCsize = layerSCsize[layerNo];
-	    prevLoDscale = currentLoDscale;
-
+		prevSCsize = LoD1SCsize * LoDscale;
+	    prevLoDscale = LoDscale;
+		LoDscale = LoDscale / 2;
 	}
 }
 
