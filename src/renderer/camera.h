@@ -16,6 +16,7 @@ public:
 	void yaw(float angle);
 	void pitch(float angle);
 	void dolly(float dist);
+	glm::vec3 getTargetDir();
 	void track(float dist);
 	void elevate(float dist);
 	void keepUpright(const glm::vec3& target);

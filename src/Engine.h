@@ -19,6 +19,8 @@
 #include "renderer\material.h"
 #include "renderer\renderMaterial.h"
 #include "renderer\billboard.h"
+#include "wireBoxShader.h"
+#include "physics\physObjManager.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -150,9 +152,11 @@ public:
 	void createStandardPhongShader();
 	void createStandardWireShader();
 	void createStandardBillboardShader();
+	void createWireBoxShader();
 	CBillboard* createBillboard(glm::vec3& pos, glm::vec2 size);
 	void setCurrentCamera(CCamera* camera);
 	CCamera* getCurrentCamera();
+	CPhysObj* addPhysics(CModel* model);
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
@@ -218,9 +222,14 @@ public:
 	CPhongShader* phongShader; ///<The standard phong shader
 	CWireShader* wireShader;
 	CBillboardShader* billboardShader;
+	CWireBoxShader* wireBoxShader;
+
+	CPhysObjManager physObjManager;
 
 private:
 	CCamera* currentCamera; ///<In-use camera for clipping.
+
+
 
 };
 

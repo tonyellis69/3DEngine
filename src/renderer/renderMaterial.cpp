@@ -78,8 +78,12 @@ void CRenderMaterial::setTile(int texNo, glm::vec2 & tile) {
 void CRenderMaterial::unAssign() {
 	//pRenderer->setShader(0); //turned this off as there's a performance hit
 	
-	//pRenderer->attachTexture(0, 0);
+	pRenderer->attachTexture(0, 0);
 	//Don't seem to need the above any more, either.
+	//TO DO: ACHTUNG! Currently need this for text, but probably because text is still drawn old-style.
+	//modernise text drawing then see.
+
+
 	for (size_t texNo = 0; texNo < textures.size(); texNo++) {
 		//pRenderer->attachTexture(texNo, 0);
 	}

@@ -106,6 +106,11 @@ void CCamera::dolly(float dist) {
 	setPos(pos);
 }
 
+glm::vec3 CCamera::getTargetDir() {
+	glm::vec3 dir = glm::vec3(0, 0, -1);
+	return orientation * dir;
+}
+
 
 /** Move perpendicular to target. */
 void CCamera::track(float dist) {

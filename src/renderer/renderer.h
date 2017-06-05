@@ -21,6 +21,7 @@
 #include "wireShader.h"
 #include "billboardShader.h"
 
+
 enum renderTextureFormat {floatTex,intTex, uintTex};
 
 extern int totalbufsize;

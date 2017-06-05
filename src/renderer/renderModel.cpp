@@ -7,16 +7,10 @@ CRenderModel::CRenderModel() : CModel() {
 
 }
 
-
-
 void CRenderModel::drawNew() {
-
 	material->assign();
-
 	pRenderer->drawModel(*this);
-	
 	material->unAssign();
-
 }
 
 unsigned int CRenderModel::getBuffer() {

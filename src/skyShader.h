@@ -11,7 +11,7 @@ class CSkyShader : public CRenderShader {
 public:
 	CSkyShader() {};
 	void getShaderHandles();
-	void setMVP(glm::mat4 matrix);
+	void setMVP(glm::mat4& matrix);
 	void setHeightColours(glm::vec3* colours);
 
 	GLuint hSkyDomeHeightColours;

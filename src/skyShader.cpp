@@ -7,7 +7,7 @@ void CSkyShader::getShaderHandles() {
 	hSkyDomeHeightColours = pRenderer->getShaderDataHandle(hShader,"heightColour");
 }
 
-void CSkyShader::setMVP(glm::mat4 matrix)
+void CSkyShader::setMVP(glm::mat4& matrix)
 {
 	pRenderer->setShaderValue(hMVP, 1, matrix);
 }

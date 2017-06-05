@@ -21,7 +21,7 @@ using namespace watch;
  int totalchunks = 1;
 
 CTerrain::CTerrain() : CModelMulti() {
-	totalTris = 0;
+	totalTris = 0; totalSCs = 0;
 	chunkOrigin = glm::translate(glm::mat4(1), getPos());
 	scrollTriggerPoint = vec3(0);
 	chunkOriginInt = i32vec3(0);
@@ -47,7 +47,6 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	float LoD1SCsize = layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge;
 	deque<float> layerSize = { layerExtent * 2 };
 	deque<int> superChunksPerLayerEdge = {int(layerSize.front() / LoD1SCsize) };
-	std::cerr << "\nlayer size " << layerSize.front() << " SCs per edge: " << superChunksPerLayerEdge.front();
 	int noLayers = 1;
 	float layerSuperchunkSize;
 	float layerGrowth = 2.0f; //4.0f
@@ -82,7 +81,6 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layerSize.push_front(currentLayerSize);
 		noLayers++;
 		currentStep++;
-		std::cerr << "\nlayer size " << currentLayerSize << " SCs per edge: " << SCsPerLayerEdge;
 	}
 
 	//assume we iterated out, we should now have enough info to create the SC layers
@@ -147,6 +145,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	    prevLoDscale = LoDscale;
 		LoDscale = LoDscale / 2;
 	}
+	cerr << "\ntotal superchnks " << totalSCs;
 }
 
 /** Create each nested layer of superchunks. */
@@ -263,6 +262,7 @@ void CTerrain::createSuperChunks(T3dArray &scArray, vector<CSuperChunk*>& parent
 		for (size_t y=0; y<scArray[0].size(); ++y) {
 			for (size_t z=0;z<scArray[0][0].size(); ++z) {
 				CSuperChunk* sChunk = new CSuperChunk();
+				totalSCs++;
 				sChunk->terrain = this;
 				scArray[x][y][z] = sChunk;
 				parentLayer.push_back(sChunk);

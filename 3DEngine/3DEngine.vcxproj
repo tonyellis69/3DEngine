@@ -99,6 +99,8 @@
     <ClCompile Include="..\Src\ImageLib.cpp" />
     <ClCompile Include="..\src\isoSurface.cpp" />
     <ClCompile Include="..\src\particle.cpp" />
+    <ClCompile Include="..\src\physics\physObj.cpp" />
+    <ClCompile Include="..\src\physics\physObjManager.cpp" />
     <ClCompile Include="..\src\Reader.cpp" />
     <ClCompile Include="..\src\renderer\2d.cpp" />
     <ClCompile Include="..\src\renderer\3d.cpp" />
@@ -154,6 +156,7 @@
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
     <ClCompile Include="..\Src\Window.cpp" />
+    <ClCompile Include="..\src\wireBoxShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\2DPolygon.h" />
@@ -173,6 +176,8 @@
     <ClInclude Include="..\src\isoSurface.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\particle.h" />
+    <ClInclude Include="..\src\physics\physObj.h" />
+    <ClInclude Include="..\src\physics\physObjManager.h" />
     <ClInclude Include="..\src\Reader.h" />
     <ClInclude Include="..\src\renderer\2d.h" />
     <ClInclude Include="..\src\renderer\3d.h" />
@@ -235,6 +240,7 @@
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
     <ClInclude Include="..\Src\Window.h" />
+    <ClInclude Include="..\src\wireBoxShader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

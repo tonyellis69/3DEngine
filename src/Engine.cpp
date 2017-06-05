@@ -50,6 +50,7 @@ void CEngine::init(HWND& hWnd) {
 	createStandardWireShader();
 	createStandardMultiTexShader();
 	createStandardBillboardShader();
+	createWireBoxShader();
 }
 
 
@@ -1010,6 +1011,17 @@ void CEngine::createStandardBillboardShader() {
 	shaderList.push_back(billboardShader);
 }
 
+void CEngine::createWireBoxShader() {
+	wireBoxShader = new CWireBoxShader();
+	wireBoxShader->pRenderer = &Renderer;
+	wireBoxShader->create(dataPath + "wireBox");
+	wireBoxShader->getShaderHandles();
+	wireBoxShader->setType(userShader);
+	shaderList.push_back(wireBoxShader);
+
+
+}
+
 CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 	//create the object
 	CBillboard* billboard = new CBillboard(pos, size);
@@ -1030,6 +1042,10 @@ void CEngine::setCurrentCamera(CCamera * camera) {
 
 CCamera * CEngine::getCurrentCamera() {
 	return currentCamera;
+}
+
+CPhysObj * CEngine::addPhysics(CModel * model) {
+	return	physObjManager.addModel(model);
 }
 
 

@@ -100,6 +100,7 @@ public:
 
 	std::vector<Chunk*> toFree; ///<List of chunks to be taken out of play.
 
+	int totalSCs;
 	};
 
 

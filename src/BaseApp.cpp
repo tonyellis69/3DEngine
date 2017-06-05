@@ -12,9 +12,6 @@ using namespace watch;
 
 
 CBaseApp::CBaseApp(void)  {
-	
-
-
 	homeDir = Window.getExePath();
 #ifdef _DEBUG
 	homeDir += "..\\";
@@ -142,15 +139,8 @@ void CBaseApp::OnCharEntry(unsigned int Key, long Mod) {
 void CBaseApp::OnMouseMsg(unsigned int Msg, unsigned int wParam, long lParam) {
 	
 	GUIroot.MouseMsg(Msg,GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam),wParam);
-	//dMouseX =0;dMouseY=0;
 	if (Msg == WM_MOUSEMOVE) {
-		//int oldMouseX = mouseX; int oldMouseY = mouseY;
-	//	mouseX = GET_X_LPARAM(lParam); //TO DO: move outside if statement?
-	//	mouseY = GET_Y_LPARAM(lParam);
-		//dMouseX = mouseX - oldMouseX;
-		//dMouseY = mouseY - oldMouseY;
 		mouseKey = wParam;
-		//mouseMove(mouseX,mouseY,wParam);
 	}
 
 }
@@ -167,16 +157,10 @@ void CBaseApp::OnMouseWheelMsg(unsigned int wParam, long lParam) {
 
 
 void CBaseApp::AppTasks() {
-	//Pre-draw
-//Engine.Renderer.setTextureMode(true);
-
 	if (Engine.MakingFit) //activate the global scaling matrix, if we're using one.
-		//Engine.resetViewMatrix(); //reset to identity matrix, no scaling
 		Engine.applyGlobalScale(); //TO DO: messes GUI - look into or scrap - prob due to line-drawing methods
 
 	Engine.clearFrame();
-
-	
 
 	Time = Engine.Time.milliseconds();
 	dT = Time - LastTime;
@@ -195,6 +179,8 @@ void CBaseApp::AppTasks() {
 	if (Engine.skyDome) {
 		drawSkyDome();
 	}
+
+	Engine.physObjManager.update(float(dT * 0.001f));
 
 
 	Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed
