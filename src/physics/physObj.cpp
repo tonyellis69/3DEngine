@@ -18,7 +18,19 @@ void CPhysObj::setMass(float newMass) {
 
 
 /** Update the physics state. */
-void CPhysObj::update(const float & dT) {
+vec3 CPhysObj::update(const float & dT) {
 	velocity = velocity + (vec3(0, -1, 0) *dT);
+	return velocity;
+}
+
+CModel * CPhysObj::getModel() {
+	return pModel;
+}
+
+void CPhysObj::modifyVelocity(glm::vec3 & modifier) {
+	velocity += modifier;
+}
+
+void CPhysObj::applyVelocity() {
 	pModel->translate(velocity);
 }

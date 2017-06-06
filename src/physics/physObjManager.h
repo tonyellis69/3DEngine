@@ -1,16 +1,18 @@
 #pragma once
 
-#include "physObj.h"
+#include "basePhysObj.h"
 
-/** Manager of physics onjects. */
+/** Manager of physics objects. */
 class CPhysObjManager {
 public:
 	CPhysObjManager() {}
 	~CPhysObjManager();
-	CPhysObj* addModel(CModel* model);
+	CBasePhysObj* addModel(CModel* model);
+	void addPhysObj(CBasePhysObj* obj);
 	void update(const float & dT);
+	glm::vec3 checkForCollisions(CBasePhysObj* collider, glm::vec3& velocity);
 
 
 private:
-	std::vector<CPhysObj*> physObjList;
+	std::vector<CBasePhysObj*> physObjList;
 };

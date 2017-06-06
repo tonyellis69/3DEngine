@@ -21,6 +21,8 @@
 #include "renderer\billboard.h"
 #include "wireBoxShader.h"
 #include "physics\physObjManager.h"
+#include "physics\terrainPhysObj.h"
+
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -117,8 +119,8 @@ public:
 	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
 	CModel* createHemisphere(glm::vec3& pos, float radius, int steps);
 	CModel* createPlane(glm::vec3& pos, float width, float height, int steps);
-	void renderTo3DTexture(glm::vec3 vol, float* buf);
-	void renderTo2DTexture(glm::vec2 size, int* buf);
+	void renderTo3DTexture(glm::i32vec3 vol, float* buf);
+	void renderTo2DTexture(glm::i32vec2 size, int* buf);
 	void storeModel(CModel* model, glm::vec3* verts, int noVerts);
 	/** Send these indexed vertices to the graphics hardware to be buffered, and register them with the given model. */
 	template <typename T>
@@ -156,7 +158,7 @@ public:
 	CBillboard* createBillboard(glm::vec3& pos, glm::vec2 size);
 	void setCurrentCamera(CCamera* camera);
 	CCamera* getCurrentCamera();
-	CPhysObj* addPhysics(CModel* model);
+	CBasePhysObj* addPhysics(CModel* model);
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;

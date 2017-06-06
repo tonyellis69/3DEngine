@@ -61,6 +61,7 @@ public:
 	void newChunkRequest(glm::vec3& samplePos, CSuperChunk* parentSC, glm::i32vec3& index);
 	void handleNextChunkRequest();
 	void freeChunk(Chunk& chunk);
+	CSuperChunk* getSC(glm::vec3& pos);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -122,6 +123,7 @@ public:
 	glm::i32vec3 scrollState; ///<Tracks how close layer is to scrolling in any direction.
 	
 	static float LoD1chunkSize;
+	float scSize;
 
 	std::vector<CSuperChunk*> faceGroup[6];
 	glm::i32vec3 resetState; ///<Tracks how close layer is to returning to its reset position.

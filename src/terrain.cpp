@@ -59,8 +59,8 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layerSuperchunkSize = LoD1SCsize * LoDscale;
 
 		layerExtent = layerExtent * layerGrowth;
-		int currentLayerSize = layerExtent * 2;
-		int SCsPerLayerEdge = currentLayerSize / layerSuperchunkSize;
+		float currentLayerSize = layerExtent * 2;
+		int SCsPerLayerEdge = int(currentLayerSize / layerSuperchunkSize);
 		if (SCsPerLayerEdge % 2 != 0) { //can't have an odd number of SCs on an edge
 			SCsPerLayerEdge += 1;
 			currentLayerSize = SCsPerLayerEdge * layerSuperchunkSize;
@@ -102,7 +102,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;
 	float prevLayerSize = layerSize.front();
-	int prevSCsize =  layerSuperchunkSize;
+	float prevSCsize =  layerSuperchunkSize;
 	float prevLoDscale = 0;
 
 	for (int layerNo = 0; layerNo < noLayers; layerNo++) {
@@ -110,6 +110,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layers[layerNo].nwLayerPos = vec3(layerSize[layerNo]) * -0.5f;
 		layers[layerNo].cubeSize = LoD1cubeSize * LoDscale;;
 		layers[layerNo].LoD = currentLoD;
+		layers[layerNo].scSize = LoD1SCsize * LoDscale;
 
 		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
 		SCsBetweenLayers = gapBetweenLayers / prevSCsize;
@@ -120,7 +121,6 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		connectSuperChunks(*outerArray);
 		findLayerFaces(*outerArray, layerNo);
 
-	
 		currentLoD = currentLoD - 1;
 
 		if (layerNo > 0) { //stitch this layer into previous, outer layer
@@ -543,6 +543,22 @@ void CTerrain::freeChunk(Chunk & chunk) {
 		multiBuf.deleteBlock(chunk.id);
 	chunk.status = chFree;
 	spareChunks.push_back(&chunk);
+}
+
+/** Return the superchunk at the given position. */
+CSuperChunk * CTerrain::getSC(glm::vec3 & pos) {
+	for (int layerNo = layers.size() - 1; layerNo >= 0; layerNo--) {
+		bvec3 inside = lessThanEqual(glm::abs(pos), abs(layers[layerNo].nwLayerPos));
+		if ( all(inside) ) {
+			pos +=glm::abs( layers[layerNo].nwLayerPos);
+			i32vec3 index = pos / layers[layerNo].scSize;
+			for (size_t sc = 0; sc < layers[layerNo].superChunks.size(); sc++) {
+				if (layers[layerNo].superChunks[sc]->tmpIndex == index)
+					return layers[layerNo].superChunks[sc];
+			}
+		}
+	}
+	return nullptr;
 }
 
 CTerrain::~CTerrain() {

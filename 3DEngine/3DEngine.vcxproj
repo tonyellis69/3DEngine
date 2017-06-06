@@ -99,8 +99,10 @@
     <ClCompile Include="..\Src\ImageLib.cpp" />
     <ClCompile Include="..\src\isoSurface.cpp" />
     <ClCompile Include="..\src\particle.cpp" />
+    <ClCompile Include="..\src\physics\basePhysObj.cpp" />
     <ClCompile Include="..\src\physics\physObj.cpp" />
     <ClCompile Include="..\src\physics\physObjManager.cpp" />
+    <ClCompile Include="..\src\physics\terrainPhysObj.cpp" />
     <ClCompile Include="..\src\Reader.cpp" />
     <ClCompile Include="..\src\renderer\2d.cpp" />
     <ClCompile Include="..\src\renderer\3d.cpp" />
@@ -176,8 +178,10 @@
     <ClInclude Include="..\src\isoSurface.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\particle.h" />
+    <ClInclude Include="..\src\physics\basePhysObj.h" />
     <ClInclude Include="..\src\physics\physObj.h" />
     <ClInclude Include="..\src\physics\physObjManager.h" />
+    <ClInclude Include="..\src\physics\terrainPhysObj.h" />
     <ClInclude Include="..\src\Reader.h" />
     <ClInclude Include="..\src\renderer\2d.h" />
     <ClInclude Include="..\src\renderer\3d.h" />

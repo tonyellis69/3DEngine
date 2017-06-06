@@ -9,7 +9,7 @@
 #include "colour.h"
 #include "renderer\renderMaterial.h"
 #include "renderer\renderShader.h"
-
+#include "physics\physObj.h"
 
 
 //using namespace glm;
@@ -778,12 +778,12 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 }
 
 /** Render a 3D block of pixels of the given volume to a buffer, one pixel-layer after another. */
-void CEngine::renderTo3DTexture(glm::vec3 vol, float* buf) {
+void CEngine::renderTo3DTexture(glm::i32vec3 vol, float* buf) {
 	Renderer.renderTo3DTexture(currentProgram,vol.x,vol.y,vol.z,buf);
 }
 
 /** Render a 2D block of pixels of the given size to a buffer. */
-void CEngine::renderTo2DTexture(glm::vec2 size, int* buf) {
+void CEngine::renderTo2DTexture(glm::i32vec2 size, int* buf) {
 	Renderer.renderTo2DTexture(currentProgram,size.x,size.y,buf);
 	//glViewport(0,0,Renderer.Width,Renderer.Height);
 }
@@ -878,6 +878,12 @@ CTerrain * CEngine::createTerrain() {
 	terrain->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
 	terrain->setMaterial(*material);
+
+	CTerrainPhysObj* terrainPhysObj = new CTerrainPhysObj();
+	terrainPhysObj->attachModel(terrain);
+	physObjManager.addPhysObj(terrainPhysObj);
+	terrainPhysObj->setCollides(false);
+
 	return terrain;
 }
 
@@ -1044,7 +1050,7 @@ CCamera * CEngine::getCurrentCamera() {
 	return currentCamera;
 }
 
-CPhysObj * CEngine::addPhysics(CModel * model) {
+CBasePhysObj * CEngine::addPhysics(CModel * model) {
 	return	physObjManager.addModel(model);
 }
 
