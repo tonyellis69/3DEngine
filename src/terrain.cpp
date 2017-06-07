@@ -558,7 +558,22 @@ CSuperChunk * CTerrain::getSC(glm::vec3 & pos) {
 			}
 		}
 	}
-	return nullptr;
+	return NULL;
+}
+
+/** Return the chunk, if any, at the given position. */
+Chunk * CTerrain::getChunk(glm::vec3 & pos) {
+	CSuperChunk* sc = getSC(pos);
+	if (!sc)
+		return NULL;
+	pos = glm::abs(pos - sc->nwWorldPos);
+	i32vec3 index = pos / sc->chunkSize;
+	for (size_t chunk = 0; chunk < sc->chunkList.size(); chunk++) {
+		if (sc->chunkList[chunk]->scIndex == index)
+			return sc->chunkList[chunk];
+	}
+
+	return NULL;
 }
 
 CTerrain::~CTerrain() {

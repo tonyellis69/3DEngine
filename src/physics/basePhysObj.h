@@ -15,7 +15,7 @@ public:
 	virtual void modifyVelocity(glm::vec3& modifier) {};
 	virtual void applyVelocity() {};
 	void setCollides(bool status);
-	virtual glm::vec3 collisionCheck(glm::vec3 pos) { return glm::vec3(0); };
+	virtual glm::vec3 collisionCheck(glm::vec3& pos) { return glm::vec3(0); };
 
 	bool collides; ///<True if this object collides *into* other objects.
 

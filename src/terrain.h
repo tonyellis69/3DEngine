@@ -62,6 +62,7 @@ public:
 	void handleNextChunkRequest();
 	void freeChunk(Chunk& chunk);
 	CSuperChunk* getSC(glm::vec3& pos);
+	Chunk* getChunk(glm::vec3& pos);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.

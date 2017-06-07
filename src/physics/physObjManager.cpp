@@ -48,11 +48,12 @@ vec3 CPhysObjManager::checkForCollisions(CBasePhysObj * collider, glm::vec3 & ve
 		collidee = physObjList[obj];
 		if (collidee == collider)
 			continue;	
-		collidee->collisionCheck(pos);
-
-
+		response = collidee->collisionCheck(pos);
+		if (response.y == 0)
+			return velocity;
+		else
+			return vec3(0);
 	}
 
-	response = velocity;
-	return response;
+	return velocity;
 }

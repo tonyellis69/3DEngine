@@ -1,7 +1,16 @@
 #include "terrainPhysObj.h"
 
-glm::vec3 CTerrainPhysObj::collisionCheck(glm::vec3 pos) {
-	return glm::vec3();
+#include <iostream> //for cerr
+
+using namespace glm;
+
+glm::vec3 CTerrainPhysObj::collisionCheck(glm::vec3& pos) {
+	Chunk* chunk = pTerrain->getChunk(pos);
+	if (chunk == NULL) {
+		return vec3(0);
+	}
+
+	return vec3(1);
 }
 
 void CTerrainPhysObj::attachModel(CModel * model) {
