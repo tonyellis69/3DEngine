@@ -6,6 +6,7 @@ using namespace glm;
 
 void CPhysObj::attachModel(CModel * model) {
 	pModel = model; 
+	position = pModel->getPos();
 }
 
 void CPhysObj::setVelocity(glm::vec3 & newVelocity) {
@@ -17,11 +18,7 @@ void CPhysObj::setMass(float newMass) {
 }
 
 
-/** Update the physics state. */
-vec3 CPhysObj::update(const float & dT) {
-	velocity = velocity + (vec3(0, -1, 0) *dT);
-	return velocity;
-}
+
 
 CModel * CPhysObj::getModel() {
 	return pModel;
@@ -33,4 +30,21 @@ void CPhysObj::modifyVelocity(glm::vec3 & modifier) {
 
 void CPhysObj::applyVelocity() {
 	pModel->translate(velocity);
+}
+
+/** Integrate the object's position and velocity, over the given time. */
+void CPhysObj::integrate(float dT) {
+	//update position from velocity
+	position += velocity * dT;
+
+	//update velocity from acceleration
+	velocity += acceleration * dT;
+
+	//apply damping
+	velocity *= pow(damping,dT);
+
+}
+
+void CPhysObj::repositionModel() {
+	pModel->setPos(position);
 }

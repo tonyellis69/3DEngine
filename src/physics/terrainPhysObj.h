@@ -7,7 +7,7 @@
 /** The terrain physics object. */
 class CTerrainPhysObj : public CPhysObj {
 public:
-	glm::vec3 collisionCheck(glm::vec3& pos);
+	glm::vec3 collisionCheck(CBasePhysObj& collider);
 	void attachModel(CModel* model);
 	glm::vec3 update(const float & dT);
 

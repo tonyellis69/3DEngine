@@ -12,6 +12,7 @@ using namespace watch;
 
 
 CBaseApp::CBaseApp(void)  {
+
 	homeDir = Window.getExePath();
 #ifdef _DEBUG
 	homeDir += "..\\";
@@ -73,7 +74,8 @@ void CBaseApp::RegisterHandlers() {
 
 /** Starts the application loop. This will not return until the app is shut down. */
 void CBaseApp::start() {
-	LastTime = Engine.Time.milliseconds();
+	//LastTime = Engine.Time.milliseconds();
+	LastTime = Engine.Time.seconds();
 	onStart();
 	Window.WinLoop();
 }
@@ -162,7 +164,8 @@ void CBaseApp::AppTasks() {
 
 	Engine.clearFrame();
 
-	Time = Engine.Time.milliseconds();
+	//Time = Engine.Time.milliseconds();
+	Time = Engine.Time.seconds();
 	dT = Time - LastTime;
 	Engine.dT = dT;
 	LastTime = Time;
@@ -180,7 +183,7 @@ void CBaseApp::AppTasks() {
 		drawSkyDome();
 	}
 
-	Engine.physObjManager.update(float(dT * 0.001f));
+	Engine.physObjManager.update(float(dT * 10.0f));
 
 
 	Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed

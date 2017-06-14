@@ -100,6 +100,9 @@
     <ClCompile Include="..\src\isoSurface.cpp" />
     <ClCompile Include="..\src\particle.cpp" />
     <ClCompile Include="..\src\physics\basePhysObj.cpp" />
+    <ClCompile Include="..\src\physics\bsphere.cpp" />
+    <ClCompile Include="..\src\physics\collision.cpp" />
+    <ClCompile Include="..\src\physics\contacts.cpp" />
     <ClCompile Include="..\src\physics\physObj.cpp" />
     <ClCompile Include="..\src\physics\physObjManager.cpp" />
     <ClCompile Include="..\src\physics\terrainPhysObj.cpp" />
@@ -179,6 +182,9 @@
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\particle.h" />
     <ClInclude Include="..\src\physics\basePhysObj.h" />
+    <ClInclude Include="..\src\physics\bsphere.h" />
+    <ClInclude Include="..\src\physics\collision.h" />
+    <ClInclude Include="..\src\physics\contacts.h" />
     <ClInclude Include="..\src\physics\physObj.h" />
     <ClInclude Include="..\src\physics\physObjManager.h" />
     <ClInclude Include="..\src\physics\terrainPhysObj.h" />

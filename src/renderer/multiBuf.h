@@ -47,6 +47,8 @@ public:
 	void draw();
 	void deleteBlock(unsigned int id);
 	void setBlockColour(unsigned int id, tmpRGBAtype& colour);
+	void copyBlock(unsigned int id, char* buf);
+	unsigned int getBlockSize(unsigned int id);
 	
 
 	GLint* first;

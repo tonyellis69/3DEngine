@@ -194,6 +194,22 @@ void CMultiBuf::setBlockColour(unsigned int id, tmpRGBAtype & colour) {
 	childBuf->colour[blockIdx] = glm::vec4(colour.r, colour.g, colour.b, colour.a);
 }
 
+void CMultiBuf::copyBlock(unsigned int id, char * buf) {
+	CChildBlock* block = &blocks[id];
+	unsigned short childBufNo = (id >> 16) - 1;
+	
+	CChildBuf* childBuf = &childBufs[childBufNo];
+	GLuint hSrcBuf = childBuf->getBufHandle();
+
+	glBindBuffer(GL_COPY_READ_BUFFER, hSrcBuf);
+	glGetBufferSubData(GL_COPY_READ_BUFFER, block->blockStart, block->blockSize, buf);
+}
+
+unsigned int CMultiBuf::getBlockSize(unsigned int id) {
+	CChildBlock* block = &blocks[id];
+	return block->blockSize;
+}
+
 /** Return the id of the nearest larger block than size, or zero. */
 unsigned int CMultiBuf::getFreeBlock(unsigned int size) {
 	std::multimap<unsigned int, unsigned int>::iterator it = freeBlocks.lower_bound(size);

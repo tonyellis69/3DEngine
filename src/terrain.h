@@ -30,9 +30,15 @@ class Chunk;
 
 
 typedef std::vector<std::vector<std::vector<CSuperChunk*>>> T3dArray;
+typedef vBuf::T3DnormVert TChunkVert;
 
-
-
+class TChunkTriBuf {
+public:
+	TChunkTriBuf() { id = size = 0; buf = NULL; }
+	unsigned int id;
+	unsigned int size;
+	TChunkVert* buf;
+};
 
 class CTerrain : public CModelMulti  {
 public:
@@ -61,8 +67,10 @@ public:
 	void newChunkRequest(glm::vec3& samplePos, CSuperChunk* parentSC, glm::i32vec3& index);
 	void handleNextChunkRequest();
 	void freeChunk(Chunk& chunk);
-	CSuperChunk* getSC(glm::vec3& pos);
-	Chunk* getChunk(glm::vec3& pos);
+	CSuperChunk* getSC(const glm::vec3& pos);
+	Chunk* getChunk(const glm::vec3& pos);
+	void getChunkTris(Chunk& chunk, TChunkVert* buf);
+	void getTris(glm::vec3& pos, TChunkVert* &buf, unsigned int& noTris);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -103,6 +111,8 @@ public:
 	std::vector<Chunk*> toFree; ///<List of chunks to be taken out of play.
 
 	int totalSCs;
+
+	TChunkTriBuf cachedChunkTris; ///<Chunk triangles recently downloaded from graphics memory.
 	};
 
 

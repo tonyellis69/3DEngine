@@ -5,6 +5,10 @@ using namespace glm;
 
 CBasePhysObj::CBasePhysObj() {
 	collides = true;
+	velocity = vec3(0);
+	setMass(10);
+	damping = 0.9f;;
+	setAcceleration(vec3(0,-10,0));
 }
 
 
@@ -14,7 +18,12 @@ void CBasePhysObj::setVelocity(glm::vec3 & newVelocity) {
 }
 
 void CBasePhysObj::setMass(float newMass) {
+	inverseMass = 1.0f / mass;
 	mass = newMass;
+}
+
+void CBasePhysObj::setAcceleration(vec3 & accel) {
+	acceleration = accel;
 }
 
 

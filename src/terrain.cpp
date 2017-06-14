@@ -113,7 +113,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layers[layerNo].scSize = LoD1SCsize * LoDscale;
 
 		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
-		SCsBetweenLayers = gapBetweenLayers / prevSCsize;
+		SCsBetweenLayers = (int)gapBetweenLayers / prevSCsize;
 		nwLayerSamplePos += vec3(SCsBetweenLayers * cubesPerChunkEdge * prevLoDscale * chunksPerSChunkEdge * sampleScale);
 
 		createSuperChunks(*outerArray, layers[layerNo].superChunks);
@@ -546,12 +546,12 @@ void CTerrain::freeChunk(Chunk & chunk) {
 }
 
 /** Return the superchunk at the given position. */
-CSuperChunk * CTerrain::getSC(glm::vec3 & pos) {
+CSuperChunk * CTerrain::getSC(const glm::vec3 & pos) {
 	for (int layerNo = layers.size() - 1; layerNo >= 0; layerNo--) {
 		bvec3 inside = lessThanEqual(glm::abs(pos), abs(layers[layerNo].nwLayerPos));
 		if ( all(inside) ) {
-			pos +=glm::abs( layers[layerNo].nwLayerPos);
-			i32vec3 index = pos / layers[layerNo].scSize;
+			vec3 offset = pos + glm::abs( layers[layerNo].nwLayerPos);
+			i32vec3 index = offset / layers[layerNo].scSize;
 			for (size_t sc = 0; sc < layers[layerNo].superChunks.size(); sc++) {
 				if (layers[layerNo].superChunks[sc]->tmpIndex == index)
 					return layers[layerNo].superChunks[sc];
@@ -562,18 +562,51 @@ CSuperChunk * CTerrain::getSC(glm::vec3 & pos) {
 }
 
 /** Return the chunk, if any, at the given position. */
-Chunk * CTerrain::getChunk(glm::vec3 & pos) {
+Chunk * CTerrain::getChunk(const glm::vec3 & pos) {
 	CSuperChunk* sc = getSC(pos);
 	if (!sc)
 		return NULL;
-	pos = glm::abs(pos - sc->nwWorldPos);
-	i32vec3 index = pos / sc->chunkSize;
+	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos) - sc->nwWorldPos;
+	//	glm::abs(pos - sc->nwWorldPos);
+	i32vec3 index = offset / sc->chunkSize;
 	for (size_t chunk = 0; chunk < sc->chunkList.size(); chunk++) {
 		if (sc->chunkList[chunk]->scIndex == index)
 			return sc->chunkList[chunk];
 	}
 
 	return NULL;
+}
+
+void CTerrain::getChunkTris(Chunk & chunk, vBuf::T3DnormVert * buf) {
+	//get the id of this chunk
+	unsigned int id = chunk.id;
+	//copy the data from the multibuf to system memory
+	multiBuf.copyBlock(id, (char*)buf);
+
+}
+
+/** Return a pointer to a buffer of chunk triangles for the given position, if any. */
+void CTerrain::getTris(glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) {
+	//get chunk at this position
+	Chunk* chunk = getChunk(pos);
+	if (!chunk) {
+		noTris = 0;
+		return;
+	}
+
+	//find required size of buffer
+	unsigned int size = multiBuf.getBlockSize(chunk->id);
+	if (cachedChunkTris.id != chunk->id) {
+		delete cachedChunkTris.buf;
+		cachedChunkTris.buf = (TChunkVert*) new char[size];
+
+		cachedChunkTris.size = size;
+		cachedChunkTris.id = chunk->id;
+
+		getChunkTris(*chunk, cachedChunkTris.buf);
+		noTris = size / (sizeof(TChunkVert) * 3);
+		buf = cachedChunkTris.buf;
+	}
 }
 
 CTerrain::~CTerrain() {
@@ -586,6 +619,8 @@ CTerrain::~CTerrain() {
 			delete layers[l].superChunks[s];
 		}
 	}
+	if (cachedChunkTris.buf)
+		delete cachedChunkTris.buf;
 }
 
 
