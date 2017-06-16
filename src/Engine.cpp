@@ -16,6 +16,8 @@
 using namespace vBuf;
 
 CEngine::CEngine() {
+	
+
 	CurrentTileSet = 0; //TO DO - should be the built-in default;
 	CurrentTexture = 0; //TO DO - should be the built-in default;
 	CurrentSprite = 0;
@@ -51,6 +53,7 @@ void CEngine::init(HWND& hWnd) {
 	createStandardMultiTexShader();
 	createStandardBillboardShader();
 	createWireBoxShader();
+	
 }
 
 

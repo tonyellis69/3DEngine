@@ -13,6 +13,9 @@ CPhysObjManager::~CPhysObjManager() {
 	for (size_t obj = 0; obj < physObjList.size(); obj++) {
 		delete physObjList[obj];
 	}
+	for (size_t obj = 0; obj < sceneryList.size(); obj++) {
+		delete sceneryList[obj];
+	}
 }
 
 CBasePhysObj * CPhysObjManager::addModel(CModel * model) {

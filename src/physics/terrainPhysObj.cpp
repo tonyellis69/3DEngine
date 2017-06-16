@@ -15,7 +15,7 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		return;
 
 	collider.bSphere.setCentre(colliderPos);
-	float restitution = 0.2f;
+	float restitution = 0.1f;
 
 	bool hit = false;
 	//test pos agains these triangles
@@ -38,7 +38,17 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 			if (contactCount < 5) {
 				pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, penetration);
 				contactDir = -normalize(collider.velocity);
-				//pManager->addContact(&collider, NULL, contactDir, restitution, penetration);
+
+				//find tri normal
+				vec3 a = pBuf[v + 1].v - pBuf[v].v;
+				vec3 b = pBuf[v + 2].v - pBuf[v].v;
+
+				vec3 triNorm = normalize(cross(a, b));
+
+				vec3 reflection = collider.velocity - (2.0f * triNorm* dot(triNorm, collider.velocity));
+				reflection = normalize(reflection);
+
+				//pManager->addContact(&collider, NULL, reflection, restitution, penetration);
 				contactCount++;
 			}
 

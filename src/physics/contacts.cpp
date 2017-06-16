@@ -117,7 +117,7 @@ void contact::resolvePenetration(float dT) {
 	}
 
 	// Apply the penetration resolution
-	collider->position = collider->position + colliderMovement + vec3(0,10,0);
+	collider->position = collider->position + colliderMovement + vec3(0,0,0);
 	if (collidee) {
 		collidee->position = collidee->position + collideeMovement;
 	}

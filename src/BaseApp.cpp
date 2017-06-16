@@ -12,6 +12,7 @@ using namespace watch;
 
 
 CBaseApp::CBaseApp(void)  {
+	
 
 	homeDir = Window.getExePath();
 #ifdef _DEBUG
@@ -40,10 +41,10 @@ CBaseApp::CBaseApp(void)  {
 
 	BuiltInFullScrn = true;
 	Paused = false;
-
+	
 	//Set up engine for rendering
 	Engine.init(Window.hWnd);
-
+	
 	quitOnEsc = true;
 }
 
