@@ -16,7 +16,7 @@ public:
 	virtual void modifyVelocity(glm::vec3& modifier) {};
 	virtual void applyVelocity() {};
 	void setCollides(bool status);
-	virtual glm::vec3 collisionCheck(CBasePhysObj & collider) { return glm::vec3(0); };
+	virtual void collisionCheck(CBasePhysObj & collider) {};
 	virtual void integrate(float dT) {};
 	virtual void repositionModel() {};
 
@@ -28,11 +28,12 @@ public:
 	glm::vec3 velocity;
 	glm::vec3 position;
 	float inverseMass;
+	glm::vec3 acceleration;
 
 protected:
 	float mass;
 	
-	glm::vec3 acceleration;
+	
 	float damping;
 
 	

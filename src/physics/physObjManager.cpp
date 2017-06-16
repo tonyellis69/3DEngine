@@ -42,6 +42,8 @@ void CPhysObjManager::update(const float & dT) {
 
 	contactResolver();
 
+
+	watch::watch2 << contactList.size();
 	
 	repositionModels();
 }
@@ -85,7 +87,7 @@ void CPhysObjManager::collisionCheck() {
 
 void CPhysObjManager::contactResolver() {
 
-	maxIterations = contactList.size(); //TO DO: should be able to set this
+	maxIterations = contactList.size() * 3 ; //TO DO: should be able to set this
 	int currentIteration = 0;
 
 	while (currentIteration < maxIterations) {
@@ -104,25 +106,56 @@ void CPhysObjManager::contactResolver() {
 			}
 		}
 
+		if (maxIndex == contactList.size() -1 ) 
+			break;
 
-		//exit if that's still > 0
 
 		//run the collision response algorith for the lowest separating velocity
 
 
 		// Resolve this contact.
-		contactList[maxIndex].resolve();
+		contactList[maxIndex].resolve(dT);
 
-		contactList.erase(contactList.begin() + maxIndex);
+		// Update the interpenetrations for all particles
+		vec3 colliderMove = contactList[maxIndex].colliderMovement;
+		vec3 collideeMove = contactList[maxIndex].collideeMovement;
+		for (int i = 0; i < contactList.size(); i++)
+		{
+			if (contactList[i].collider == contactList[maxIndex].collider)
+			{
+				contactList[i].penetration -= dot(colliderMove,contactList[i].contactNormal);
+			}
+			else if (contactList[i].collider == contactList[maxIndex].collidee)
+			{
+				contactList[i].penetration -= dot(collideeMove, contactList[i].contactNormal);
+			}
+			if (contactList[i].collidee)
+			{
+				if (contactList[i].collidee == contactList[maxIndex].collider)
+				{
+					contactList[i].penetration += dot(colliderMove, contactList[i].contactNormal);
+				}
+				else if (contactList[i].collidee == contactList[maxIndex].collidee)
+				{
+					contactList[i].penetration += dot(collideeMove, contactList[i].contactNormal);
+				}
+			}
+		}
+
+
+		//contactList.erase(contactList.begin() + maxIndex);
 	
 		currentIteration++;
 	}
 
 }
 
-void CPhysObjManager::addContact(CBasePhysObj * collider, CBasePhysObj * collidee, glm::vec3& contactNormal, float restitution) {
+void CPhysObjManager::addContact(CBasePhysObj * collider, CBasePhysObj * collidee, glm::vec3& contactNormal, float restitution,
+	float penetration) {
 	contact newContact(collider, collidee);
 	newContact.contactNormal = contactNormal;
 	newContact.restitution = restitution;
+	newContact.penetration = penetration;
 	contactList.push_back(newContact);
+	std::cerr << "\nNew contact, penetration " << penetration << " collider " << collider;
 }

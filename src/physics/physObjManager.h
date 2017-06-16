@@ -6,7 +6,7 @@
 /** Manager of physics objects. */
 class CPhysObjManager {
 public:
-	CPhysObjManager() { tmp = 0; }
+	CPhysObjManager() { tmp = 0; maxContacts = 20; }
 	~CPhysObjManager();
 	CBasePhysObj* addModel(CModel* model);
 	void addPhysObj(CBasePhysObj* obj);
@@ -15,14 +15,15 @@ public:
 	void repositionModels();
 	void collisionCheck();
 	void contactResolver();
-	void addContact(CBasePhysObj * collider, CBasePhysObj * collidee, glm::vec3& contactNormal, float restitution);
+	void addContact(CBasePhysObj * collider, CBasePhysObj * collidee, glm::vec3& contactNormal, float restitution, float penetration);
 
 	std::vector<contact> contactList;
 
 private:
 	std::vector<CBasePhysObj*> physObjList;
 	float dT; ///<Time difference since last frame.
-	int maxIterations;
+	int maxIterations; ///<How many times per frame we try to resolve contacts.
+	int maxContacts; ///<How many contacts we can track.
 
 	double tmp;
 };
