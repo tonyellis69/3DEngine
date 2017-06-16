@@ -881,8 +881,9 @@ CTerrain * CEngine::createTerrain() {
 
 	CTerrainPhysObj* terrainPhysObj = new CTerrainPhysObj();
 	terrainPhysObj->attachModel(terrain);
-	physObjManager.addPhysObj(terrainPhysObj);
 	terrainPhysObj->setCollides(false);
+	physObjManager.addPhysObj(terrainPhysObj);
+	
 
 	return terrain;
 }

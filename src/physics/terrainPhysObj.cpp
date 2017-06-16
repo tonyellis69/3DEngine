@@ -24,7 +24,6 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	int contactCount = 0;
 	for (int v = 0; v < noTris * 3; v += 3) {
 		int intersect = triSphereIntersection(collider.bSphere, pBuf[v].v, pBuf[v + 1].v, pBuf[v + 2].v, p);
-		//cerr << "\nintersection: " << intersect << " " << p.x << " " << p.y << " " << p.z;
 		if (intersect) {
 			//let's create a contact!
 			//find vector from sphere centre to contact point
@@ -36,8 +35,10 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 			if (penetration > maxPenetration) {
 				maxPenetration = penetration;
 			}
-			if (contactCount < 10) {
+			if (contactCount < 5) {
 				pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, penetration);
+				contactDir = -normalize(collider.velocity);
+				//pManager->addContact(&collider, NULL, contactDir, restitution, penetration);
 				contactCount++;
 			}
 

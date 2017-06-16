@@ -21,6 +21,7 @@ public:
 
 private:
 	std::vector<CBasePhysObj*> physObjList;
+	std::vector<CBasePhysObj*> sceneryList;
 	float dT; ///<Time difference since last frame.
 	int maxIterations; ///<How many times per frame we try to resolve contacts.
 	int maxContacts; ///<How many contacts we can track.

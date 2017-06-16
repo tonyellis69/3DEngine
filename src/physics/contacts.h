@@ -24,4 +24,6 @@ public:
 	glm::vec3 colliderMovement; ///<Amount collider is moved in penetration resolution.
 	glm::vec3 collideeMovement; ///<Amount collidee is moved in penetration resolution.
 
+	bool resolved;
+	bool resting;
 };

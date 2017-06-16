@@ -8,6 +8,8 @@ using namespace glm;
 contact::contact(CBasePhysObj * collider, CBasePhysObj* collidee) {
 	contact::collider = collider;
 	contact::collidee = collidee;
+	resolved = false;
+	resting = false;
 }
 
 float contact::calcSeparatingVelocity() {
@@ -20,6 +22,8 @@ float contact::calcSeparatingVelocity() {
 void contact::resolve(float dT) {
 	resolveVelocity(dT);
 	resolvePenetration(dT);
+	if (!resting)
+		resolved = true;
 }
 
 void contact::resolveVelocity(float dT) {
@@ -27,8 +31,10 @@ void contact::resolveVelocity(float dT) {
 	//find the velocity in the direction of the contact
 	float separatingVelocity = calcSeparatingVelocity();
 
-	if (separatingVelocity > 0) //objects already heading apart
+	if (separatingVelocity > 0) {//objects already heading apart
+		std::cerr << "\n" << this << " now separating";
 		return;
+	}
 
 
 	//adjust for springiness of the contact
@@ -45,6 +51,9 @@ void contact::resolveVelocity(float dT) {
 	if (accCausedSepVelocity < 0)
 	{
 		newSeparatingVelocity += restitution * accCausedSepVelocity;
+
+		std::cerr << "\n" << this << " at rest";
+		resting = true;
 		// Make sure we haven’t removed more than was
 		// there to remove.
 		if (newSeparatingVelocity < 0) 
@@ -108,7 +117,7 @@ void contact::resolvePenetration(float dT) {
 	}
 
 	// Apply the penetration resolution
-	collider->position = collider->position + colliderMovement;
+	collider->position = collider->position + colliderMovement + vec3(0,10,0);
 	if (collidee) {
 		collidee->position = collidee->position + collideeMovement;
 	}

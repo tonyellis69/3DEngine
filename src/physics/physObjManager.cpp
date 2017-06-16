@@ -24,8 +24,12 @@ CBasePhysObj * CPhysObjManager::addModel(CModel * model) {
 }
 
 void CPhysObjManager::addPhysObj(CBasePhysObj * obj) {
-	physObjList.push_back(obj);
 	((CPhysObj*)obj)->pManager = this;
+	if (obj->collides)
+		physObjList.push_back(obj);
+	else
+		sceneryList.push_back(obj);
+	
 }
 
 
@@ -42,8 +46,21 @@ void CPhysObjManager::update(const float & dT) {
 
 	contactResolver();
 
+	/*
+	for (auto it = contactList.begin(); it != contactList.end();) {
+		if (it->resting && contactList.size() > 2) {
+			 it = contactList.erase(it);
+		}
+		else {
+			++it;
+		}
+	}
+	*/
+	
 
 	watch::watch2 << contactList.size();
+
+
 	
 	repositionModels();
 }
@@ -66,20 +83,13 @@ void CPhysObjManager::repositionModels() {
 
 
 void CPhysObjManager::collisionCheck() {
-	CBasePhysObj* collider, *collidee;
-	for (size_t obj = 0; obj < physObjList.size(); obj++) {
-		collider = physObjList[obj];
-		if (!collider->collides)
-			//2. maybe make this check later, and swap objects accordingly
-			continue;
-		for (size_t obj2 = 0; obj2 < physObjList.size(); obj2++) {
-			collidee = physObjList[obj2];
-			//TO DO: more elegant way to compare each pair only once?
-			//remove an object after comparing it to every other, then go on to the next?
-			if (collidee == collider)
-				continue;
+	CBasePhysObj* collider, *sceneryObj;
+	for (size_t scenery = 0; scenery < sceneryList.size(); scenery++) {
+		sceneryObj = sceneryList[scenery];
+		for (size_t obj = 0; obj < physObjList.size(); obj++) {
+			collider = physObjList[obj];
 			//check for collision between this pair, create contact if so
-			collidee->collisionCheck(*collider);
+			sceneryObj->collisionCheck(*collider);
 		}
 	}
 }
@@ -87,7 +97,7 @@ void CPhysObjManager::collisionCheck() {
 
 void CPhysObjManager::contactResolver() {
 
-	maxIterations = contactList.size() * 3 ; //TO DO: should be able to set this
+	maxIterations = 100; // contactList.size() * 3; //TO DO: should be able to set this
 	int currentIteration = 0;
 
 	while (currentIteration < maxIterations) {
@@ -142,8 +152,8 @@ void CPhysObjManager::contactResolver() {
 			}
 		}
 
-
-		//contactList.erase(contactList.begin() + maxIndex);
+		
+		
 	
 		currentIteration++;
 	}
@@ -157,5 +167,5 @@ void CPhysObjManager::addContact(CBasePhysObj * collider, CBasePhysObj * collide
 	newContact.restitution = restitution;
 	newContact.penetration = penetration;
 	contactList.push_back(newContact);
-	std::cerr << "\nNew contact, penetration " << penetration << " collider " << collider;
+	std::cerr << "\nNew contact " << &contactList.back() << ", penetration " << penetration << " collider " << collider;
 }
