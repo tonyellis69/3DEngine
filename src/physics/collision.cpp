@@ -2,6 +2,8 @@
 
 using namespace glm;
 
+/** Returns true if sphere s intersects triangle ABC, false otherwise.
+The point p on abc closest to the sphere center is also returned. */
 glm::vec3 closestPointToTriangle(glm::vec3 & triA, glm::vec3 & triB, glm::vec3 & triC, glm::vec3 & p) {
 	// Check if P in vertex region outside A
 	vec3 ab = triB - triA;
@@ -51,6 +53,7 @@ glm::vec3 closestPointToTriangle(glm::vec3 & triA, glm::vec3 & triB, glm::vec3 &
 	return triA + ab * v + ac * w; // = u*a + v*b + w*c, u = va * denom = 1.0f - v - w
 }
 
+/** Returns true if the triangle intersects the sphere, with the closest point of intersection in p. */
 int triSphereIntersection(CBsphere & sphere, glm::vec3 & triA, glm::vec3 & triB, glm::vec3 & triC, glm::vec3 & p) {
 	// Find point P on triangle ABC closest to sphere centre
 	p = closestPointToTriangle(sphere.centre, triA, triB, triC);
@@ -59,4 +62,31 @@ int triSphereIntersection(CBsphere & sphere, glm::vec3 & triA, glm::vec3 & triB,
 	// centre to point p is less than the (squared) sphere radius
 	vec3 v = p - sphere.centre;
 	return glm::dot(v, v) <= sphere.radius * sphere.radius;
+}
+
+/** Returns true if the line intersects the triangle, with the point of intersection in baryonic coordiantes. */
+int triLineIntersection(glm::vec3& p, glm::vec3& q, glm::vec3& a, glm::vec3& b, glm::vec3& c,
+	float &u, float &v, float &w)  {
+
+	glm::vec3 pq = q - p;
+	glm::vec3 pa = a - p;
+	glm::vec3 pb = b - p;
+	glm::vec3 pc = c - p;
+
+	// Test if pq is inside the edges bc, ca and ab. 
+	glm::vec3 m = glm::cross(pq, pc);
+	u = glm::dot(pb, m); // ScalarTriple(pq, pc, pb);
+	if (u < 0.0f) return 0; 
+	v = -glm::dot(pa, m); // ScalarTriple(pq, pa, pc);
+	if (v < 0.0f) return 0;
+	w = glm::dot( glm::cross(pq, pb), pa);
+	if (w < 0.0f) return 0;
+
+	// Compute the barycentric coordinates (u, v, w) determining the
+	// intersection point r, r = u*a + v*b + w*c
+	float denom = 1.0f / (u + v + w);
+	u *= denom;
+	v *= denom;
+	w *= denom; // w = 1.0f - u - v;
+	return 1;
 }

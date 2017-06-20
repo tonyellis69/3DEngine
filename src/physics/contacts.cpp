@@ -22,8 +22,9 @@ float contact::calcSeparatingVelocity() {
 void contact::resolve(float dT) {
 	resolveVelocity(dT);
 	resolvePenetration(dT);
-	if (!resting)
-		resolved = true;
+//	if (penetration < -10)
+//		resolved = true;
+	std::cerr << "\n resolved " << this << " had a penetration of " << penetration;
 }
 
 void contact::resolveVelocity(float dT) {

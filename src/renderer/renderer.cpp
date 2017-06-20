@@ -608,10 +608,25 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedba
 	}
 
 
+
 	int outSize = primitives * 3 * sizeof(vBuf::T3DnormVert);
 	totalbufsize += outSize;
 	totalchunks++;
 
+	/* //degenerate triangle check
+	glBindBuffer(GL_ARRAY_BUFFER, tempFeedbackBuf.getBufHandle());
+	vBuf::T3DnormVert* tmpPtr; int degen = 0;
+	tmpPtr = (vBuf::T3DnormVert*)  glMapBufferRange(GL_ARRAY_BUFFER, 0, outSize, GL_MAP_READ_BIT);
+	for (int v = 0; v < primitives * 3; v += 3) {
+		glm::bvec3 test = glm::equal(tmpPtr[v].v, tmpPtr[v + 1].v);
+		if (test.x && test.y && test.z) {
+			cerr << "\ndegenerate tri";
+			degen++;
+		}
+	}
+	cerr << "\ntotal degenerates " << degen;
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	*/
 
 	//verts are in our temporary feedback buffer. Now we want to copy them to the user-supplied buffer, which may or may not be a multibuffer
 	//if it is a multibuffer, we want to say "here's this block of verts, find a space for it." So, some kind of copyBuffer method.

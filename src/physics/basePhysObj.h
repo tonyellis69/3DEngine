@@ -30,6 +30,8 @@ public:
 	float inverseMass;
 	glm::vec3 acceleration;
 
+	glm::vec3 lastContact; ///<Position of last recorded contact.
+
 protected:
 	float mass;
 	

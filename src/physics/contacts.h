@@ -7,6 +7,7 @@
 
 class contact {
 public:
+	contact() {};
 	contact(CBasePhysObj* collider, CBasePhysObj* collidee);
 	float calcSeparatingVelocity();
 	void resolve(float dT);

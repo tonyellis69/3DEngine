@@ -7,6 +7,7 @@ using namespace glm;
 void CPhysObj::attachModel(CModel * model) {
 	pModel = model; 
 	position = pModel->getPos();
+	lastContact = position;
 }
 
 void CPhysObj::setVelocity(glm::vec3 & newVelocity) {

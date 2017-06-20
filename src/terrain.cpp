@@ -587,6 +587,8 @@ void CTerrain::getChunkTris(Chunk & chunk, vBuf::T3DnormVert * buf) {
 
 /** Return a pointer to a buffer of chunk triangles for the given position, if any. */
 void CTerrain::getTris(glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) {
+
+
 	//get chunk at this position
 	Chunk* chunk = getChunk(pos);
 	if (!chunk) {
@@ -604,9 +606,10 @@ void CTerrain::getTris(glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) 
 		cachedChunkTris.id = chunk->id;
 
 		getChunkTris(*chunk, cachedChunkTris.buf);
+	}
 		noTris = size / (sizeof(TChunkVert) * 3);
 		buf = cachedChunkTris.buf;
-	}
+	//}
 }
 
 CTerrain::~CTerrain() {

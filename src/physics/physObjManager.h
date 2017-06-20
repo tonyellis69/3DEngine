@@ -3,10 +3,15 @@
 #include "basePhysObj.h"
 #include "contacts.h"
 
+#include <deque>
+
+
 /** Manager of physics objects. */
 class CPhysObjManager {
 public:
-	CPhysObjManager() { tmp = 0; maxContacts = 20; }
+	CPhysObjManager() { tmp = 0; maxContacts = 100; 
+	
+	}
 	~CPhysObjManager();
 	CBasePhysObj* addModel(CModel* model);
 	void addPhysObj(CBasePhysObj* obj);
@@ -17,7 +22,7 @@ public:
 	void contactResolver();
 	void addContact(CBasePhysObj * collider, CBasePhysObj * collidee, glm::vec3& contactNormal, float restitution, float penetration);
 
-	std::vector<contact> contactList;
+	std::deque<contact> contactList;
 
 private:
 	std::vector<CBasePhysObj*> physObjList;

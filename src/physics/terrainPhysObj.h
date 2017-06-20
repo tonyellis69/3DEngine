@@ -11,6 +11,8 @@ public:
 	void attachModel(CModel* model);
 	glm::vec3 update(const float & dT);
 
+	unsigned int chunkCheck(glm::vec3& start, glm::vec3& end, TChunkVert* & buf);
+
 	CTerrain* pTerrain;
 
 };
