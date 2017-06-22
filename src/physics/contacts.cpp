@@ -89,7 +89,6 @@ void contact::resolveVelocity(float dT) {
 	//...big velocity in opposite direction to object's colliding velocity
 
 	// Apply impulses: in the direction of the contact, proportional to the inverse mass.
-
 	collider->setVelocity(collider->velocity + impulsePerUnitMass * collider->inverseMass);
 	//small velocity (1.7) in opposite direction to original colliding velocity
 
@@ -104,6 +103,8 @@ void contact::resolveVelocity(float dT) {
 
 }
 
+/** Adjust the position of the objects in this contact to remove any interpenetration. 
+	NB: the penetration member itself is not reset here, but by the calling process. */
 void contact::resolvePenetration(float dT) {
 	// If we don't have any penetration, skip this step.
 	if (penetration <= 0) 
@@ -122,6 +123,7 @@ void contact::resolvePenetration(float dT) {
 	vec3 movePerIMass = contactNormal * (penetration / totalInverseMass);
 
 	// Calculate the the movement amounts
+	//for an object colliding with scenery it will be the full penetration length in the contact normal direction
 	colliderMovement = movePerIMass * collider->inverseMass;
 	if (collidee) {
 		collideeMovement = movePerIMass * -collidee->inverseMass;
@@ -131,8 +133,13 @@ void contact::resolvePenetration(float dT) {
 	}
 
 	// Apply the penetration resolution
-	collider->position = collider->position + colliderMovement + vec3(0,0,0);
+	std::cerr << "\nposition moved from " << collider->position.x << " " << collider->position.y << " "
+		<< collider->position.z;
+
+	collider->position = collider->position + colliderMovement ;
 	if (collidee) {
 		collidee->position = collidee->position + collideeMovement;
 	}
+	std::cerr << "\nto " << collider->position.x << " " << collider->position.y << " "
+		<< collider->position.z << " to solve penetration of " << penetration;
 }

@@ -17,7 +17,8 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	
 	if (noTris == 0)
 		return;
-	std::cerr << "\nIn a populated chunk...";
+	std::cerr << "\nIn a populated chunk... velocity " << collider.velocity.x << " " << collider.velocity.y
+		<< " " << collider.velocity.z;
 	collider.bSphere.setCentre(colliderPos);
 	float restitution = 0.1f;
 
@@ -78,7 +79,7 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 			 
 			if (intersect) {
 				vec3 intersectionPoint = (pBuf[v].v * a) + (pBuf[v + 1].v * b) + (pBuf[v + 2].v * c);
-				std::cerr << "\nIntersection! Tri y: " << intersectionPoint.y << " penetrating point y: " << projectedPos.y;
+				std::cerr << "\nIntersection! Tri " << v << ", y: " << intersectionPoint.y << " penetrating point y: " << projectedPos.y;
 				//which side of the triangle will the current velocity put the leading point of the bounding sphere?
 				vec3 a = pBuf[v + 1].v - pBuf[v].v;
 				vec3 b = pBuf[v + 2].v - pBuf[v].v;

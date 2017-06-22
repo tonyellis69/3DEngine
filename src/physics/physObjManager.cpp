@@ -130,7 +130,7 @@ void CPhysObjManager::contactResolver() {
 		//where the objects are therefore *not* separating but colliding
 		contactList[maxIndex].resolve(dT);
 
-		// Update the interpenetrations for all particles
+		// Update the interpenetrations for all contacts the particles of this contact are involved in
 		vec3 colliderMove = contactList[maxIndex].colliderMovement;
 		vec3 collideeMove = contactList[maxIndex].collideeMovement;
 		for (int i = 0; i < contactList.size(); i++)
@@ -138,11 +138,13 @@ void CPhysObjManager::contactResolver() {
 			if (contactList[i].collider == contactList[maxIndex].collider)
 			{
 				contactList[i].penetration -= dot(colliderMove,contactList[i].contactNormal);
+				std::cerr << "\nContact " << contactList[i].id << " reset to " << contactList[i].penetration;
 			}
 			else if (contactList[i].collider == contactList[maxIndex].collidee)
 			{
 				contactList[i].penetration -= dot(collideeMove, contactList[i].contactNormal);
 			}
+
 			if (contactList[i].collidee)
 			{
 				if (contactList[i].collidee == contactList[maxIndex].collider)
@@ -156,11 +158,17 @@ void CPhysObjManager::contactResolver() {
 			}
 		}
 
-		
-		
+
+
+		////////////////////////////////////
+		//My fix to prevent the penetration distance of resting contacts being pushed endlessly into lower negative numbers
+		contactList[maxIndex].colliderMovement = vec3(0);
+		contactList[maxIndex].collideeMovement = vec3(0);
+		/////////////////////////////////////
 	
 		currentIteration++;
 	}
+
 
 }
 
