@@ -71,9 +71,11 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	if (!intersections) { // see if we  tunnelled through a triangle
 	
 		float a, b, c;
+
 		for (int v = 0; v < noTris * 3; v += 3) {
 			int intersect = triLineIntersection(colliderPos, projectedPos, pBuf[v].v, pBuf[v + 1].v, pBuf[v + 2].v,
 				a,b,c);
+			 
 			if (intersect) {
 				vec3 intersectionPoint = (pBuf[v].v * a) + (pBuf[v + 1].v * b) + (pBuf[v + 2].v * c);
 				std::cerr << "\nIntersection! Tri y: " << intersectionPoint.y << " penetrating point y: " << projectedPos.y;
@@ -94,10 +96,16 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 				//create a contact
 				//project back along our tunnelling line - in this case, velocity
 				contactDir = glm::normalize(-collider.velocity);
+
+				//contactDir = -normalize(collider.velocity);
+
 				float penetration = glm::length(intersectionPoint - colliderPos);
 				penetration += collider.bSphere.radius;
 				pManager->addContact(&collider, NULL, contactDir, restitution, penetration);
 			}
+
+			//no intersection? Then move our start point for the next search out of this populated chunk
+			collider.lastContact = colliderPos;
 		}
 	}
 
@@ -119,22 +127,13 @@ unsigned int CTerrainPhysObj::chunkCheck(glm::vec3 & start, glm::vec3 & end, TCh
 	vec3 searchVec = normalize(end - start) * smallestSCsize;
 	vec3 checkPos = start;
 	float searchLength = length(end - start);
-	unsigned int noTris = 0; int tmp = 0;
+	unsigned int noTris = 0; 
 	while (noTris == 0) {
-		if (tmp == 1)
-		int t = 0;
-	
-		cerr << "\n" << tmp << " checking between " << start.x << " " << start.y << " " << start.z;
-		cerr << " and "  << end.x << " " << end.y << " " << end.z;
-		cerr << "\n" << " checking at " << checkPos.x << " " << checkPos.y << " " << checkPos.z;
-		CSuperChunk* sc = pTerrain->getSC(checkPos);
-		cerr << " SC " << sc->tmpIndex.x << " " << sc->tmpIndex.y << " " << sc->tmpIndex.z;
 		pTerrain->getTris(checkPos, pBuf, noTris);
 		cerr << " tris found: " << noTris;
 		checkPos += searchVec;
 		if (length(start - checkPos) > searchLength)
 			return noTris;
-		tmp++;
 	}
 	return noTris;
 }

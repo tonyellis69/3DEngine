@@ -27,4 +27,6 @@ public:
 
 	bool resolved;
 	bool resting;
+
+	unsigned int id;
 };

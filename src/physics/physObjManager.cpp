@@ -52,6 +52,7 @@ void CPhysObjManager::update(const float & dT) {
 	
 	for (auto it = contactList.begin(); it != contactList.end();) {
 		if (it->resolved) {
+			std::cerr << "\nContact " << it->id << " erased.";
 			 it = contactList.erase(it);
 		}
 		else {
@@ -106,14 +107,14 @@ void CPhysObjManager::contactResolver() {
 	int currentIteration = 0;
 
 	while (currentIteration < maxIterations) {
-
+		std::cerr << "\niteration: " << currentIteration;
 		//calculate the separating velocity of each contact
 		//keep track of the lowest
 		float max = 0;
 		int maxIndex = contactList.size()-1;
 		for (int i = 0; i < contactList.size(); i++)
 		{
-			float sepVel = contactList[i].calcSeparatingVelocity();
+			float sepVel = contactList[i].calcSeparatingVelocity(); //objects separating have a negative velocity
 			if (sepVel < max)
 			{
 				max = sepVel;
@@ -125,10 +126,8 @@ void CPhysObjManager::contactResolver() {
 	//		break;
 
 
-		//run the collision response algorith for the lowest separating velocity
-
-
-		// Resolve this contact.
+		//we run the collision response algorith for the lowest separating velocity, ie, the most negative,
+		//where the objects are therefore *not* separating but colliding
 		contactList[maxIndex].resolve(dT);
 
 		// Update the interpenetrations for all particles
@@ -171,9 +170,10 @@ void CPhysObjManager::addContact(CBasePhysObj * collider, CBasePhysObj * collide
 	newContact.contactNormal = contactNormal;
 	newContact.restitution = restitution;
 	newContact.penetration = penetration;
+	newContact.id = nextID++;
 	contactList.push_back(newContact);
 	collider->lastContact = collider->position;
 	if (contactList.size() > maxContacts)
 		contactList.pop_front();
-	std::cerr << "\nNew contact " << &contactList.back() << ", penetration " << penetration << " collider " << collider;
+	std::cerr << "\nNew contact " << newContact.id << ", penetration " << penetration << " collider " << collider;
 }

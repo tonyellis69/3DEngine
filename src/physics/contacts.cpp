@@ -12,6 +12,8 @@ contact::contact(CBasePhysObj * collider, CBasePhysObj* collidee) {
 	resting = false;
 }
 
+/** Return the separating velocity between two objects. The direction is dictated by the line between the objects:
+	separating objects have a positive velocity, closing objects have negative. */
 float contact::calcSeparatingVelocity() {
 	vec3 relativeVelocity = collider->velocity;
 	if (collidee)
@@ -22,38 +24,43 @@ float contact::calcSeparatingVelocity() {
 void contact::resolve(float dT) {
 	resolveVelocity(dT);
 	resolvePenetration(dT);
-//	if (penetration < -10)
-//		resolved = true;
-	std::cerr << "\n resolved " << this << " had a penetration of " << penetration;
+	//if (penetration < -1)
+	//	resolved = true;
+	std::cerr << "\n resolved " << id << " had a penetration of " << penetration;
 }
 
 void contact::resolveVelocity(float dT) {
 
-	//find the velocity in the direction of the contact
-	float separatingVelocity = calcSeparatingVelocity();
+	//find the velocity along the direction of the contact
+	float separatingVelocity = calcSeparatingVelocity(); 
+	// eg, -19 for a 0,-19,0 velocity impact with the ground
 
-	if (separatingVelocity > 0) {//objects already heading apart
-		std::cerr << "\n" << this << " now separating";
+	if (separatingVelocity > 0) {//objects heading apart, collision already resolved
+		std::cerr << "\n" << id << " now separating";
+		//resolved = true;
 		return;
 	}
 
-
 	//adjust for springiness of the contact
 	float newSeparatingVelocity = -separatingVelocity * restitution;
+	//small, positive (1.7) for an impact with the ground
 
 	
-	// Check the velocity build-up due to acceleration only.
+	//Code to prevent vibrations caused by illegal acceleration in a resting object
 	vec3 accCausedVelocity = collider->acceleration;
 	if (collidee) 
 		accCausedVelocity -= collidee->acceleration;
 	float accCausedSepVelocity = glm::dot(accCausedVelocity,contactNormal) * dT;
+	//only caused by 'boring into' collidee between frames - wouldn't happen in real life
+
 	// If we’ve got a closing velocity due to acceleration build-up,
 	// remove it from the new separating velocity.
 	if (accCausedSepVelocity < 0)
 	{
 		newSeparatingVelocity += restitution * accCausedSepVelocity;
+		//removes from the separating velocity any (small) amount caused by acceleration build-up
 
-		std::cerr << "\n" << this << " at rest";
+		std::cerr << "\n" << id << " now considered at rest";
 		resting = true;
 		// Make sure we haven’t removed more than was
 		// there to remove.
@@ -65,6 +72,7 @@ void contact::resolveVelocity(float dT) {
 
 	//find change in velocity
 	float dVelocity = newSeparatingVelocity - separatingVelocity;
+	//eg, positive, slightly larger value (20) than collision velocity
 
 	//apply velocity to colliding objects in proportion to their mass
 	float totalInverseMass = collider->inverseMass;
@@ -75,14 +83,19 @@ void contact::resolveVelocity(float dT) {
 		return;
 
 	float impulse = dVelocity / totalInverseMass;
+	//big positive value here, eg, 200
 
 	vec3 impulsePerUnitMass = contactNormal * impulse;
+	//...big velocity in opposite direction to object's colliding velocity
 
-
-	// Apply impulses : they are applied in the direction of the contact,
-		// and are proportional to the inverse mass.
+	// Apply impulses: in the direction of the contact, proportional to the inverse mass.
 
 	collider->setVelocity(collider->velocity + impulsePerUnitMass * collider->inverseMass);
+	//small velocity (1.7) in opposite direction to original colliding velocity
+
+	vec3 debugVar = impulsePerUnitMass * collider->inverseMass;
+	std::cerr << "\nImpulse of " << debugVar.x << " " << debugVar.y << " " << debugVar.z;
+	std::cerr << "\changed velocity to " << collider->velocity.x << " " << collider->velocity.y << " " << collider->velocity.z;
 
 	if (collidee) {
 		// goes in the opposite direction.

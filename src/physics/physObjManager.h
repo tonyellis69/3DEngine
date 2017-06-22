@@ -10,7 +10,7 @@
 class CPhysObjManager {
 public:
 	CPhysObjManager() { tmp = 0; maxContacts = 100; 
-	
+	nextID = 0;
 	}
 	~CPhysObjManager();
 	CBasePhysObj* addModel(CModel* model);
@@ -32,4 +32,5 @@ private:
 	int maxContacts; ///<How many contacts we can track.
 
 	double tmp;
+	unsigned int nextID;
 };

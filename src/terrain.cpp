@@ -566,9 +566,11 @@ Chunk * CTerrain::getChunk(const glm::vec3 & pos) {
 	CSuperChunk* sc = getSC(pos);
 	if (!sc)
 		return NULL;
-	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos) - sc->nwWorldPos;
-	//	glm::abs(pos - sc->nwWorldPos);
+	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos); //+ glm::abs( sc->nwWorldPos);
+	offset -= sc->nwWorldPos;
+	//offset = pos; //TO DO - is this needed CHECK
 	i32vec3 index = offset / sc->chunkSize;
+	
 	for (size_t chunk = 0; chunk < sc->chunkList.size(); chunk++) {
 		if (sc->chunkList[chunk]->scIndex == index)
 			return sc->chunkList[chunk];
