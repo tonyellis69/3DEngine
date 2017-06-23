@@ -94,6 +94,8 @@ void CPhysObjManager::collisionCheck() {
 			collider = physObjList[obj];
 			//check for collision between this pair, create contact if so
 			sceneryObj->collisionCheck(*collider);
+			//collider->AABBcollisionCheck(*scenery);
+
 		}
 	}
 }
@@ -137,8 +139,9 @@ void CPhysObjManager::contactResolver() {
 		{
 			if (contactList[i].collider == contactList[maxIndex].collider)
 			{
+				std::cerr << "\nContact " << contactList[i].id << " penetration reset from " << contactList[i].penetration;
 				contactList[i].penetration -= dot(colliderMove,contactList[i].contactNormal);
-				std::cerr << "\nContact " << contactList[i].id << " reset to " << contactList[i].penetration;
+				std::cerr << " to " << contactList[i].penetration;
 			}
 			else if (contactList[i].collider == contactList[maxIndex].collidee)
 			{
@@ -165,6 +168,7 @@ void CPhysObjManager::contactResolver() {
 		contactList[maxIndex].colliderMovement = vec3(0);
 		contactList[maxIndex].collideeMovement = vec3(0);
 		/////////////////////////////////////
+		contactList[maxIndex].resolved = true;
 	
 		currentIteration++;
 	}

@@ -86,8 +86,9 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 				triNorm = normalize(cross(a, b));
 				vec3 test = normalize(projectedPos - intersectionPoint);
 				float compare = dot(triNorm, test);
-
-				if (compare > 0) {//TO DO: see if we can return here. No other triangle should be in contention
+				std::cerr << "\ncomparison: " << compare;
+				//if (compare > 0) {//TO DO: see if we can return here. No other triangle should be in contention
+				if (compare > 0) {
 					std::cerr << "\nRejecting for being in front of triangle";
 					continue;
 				}
@@ -102,6 +103,11 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 
 				float penetration = glm::length(intersectionPoint - colliderPos);
 				penetration += collider.bSphere.radius;
+
+			//	penetration = intersectionPoint.y - projectedPos.y;
+
+				penetration = glm::length(intersectionPoint - projectedPos);
+
 				pManager->addContact(&collider, NULL, contactDir, restitution, penetration);
 			}
 

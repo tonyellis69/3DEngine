@@ -19,6 +19,7 @@ public:
 	virtual void collisionCheck(CBasePhysObj & collider) {};
 	virtual void integrate(float dT) {};
 	virtual void repositionModel() {};
+	virtual void AABBcollisionCheck(CBasePhysObj & collidee) {};
 
 	bool collides; ///<True if this object collides *into* other objects.
 
