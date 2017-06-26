@@ -90,3 +90,51 @@ int triLineIntersection(glm::vec3& p, glm::vec3& q, glm::vec3& a, glm::vec3& b, 
 	w *= denom; // w = 1.0f - u - v;
 	return 1;
 }
+
+/** Returns true if the line segment intersects triangle abc, with the intersection point
+	in the baryonic coordinates u,v,w. */
+int triSegmentIntersection(glm::vec3 p, glm::vec3 q, glm::vec3 a, glm::vec3 b, glm::vec3 c,
+	float &u, float &v, float &w, float &t) {
+	
+	vec3 ab = b - a;
+	vec3 ac = c - a;
+	vec3 qp = p - q;
+
+	// Compute triangle normal.
+	vec3 n = cross(ab, ac);
+
+	// Compute denominator d. If d <= 0, segment is parallel to or points
+	// away from triangle, so exit early
+	float d = dot(qp, n);
+	if (d <= 0.0f) 
+		return 0;
+
+	// Compute intersection t value of pq with plane of triangle. A ray
+	// intersects if 0 <= t. Segment intersects if 0 <= t <= 1. Delay
+	// dividing by d until intersection has been found to pierce triangle
+
+	glm::vec3 ap = p - a;
+	t = dot(ap, n);
+	if (t < 0.0f) 
+		return 0;
+	if (t > d) // For segment; exclude this code line for a ray test
+		return 0; 
+	
+	// Compute barycentric coordinate components and test if within bounds
+	vec3 e = cross(qp, ap);
+	v = dot(ac, e);
+	if (v < 0.0f || v > d) 
+		return 0;
+	w = -dot(ab, e);
+	if (w < 0.0f || v + w > d) 
+		return 0;
+
+	// Segment/ray intersects triangle. Perform delayed division and
+	// compute the last barycentric coordinate component
+	float ood = 1.0f / d;
+	t *= ood;
+	v *= ood;
+	w *= ood;
+	u = 1.0f - v - w;
+	return 1;
+}

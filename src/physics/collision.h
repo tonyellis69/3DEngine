@@ -13,3 +13,7 @@ int triSphereIntersection(CBsphere& sphere, glm::vec3& triA, glm::vec3& triB, gl
 
 int triLineIntersection(glm::vec3& p, glm::vec3& q, glm::vec3& a, glm::vec3& b, glm::vec3& c,
 	float &u, float &v, float &w);
+
+
+int triSegmentIntersection(glm::vec3 p, glm::vec3 q, glm::vec3 a, glm::vec3 b, glm::vec3 c,
+	float &u, float &v, float &w, float &t);

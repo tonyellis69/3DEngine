@@ -3,6 +3,7 @@
 #include "glm\glm.hpp"
 #include "..\renderer\model.h"
 #include "bsphere.h"
+#include "aabb.h"
 
 /** The base basic physics object. */
 class CBasePhysObj {
@@ -32,6 +33,7 @@ public:
 	glm::vec3 acceleration;
 
 	glm::vec3 lastContact; ///<Position of last recorded contact.
+	CAABB AABB; ///<AABB for this object
 
 protected:
 	float mass;

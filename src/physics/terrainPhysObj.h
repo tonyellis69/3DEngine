@@ -8,7 +8,8 @@
 class CTerrainPhysObj : public CPhysObj {
 public:
 	void collisionCheck(CBasePhysObj& collider);
-	void collisionCheck2(CBasePhysObj& collider);
+	void collisionCheckSphere(CBasePhysObj& collider);
+	void collisionCheckLine(CBasePhysObj& collider);
 	void attachModel(CModel* model);
 	glm::vec3 update(const float & dT);
 

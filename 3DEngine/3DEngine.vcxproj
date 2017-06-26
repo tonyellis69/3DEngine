@@ -99,6 +99,7 @@
     <ClCompile Include="..\Src\ImageLib.cpp" />
     <ClCompile Include="..\src\isoSurface.cpp" />
     <ClCompile Include="..\src\particle.cpp" />
+    <ClCompile Include="..\src\physics\aabb.cpp" />
     <ClCompile Include="..\src\physics\basePhysObj.cpp" />
     <ClCompile Include="..\src\physics\bsphere.cpp" />
     <ClCompile Include="..\src\physics\collision.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="..\src\isoSurface.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\particle.h" />
+    <ClInclude Include="..\src\physics\aabb.h" />
     <ClInclude Include="..\src\physics\basePhysObj.h" />
     <ClInclude Include="..\src\physics\bsphere.h" />
     <ClInclude Include="..\src\physics\collision.h" />
