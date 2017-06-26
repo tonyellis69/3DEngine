@@ -13,7 +13,11 @@ public:
 	void attachModel(CModel* model);
 	glm::vec3 update(const float & dT);
 
-	unsigned int chunkCheck(glm::vec3& start, glm::vec3& end, TChunkVert* & buf);
+	unsigned int chunkCheck(const glm::vec3& start, const glm::vec3& end, TChunkVert* & buf);
+
+	float checkDiagonal(const glm::vec3 & baseCorner, const glm::vec3 & topCorner, glm::vec3 & contactDir);
+
+	float checkTunnellingLine(const glm::vec3 & lineP, const glm::vec3 & lineQ, glm::vec3 & contactDir);
 
 	CTerrain* pTerrain;
 

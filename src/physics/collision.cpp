@@ -65,7 +65,7 @@ int triSphereIntersection(CBsphere & sphere, glm::vec3 & triA, glm::vec3 & triB,
 }
 
 /** Returns true if the line intersects the triangle, with the point of intersection in baryonic coordiantes. */
-int triLineIntersection(glm::vec3& p, glm::vec3& q, glm::vec3& a, glm::vec3& b, glm::vec3& c,
+int triLineIntersection(const glm::vec3& p, const glm::vec3& q, glm::vec3& a, glm::vec3& b, glm::vec3& c,
 	float &u, float &v, float &w)  {
 
 	glm::vec3 pq = q - p;

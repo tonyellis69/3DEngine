@@ -8,113 +8,49 @@
 using namespace glm;
 
 void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
-	std::cerr << "\ncollison checking...";
 	float restitution = 0.1f;
+	float roundingError = 1.0f; //At least, I think that's what it is.
 	CAABB* aabb = &collider.AABB;
 	aabb->setPos(collider.position);
-	std::cerr << " ...collider at " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
-	TChunkVert* pBuf = NULL; unsigned int noTris = 0; bool trisFound = false;
-	float u, v, w, t;
-	vec3 intersectionPoint;
-	vec3 contactDir; vec3 triNorm;
+	vec3 contactDir, finalContactDir; 
 	float maxPenetration = 0; float penetration;
-	//for each (bottom for now) corner of the AABB, see if it's in an occupied chunk
+	//for each diagonal segment of the AABB, see if it's in an occupied chunk
 	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
-		penetration = 0; pBuf = NULL;
-		pTerrain->getTris(aabb->corner[cornerNo], pBuf, noTris);
-		if (pBuf) {
-			std::cerr << "\ntris found, corner " << cornerNo << " at " << aabb->corner[cornerNo].x << " " << aabb->corner[cornerNo].y <<
-				" " << aabb->corner[cornerNo].z;
-			trisFound = true;
-			for (int vNo = 0; vNo < noTris * 3; vNo += 3) {
-				int intersect = triSegmentIntersection(aabb->corner[7 - cornerNo],aabb->corner[cornerNo],
-					pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
-				if (intersect) {
-					std::cerr << " intersection found";
-					intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
-					std::cerr << " at " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z;
-					penetration = length(aabb->corner[cornerNo] - intersectionPoint);
-					std::cerr << "\npenetration " << penetration;
-					vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
-					vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
-					triNorm = normalize(cross(a, b));
-					break; //TO DO: may not want to do this, or at least try for 2 hits
-				}
-			}
-			if (penetration > maxPenetration) {
-				maxPenetration = penetration;
-				contactDir = triNorm;
-			}
-
+		penetration = checkDiagonal(aabb->corner[cornerNo], aabb->corner[7 - cornerNo], contactDir);
+		if (penetration > maxPenetration) {
+			maxPenetration = penetration;
+			finalContactDir = contactDir;
 		}
-		if (maxPenetration) {
-			std::cerr << "\n\n!!!!!!!!!!Contact found";
-			pManager->addContact(&collider, NULL, vec3(0,1,0) /*contactDir*/, restitution, maxPenetration);
+	}
+
+	if (maxPenetration) {
+			pManager->addContact(&collider, NULL, vec3(0,1,0) /*finalContactDir*/, restitution, maxPenetration - roundingError);
 			return;
-		}
-		else {
-			std::cerr << "\n...no intersections found.";
-
-		}
-
 	}
 
 	//if we're here, we're either above terrain or tunnelled right through it
-	noTris = 0;
-	std::cerr << "\nchecking for tunnelling... ";
+	
+
 	//for each bottom corner plot a line in the reverse-velocity direction to find a chunk, use that
 	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
-		penetration = 0; pBuf = NULL;
 		vec3 cornerOffset = aabb->corner[cornerNo] - collider.position;
 		vec3 backProjectedPos = collider.lastContact + cornerOffset;
-		unsigned int noTris = chunkCheck(backProjectedPos, aabb->corner[cornerNo], pBuf);
-		if (noTris) {
-			std::cerr << "\ncorner " << cornerNo << " at " << aabb->corner[cornerNo].x << " " << aabb->corner[cornerNo].y <<
-				" " << aabb->corner[cornerNo].z << " line check found chunk...";
-			//check for intersection
-			for (int vNo = 0; vNo < noTris * 3; vNo += 3) {
-				int intersect = triLineIntersection(backProjectedPos, aabb->corner[cornerNo], pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v,
-					u, v, w);
-				if (intersect) {
-					std::cerr << " intersection found";
-					intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
-					std::cerr << " at " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z;
 
-					//check which side of triangle corner is on.
-					vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
-					vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
-					triNorm = normalize(cross(a, b));
-					vec3 test = normalize(aabb->corner[cornerNo] - intersectionPoint);
-					float compare = dot(triNorm, test);
-					std::cerr << "\ncomparison: " << compare;
-					if (compare > 0) {
-						std::cerr << "\nRejecting for being in front of triangle";
-						break;//;
-					}
-					
+		penetration = checkTunnellingLine(aabb->corner[cornerNo], backProjectedPos, contactDir);
 
-
-					penetration = length(aabb->corner[cornerNo] - intersectionPoint);
-					std::cerr << " penetration of " << penetration;
-					if (penetration > maxPenetration) {
-						maxPenetration = penetration;
-						contactDir = normalize(intersectionPoint - aabb->corner[cornerNo] );
-						std::cerr << " contact dir " << contactDir.x << " " << contactDir.y << " " << contactDir.z;
-					}
-					break;
-				}
-			}
+		if (penetration > maxPenetration) {
+			maxPenetration = penetration;
+			finalContactDir = contactDir;
 		}
 	}
+
 	if (maxPenetration) {
-		std::cerr << "\n\n!!!!!!!!!!Contact found via tunnelling";
-		pManager->addContact(&collider, NULL, vec3(0, 1, 0) /*contactDir*/, restitution, maxPenetration);
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0) /*contactDir*/, restitution, maxPenetration - roundingError);
+		return;
 	}
-	//none? we're probably just falling then.
-	if (maxPenetration == 0) {
-		std::cerr << " ... no evidence of tunnelling.";
-		collider.lastContact = collider.position;;
-	}
+
+	//still here? we're probably just falling above terrain then
+	collider.lastContact = collider.position; //update where we start checking for tunnelling
 }
 
 void CTerrainPhysObj::collisionCheckLine(CBasePhysObj& collider) {
@@ -320,7 +256,7 @@ glm::vec3 CTerrainPhysObj::update(const float & dT) {
 	return glm::vec3(0);
 }
 
-unsigned int CTerrainPhysObj::chunkCheck(glm::vec3 & start, glm::vec3 & end, TChunkVert *& pBuf) {
+unsigned int CTerrainPhysObj::chunkCheck(const glm::vec3 & start, const glm::vec3 & end, TChunkVert *& pBuf) {
 	float smallestSCsize =  pTerrain->cubesPerChunkEdge * pTerrain->LoD1cubeSize;
 	vec3 searchVec = normalize(end - start) * smallestSCsize;
 	vec3 checkPos = start;
@@ -336,4 +272,62 @@ unsigned int CTerrainPhysObj::chunkCheck(glm::vec3 & start, glm::vec3 & end, TCh
 			return noTris;
 	}
 	return noTris;
+}
+
+float CTerrainPhysObj::checkDiagonal(const glm::vec3& baseCorner,const glm::vec3& topCorner, glm::vec3& contactDir) {
+	float penetration = 0; 
+	TChunkVert* pBuf = NULL; unsigned int noTris = 0;
+	pTerrain->getTris(baseCorner, pBuf, noTris);
+	float u, v, w, t; vec3 intersectionPoint, triNorm;
+	if (pBuf) { //corner in a non-empty chunk
+		for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
+			int intersect = triSegmentIntersection(topCorner, baseCorner, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
+			if (intersect) {
+				intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
+				penetration = length(baseCorner - intersectionPoint);
+
+				vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
+				vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
+				triNorm = normalize(cross(a, b));
+				break; //TO DO: may not want to do this, or at least try for 2 hits
+			}
+		}	
+	}
+	return penetration;
+}
+
+
+float CTerrainPhysObj::checkTunnellingLine(const glm::vec3& lineP, const glm::vec3& lineQ, glm::vec3& contactDir) {
+	float penetration = 0;
+	TChunkVert* pBuf = NULL; unsigned int noTris = 0;
+	float u, v, w;
+	vec3 intersectionPoint;
+
+	noTris = chunkCheck(lineQ, lineP, pBuf);
+	if (noTris) { //line passes through a non-empty chunk
+		for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
+			int intersect = triLineIntersection(lineQ, lineP, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w);
+			if (intersect) {
+				intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
+
+				//TO DO: can scrap all this if we use a tri-segment test. faster?
+
+				//check which side of triangle the starting point of our line is on.
+				vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
+				vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
+				vec3 triNorm = normalize(cross(a, b));
+				vec3 test = normalize(lineP - intersectionPoint);
+				float compare = dot(triNorm, test);
+				if (compare > 0) { //start point in front of triangle, therefore doesn't intersect it
+					break;
+				}
+
+				penetration = length(lineP - intersectionPoint);
+				contactDir = normalize(intersectionPoint - lineP);
+				return penetration;
+			}
+		}
+	}
+
+	return 0;
 }

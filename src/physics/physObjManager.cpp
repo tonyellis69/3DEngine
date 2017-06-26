@@ -105,7 +105,7 @@ void CPhysObjManager::contactResolver() {
 	if (!contactList.size())
 		return;
 
-	maxIterations = 100; // contactList.size() * 3; //TO DO: should be able to set this
+	maxIterations = 10; // contactList.size() * 3; //TO DO: should be able to set this
 	int currentIteration = 0;
 
 	while (currentIteration < maxIterations) {

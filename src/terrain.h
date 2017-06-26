@@ -70,7 +70,7 @@ public:
 	CSuperChunk* getSC(const glm::vec3& pos);
 	Chunk* getChunk(const glm::vec3& pos);
 	void getChunkTris(Chunk& chunk, TChunkVert* buf);
-	void getTris(glm::vec3& pos, TChunkVert* &buf, unsigned int& noTris);
+	void getTris(const glm::vec3& pos, TChunkVert* &buf, unsigned int& noTris);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
