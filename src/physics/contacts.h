@@ -28,5 +28,7 @@ public:
 	bool resolved;
 	bool resting;
 
+	float depenetrationAggression;
+
 	unsigned int id;
 };

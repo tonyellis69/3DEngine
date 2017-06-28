@@ -1,7 +1,7 @@
 #include "physObj.h"
 
 #include "..\watch.h"
-
+#include <iostream>
 using namespace glm;
 
 void CPhysObj::attachModel(CModel * model) {
@@ -35,14 +35,20 @@ void CPhysObj::applyVelocity() {
 
 /** Integrate the object's position and velocity, over the given time. */
 void CPhysObj::integrate(float dT) {
+
+
+
 	//update position from velocity
 	position += velocity * dT;
+
 
 	//update velocity from acceleration
 	velocity += acceleration * dT;
 
 	//apply damping
 	velocity *= pow(damping,dT);
+
+	
 
 }
 

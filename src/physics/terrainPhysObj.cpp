@@ -8,8 +8,21 @@
 using namespace glm;
 
 void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
+	std::cerr << "\ncollider pos " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
+	if (collider.position.z < 93.1f) {  //93   starts     
+		//collider.velocity.z = 0;
+		if (!tmp) {
+			std::cerr << "\n!!!!starts!";
+			tmp = true;
+		}
+	}
+	if (collider.position.z < 92.51f) {  //93   starts     
+	//	collider.velocity.z = 0;	
+		std::cerr << "\n!!!!ends!";
+	}
+
 	float restitution = 0.1f;
-	float roundingError = 1.0f; //At least, I think that's what it is.
+	float roundingError = 0.0f; //At least, I think that's what it is.
 	CAABB* aabb = &collider.AABB;
 	aabb->setPos(collider.position);
 	vec3 contactDir, finalContactDir; 
@@ -20,11 +33,19 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		if (penetration > maxPenetration) {
 			maxPenetration = penetration;
 			finalContactDir = contactDir;
+			finalContactDir = vec3(0, 1, 0);
 		}
+		if (penetration > 0) {
+			//pManager->addContact(&collider, NULL, finalContactDir, restitution, penetration);
+		}
+		
 	}
 
 	if (maxPenetration) {
-			pManager->addContact(&collider, NULL, vec3(0,1,0) /*finalContactDir*/, restitution, maxPenetration - roundingError);
+		std::cerr << "\n\tinternal contact generated.";
+		if (maxPenetration < 0.001f)
+			maxPenetration = 0;
+		pManager->addContact(&collider, NULL,finalContactDir, restitution, maxPenetration - roundingError);
 			return;
 	}
 
@@ -41,11 +62,18 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		if (penetration > maxPenetration) {
 			maxPenetration = penetration;
 			finalContactDir = contactDir;
+			finalContactDir = vec3(0, 1, 0);
 		}
+		if (penetration > 0) {
+			//pManager->addContact(&collider, NULL, finalContactDir, restitution, penetration);
+			
+		}
+		
 	}
 
 	if (maxPenetration) {
-		pManager->addContact(&collider, NULL, vec3(0, 1, 0) /*contactDir*/, restitution, maxPenetration - roundingError);
+		std::cerr << "\n\ttunnelling contact generated.";
+		pManager->addContact(&collider, NULL, finalContactDir, restitution, maxPenetration - roundingError);
 		return;
 	}
 
@@ -266,7 +294,6 @@ unsigned int CTerrainPhysObj::chunkCheck(const glm::vec3 & start, const glm::vec
 	unsigned int noTris = 0; 
 	while (noTris == 0) {
 		pTerrain->getTris(checkPos, pBuf, noTris);
-		//cerr << " tris found: " << noTris;
 		checkPos += searchVec;
 		if (length(start - checkPos) > searchLength)
 			return noTris;
@@ -280,18 +307,28 @@ float CTerrainPhysObj::checkDiagonal(const glm::vec3& baseCorner,const glm::vec3
 	pTerrain->getTris(baseCorner, pBuf, noTris);
 	float u, v, w, t; vec3 intersectionPoint, triNorm;
 	if (pBuf) { //corner in a non-empty chunk
+		std::cerr << "\nchunk found";
 		for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 			int intersect = triSegmentIntersection(topCorner, baseCorner, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
 			if (intersect) {
 				intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
+				std::cerr << "\nIntersection " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z;
 				penetration = length(baseCorner - intersectionPoint);
+				//penetration = length(baseCorner.y - intersectionPoint.y);
+				//penetration assuming a vertical contact dir
+				std::cerr << " penetration " << penetration;
 
 				vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
 				vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
 				triNorm = normalize(cross(a, b));
+				contactDir = triNorm;
+				std::cerr << "\ncontactDir " << contactDir.x << " " << contactDir.y << " " << contactDir.z;
 				break; //TO DO: may not want to do this, or at least try for 2 hits
 			}
 		}	
+	}
+	else {
+		std::cerr << "\nchunk not found";
 	}
 	return penetration;
 }
@@ -323,6 +360,7 @@ float CTerrainPhysObj::checkTunnellingLine(const glm::vec3& lineP, const glm::ve
 				}
 
 				penetration = length(lineP - intersectionPoint);
+				//penetration = length(lineP.y - intersectionPoint.y);
 				contactDir = normalize(intersectionPoint - lineP);
 				return penetration;
 			}

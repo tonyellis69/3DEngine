@@ -41,6 +41,7 @@ void CPhysObjManager::update(const float & dT) {
 
 	tmp = tmp + dT;
 	watch::watch1 << tmp;
+	std::cerr << "\ntime " << dT;
 
 	CPhysObjManager::dT = dT;
 	integrateObjects();
@@ -109,7 +110,7 @@ void CPhysObjManager::contactResolver() {
 	int currentIteration = 0;
 
 	while (currentIteration < maxIterations) {
-		std::cerr << "\niteration: " << currentIteration;
+	//	std::cerr << "\niteration: " << currentIteration;
 		//calculate the separating velocity of each contact
 		//keep track of the lowest
 		float max = 0;
@@ -117,7 +118,8 @@ void CPhysObjManager::contactResolver() {
 		for (int i = 0; i < contactList.size(); i++)
 		{
 			float sepVel = contactList[i].calcSeparatingVelocity(); //objects separating have a negative velocity
-			if (sepVel < max)
+			if (sepVel < max &&
+				(sepVel < 0 || contactList[i].penetration > 0))
 			{
 				max = sepVel;
 				maxIndex = i;
@@ -125,7 +127,7 @@ void CPhysObjManager::contactResolver() {
 		}
 
 	//	if (maxIndex == contactList.size() -1 ) 
-	//		break;
+		//	break;
 
 
 		//we run the collision response algorith for the lowest separating velocity, ie, the most negative,
@@ -137,11 +139,14 @@ void CPhysObjManager::contactResolver() {
 		vec3 collideeMove = contactList[maxIndex].collideeMovement;
 		for (int i = 0; i < contactList.size(); i++)
 		{
-			if (contactList[i].collider == contactList[maxIndex].collider)
+			if (contactList[i].collider == contactList[maxIndex].collider )
 			{
 				std::cerr << "\nContact " << contactList[i].id << " penetration reset from " << contactList[i].penetration;
 				contactList[i].penetration -= dot(colliderMove,contactList[i].contactNormal);
 				std::cerr << " to " << contactList[i].penetration;
+				if (contactList[i].penetration < 0.1f) //was 0.1f
+					contactList[i].resolved = true;
+				//	contactList[i].penetration = 0;
 			}
 			else if (contactList[i].collider == contactList[maxIndex].collidee)
 			{
@@ -168,7 +173,7 @@ void CPhysObjManager::contactResolver() {
 		contactList[maxIndex].colliderMovement = vec3(0);
 		contactList[maxIndex].collideeMovement = vec3(0);
 		/////////////////////////////////////
-		contactList[maxIndex].resolved = true;
+		//contactList[maxIndex].resolved = true;
 	
 		currentIteration++;
 	}
@@ -178,6 +183,7 @@ void CPhysObjManager::contactResolver() {
 
 void CPhysObjManager::addContact(CBasePhysObj * collider, CBasePhysObj * collidee, glm::vec3& contactNormal, float restitution,
 	float penetration) {
+	
 	contact newContact(collider, collidee);
 	newContact.contactNormal = contactNormal;
 	newContact.restitution = restitution;

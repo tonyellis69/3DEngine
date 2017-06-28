@@ -27,6 +27,8 @@ CTerrain::CTerrain() : CModelMulti() {
 	chunkOriginInt = i32vec3(0);
 	chunkProcessDelay = 0;
 	sampleScale = 0.002f;
+
+	cachedChunkTris.buf = (TChunkVert*) new char[160000];
 }
 
 /** Set the dimensions and building block sizes of this terrain. */
@@ -601,8 +603,9 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	//find required size of buffer
 	unsigned int size = multiBuf.getBlockSize(chunk->id);
 	if (cachedChunkTris.id != chunk->id) {
-		delete cachedChunkTris.buf;
-		cachedChunkTris.buf = (TChunkVert*) new char[size];
+		//delete cachedChunkTris.buf;
+		//cachedChunkTris.buf = (TChunkVert*) new char[size];
+		cerr << "\nChanged buffer. Size " << size;
 
 		cachedChunkTris.size = size;
 		cachedChunkTris.id = chunk->id;
@@ -611,7 +614,7 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	}
 		noTris = size / (sizeof(TChunkVert) * 3);
 		buf = cachedChunkTris.buf;
-	//}
+
 }
 
 CTerrain::~CTerrain() {

@@ -7,6 +7,7 @@
 /** The terrain physics object. */
 class CTerrainPhysObj : public CPhysObj {
 public:
+	CTerrainPhysObj() { tmp = false; }
 	void collisionCheck(CBasePhysObj& collider);
 	void collisionCheckSphere(CBasePhysObj& collider);
 	void collisionCheckLine(CBasePhysObj& collider);
@@ -21,4 +22,5 @@ public:
 
 	CTerrain* pTerrain;
 
+	bool tmp;
 };
