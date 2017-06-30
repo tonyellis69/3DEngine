@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <deque>
+#include <queue>
 #include <set>
 
 //LOD counts down from the outmost layer towards the innermost, 1.
@@ -34,11 +35,14 @@ typedef vBuf::T3DnormVert TChunkVert;
 
 class TChunkTriBuf {
 public:
-	TChunkTriBuf() { id = size = 0; buf = NULL; }
+	TChunkTriBuf() { id = noTris = 0; /*buf = NULL;*/ }
 	unsigned int id;
-	unsigned int size;
-	TChunkVert* buf;
+	unsigned int noTris;
+	TChunkVert buf[4200];
 };
+
+const int chunkTriCacheSize = 6;
+
 
 class CTerrain : public CModelMulti  {
 public:
@@ -112,7 +116,8 @@ public:
 
 	int totalSCs;
 
-	TChunkTriBuf cachedChunkTris; ///<Chunk triangles recently downloaded from graphics memory.
+	TChunkTriBuf cachedChunkTris[chunkTriCacheSize]; ///<Chunk triangles recently downloaded from graphics memory.
+	int freeChunkTriCache;
 	};
 
 

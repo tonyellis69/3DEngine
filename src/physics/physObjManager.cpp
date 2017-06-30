@@ -170,8 +170,8 @@ void CPhysObjManager::contactResolver() {
 
 		////////////////////////////////////
 		//My fix to prevent the penetration distance of resting contacts being pushed endlessly into lower negative numbers
-		contactList[maxIndex].colliderMovement = vec3(0);
-		contactList[maxIndex].collideeMovement = vec3(0);
+	//	contactList[maxIndex].colliderMovement = vec3(0);
+		//contactList[maxIndex].collideeMovement = vec3(0);
 		/////////////////////////////////////
 		//contactList[maxIndex].resolved = true;
 	

@@ -28,7 +28,8 @@ CTerrain::CTerrain() : CModelMulti() {
 	chunkProcessDelay = 0;
 	sampleScale = 0.002f;
 
-	cachedChunkTris.buf = (TChunkVert*) new char[160000];
+	//cachedChunkTris.buf = (TChunkVert*) new char[160000];
+	freeChunkTriCache = 0;
 }
 
 /** Set the dimensions and building block sizes of this terrain. */
@@ -570,7 +571,7 @@ Chunk * CTerrain::getChunk(const glm::vec3 & pos) {
 		return NULL;
 	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos); //+ glm::abs( sc->nwWorldPos);
 	offset -= sc->nwWorldPos;
-	//offset = pos; //TO DO - is this needed CHECK
+	
 	i32vec3 index = offset / sc->chunkSize;
 	
 	for (size_t chunk = 0; chunk < sc->chunkList.size(); chunk++) {
@@ -591,8 +592,6 @@ void CTerrain::getChunkTris(Chunk & chunk, vBuf::T3DnormVert * buf) {
 
 /** Return a pointer to a buffer of chunk triangles for the given position, if any. */
 void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) {
-
-
 	//get chunk at this position
 	Chunk* chunk = getChunk(pos);
 	if (!chunk) {
@@ -600,20 +599,27 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 		return;
 	}
 
-	//find required size of buffer
-	unsigned int size = multiBuf.getBlockSize(chunk->id);
-	if (cachedChunkTris.id != chunk->id) {
-		//delete cachedChunkTris.buf;
-		//cachedChunkTris.buf = (TChunkVert*) new char[size];
-		cerr << "\nChanged buffer. Size " << size;
-
-		cachedChunkTris.size = size;
-		cachedChunkTris.id = chunk->id;
-
-		getChunkTris(*chunk, cachedChunkTris.buf);
+	//check if we already have this chunk in the cache
+	for (int cacheNo = 0; cacheNo < chunkTriCacheSize; cacheNo++) {
+		if (cachedChunkTris[cacheNo].id == chunk->id) {
+			noTris = cachedChunkTris[cacheNo].noTris;
+			buf = cachedChunkTris[cacheNo].buf;
+			return;
+		}
 	}
-		noTris = size / (sizeof(TChunkVert) * 3);
-		buf = cachedChunkTris.buf;
+
+	//no? Let's go retrieve it then
+	getChunkTris(*chunk, cachedChunkTris[freeChunkTriCache].buf);
+	unsigned int size = multiBuf.getBlockSize(chunk->id);
+	noTris = cachedChunkTris[freeChunkTriCache].noTris = size / (sizeof(TChunkVert) * 3);
+	cerr << "\nRetrieving new chunk data.";
+	cachedChunkTris[freeChunkTriCache].id = chunk->id;
+	buf = cachedChunkTris[freeChunkTriCache].buf;
+
+
+	freeChunkTriCache++;
+	if (freeChunkTriCache >= chunkTriCacheSize)
+		freeChunkTriCache = 0;
 
 }
 
@@ -627,8 +633,8 @@ CTerrain::~CTerrain() {
 			delete layers[l].superChunks[s];
 		}
 	}
-	if (cachedChunkTris.buf)
-		delete cachedChunkTris.buf;
+//	if (cachedChunkTris.buf)
+//		delete cachedChunkTris.buf;
 }
 
 

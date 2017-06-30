@@ -143,7 +143,7 @@ void contact::resolvePenetration(float dT) {
 		return;
 
 	float adjPenetration = penetration * depenetrationAggression;
-	adjPenetration = penetration - 0.09f;
+	adjPenetration = penetration -0.09f;   //0.09f works best or slightly lower values
 
 	depenetrationAggression = 0.1f; // best so far 0.1f
 	//if (depenetrationAggression < 0.09f)
