@@ -36,6 +36,7 @@ public:
 	virtual void setDrawMode(TdrawMode drawMode) {};
 	virtual void assignMaterial() {};
 
+
 	int drawMode; ///<Triangles, lines etc
 
 

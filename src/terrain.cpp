@@ -582,7 +582,7 @@ Chunk * CTerrain::getChunk(const glm::vec3 & pos) {
 	return NULL;
 }
 
-void CTerrain::getChunkTris(Chunk & chunk, vBuf::T3DnormVert * buf) {
+void CTerrain::getChunkTris(Chunk & chunk, TChunkVert * buf) {
 	//get the id of this chunk
 	unsigned int id = chunk.id;
 	//copy the data from the multibuf to system memory
