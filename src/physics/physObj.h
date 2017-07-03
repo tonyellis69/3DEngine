@@ -9,14 +9,15 @@
 class CPhysObj : public CBasePhysObj {
 public:
 
-	void attachModel(CModel* model);
+	void attachModel(C3dObject* model);
 	void setVelocity(glm::vec3& newVelocity);
 	void setMass(float newMass);
-	CModel* getModel();
+	C3dObject* getModel();
 	void modifyVelocity(glm::vec3 & modifier);
 	void applyVelocity();
 	void integrate(float dT);
 	void repositionModel();
+	void updatePosition();
 
 	//CModel* pModel;
 	CPhysObjManager* pManager;

@@ -9,11 +9,11 @@
 class CBasePhysObj {
 public:
 	CBasePhysObj();
-	virtual void attachModel(CModel* model) {};
+	virtual void attachModel(C3dObject* model) {};
 	void setVelocity(glm::vec3& newVelocity);
 	void setMass(float newMass);
 	void setAcceleration(glm::vec3& accel);
-	virtual CModel* getModel() { return 0; };
+	virtual C3dObject* getModel() { return 0; };
 	virtual void modifyVelocity(glm::vec3& modifier) {};
 	virtual void applyVelocity() {};
 	void setCollides(bool status);
@@ -21,10 +21,11 @@ public:
 	virtual void integrate(float dT) {};
 	virtual void repositionModel() {};
 	virtual void AABBcollisionCheck(CBasePhysObj & collidee) {};
+	virtual void updatePosition() {};
 
 	bool collides; ///<True if this object collides *into* other objects.
 
-	CModel* pModel;
+	C3dObject* pModel;
 
 	CBsphere bSphere; ///<Bounding sphere for this object
 	glm::vec3 velocity;
@@ -34,6 +35,8 @@ public:
 
 	glm::vec3 lastContact; ///<Position of last recorded contact.
 	CAABB AABB; ///<AABB for this object
+
+	bool asleep;
 
 protected:
 	float mass;

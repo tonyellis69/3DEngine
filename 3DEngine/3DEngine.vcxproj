@@ -107,6 +107,7 @@
     <ClCompile Include="..\src\physics\physObj.cpp" />
     <ClCompile Include="..\src\physics\physObjManager.cpp" />
     <ClCompile Include="..\src\physics\terrainPhysObj.cpp" />
+    <ClCompile Include="..\src\playerObj.cpp" />
     <ClCompile Include="..\src\Reader.cpp" />
     <ClCompile Include="..\src\renderer\2d.cpp" />
     <ClCompile Include="..\src\renderer\3d.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="..\src\physics\physObj.h" />
     <ClInclude Include="..\src\physics\physObjManager.h" />
     <ClInclude Include="..\src\physics\terrainPhysObj.h" />
+    <ClInclude Include="..\src\playerObj.h" />
     <ClInclude Include="..\src\Reader.h" />
     <ClInclude Include="..\src\renderer\2d.h" />
     <ClInclude Include="..\src\renderer\3d.h" />

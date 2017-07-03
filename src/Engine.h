@@ -101,7 +101,7 @@ public:
 	unsigned int attachShaders();
 
 	CCamera* createCamera(glm::vec3& pos);
-	CModel* createCube(glm::vec3& pos,float size);
+	CModel* createCube(glm::vec3& pos, glm::vec3& size);
 	void drawModels();
 	void drawModelDefaultShader(CModel& model);
 	void drawModel(CModel& model);
@@ -158,7 +158,7 @@ public:
 	CBillboard* createBillboard(glm::vec3& pos, glm::vec2 size);
 	void setCurrentCamera(CCamera* camera);
 	CCamera* getCurrentCamera();
-	CBasePhysObj* addPhysics(CModel* model);
+	CBasePhysObj* addPhysics(C3dObject* model);
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;

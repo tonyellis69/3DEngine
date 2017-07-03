@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace glm;
 
-void CPhysObj::attachModel(CModel * model) {
+void CPhysObj::attachModel(C3dObject * model) {
 	pModel = model; 
 	position = pModel->getPos();
 	lastContact = position;
@@ -21,7 +21,7 @@ void CPhysObj::setMass(float newMass) {
 
 
 
-CModel * CPhysObj::getModel() {
+C3dObject * CPhysObj::getModel() {
 	return pModel;
 }
 
@@ -54,4 +54,9 @@ void CPhysObj::integrate(float dT) {
 
 void CPhysObj::repositionModel() {
 	pModel->setPos(position);
+}
+
+/** Position with its associate model. */
+void CPhysObj::updatePosition() {
+	position = pModel->getPos();
 }

@@ -503,19 +503,21 @@ CCamera* CEngine::createCamera(glm::vec3& pos) {
 }
 
 /** Create a cube model. */
-CModel* CEngine::createCube(glm::vec3& pos,float size) {
+CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 	CModel* cube = createModel();
 	cube->setPos(pos);
 
-	float r = size/2.0f;
-	glm::vec3 A(-r,r,r);
-	glm::vec3 B(r,r,r);
-	glm::vec3 C(r,-r,r);
-	glm::vec3 D(-r,-r,r);
-	glm::vec3 E(-r,r,-r);
-	glm::vec3 F(r,r,-r);
-	glm::vec3 G(r,-r,-r);
-	glm::vec3 H(-r,-r,-r);
+	float w = size.x * 0.5f;
+	float h = size.y * 0.5f;
+	float d = size.z * 0.5f;
+	glm::vec3 A(-w,h,d);
+	glm::vec3 B(w,h,d);
+	glm::vec3 C(w,-h,d);
+	glm::vec3 D(-w,-h,d);
+	glm::vec3 E(-w,h,-d);
+	glm::vec3 F(w,h,-d);
+	glm::vec3 G(w,-h,-d);
+	glm::vec3 H(-w,-h,-d);
 
 
 
@@ -553,7 +555,7 @@ CModel* CEngine::createCube(glm::vec3& pos,float size) {
 	cube->storeLayout(3, 3, 0, 0);
 
 	//modelList.push_back(cube);
-	modelDrawList.push_back(cube);
+	//modelDrawList.push_back(cube);
 	return cube;
 }
 
@@ -1054,7 +1056,7 @@ CCamera * CEngine::getCurrentCamera() {
 	return currentCamera;
 }
 
-CBasePhysObj * CEngine::addPhysics(CModel * model) {
+CBasePhysObj * CEngine::addPhysics(C3dObject * model) {
 	return	physObjManager.addModel(model);
 }
 

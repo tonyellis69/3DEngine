@@ -9,6 +9,7 @@ CBasePhysObj::CBasePhysObj() {
 	setMass(10);
 	damping = 0.9f;;
 	setAcceleration(vec3(0,-10,0));
+	asleep = false;
 }
 
 

@@ -18,7 +18,7 @@ CPhysObjManager::~CPhysObjManager() {
 	}
 }
 
-CBasePhysObj * CPhysObjManager::addModel(CModel * model) {
+CBasePhysObj * CPhysObjManager::addModel(C3dObject * model) {
 	CPhysObj* obj = new CPhysObj();
 	obj->attachModel(model);
 	addPhysObj(obj);
@@ -76,7 +76,10 @@ void CPhysObjManager::integrateObjects() {
 	CBasePhysObj* physObj;
 	for (size_t obj = 0; obj < physObjList.size(); obj++) {
 		physObj = physObjList[obj];
-		physObj->integrate(dT);
+		if (!physObj->asleep) {
+			physObj->updatePosition();
+			physObj->integrate(dT);
+		}
 	}
 }
 
@@ -89,13 +92,14 @@ void CPhysObjManager::repositionModels() {
 
 void CPhysObjManager::collisionCheck() {
 	CBasePhysObj* collider, *sceneryObj;
+	//check for collisions with sceneru:
 	for (size_t scenery = 0; scenery < sceneryList.size(); scenery++) {
 		sceneryObj = sceneryList[scenery];
 		for (size_t obj = 0; obj < physObjList.size(); obj++) {
 			collider = physObjList[obj];
-			//check for collision between this pair, create contact if so
-			sceneryObj->collisionCheck(*collider);
-			//collider->AABBcollisionCheck(*scenery);
+			if (!collider->asleep)
+				sceneryObj->collisionCheck(*collider);
+		
 
 		}
 	}
@@ -129,6 +133,8 @@ void CPhysObjManager::contactResolver() {
 	//	if (maxIndex == contactList.size() -1 ) 
 		//	break;
 
+		if (contactList[maxIndex].collider->asleep)
+			break;
 
 		//we run the collision response algorith for the lowest separating velocity, ie, the most negative,
 		//where the objects are therefore *not* separating but colliding

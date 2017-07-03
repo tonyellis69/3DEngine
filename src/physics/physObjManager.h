@@ -13,7 +13,7 @@ public:
 	nextID = 0;
 	}
 	~CPhysObjManager();
-	CBasePhysObj* addModel(CModel* model);
+	CBasePhysObj* addModel(C3dObject* model);
 	void addPhysObj(CBasePhysObj* obj);
 	void update(const float & dT);
 	void integrateObjects();
