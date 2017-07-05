@@ -36,10 +36,17 @@ void CPhysObj::applyVelocity() {
 /** Integrate the object's position and velocity, over the given time. */
 void CPhysObj::integrate(float dT) {
 
-
+//	lastVelocity = velocity;
 
 	//update position from velocity
 	position += velocity * dT;
+
+	std::cerr << "\nIntegration moves collider to " << position.x << " " << position.y << " " << position.z;
+
+	if (position.y > oldHeight) {
+	//	position.y = oldHeight;
+	}
+	oldHeight = position.y;
 
 
 	//update velocity from acceleration

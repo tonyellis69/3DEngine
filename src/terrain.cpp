@@ -592,12 +592,24 @@ void CTerrain::getChunkTris(Chunk & chunk, TChunkVert * buf) {
 
 /** Return a pointer to a buffer of chunk triangles for the given position, if any. */
 void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) {
+
+	CSuperChunk* sc = getSC(pos); //TO TO: temp!
+	if (!sc)
+		return;
+
 	//get chunk at this position
+	std::cerr << "\nlooking for chunks at SC " << sc->tmpIndex.x << sc->tmpIndex.y << sc->tmpIndex.z;
+	std::cerr << " position " << pos.x << " " << pos.y << " " << pos.z;
 	Chunk* chunk = getChunk(pos);
 	if (!chunk) {
+		std::cerr << " ...none found.";
 		noTris = 0;
 		return;
 	}
+
+	
+	std::cerr << " ... chunk " << chunk->scIndex.x << " " << chunk->scIndex.y << " "
+		<< chunk->scIndex.z << " found";
 
 	//check if we already have this chunk in the cache
 	for (int cacheNo = 0; cacheNo < chunkTriCacheSize; cacheNo++) {

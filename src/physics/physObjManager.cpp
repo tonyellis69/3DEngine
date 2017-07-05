@@ -121,7 +121,7 @@ void CPhysObjManager::contactResolver() {
 		int maxIndex = contactList.size()-1;
 		for (int i = 0; i < contactList.size(); i++)
 		{
-			float sepVel = contactList[i].calcSeparatingVelocity(); //objects separating have a negative velocity
+			float sepVel = contactList[i].calcSeparatingVelocity(); 
 			if (sepVel < max &&
 				(sepVel < 0 || contactList[i].penetration > 0))
 			{

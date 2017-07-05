@@ -45,6 +45,8 @@ void contact::resolveVelocity(float dT) {
 	if (separatingVelocity > 0) {//objects heading apart, collision already resolved
 		//std::cerr << "\n" << id << " now separating";
 		//resolved = true;
+		std::cerr << "\nForcing velocity to 0";
+		collider->velocity.y = 0;
 		return;
 	}
 
@@ -73,7 +75,7 @@ void contact::resolveVelocity(float dT) {
 
 		std::cerr << "\nnewSeparatingVelocity = " << newSeparatingVelocity;
 
-
+		
 	//	std::cerr << "\n" << id << " now considered at rest";
 		resting = true;
 		// Make sure we haven’t removed more than was
@@ -114,6 +116,8 @@ void contact::resolveVelocity(float dT) {
 	vec3 debugVar = impulsePerUnitMass * collider->inverseMass;
 	std::cerr << "\nImpulse of " << debugVar.x << " " << debugVar.y << " " << debugVar.z;
 	std::cerr << "\changed velocity to " << collider->velocity.x << " " << collider->velocity.y << " " << collider->velocity.z;
+
+
 
 	if (collidee) {
 		// goes in the opposite direction.

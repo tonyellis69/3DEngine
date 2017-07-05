@@ -73,6 +73,7 @@ int triLineIntersection(const glm::vec3& p, const glm::vec3& q, glm::vec3& a, gl
 	glm::vec3 pb = b - p;
 	glm::vec3 pc = c - p;
 
+	/*
 	// Test if pq is inside the edges bc, ca and ab. 
 	glm::vec3 m = glm::cross(pq, pc);
 	u = glm::dot(pb, m); // ScalarTriple(pq, pc, pb);
@@ -81,6 +82,19 @@ int triLineIntersection(const glm::vec3& p, const glm::vec3& q, glm::vec3& a, gl
 	if (v < 0.0f) return 0;
 	w = glm::dot( glm::cross(pq, pb), pa);
 	if (w < 0.0f) return 0;
+	*/
+
+	glm::vec3 m = glm::cross(pq, pc);
+	u = glm::dot(pb, m); // ScalarTriple(pq, pc, pb);
+	v = -glm::dot(pa, m); // ScalarTriple(pq, pa, pc);
+	if (glm::sign(u) != glm::sign(v)) 
+		return 0;
+	w = glm::dot(glm::cross(pq, pb), pa);
+	if (glm::sign(u) != glm::sign(w))
+		return 0;
+
+
+
 
 	// Compute the barycentric coordinates (u, v, w) determining the
 	// intersection point r, r = u*a + v*b + w*c

@@ -8,41 +8,49 @@
 using namespace glm;
 
 void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
-	std::cerr << "\ncollider pos " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
 
+	std::cerr << "\ncollider pos " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
+	std::cerr << " velocity " << collider.velocity.x << " " << collider.velocity.y << " " << collider.velocity.z;
 	float restitution = 0.1f;
 	float roundingError = 0.0f; //At least, I think that's what it is.
+	float earlyCollision = 0.0;;
 	CAABB* aabb = &collider.AABB;
 	aabb->setPos(collider.position);
 	vec3 contactDir, finalContactDir;
 	float maxPenetration = 0; float penetration;
 	//for each diagonal segment of the AABB, see if it's in an occupied chunk
-	mat4 terrainShift =(pTerrain->chunkOrigin);
+	mat4 terrainShift = (pTerrain->chunkOrigin);
 	vec3 segStart, segEnd;
 	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
 		segStart = aabb->corner[cornerNo];
 		segEnd = aabb->corner[cornerNo - 4];
 		//penetration = checkDiagonal(aabb->corner[cornerNo], aabb->corner[7 - cornerNo], contactDir);
+		segStart.y -= earlyCollision;
+		std::cerr << "\ncorner " << cornerNo << " ";
 		penetration = checkAABBsegment(segStart, segEnd, contactDir);
+
 		if (penetration > maxPenetration) {
 			maxPenetration = penetration;
 			finalContactDir = contactDir;
-			finalContactDir = vec3(0, 1, 0);
 		}
 
 	}
 
 
 	if (maxPenetration) {
-		std::cerr << "\n\tinternal contact generated.";
+		std::cerr << "\n\n\tInternal contact generated.";
+		maxPenetration -= earlyCollision;
+		collider.currentContactNormal = finalContactDir;
 		if (maxPenetration < 0.001f)  //0.001f works
 			maxPenetration = 0;
-		pManager->addContact(&collider, NULL,finalContactDir, restitution, maxPenetration - roundingError);
-			return;
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, maxPenetration - roundingError);
+		collider.lastVelocity = collider.velocity;
+		
+		return;
 	}
 
 	//if we're here, we're either above terrain or tunnelled right through it
-	
+
 
 	//for each bottom corner plot a line in the reverse-velocity direction to find a chunk, use that
 	vec3 lineStart, lineEnd, cornerOffset, backProjectedPos;
@@ -52,30 +60,59 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		lineStart = aabb->corner[cornerNo];
 		lineEnd = backProjectedPos;
 
-		penetration = checkTunnellingLine(lineStart, lineEnd, contactDir);
+		//penetration = checkTunnellingLine(lineStart, lineEnd, contactDir);
+		penetration = checkTunnellingLine(lineEnd, lineStart, contactDir);
 
 		if (penetration > maxPenetration) {
 			maxPenetration = penetration;
 			finalContactDir = contactDir;
-			finalContactDir = vec3(0, 1, 0);
+
 		}
-		if (penetration > 0) {
-			//pManager->addContact(&collider, NULL, finalContactDir, restitution, penetration);
-			
-		}
-		
+
 	}
 
 	if (maxPenetration) {
-		std::cerr << "\n\ttunnelling contact generated.";
+		maxPenetration -= earlyCollision;
+		collider.currentContactNormal = finalContactDir;
+		std::cerr << "\n\n\ttunnelling contact generated.";
 		if (maxPenetration < 0.001f)  //0.001f works
 			maxPenetration = 0;
-		pManager->addContact(&collider, NULL, finalContactDir, restitution, maxPenetration - roundingError);
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, maxPenetration - roundingError);
+		collider.lastVelocity = collider.velocity;
 		return;
 	}
 
 	//still here? we're probably just falling above terrain then
 	collider.lastContact = collider.position; //update where we start checking for tunnelling
+
+	std::cerr << "\n\nNo contacts";
+
+	/*if (abs(collider.velocity.z) > 0.5f) {
+		std::cerr << "... treating as a mini-bounce, applying velocity of ";
+		vec3 adjVelocity = collider.lastVelocity;
+		adjVelocity *= 0.5f;
+		std::cerr << adjVelocity.x << " " << adjVelocity.y << " " << adjVelocity.z;
+		collider.velocity = adjVelocity;
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, 0);
+		return;
+	}*/
+
+
+	//so, fire a ray straight down and see how away the ground is
+	vec3 altContactDir;
+	lineStart = aabb->corner[6]; 
+	lineEnd = lineStart + vec3(0, -10, 0);
+	penetration = checkTunnellingLine(lineEnd, lineStart, altContactDir);
+	std::cerr << "\nraycast finds penetration of " << penetration;
+
+	penetration = 10 - penetration;
+	if (penetration > 0) {
+		collider.position.y -= penetration;
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, 0);
+		collider.currentContactNormal = altContactDir;
+		return;
+	}
+	collider.currentContactNormal = vec3(0, 0, 0);
 }
 
 void CTerrainPhysObj::collisionCheckLine(CBasePhysObj& collider) {
@@ -309,7 +346,6 @@ float CTerrainPhysObj::checkAABBsegment(const glm::vec3& baseCorner, const glm::
 	float u, v, w, t; vec3 intersectionPoint, triNorm;
 	for (int height = 1; height < 3; height++) {
 		if (pBuf) { //corner in a non-empty chunk
-			std::cerr << "\nchunk found";
 			for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrollTopCorner, scrollBaseCorner, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
 				if (intersect) {
@@ -349,13 +385,18 @@ float CTerrainPhysObj::checkTunnellingLine(const glm::vec3& lineP, const glm::ve
 	vec3 scrollLineP = glm::inverse(pTerrain->chunkOrigin) * vec4(lineP, 1);
 	vec3 scrollLineQ = glm::inverse(pTerrain->chunkOrigin)* vec4(lineQ, 1);
 
+	//scrollLineP.y = -10000;
+
+	std::cerr << "\nLooking for tunnelling along " << scrollLineP.x << " " << scrollLineP.y << " " <<
+		scrollLineP.z << " to " << scrollLineQ.x << " " << scrollLineQ.y << " " << scrollLineQ.z;
 
 	if (noTris) { //line passes through a non-empty chunk
 		for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 			int intersect = triLineIntersection(scrollLineQ, scrollLineP, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w);
 			if (intersect) {
 				intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
-
+				std::cerr << "\ntunnelling intersection found at " << intersectionPoint.x << " " <<
+					intersectionPoint.y << " " << intersectionPoint.z;
 				//TO DO: can scrap all this if we use a tri-segment test. faster?
 
 				//check which side of triangle the starting point of our line is on.
@@ -365,6 +406,7 @@ float CTerrainPhysObj::checkTunnellingLine(const glm::vec3& lineP, const glm::ve
 				vec3 test = normalize(scrollLineP - intersectionPoint);
 				float compare = dot(triNorm, test);
 				if (compare > 0) { //start point in front of triangle, therefore doesn't intersect it
+					std::cerr << "\ntriangle in front";
 					break;
 				}
 

@@ -37,7 +37,10 @@ public:
 	CAABB AABB; ///<AABB for this object
 
 	bool asleep;
+	glm::vec3 currentContactNormal;
 
+	float oldHeight;
+	glm::vec3 lastVelocity;
 protected:
 	float mass;
 	

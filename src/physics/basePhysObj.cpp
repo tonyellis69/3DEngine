@@ -7,9 +7,12 @@ CBasePhysObj::CBasePhysObj() {
 	collides = true;
 	velocity = vec3(0);
 	setMass(10);
-	damping = 0.9f;;
+	damping = 0.7f;;
 	setAcceleration(vec3(0,-10,0));
 	asleep = false;
+	oldHeight = 5000;
+
+	lastVelocity = vec3(0);
 }
 
 

@@ -21,6 +21,7 @@ public:
 
 	//CModel* pModel;
 	CPhysObjManager* pManager;
+	
 private:
 //	glm::vec3 velocity;
 //	float mass;
