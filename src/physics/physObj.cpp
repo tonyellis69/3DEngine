@@ -43,11 +43,6 @@ void CPhysObj::integrate(float dT) {
 
 	std::cerr << "\nIntegration moves collider to " << position.x << " " << position.y << " " << position.z;
 
-	if (position.y > oldHeight) {
-	//	position.y = oldHeight;
-	}
-	oldHeight = position.y;
-
 
 	//update velocity from acceleration
 	velocity += acceleration * dT;

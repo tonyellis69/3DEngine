@@ -7,7 +7,54 @@
 
 using namespace glm;
 
+/** Check for collisions with this terrain from an AABB collider. */
 void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
+	float restitution = 0.1f; 
+	float miniBounceAllowance = 10;
+	CAABB* aabb = &collider.AABB;
+	aabb->setPos(collider.position);
+	vec3 contactDir, maxContactDir, segBase, segTop;
+	float penetration = 0; float maxPenetration = 0;
+
+	//for each upright of the AABB, perform one or more intersection tests with the nearest column of chunks
+	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
+		segBase = aabb->corner[cornerNo] + vec3(0, -miniBounceAllowance, 0);
+		segTop = aabb->corner[cornerNo - 4];
+
+		//check against local column of chunks
+		penetration = checkAABBsegment(segBase, segTop, contactDir);
+		if (penetration > maxPenetration) {
+			maxPenetration = penetration;
+			maxContactDir = contactDir;
+		}
+	}
+
+	if (maxPenetration) { //we had an intersection
+		if (maxPenetration > miniBounceAllowance) { //it happened somewhere above the base of the AABB
+			maxPenetration -= miniBounceAllowance;
+			collider.currentContactNormal = maxContactDir;
+			if (maxPenetration < 0.001f)  //0.001f works
+				maxPenetration = 0;
+			pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, maxPenetration);
+			return;
+		}
+
+		//intersection slightly below AABB. Are we mini-bouncing?
+		vec3 horizontalVelocity = collider.velocity; horizontalVelocity.y = 0;
+		if (collider.velocity.y < 0 && length(horizontalVelocity) > 0.5f) { //really crude test
+			collider.position.y -= (miniBounceAllowance - maxPenetration );
+			pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, 0);
+			collider.currentContactNormal = maxContactDir;
+			return;
+		}
+	}
+
+	//still here? Presumably in mid-air, then.
+	collider.currentContactNormal = vec3(0);
+
+}
+
+void CTerrainPhysObj::collisionCheckOld(CBasePhysObj& collider) {
 
 	std::cerr << "\ncollider pos " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
 	std::cerr << " velocity " << collider.velocity.x << " " << collider.velocity.y << " " << collider.velocity.z;
@@ -44,7 +91,7 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		if (maxPenetration < 0.001f)  //0.001f works
 			maxPenetration = 0;
 		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, maxPenetration - roundingError);
-		collider.lastVelocity = collider.velocity;
+
 		
 		return;
 	}
@@ -78,7 +125,7 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		if (maxPenetration < 0.001f)  //0.001f works
 			maxPenetration = 0;
 		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, maxPenetration - roundingError);
-		collider.lastVelocity = collider.velocity;
+
 		return;
 	}
 

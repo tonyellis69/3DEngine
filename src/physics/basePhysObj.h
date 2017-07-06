@@ -39,8 +39,6 @@ public:
 	bool asleep;
 	glm::vec3 currentContactNormal;
 
-	float oldHeight;
-	glm::vec3 lastVelocity;
 protected:
 	float mass;
 	

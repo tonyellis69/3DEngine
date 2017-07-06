@@ -9,6 +9,7 @@ class CTerrainPhysObj : public CPhysObj {
 public:
 	CTerrainPhysObj() { tmp = false; }
 	void collisionCheck(CBasePhysObj& collider);
+	void collisionCheckOld(CBasePhysObj& collider);
 	void collisionCheckSphere(CBasePhysObj& collider);
 	void collisionCheckLine(CBasePhysObj& collider);
 	void attachModel(CModel* model);

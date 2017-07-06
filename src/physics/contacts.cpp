@@ -45,8 +45,8 @@ void contact::resolveVelocity(float dT) {
 	if (separatingVelocity > 0) {//objects heading apart, collision already resolved
 		//std::cerr << "\n" << id << " now separating";
 		//resolved = true;
-		std::cerr << "\nForcing velocity to 0";
-		collider->velocity.y = 0;
+		//std::cerr << "\nForcing velocity to 0";
+	//	collider->velocity.y = 0;
 		return;
 	}
 
