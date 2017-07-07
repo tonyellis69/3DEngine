@@ -38,6 +38,7 @@ public:
 
 	bool asleep;
 	glm::vec3 currentContactNormal;
+	bool groundContact;
 
 protected:
 	float mass;

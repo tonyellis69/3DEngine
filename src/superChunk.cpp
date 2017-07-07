@@ -43,8 +43,9 @@ void CSuperChunk::setSamplePos(vec3& pos) {
 	skinning*/
 void CSuperChunk::createAllChunks() {
 	//first, rule out this superChunk altogether if possible
-	if (terrain->superChunkIsEmpty(nwSamplePos,LoD))
-		return;
+	//if (terrain->superChunkIsEmpty(nwSamplePos,LoD))
+	//	return;
+	//TO DO: faulty! Needs a look at
 
 	for (int x=0;x<sizeInChunks.x;x++) {
 		for (int y=0;y<sizeInChunks.y;y++) {

@@ -36,7 +36,12 @@ void CPhysObj::applyVelocity() {
 /** Integrate the object's position and velocity, over the given time. */
 void CPhysObj::integrate(float dT) {
 
-//	lastVelocity = velocity;
+	//apply faux friction
+	if (groundContact) {
+		velocity.x *= 0.9f;
+		velocity.z *= 0.9f;
+		std::cerr << "\nreducing horizontal velocity due to ground friction.";
+	}
 
 	//update position from velocity
 	position += velocity * dT;
@@ -49,9 +54,9 @@ void CPhysObj::integrate(float dT) {
 
 	//apply damping
 	velocity *= pow(damping,dT);
-
 	
-
+	
+	
 }
 
 void CPhysObj::repositionModel() {

@@ -101,6 +101,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	float baseLayerSampleSize = layerSize.front() / 1280; // = 1 for small terrains
 	
 	vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
+	nwLayerSamplePos.y += 0.2f;
 
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;
@@ -445,7 +446,7 @@ void CTerrain::update() {
 
 
 	size_t s = toSkin.size();
-	while ((watch::pTimer->milliseconds() - startT) < 75) { //75 brings judder back, eats too many cycles
+	while ((watch::pTimer->milliseconds() - startT) < 30) { //75 brings judder back, eats too many cycles
 						//NB 30 can cause glitches for very fast alternation of north/west scrolling - not real life
 		if (s == 0)
 			break;

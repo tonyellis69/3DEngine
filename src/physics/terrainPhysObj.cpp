@@ -9,8 +9,14 @@ using namespace glm;
 
 /** Check for collisions with this terrain from an AABB collider. */
 void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
-	float restitution = 0.1f; 
+	collider.groundContact = true;
+	std::cerr << "\ncollider pos " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
+	std::cerr << " velocity " << collider.velocity.x << " " << collider.velocity.y << " " << collider.velocity.z;
+
+
+	float restitution = 0.01f; 
 	float miniBounceAllowance = 10;
+	float tunnellingAllowance = 20;// = 20; //may not need this
 	CAABB* aabb = &collider.AABB;
 	aabb->setPos(collider.position);
 	vec3 contactDir, maxContactDir, segBase, segTop;
@@ -19,7 +25,7 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	//for each upright of the AABB, perform one or more intersection tests with the nearest column of chunks
 	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
 		segBase = aabb->corner[cornerNo] + vec3(0, -miniBounceAllowance, 0);
-		segTop = aabb->corner[cornerNo - 4];
+		segTop = aabb->corner[cornerNo - 4] + vec3(0, tunnellingAllowance,0);
 
 		//check against local column of chunks
 		penetration = checkAABBsegment(segBase, segTop, contactDir);
@@ -41,17 +47,20 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 
 		//intersection slightly below AABB. Are we mini-bouncing?
 		vec3 horizontalVelocity = collider.velocity; horizontalVelocity.y = 0;
-		if (collider.velocity.y < 0 && length(horizontalVelocity) > 0.5f) { //really crude test
+		if (collider.velocity.y < 0 && collider.velocity.y > -3.0f && length(horizontalVelocity) > 0.5f) { //really crude test
+			std::cerr << "\nmini-bounce fix activated!";
 			collider.position.y -= (miniBounceAllowance - maxPenetration );
 			pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, 0);
 			collider.currentContactNormal = maxContactDir;
 			return;
 		}
+		
 	}
 
 	//still here? Presumably in mid-air, then.
 	collider.currentContactNormal = vec3(0);
-
+	std::cerr << "\n@@@falling?";
+	collider.groundContact = false;
 }
 
 void CTerrainPhysObj::collisionCheckOld(CBasePhysObj& collider) {
