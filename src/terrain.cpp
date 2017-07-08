@@ -593,7 +593,7 @@ void CTerrain::getChunkTris(Chunk & chunk, TChunkVert * buf) {
 
 /** Return a pointer to a buffer of chunk triangles for the given position, if any. */
 void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) {
-
+	noTris = 0;
 	CSuperChunk* sc = getSC(pos); //TO TO: temp!
 	if (!sc)
 		return;
@@ -604,9 +604,12 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	Chunk* chunk = getChunk(pos);
 	if (!chunk) {
 		std::cerr << " ...none found.";
-		noTris = 0;
+	
 		return;
 	}
+
+	if (chunk->id == 0) //TO DO: shouldn't get chunks like this, but they seem to happen occassionally. Investigate.
+		return;
 
 	
 	std::cerr << " ... chunk " << chunk->scIndex.x << " " << chunk->scIndex.y << " "
