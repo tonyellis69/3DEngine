@@ -578,7 +578,7 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 
 	phongShader->setNormalModelToCameraMatrix(normMatrix);
 
-	model.assignMaterial();
+//	model.assignMaterial();
 	model.drawNew();
 }
 
@@ -1058,6 +1058,11 @@ CCamera * CEngine::getCurrentCamera() {
 
 CBasePhysObj * CEngine::addPhysics(C3dObject * model) {
 	return	physObjManager.addModel(model);
+}
+
+void CEngine::recompileShaders() {
+	for (size_t s = 0; s < shaderList.size(); s++)
+		shaderList[s]->recompile();
 }
 
 

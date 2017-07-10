@@ -159,6 +159,7 @@ public:
 	void setCurrentCamera(CCamera* camera);
 	CCamera* getCurrentCamera();
 	CBasePhysObj* addPhysics(C3dObject* model);
+	void recompileShaders();
 
 	CImageLib ImageLib;
 	CSoundLib SoundLib;

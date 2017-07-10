@@ -127,7 +127,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	//vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
 	vec3 nwLayerSamplePos = vec3(terrainSize / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
 
-	nwLayerSamplePos.y += 0.2f; //gives it nudge up
+	nwLayerSamplePos.y += 0.5f; //gives it nudge up
 
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;

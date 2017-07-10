@@ -22,8 +22,16 @@ public:
 	virtual unsigned int getShaderHandle() { return 0; };
 	virtual CShader* getThisShader() { return 0; };
 	virtual unsigned int getMVPhandle() { return 0; };
+	virtual void recompile() {};
 	TStandardShaderType getType();
 	void setType(TStandardShaderType ident);
+	virtual void getShaderHandles() {};
 
 	TStandardShaderType ident;
+
+	std::string vertFile;
+	std::string geomFile;
+	std::string fragFile;
+
+
 };
