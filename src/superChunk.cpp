@@ -60,7 +60,7 @@ void CSuperChunk::createAllChunks() {
 extern int uniTag = 0;
 /** Return a pointer to a chunk that has been positioned at the given chunk position and initialised for skinning.*/
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition, Tdirection overlap) {
-	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (cubesPerChunkEdge * LoDscale) * terrain->sampleScale;
+	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (chunkSize / terrain->worldUnitsPerSampleUnit);
 	Chunk* newChunk = terrain->getFreeChunk();
 	vec3 layerPos = terrain->layers[layerNo].nwLayerPos;
 	newChunk->terrainPos = layerPos + nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]);
@@ -83,7 +83,8 @@ Chunk* CSuperChunk::createChunk(i32vec3& gridPosition, Tdirection overlap) {
 /** Scroll by one chunk in the given direction. */
 void CSuperChunk::scroll(i32vec3& scrollVec) {
 	//when we scroll, superchunks stay where they are but their sample point changes
-	nwSamplePos += vec3(scrollVec) * (float)cubesPerChunkEdge * LoDscale * terrain->sampleScale;
+	float samplesPerCube = terrain->LoD1cubeSize / terrain->worldUnitsPerSampleUnit;
+	nwSamplePos += vec3(scrollVec) * (float)cubesPerChunkEdge * LoDscale * samplesPerCube;
 	
 	//find which face is being scrolled out, and the opposite 'in' face receiving a new layer of nodes.
 	//NB if scrolling in new terrain from north, dir is -1

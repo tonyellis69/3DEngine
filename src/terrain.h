@@ -49,7 +49,6 @@ public:
 	CTerrain();
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
 	void createLayers2(float terrainSize, float LoD1extent, int steps);
-	void createLayers(int layerSize, int noLayers, int layerThickness);
 	void createAllChunks();
 	void resize3dArray(T3dArray &scArray, glm::i32vec3& size);
 	void createSuperChunks(T3dArray &scArray, std::vector<CSuperChunk*>& container);
@@ -106,7 +105,7 @@ public:
 	glm::vec3 scrollTriggerPoint; ///<Tracks how close terrain is to scrolling in any direction.
 	glm::i32vec3 chunkOriginInt;
 
-	float sampleScale; ///<ratio of sample space to world space, eg, sample space units to metres.
+	//float sampleScale; ///<ratio of sample space to world space, eg, sample space units to metres.
 	
 	float chunkProcessDelay;
 
@@ -118,6 +117,8 @@ public:
 
 	TChunkTriBuf cachedChunkTris[chunkTriCacheSize]; ///<Chunk triangles recently downloaded from graphics memory.
 	int freeChunkTriCache;
+
+	float worldUnitsPerSampleUnit;
 	};
 
 
@@ -143,6 +144,7 @@ public:
 
 	std::vector<CSuperChunk*> faceGroup[6];
 	glm::i32vec3 resetState; ///<Tracks how close layer is to returning to its reset position.
+	float sampleStep;
 };
 
 
