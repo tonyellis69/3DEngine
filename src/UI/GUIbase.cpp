@@ -150,9 +150,7 @@ void CGUIbase::Add(CGUIbase* child) {
 
 /** Recursively update this control's position, dimensions and clipping, and those of its children. */
 void CGUIbase::updateAppearance() {
-	///27/09 changed clipMargin to borderWidth
-	if (parent->borderWidth > 0 )
-		int x = 5;
+
 	needsUpdate = false;
 	//1. Recalculate x,y,w,h if necessary due to justification or spanning
 	if (anchorRight != NONE)

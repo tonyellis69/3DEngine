@@ -346,12 +346,11 @@ void CSuperChunk::skinChunk(Chunk * chunk) {
 
 
 void CSuperChunk::removeAllChunks() {
-	for (int c = 0; c < chunkList.size(); c++) {
-		int id = chunkList[c]->id;
-		if (id)
-			terrain->multiBuf.deleteBlock(id);
+	int noChunks = chunkList.size();
+	for (int c = 0; c < noChunks; c++) {
+		terrain->freeChunk(*chunkList[c]);
 	}
-	
+	chunkList.clear();
 }
 
 void CSuperChunk::raiseOverlapCount(int chunks, Tdirection faceDir) {

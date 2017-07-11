@@ -581,7 +581,17 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	freeChunkTriCache++;
 	if (freeChunkTriCache >= chunkTriCacheSize)
 		freeChunkTriCache = 0;
+}
 
+
+/** Remove all current terrain and free up the memory. */
+void CTerrain::clear() {
+	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
+		for (size_t scNo = 0; scNo < layers[layerNo].superChunks.size(); scNo++) {
+			CSuperChunk* sc = layers[layerNo].superChunks[scNo];
+			sc->removeAllChunks();
+		}
+	}	
 }
 
 CTerrain::~CTerrain() {
