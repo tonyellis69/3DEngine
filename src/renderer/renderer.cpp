@@ -443,6 +443,7 @@ void CRenderer::setShader(int program) {
 
 void CRenderer::setShader(CShader * shader) {
 	glUseProgram(shader->getShaderHandle());
+	int x = glGetError();
 }
 
 void CRenderer::drawModel(CRenderModel& model) {
@@ -767,5 +768,13 @@ void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 }
 
 
+void CRenderer::drawBuf(CBuf& buf, const unsigned int& drawMode) {
+	glBindVertexArray(buf.hVAO);
+	if (buf.hIndex == 0)
+		glDrawArrays(GL_TRIANGLES, 0, buf.noVerts);
+	else
+		glDrawElements(GL_TRIANGLES, buf.noIndices, GL_UNSIGNED_SHORT,0);
 
+	glBindVertexArray(0);
+}
 

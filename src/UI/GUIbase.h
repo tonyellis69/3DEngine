@@ -3,6 +3,7 @@
 #include <vector>
 #include "..\Delegate.h"
 
+//#include "GUIbetterBase.h"
 
 #include <iostream> //for cerr
 
@@ -69,7 +70,7 @@ class CGUIbase;
 //TO DO: remove test
 extern DelegateP<void,int> setFont; 
 
-
+class CGUIbetterBase;
 /** Contains member function pointers to the various drawing function the GUI needs. It is the user's responsibility
 	to create an instance of this, initialise it and pass it to GUIroot. */
 class CDrawFuncs {
@@ -93,12 +94,16 @@ public:
 	DelegatePPP<void, UIcolour, UIcolour, bool> setDrawColoursConditional;
 	DelegatePPPP<void,int,int,int,int> drawDottedRect;
 	DelegatePP<void,float,float> setScale;
+
+	virtual void registerControl(CGUIbetterBase& control) {};
+	virtual void drawCtrlRect(CGUIbetterBase& control) {};
 };
 
 
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
-		dlgCtrl};
+		dlgCtrl,
+			uiImage};
 
 
 

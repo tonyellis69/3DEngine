@@ -254,6 +254,18 @@
     <ClCompile Include="..\src\playerObj.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUIbetterBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\renderDrawFuncs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIimage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\uiRectShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -521,6 +533,18 @@
       <Filter>physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\playerObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIbetterBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\renderDrawFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIimage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\uiRectShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

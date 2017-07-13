@@ -23,6 +23,7 @@
 #include "physics\physObjManager.h"
 #include "physics\terrainPhysObj.h"
 
+#include "UI\uiRectShader.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -226,6 +227,8 @@ public:
 	CWireShader* wireShader;
 	CBillboardShader* billboardShader;
 	CWireBoxShader* wireBoxShader;
+
+	CGUIrectShader* uiRectShader;
 
 	CPhysObjManager physObjManager;
 

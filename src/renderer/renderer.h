@@ -23,6 +23,9 @@
 
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
+enum  TUidrawMode { uiDrawPoints, uiDrawLines, uiDrawTris };
+
+
 
 extern int totalbufsize;
 extern int totalchunks;
@@ -90,6 +93,7 @@ public:
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
+	void drawBuf(CBuf& buf, const unsigned int& drawMode);
 
 
 	int Width; ///<Width of the view

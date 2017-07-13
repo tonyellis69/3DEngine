@@ -34,7 +34,7 @@ CBaseApp::CBaseApp(void)  {
 
 	UIeng.pEngine = &Engine;
 	
-	RegisterUIfunctors();
+	
 
 	Time = LastTime = 0;
 	mouseX = mouseY = 0;
@@ -44,6 +44,8 @@ CBaseApp::CBaseApp(void)  {
 	
 	//Set up engine for rendering
 	Engine.init(Window.hWnd);
+
+	RegisterUIfunctors();
 	
 	quitOnEsc = true;
 }
@@ -102,12 +104,14 @@ void CBaseApp::SetWindow(const std::string& Title) {
 void CBaseApp::sizeViewToWindow() {
 	int w,h; Window.getDrawingArea(w,h);
 	onWinResize(w,h);
+	
 }
 
 /** Handler for when our window is rezized. */
 void CBaseApp::onWinResize( int w, int h) {
 	viewWidth = w; viewHeight = h;
 	Engine.resizeView(0,0,w,h); //We need to change shape of view.
+	drawFuncs->setScreenSize(w, h);
 	GUIroot.SetPos(0,0,w,h); //Resize the base UI control so it's always the size of the view.
 	onResize(w,h); //Call the user's resize handler, in case they want to do something;
 }
@@ -187,7 +191,7 @@ void CBaseApp::AppTasks() {
 	Engine.physObjManager.update(float(dT * 10.0f));
 
 
-	Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed
+	//Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed
 
 	Engine.drawModels();
 	
@@ -197,7 +201,7 @@ void CBaseApp::AppTasks() {
 
 	
 
-	Engine.removeUserScale();
+	//Engine.removeUserScale();
 
 	updateWatches();
 	DrawUI(); 
@@ -232,7 +236,13 @@ void CBaseApp::DrawUI() {
 
 /** Assign engine functions to the UI so it can draw itself, etc. */
 void CBaseApp::RegisterUIfunctors() {	
-	drawFuncs = new CDrawFuncs;
+	//drawFuncs = new CDrawFuncs;
+	//TO DO: rename this when it's been updated
+	drawFuncs = new CRenderDrawFuncs();
+	drawFuncs->setRenderer(&Engine.Renderer);
+	drawFuncs->loadShaders();
+
+
 	drawFuncs->setFont.Set(&UIeng,&CGUIengine::setFont);
 	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
 	drawFuncs->getTextWidth.Set(&UIeng, &CGUIengine::getTextWidth);

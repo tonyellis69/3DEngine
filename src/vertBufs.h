@@ -56,6 +56,12 @@ public:
 	T3Dvert a,b,c;
 };
 
+struct T2DcolVert {
+public:
+	glm::vec2 v; ///<Actual vertex
+	glm::vec4 colour;
+};
+
 
 void drawBLQuad( T2DVertTri* buf, float x, float y,int w,int h);
 void colourBLQuad(TColTri* buf, rgba colour);

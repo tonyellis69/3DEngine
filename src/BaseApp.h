@@ -18,6 +18,7 @@
 #include "Reader.h"
 #include "UIengine.h"
 
+#include "UI\renderDrawFuncs.h"
 
 
 #include <iostream> //for cerr
@@ -71,7 +72,9 @@ public:
 
 	FILE* ErrStream;	///<Filestream error messages are written to.
 
-	CDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
+	//CDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
+	CRenderDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
+
 
 	TSpecificFunctor<CBaseApp> KeyDownFunc;
 	TSpecificFunctor<CBaseApp> KeyUpFunc;

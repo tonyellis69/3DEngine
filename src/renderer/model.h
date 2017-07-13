@@ -7,7 +7,7 @@
 #include "multiBuf.h"
 #include "material.h"
 
-enum  TdrawMode { drawPoints, drawLines, drawTris};
+enum  TdrawMode { drawPoints, drawLines, drawTris };
 
 //class CMaterial;
 
