@@ -23,7 +23,7 @@
 
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
-enum  TUidrawMode { uiDrawPoints, uiDrawLines, uiDrawTris };
+enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, uiDrawTriStrip=5, uiDrawQuads=7};
 
 
 

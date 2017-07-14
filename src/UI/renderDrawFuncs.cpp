@@ -18,50 +18,65 @@ void CRenderDrawFuncs::loadShaders() {
 	uiRectShader->getShaderHandles();
 	uiRectShader->setType(uiRect);
 	shaderList.push_back(uiRectShader);
+
+	uiTexShader = new CGUItexShader();
+	uiTexShader->pRenderer = pRenderer;
+	uiTexShader->create(pRenderer->dataPath + "uiTexture");
+	uiTexShader->getShaderHandles();
+	uiTexShader->setType(uiTex);
+	shaderList.push_back(uiTexShader);
+
 }
 
 
 
 /** Register this control with the uiEngine, storing its details for drawing. */
 void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
-	CBuf newBuf;
-	quadBufs[control.uniqueID] = newBuf;
+	CBuf rectBuf, borderBuf;
+	quadBufs[control.uniqueID].rect = rectBuf;
 	//A B
 	//C D
-	vBuf::T3Dvert corners[4];
-	corners[0].v = vec3(control.drawBox.pos,0); //A
-	corners[1].v = vec3(control.drawBox.pos + i32vec2(control.drawBox.size.x, 0),0); //B
-	corners[2].v = vec3(control.drawBox.pos + i32vec2(0, control.drawBox.size.y),0); //C
-	corners[3].v = vec3(control.drawBox.pos + control.drawBox.size,0); //D
+	vBuf::T2DtexVert corners[4];
+	corners[0].v = vec2(control.drawBox.pos); //A
+	corners[1].v = vec2(control.drawBox.pos + i32vec2(control.drawBox.size.x, 0)); //B
+	corners[2].v = vec2(control.drawBox.pos + i32vec2(0, control.drawBox.size.y)); //C
+	corners[3].v = vec2(control.drawBox.pos + control.drawBox.size); //D
+	corners[0].tex = vec2(0);
+	corners[1].tex = vec2(1,0);
+	corners[2].tex = vec2(0,1);
+	corners[3].tex = vec2(1,1);
 
+	unsigned short index[4] = { 2,3,0,1 };
+	quadBufs[control.uniqueID].rect.storeVertexes(corners, sizeof(corners), 4);
+	quadBufs[control.uniqueID].rect.storeIndex(index, sizeof(index), 4);
+	quadBufs[control.uniqueID].rect.storeLayout(2, 2, 0, 0);
 
-	corners[0].colour = (vec4&)control.backColour1;
-	corners[1].colour = (vec4&)control.backColour1;
-	corners[2].colour = (vec4&)control.backColour2;
-	corners[3].colour = (vec4&)control.backColour2;
-
-
-	unsigned short index[6] = { 0,2,3,0,3,1 };
-
-	quadBufs[control.uniqueID].storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].storeIndex(index, sizeof(index), 6);
-	quadBufs[control.uniqueID].storeLayout(3, 4, 3, 0);
-
+	unsigned short index2[4] = { 1,0,2,3 };
+	quadBufs[control.uniqueID].border.storeVertexes(corners, sizeof(corners), 4);
+	quadBufs[control.uniqueID].border.storeIndex(index2, sizeof(index2), 4);
+	quadBufs[control.uniqueID].border.storeLayout(2, 2,0, 0);
 }
 
 /** Draw the drawBox of this control. */
 void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
-	//find buffer
-	CBuf* buf = &quadBufs[control.uniqueID];
-	
-	//set up the shader
+	CBuf* buf = &quadBufs[control.uniqueID].rect;
 	pRenderer->setShader(uiRectShader);
-
-	uiRectShader->setMVP(orthoView);
-
-	//draw our rectangle
-	pRenderer->drawBuf(*buf, drawTris);
+	uiRectShader->setColour1((vec4&)control.backColour1);
+	uiRectShader->setColour2((vec4&)control.backColour2);
+	uiRectShader->setOrtho(orthoView);
+	pRenderer->drawBuf(*buf, uiDrawTriStrip);
 	pRenderer->setShader(0);
+}
+
+void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
+	CBuf* buf = &quadBufs[control.uniqueID].border;
+	pRenderer->setShader(uiRectShader);
+	uiRectShader->setColour1((vec4&)control.borderColour);
+	uiRectShader->setColour2((vec4&)control.borderColour);
+	uiRectShader->setOrtho(orthoView);
+	pRenderer->drawBuf(*buf, uiDrawLineLoop);
+	pRenderer->setShader(0);
+
 }
 
 void CRenderDrawFuncs::setScreenSize(int width, int height) {
@@ -71,6 +86,10 @@ void CRenderDrawFuncs::setScreenSize(int width, int height) {
 	orthoView = flip * glm::ortho<float>(0, width, 0, height) ;
 
 	screenWidth = width; screenHeight = height;
+}
+
+unsigned int CRenderDrawFuncs::getTextureHandle(std::string & textureName) {
+	return pRenderer->textureManager.getTexture(textureName);
 }
 
 CRenderDrawFuncs::~CRenderDrawFuncs() {

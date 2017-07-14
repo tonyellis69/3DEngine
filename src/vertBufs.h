@@ -56,10 +56,17 @@ public:
 	T3Dvert a,b,c;
 };
 
-struct T2DcolVert {
+struct T2DcolTexVert {
 public:
 	glm::vec2 v; ///<Actual vertex
 	glm::vec4 colour;
+	glm::vec2 tex;
+};
+
+struct T2DtexVert {
+public:
+	glm::vec2 v; ///<Actual vertex
+	glm::vec2 tex;
 };
 
 

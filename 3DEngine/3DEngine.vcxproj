@@ -164,6 +164,7 @@
     <ClCompile Include="..\src\UI\GUItextbox.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\UI\uiRectShader.cpp" />
+    <ClCompile Include="..\src\UI\uiTexShader.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
     <ClCompile Include="..\Src\Window.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="..\src\UI\GUItextbox.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\UI\uiRectShader.h" />
+    <ClInclude Include="..\src\UI\uiTexShader.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
     <ClInclude Include="..\Src\Window.h" />

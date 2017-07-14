@@ -7,15 +7,17 @@
 
 
 /** A wrapper for the standard phong shader. */
-class CGUIrectShader : public CRenderShader {
+class CGUItexShader : public CRenderShader {
 public:
-	CGUIrectShader() {};
+	CGUItexShader() {};
 	void getShaderHandles();
 	void setOrtho(glm::mat4 matrix);
-	void setColour1(glm::vec4& colour);
-	void setColour2(glm::vec4& colour);
+	void setTextureUnit(unsigned int texUnit);
+	void setTiling(glm::vec2& tile);
+	void setOffset(glm::vec2& offset);
 
 	GLuint hOrtho; ///<Handle to  orthographic view matrix
-	GLuint hColour1;
-	GLuint hColour2;
+	GLuint hTextureUnit; ///<
+	GLuint hTile;
+	GLuint hOffset;
 };

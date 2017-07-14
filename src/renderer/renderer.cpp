@@ -771,9 +771,9 @@ void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 void CRenderer::drawBuf(CBuf& buf, const unsigned int& drawMode) {
 	glBindVertexArray(buf.hVAO);
 	if (buf.hIndex == 0)
-		glDrawArrays(GL_TRIANGLES, 0, buf.noVerts);
+		glDrawArrays(drawMode, 0, buf.noVerts);
 	else
-		glDrawElements(GL_TRIANGLES, buf.noIndices, GL_UNSIGNED_SHORT,0);
+		glDrawElements(drawMode, buf.noIndices, GL_UNSIGNED_SHORT,0);
 
 	glBindVertexArray(0);
 }

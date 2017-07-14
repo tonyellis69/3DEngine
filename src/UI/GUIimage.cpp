@@ -8,19 +8,22 @@ CGUIimage::CGUIimage(int x, int y, int w, int h) {
 
 	type = uiImage;
 
+	textureHandle = NULL; 
+
 	pDrawFuncs->registerControl(*this);
 }
 
 void CGUIimage::DrawSelf() {
-
-	//just a boring rectangle to draw.
-	pDrawFuncs->setDrawColours(backColour1, backColour2);
-//	pDrawFuncs->drawRect(screenPos, width, height);
+	pDrawFuncs->drawCtrlRect(*this);
 	if (drawBorder) {
-		pDrawFuncs->setDrawColours(borderColour, borderColour);
-		pDrawFuncs->drawBorder(screenPos.x, screenPos.y, width, height);
+		pDrawFuncs->drawCtrlBorder(*this);
 	}
 
-	pDrawFuncs->drawCtrlRect(*this);
+	
 
+}
+
+/** Get the texture handle for this texture. */
+void CGUIimage::setTexture(std::string & textureName) {
+	textureHandle = pDrawFuncs->getTextureHandle(textureName);
 }

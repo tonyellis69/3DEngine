@@ -97,6 +97,8 @@ public:
 
 	virtual void registerControl(CGUIbetterBase& control) {};
 	virtual void drawCtrlRect(CGUIbetterBase& control) {};
+	virtual void drawCtrlBorder(CGUIbetterBase& control) {};
+	virtual unsigned int getTextureHandle(std::string & textureName) { return 0; };
 };
 
 

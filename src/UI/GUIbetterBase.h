@@ -20,9 +20,8 @@ public:
 	guiRect drawBox; ///<Defines the dimensions of the control.
 	guiRect clipBox; ///<Defines the drawable area of this control for child controls.
 
-
-protected:
 	UIcolour borderColour; ///<Colour for the border of this control.
+protected:
 	bool drawBorder; ///<true if we draw this control's border.
 
 	
