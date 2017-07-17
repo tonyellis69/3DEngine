@@ -88,8 +88,24 @@ void CRenderDrawFuncs::setScreenSize(int width, int height) {
 	screenWidth = width; screenHeight = height;
 }
 
-unsigned int CRenderDrawFuncs::getTextureHandle(std::string & textureName) {
+unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName) {
 	return pRenderer->textureManager.getTexture(textureName);
+}
+
+void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {
+	CBuf* buf = &quadBufs[control.uniqueID].rect;
+	//set shader
+	pRenderer->setShader(uiTexShader);
+	//pass the texture
+	CRenderTexture* rendTex = (CRenderTexture*)&texture;
+	pRenderer->attachTexture(0, rendTex->handle);
+
+	uiTexShader->setTextureUnit(0);
+	uiTexShader->setTiling(vec2(1,1));
+	uiTexShader->setOffset(vec2(0));
+	uiTexShader->setOrtho(orthoView);
+	pRenderer->drawBuf(*buf, uiDrawTriStrip);
+
 }
 
 CRenderDrawFuncs::~CRenderDrawFuncs() {

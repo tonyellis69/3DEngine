@@ -47,3 +47,20 @@ CBaseTexture* CTextureManagerOGL::createTextureObject() {
 	internalID++;
 	return newTexture;
 }
+
+/** Create an empty OGL texure of the given size - useful for rendering to texture. */
+CBaseTexture * CTextureManagerOGL::createEmptyTexture(int width, int height) {
+	CRenderTexture* newTexture = new CRenderTexture();
+	glGenTextures(1, &newTexture->handle);
+	glBindTexture(GL_TEXTURE_2D, newTexture->handle);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	string ident = "tex"; ident += std::to_string(internalID);
+	newTexture->channels = 4; //lazily assume rgba
+	newTexture->width = width;
+	newTexture->height = height;
+	addTexture(newTexture, ident);
+	internalID++;
+	return newTexture;
+}

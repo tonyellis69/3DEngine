@@ -21,6 +21,7 @@ public:
 	guiRect clipBox; ///<Defines the drawable area of this control for child controls.
 
 	UIcolour borderColour; ///<Colour for the border of this control.
+
 protected:
 	bool drawBorder; ///<true if we draw this control's border.
 

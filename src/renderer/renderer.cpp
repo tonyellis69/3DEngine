@@ -181,7 +181,8 @@ void CRenderer::init() {
 
 	glPrimitiveRestartIndex(65535);
 
-
+	createScreenQuad();
+	createFrameBuffer();
 }
 
 
@@ -488,6 +489,47 @@ void CRenderer::initRenderToTextureBufs() {
 	glDisableVertexAttribArray(0);	//do this for legacy compatibility
 }
 
+/** Create an internal frameBuffer so  we can render to a texture when needed. */
+void CRenderer::createFrameBuffer() {
+	glGenFramebuffers(1, &hFrameBuffer);
+}
+
+/** Create a reusable quad in NDC coordinated for when we want to render to the entire screen, */
+void CRenderer::createScreenQuad() {
+
+	//vBuf::T2DtexVert vert[4];
+	glm::vec2 vert[4];
+	vert[0] = glm::vec2(-1, 1);
+	vert[1] = glm::vec2(1, 1);
+	vert[2] = glm::vec2(-1, -1);
+	vert[3] = glm::vec2(1, -1);
+
+	unsigned short index[4] = { 2,3,0,1 };
+
+	screenQuad.storeVertexes(vert, sizeof(vert), 4);
+	screenQuad.storeIndex(index, sizeof(index), 4);
+	screenQuad.storeLayout(2, 0, 0, 0);
+}
+
+/** Draw to the given texture using the current shader. */
+void CRenderer::renderToTexture(CBaseTexture& texture) {
+	CRenderTexture* glTex = (CRenderTexture*) &texture;
+	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glTex->handle, 0);
+	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, DrawBuffers);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		cerr << "\nError creating framebuffer.";
+		return;
+	}
+	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
+	drawBuf(screenQuad, uiDrawTriStrip);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, Width, Height);
+	//glEnable(GL_RASTERIZER_DISCARD);
+}
 
 /** Do the necessary preparation for a 3D render to texture.*/
 void CRenderer::initRenderToTexture(int w, int h, renderTextureFormat texType) {
@@ -614,20 +656,7 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedba
 	totalbufsize += outSize;
 	totalchunks++;
 
-	/* //degenerate triangle check
-	glBindBuffer(GL_ARRAY_BUFFER, tempFeedbackBuf.getBufHandle());
-	vBuf::T3DnormVert* tmpPtr; int degen = 0;
-	tmpPtr = (vBuf::T3DnormVert*)  glMapBufferRange(GL_ARRAY_BUFFER, 0, outSize, GL_MAP_READ_BIT);
-	for (int v = 0; v < primitives * 3; v += 3) {
-		glm::bvec3 test = glm::equal(tmpPtr[v].v, tmpPtr[v + 1].v);
-		if (test.x && test.y && test.z) {
-			cerr << "\ndegenerate tri";
-			degen++;
-		}
-	}
-	cerr << "\ntotal degenerates " << degen;
-	glUnmapBuffer(GL_ARRAY_BUFFER);
-	*/
+	
 
 	//verts are in our temporary feedback buffer. Now we want to copy them to the user-supplied buffer, which may or may not be a multibuffer
 	//if it is a multibuffer, we want to say "here's this block of verts, find a space for it." So, some kind of copyBuffer method.
@@ -738,28 +767,17 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 
 void CRenderer::setDepthTest(bool on) {
 	
-	
 	if (on) {
-	//	glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
-	//	glDepthFunc(GL_LEQUAL);
-	//glClear(GL_DEPTH_BUFFER_BIT);
-
+		glEnable(GL_DEPTH_TEST);
 	}
 	else {
-//glClear(GL_DEPTH_BUFFER_BIT);
-	//glDepthMask(GL_FALSE) ;
 		glDisable(GL_DEPTH_TEST);
-	//	glClear(GL_DEPTH_BUFFER_BIT);
-		//glDepthFunc(GL_NEVER);
 	}
 }
 
 void CRenderer::createTextureFromImageFile(std::string filename) {
 	int width, height, channels;
 	unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO); //load it to get the width, height, etc
-
-
 }
 
 void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {

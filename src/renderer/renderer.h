@@ -78,6 +78,9 @@ public:
 	void setShader(CShader* shader);
 	void drawModel(CRenderModel& model);
 	void initRenderToTextureBufs();
+	void createFrameBuffer();
+	void createScreenQuad();
+	void renderToTexture(CBaseTexture & texture);
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
@@ -111,6 +114,9 @@ public:
 	CCamera* currentCamera;
 
 	std::string dataPath;
+
+	CBuf screenQuad; ///<A re-usable quad for rendering to the entire screen.
+	GLuint hFrameBuffer; ///<Handle for our internally used framebuffer.
 private:
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 

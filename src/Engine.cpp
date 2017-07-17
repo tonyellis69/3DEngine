@@ -938,7 +938,7 @@ CSkyDome * CEngine::createSkyDome() {
 
 	//create sun billboard
 	skyDome->sunBoard = createBillboard(glm::vec3(0, 400, -400), glm::vec2(50, 50));
-	skyDome->sunMat = createMaterial(dataPath + "sun.png");
+	skyDome->sunMat = createMaterial(dataPath + "sun2.png");
 	skyDome->sunMat->setShader(billboardShader);
 	skyDome->sunBoard->setMaterial(*skyDome->sunMat);
 	return skyDome;

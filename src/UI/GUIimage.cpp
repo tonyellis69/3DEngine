@@ -8,13 +8,16 @@ CGUIimage::CGUIimage(int x, int y, int w, int h) {
 
 	type = uiImage;
 
-	textureHandle = NULL; 
+	texture = NULL;
 
 	pDrawFuncs->registerControl(*this);
 }
 
 void CGUIimage::DrawSelf() {
-	pDrawFuncs->drawCtrlRect(*this);
+	if (texture) { //let's draw a texture!
+		pDrawFuncs->drawTexture(*this,*texture);
+	} else
+		pDrawFuncs->drawCtrlRect(*this);
 	if (drawBorder) {
 		pDrawFuncs->drawCtrlBorder(*this);
 	}
@@ -23,7 +26,7 @@ void CGUIimage::DrawSelf() {
 
 }
 
-/** Get the texture handle for this texture. */
-void CGUIimage::setTexture(std::string & textureName) {
-	textureHandle = pDrawFuncs->getTextureHandle(textureName);
+/** Set the texture we're using as a source for this image. */
+void CGUIimage::setTexture(CBaseTexture& imageTexture) {
+	texture = &imageTexture;
 }

@@ -34,6 +34,7 @@ public:
 	GLuint getTexture(std::string filename);
 	void addTexture(CRenderTexture* texture, std::string filename);
 	CBaseTexture* createTextureObject();
+	CBaseTexture* createEmptyTexture(int width, int height);
 
 	std::map<std::string, CRenderTexture*> textureStrings;
 	std::vector< CRenderTexture*> textures;

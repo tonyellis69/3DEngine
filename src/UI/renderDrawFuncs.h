@@ -27,7 +27,8 @@ public:
 	void drawCtrlRect(CGUIbetterBase& control);
 	void drawCtrlBorder(CGUIbetterBase& control);
 	void setScreenSize(int width, int height);
-	unsigned int getTextureHandle(std::string& textureName);
+	unsigned int getTextureHandle(const std::string& textureName);
+	void drawTexture(CGUIbetterBase & control, CBaseTexture& texture);
 
 private:
 	CRenderer* pRenderer;

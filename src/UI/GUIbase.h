@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "..\Delegate.h"
+#include "..\renderer\texManager.h"
 
 //#include "GUIbetterBase.h"
 
@@ -98,7 +99,8 @@ public:
 	virtual void registerControl(CGUIbetterBase& control) {};
 	virtual void drawCtrlRect(CGUIbetterBase& control) {};
 	virtual void drawCtrlBorder(CGUIbetterBase& control) {};
-	virtual unsigned int getTextureHandle(std::string & textureName) { return 0; };
+	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
+	virtual void drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {};
 };
 
 

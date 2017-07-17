@@ -127,6 +127,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	//vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
 	vec3 nwLayerSamplePos = vec3(terrainSize / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
 
+
 	nwLayerSamplePos.y += 0.5f; //gives it nudge up
 
 	float gapBetweenLayers = 0;
@@ -143,7 +144,8 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layers[layerNo].cubeSize = LoD1cubeSize * LoDscale;;
 		layers[layerNo].LoD = currentLoD;
 		layers[layerNo].scSize = LoD1SCsize * LoDscale;
-		layers[layerNo].sampleStep = layers[layerNo].scSize / worldUnitsPerSampleUnit;
+		layers[layerNo].SCsampleStep = layers[layerNo].scSize / worldUnitsPerSampleUnit;
+		layers[layerNo].chunkSampleStep = (layers[layerNo].cubeSize * cubesPerChunkEdge) / worldUnitsPerSampleUnit;
 
 		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
 		SCsBetweenLayers = (int)gapBetweenLayers / prevSCsize;
@@ -151,7 +153,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		
 	//	nwLayerSamplePos += vec3(SCsBetweenLayers * cubesPerChunkEdge * prevLoDscale * chunksPerSChunkEdge * sampleScale);
 		nwLayerSamplePos += samplesPerPrevSC * (float)SCsBetweenLayers;
-
+		layers[layerNo].nwSampleCorner = nwLayerSamplePos;
 
 		createSuperChunks(*outerArray, layers[layerNo].superChunks);
 		initSuperChunks(*outerArray, layerNo, nwLayerSamplePos, i32vec3(chunksPerSChunkEdge));
@@ -238,7 +240,7 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				sChunk->setSizes(_sizeInChunks,cubesPerChunkEdge,layers[layerNo].cubeSize);		
 				sChunk->LoD = layers[layerNo].LoD;
 				sChunk->LoDscale = LoDscale;
-				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layers[layerNo].sampleStep));
+				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layers[layerNo].SCsampleStep));
 				sChunk->tmpIndex = i32vec3(x,y,z);
 				if (x == 3 && y == 1 && z == 0 && layerNo == 1)
 					dbgSC = sChunk;
@@ -656,7 +658,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	int scrollAxis = getAxis(scrollVec);
 
 	float LoDscale = (float) (1 << (LoD-1));
-	vec3 sampleStep = vec3(scrollVec ) * LoD1chunkSize * LoDscale;
+	vec3 scrollStep = vec3(scrollVec ) * LoD1chunkSize * LoDscale;
 	for (size_t s=0;s<superChunks.size();s++) { 
 		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
@@ -666,7 +668,8 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	}
 
 	//we're going to scroll this layer, so return it to its initial position first.
-	nwLayerPos += sampleStep; 
+	nwLayerPos += scrollStep;
+	nwSampleCorner += vec3(-scrollVec) * chunkSampleStep;
 	for (size_t s=0;s<superChunks.size();s++) {
 		superChunks[s]->scroll(scrollVec);
 	}
