@@ -62,7 +62,7 @@ public:
 	void prepareToFree(Chunk* chunk);
 	void update();
 	void advance(Tdirection direction);
-	bool superChunkIsEmpty(glm::vec3& samplePos, int LoD);
+	bool superChunkIsEmpty(CSuperChunk& SC);
 	bool chunkExists(glm::vec3& samplePos,int LoD);
 	void createChunkMesh(Chunk& chunk);
 	void freeChunkModel(CModel* chunk);
@@ -79,7 +79,7 @@ public:
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
 
-	DelegatePP<bool,glm::vec3&,int> EXTsuperChunkIsEmpty;
+	DelegateP<bool, CSuperChunk&> EXTsuperChunkIsEmpty;
 	DelegatePP<bool,glm::vec3&, int> EXTchunkExists;
 	DelegateP<void,CModel*> EXTfreeChunkModel;
 	DelegateP<void,Chunk&> EXTcreateChunkMesh;

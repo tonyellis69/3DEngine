@@ -55,6 +55,13 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	float layerGrowth = 2.0f; //4.0f
 	int currentStep = 0;
 
+	//make sure we have an even number of SCs along the edge:
+	while ( (superChunksPerLayerEdge[0] % 2 != 0) || (superChunksPerLayerEdge[0]/ 2) % 2 != 0) {
+		superChunksPerLayerEdge[0] += 1;
+		layerSize[0] = superChunksPerLayerEdge[0] * LoD1SCsize;
+		layerExtent = layerSize[0] / 2;
+	}
+
 	//Expanding, see how many more layers we can fit into the remaining terain space
 	while (layerSize.front() < terrainSize ) {
 		LoDscale *= 2; //halve the level of detail by doubling the size of the building blocks
@@ -93,6 +100,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 
 	layers.resize(noLayers);
 	CTerrainLayer::LoD1chunkSize = LoD1cubeSize * cubesPerChunkEdge;
+	worldSize = vec3(layerSize.front());
 
 	int currentLoD = noLayers;
 
@@ -122,13 +130,14 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 
 
 	worldUnitsPerSampleUnit = 2560; //assuming a 5120m terrain volume. Adjust if it ends up bigger
+	//worldUnitsPerSampleUnit = layerSize[0] / 2;
 
 	//find nw lower samplepos
 	//vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
 	vec3 nwLayerSamplePos = vec3(terrainSize / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
+	nwLayerSamplePos = vec3(layerSize.front() / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
 
-
-	nwLayerSamplePos.y += 0.5f; //gives it nudge up
+	nwLayerSamplePos.y += 0.6f; //gives it nudge up
 
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;
@@ -241,6 +250,7 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				sChunk->LoD = layers[layerNo].LoD;
 				sChunk->LoDscale = LoDscale;
 				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layers[layerNo].SCsampleStep));
+				sChunk->sampleStep = layers[layerNo].SCsampleStep;
 				sChunk->tmpIndex = i32vec3(x,y,z);
 				if (x == 3 && y == 1 && z == 0 && layerNo == 1)
 					dbgSC = sChunk;
@@ -443,8 +453,8 @@ void CTerrain::advance(Tdirection dir) {
 
 
 /** Call an external function that returns true if the isosurface doesn't intersect the given superChunk position.*/
-bool CTerrain::superChunkIsEmpty(vec3& samplePos, int LoD) {
-	return EXTsuperChunkIsEmpty(samplePos, LoD);
+bool CTerrain::superChunkIsEmpty(CSuperChunk& SC) {
+	return EXTsuperChunkIsEmpty(SC);
 }
 
 

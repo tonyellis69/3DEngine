@@ -93,6 +93,9 @@ public:
 
 	int layerNo;
 
+	float sampleStep;
+	bool tmp;
+
 private:
 	glm::i32vec3 faceWalkPos, faceWalkStart, faceWalkEnd;
 	Tdirection faceWalkDir;

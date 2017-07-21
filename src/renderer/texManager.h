@@ -4,10 +4,11 @@
 #include <map>
 
 #include "glew.h"
-
+#include "glm\glm.hpp"
 
 class CBaseTexture {
 public:
+	virtual glm::uvec4 getPixel(int x, int y) { return glm::uvec4(0); };
 	int width;
 	int height;
 
@@ -18,6 +19,8 @@ public:
 class CRenderTexture : public CBaseTexture {
 public:
 	CRenderTexture() {};
+	glm::uvec4 getPixel(int x, int y);
+
 	unsigned int handle;
 };
 

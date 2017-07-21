@@ -64,3 +64,21 @@ CBaseTexture * CTextureManagerOGL::createEmptyTexture(int width, int height) {
 	internalID++;
 	return newTexture;
 }
+
+glm::uvec4  CRenderTexture::getPixel(int x, int y) {
+	unsigned char data[4];
+	GLuint hTempFrameBuffer;
+	glGenFramebuffers(1, &hTempFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, hTempFrameBuffer);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, handle, 0);
+	glReadPixels(x, y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (void*)data);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	glm::uvec4 returnData;
+	returnData[0] = data[0];
+	returnData[1] = data[1];
+	returnData[2] = data[2];
+	returnData[3] = data[3];
+
+	return returnData;
+}

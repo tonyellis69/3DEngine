@@ -16,7 +16,7 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 
 	float restitution = 0.01f; 
 	float miniBounceAllowance = 10;
-	float tunnellingAllowance = 20;// = 20; //may not need this
+	float tunnellingAllowance = 12;// 12 was 20, this led to errors with a MC cube size of 1.
 	CAABB* aabb = &collider.AABB;
 	aabb->setPos(collider.position);
 	vec3 contactDir, maxContactDir, segBase, segTop;

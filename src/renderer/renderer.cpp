@@ -528,7 +528,7 @@ void CRenderer::renderToTexture(CBaseTexture& texture) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, Width, Height);
-	//glEnable(GL_RASTERIZER_DISCARD);
+	
 }
 
 /** Do the necessary preparation for a 3D render to texture.*/

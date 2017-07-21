@@ -16,6 +16,7 @@ CSuperChunk::CSuperChunk()  {
 	LoD = 0;
 	overlapCount = 0;
 	chunksToSkin = 0;
+	tmp = false;
 }
 
 /** Set the dimensions and building block sizes of this superChunk. */
@@ -43,10 +44,9 @@ void CSuperChunk::setSamplePos(vec3& pos) {
 	skinning*/
 void CSuperChunk::createAllChunks() {
 	//first, rule out this superChunk altogether if possible
-	//if (terrain->superChunkIsEmpty(nwSamplePos,LoD))
-	//	return;
-	//TO DO: faulty! Needs a look at
-
+	if (terrain->superChunkIsEmpty(*this))
+		return;
+	
 	for (int x=0;x<sizeInChunks.x;x++) {
 		for (int y=0;y<sizeInChunks.y;y++) {
 			for (int z=0;z<sizeInChunks.z;z++) {
