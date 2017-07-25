@@ -20,39 +20,75 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	CAABB* aabb = &collider.AABB;
 	aabb->setPos(collider.position);
 	vec3 contactDir, maxContactDir, segBase, segTop;
-	float penetration = 0; float maxPenetration = 0;
-
+	float penetration = 0; float maxPenetration = 0; float distance; float minDistance = FLT_MAX; vec3 minContactDir(0); vec3 contactDir2;
+	float aabbHeight = aabb->halfHeight * 2; float maxDistance = 0;
 	//for each upright of the AABB, perform one or more intersection tests with the nearest column of chunks
 	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
-		segBase = aabb->corner[cornerNo] + vec3(0, -miniBounceAllowance, 0); //start check slightly below AABB
-		segTop = aabb->corner[cornerNo - 4] + vec3(0, tunnellingAllowance,0);
+		std::cerr << "\nchecking corner " << cornerNo - 4 << " ...";
+	
+		segTop = aabb->corner[cornerNo - 4];
+		distance = checkAllWayDown(segTop, contactDir2);
+		std::cerr << "\n\tcorner " << cornerNo - 4 << " distance of " << distance << " found.";
+		if (distance < minDistance) {
+			minDistance = distance;
+			minContactDir = contactDir2;
+		}		
+	}
 
-		//check against local column of chunks
-		penetration = checkAABBsegment(segBase, segTop, contactDir);
-		if (penetration > maxPenetration) {
-			maxPenetration = penetration;
-			maxContactDir = contactDir;
+	//all four corners checked, soo...
+	std::cerr << "\nFinal min distance of " << minDistance << " found.";
+
+	if (minDistance == FLT_MAX) { //no terrain below any corner, we must have dropped through 
+		std::cerr << "\nNo terrain found below, starting tunnelling check";
+		maxDistance = 0;
+		for (int cornerNo = 4; cornerNo < 8; cornerNo++) { //for each bottom corner
+			segBase = aabb->corner[cornerNo];
+			distance = checkAllWayUp(segBase, contactDir2); //find distance to terrain above	
+			if (distance > maxDistance) {
+				maxDistance = distance;
+				maxContactDir = contactDir2;
+			}
 		}
 
-		vec3 contactDir2;
-		segTop = aabb->corner[cornerNo - 4];
-		penetration = checkAllWayDown(segTop, contactDir2);
-		if (penetration == 0) { //no terrain below us, we must have dropped through 
-			//find distance to terrain above
-			float tunnelDist = checkAllWayUp(segBase, contactDir2);
-			if (tunnelDist == 0) {
+		if (maxDistance == 0) {
 				std::cerr << "\n\n\n\n!!!!!!!!!!!!!!Error no terain found above or below!";
 				return;
-			}
-			pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, tunnelDist + (aabb->halfHeight*2));
+		}
+		std::cerr << "\ntunnelling contact created: ";
+		collider.currentContactNormal = maxContactDir;
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, maxDistance);
+		return;
+	}
+
+
+
+
+
+
+
+	if (minDistance < aabbHeight) { //an ordinary intersection, within the aabb
+		penetration = aabbHeight - minDistance ;
+		std::cerr << "\nPenetration of " << penetration << " derived from " << minDistance << " - " << aabbHeight;
+		if (penetration < 0.001f)  //0.001f works
+			penetration = 0;
+		collider.currentContactNormal = minContactDir;
+		std::cerr << "\nordindary contact created: ";
+		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, penetration);
+		return;
+	}
+
+	if (minDistance < (aabbHeight + miniBounceAllowance) ) { //intersection just below aabb, are we mini-bouncing?
+		std::cerr << "\nIn the mini-bounce area!";
+		vec3 horizontalVelocity = collider.velocity; horizontalVelocity.y = 0;
+		if (collider.velocity.y < 0 && collider.velocity.y > -3.0f && length(horizontalVelocity) > 0.5f) { //really crude test
+			std::cerr << "\nmini-bounce fix activated!";
+			collider.position.y -= (minDistance - aabbHeight);
+			pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, 0);
+			collider.currentContactNormal = minContactDir;
 			return;
 		}
 
-
-
-	}
-
-	if (maxPenetration) { //we had an intersection
+	/*if (maxPenetration) { //we had an intersection
 		std::cerr << "\nMax penetration of " << maxPenetration;
 		if (maxPenetration > miniBounceAllowance) { //it happened somewhere above a bottom corner of the AABB
 			maxPenetration -= miniBounceAllowance;
@@ -72,8 +108,8 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 			collider.currentContactNormal = maxContactDir;
 			return;
 		}
-		
-	}
+		*/
+	} 
 
 	//still here? Presumably in mid-air, then.
 	collider.currentContactNormal = vec3(0);
@@ -537,7 +573,7 @@ float CTerrainPhysObj::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contactD
 		searchPos.y -= chunkHeight;
 	}
 	std::cerr << "\n!!!!No terrain found below search point!";
-	return 0;
+	return FLT_MAX;
 }
 
 /** Search for a terrain intersection from the given point up until we exit the terrain volume. */
