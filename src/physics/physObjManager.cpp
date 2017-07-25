@@ -41,7 +41,7 @@ void CPhysObjManager::update(const float & dT) {
 
 	tmp = tmp + dT;
 	watch::watch1 << tmp;
-	std::cerr << "\ntime " << dT;
+
 
 	CPhysObjManager::dT = dT;
 	integrateObjects();
@@ -76,9 +76,12 @@ void CPhysObjManager::integrateObjects() {
 	CBasePhysObj* physObj;
 	for (size_t obj = 0; obj < physObjList.size(); obj++) {
 		physObj = physObjList[obj];
-		if (!physObj->asleep) {
-			physObj->updatePosition();
+			if (!physObj->asleep) {
+		//	physObj->moveToModelPosition(); //TO DO: why are we doing this every frame?
+			//this is breaking physics to serve terrain repositioning. Move phys object explicitly,
+			//when you move the model, and do it outside the phusics loop!
 			physObj->integrate(dT);
+
 		}
 	}
 }

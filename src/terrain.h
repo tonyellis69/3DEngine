@@ -74,6 +74,7 @@ public:
 	Chunk* getChunk(const glm::vec3& pos);
 	void getChunkTris(Chunk& chunk, TChunkVert* buf);
 	void getTris(const glm::vec3& pos, TChunkVert* &buf, unsigned int& noTris);
+	glm::vec3 getChunkPos(const glm::vec3& pos);
 	void clear();
 	~CTerrain();
 

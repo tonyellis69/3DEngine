@@ -63,7 +63,7 @@ void CPhysObj::repositionModel() {
 	pModel->setPos(position);
 }
 
-/** Position with its associate model. */
-void CPhysObj::updatePosition() {
+/** Reposition at associated model. */
+void CPhysObj::moveToModelPosition() {
 	position = pModel->getPos();
-}
+ }

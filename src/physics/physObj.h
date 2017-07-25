@@ -17,7 +17,7 @@ public:
 	void applyVelocity();
 	void integrate(float dT);
 	void repositionModel();
-	void updatePosition();
+	void moveToModelPosition();
 
 	//CModel* pModel;
 	CPhysObjManager* pManager;

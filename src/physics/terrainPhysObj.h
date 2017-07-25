@@ -21,6 +21,10 @@ public:
 
 	float checkTunnellingLine(const glm::vec3 & lineP, const glm::vec3 & lineQ, glm::vec3 & contactDir);
 
+	float checkAllWayDown(glm::vec3 & segTop, glm::vec3 & contactDir);
+
+	float checkAllWayUp(glm::vec3 & searchBase, glm::vec3 & contactDir);
+
 	CTerrain* pTerrain;
 
 	bool tmp;

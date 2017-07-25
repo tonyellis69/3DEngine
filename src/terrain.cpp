@@ -137,7 +137,7 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	vec3 nwLayerSamplePos = vec3(terrainSize / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
 	nwLayerSamplePos = vec3(layerSize.front() / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
 
-	nwLayerSamplePos.y += 0.6f; //gives it nudge up
+	nwLayerSamplePos.y += 0.5; //gives it nudge up
 
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;
@@ -508,10 +508,12 @@ void CTerrain::freeChunk(Chunk & chunk) {
 
 /** Return the superchunk at the given position. */
 CSuperChunk * CTerrain::getSC(const glm::vec3 & pos) {
+	float LoD1chunkSize = cubesPerChunkEdge * LoD1cubeSize;
 	for (int layerNo = layers.size() - 1; layerNo >= 0; layerNo--) {
-		bvec3 inside = lessThanEqual(glm::abs(pos), abs(layers[layerNo].nwLayerPos));
+		vec3 scrolledPos = pos - (vec3(layers[layerNo].scrollState) * LoD1chunkSize);
+		bvec3 inside = lessThanEqual(glm::abs(scrolledPos), abs(layers[layerNo].nwLayerPos));
 		if ( all(inside) ) {
-			vec3 offset = pos + glm::abs( layers[layerNo].nwLayerPos);
+			vec3 offset = scrolledPos + glm::abs( layers[layerNo].nwLayerPos);
 			i32vec3 index = offset / layers[layerNo].scSize;
 			for (size_t sc = 0; sc < layers[layerNo].superChunks.size(); sc++) {
 				if (layers[layerNo].superChunks[sc]->tmpIndex == index)
@@ -593,6 +595,19 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	freeChunkTriCache++;
 	if (freeChunkTriCache >= chunkTriCacheSize)
 		freeChunkTriCache = 0;
+}
+
+/** Return the position of the nw bottom corner of the chunk pos is inside. */
+glm::vec3 CTerrain::getChunkPos(const glm::vec3 & pos) {
+	CSuperChunk* sc = getSC(pos);
+	if (!sc)
+		return vec3(0);
+	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos); 
+	offset -= sc->nwWorldPos;
+
+	vec3 cornerPos =  (offset / sc->chunkSize) * sc->chunkSize;
+
+	return cornerPos;
 }
 
 
