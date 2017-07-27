@@ -30,6 +30,9 @@ CTerrain::CTerrain() : CModelMulti() {
 
 	//cachedChunkTris.buf = (TChunkVert*) new char[160000];
 	freeChunkTriCache = 0;
+
+	worldUnitsPerSampleUnit = 2560; //assuming a 5120m terrain volume. Adjust if it ends up bigger
+
 }
 
 /** Set the dimensions and building block sizes of this terrain. */
@@ -129,7 +132,6 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	//If it turns out there is a consistent scale we can hard bake into each chunk's samplePos, fine we do that.
 
 
-	worldUnitsPerSampleUnit = 2560; //assuming a 5120m terrain volume. Adjust if it ends up bigger
 	//worldUnitsPerSampleUnit = layerSize[0] / 2;
 
 	//find nw lower samplepos
@@ -138,6 +140,8 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 	nwLayerSamplePos = vec3(layerSize.front() / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
 
 	nwLayerSamplePos.y += 0.5; //gives it nudge up
+
+	nwLayerSamplePos = tryCorner;
 
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;

@@ -509,6 +509,7 @@ void CRenderer::createScreenQuad() {
 	screenQuad.storeVertexes(vert, sizeof(vert), 4);
 	screenQuad.storeIndex(index, sizeof(index), 4);
 	screenQuad.storeLayout(2, 0, 0, 0);
+	screenQuad.setDrawMode(drawLinesStrip);
 }
 
 /** Draw to the given texture using the current shader. */
@@ -523,7 +524,7 @@ void CRenderer::renderToTexture(CBaseTexture& texture) {
 		return;
 	}
 	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
-	drawBuf(screenQuad, uiDrawTriStrip);
+	drawBuf(screenQuad);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -603,7 +604,7 @@ void CRenderer::renderTo2DTexture(int shader, int w, int h, int* buf) {
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedbackBuf, CBaseBuf& destBuf) {
+unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, CBuf& destBuf) {
 
 	
 	glEnable(GL_RASTERIZER_DISCARD);
@@ -616,18 +617,16 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedba
 
 	glGenQueries(1, &query);
 	//glGenQueries(1, &speedQuery);
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tempFeedbackBuf.getBufHandle());
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, destBuf.getBufHandle());
 	//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, hDestBuf);
 
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
 	//glBeginQuery(GL_TIME_ELAPSED, speedQuery);
 
 
-	glBeginTransformFeedback(GL_TRIANGLES);
+	glBeginTransformFeedback(destBuf.drawMode);
 
-	//drawModel(model);
-	//model.drawNew();
-	drawModel((CRenderModel&)model);
+	drawBuf( srcBuf);
 
 	glEndTransformFeedback();
 
@@ -640,34 +639,10 @@ unsigned int CRenderer::getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedba
 	//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
 
 	glDisable(GL_PRIMITIVE_RESTART);
-	if (primitives == 0) {
+	
 
 		glDisable(GL_RASTERIZER_DISCARD);
 
-		//empty the internal buffer
-		//freeBuffer(tbo);
-	//	tmpBuf.freeMem();
-		return 0; //TO DO fix should not happen
-	}
-
-
-
-	int outSize = primitives * 3 * sizeof(vBuf::T3DnormVert);
-	totalbufsize += outSize;
-	totalchunks++;
-
-	
-
-	//verts are in our temporary feedback buffer. Now we want to copy them to the user-supplied buffer, which may or may not be a multibuffer
-	//if it is a multibuffer, we want to say "here's this block of verts, find a space for it." So, some kind of copyBuffer method.
-	destBuf.copyBuf(tempFeedbackBuf,outSize);
-
-	
-	glDisable(GL_RASTERIZER_DISCARD);
-
-
-	//	cerr << "\nChunk took: " << elapsed << " by query timer";
-	//tmpBuf.freeMem();
 	return primitives;
 }
 
@@ -786,12 +761,12 @@ void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 }
 
 
-void CRenderer::drawBuf(CBuf& buf, const unsigned int& drawMode) {
+void CRenderer::drawBuf(CBuf& buf) {
 	glBindVertexArray(buf.hVAO);
 	if (buf.hIndex == 0)
-		glDrawArrays(drawMode, 0, buf.noVerts);
+		glDrawArrays(buf.drawMode, 0, buf.noVerts);
 	else
-		glDrawElements(drawMode, buf.noIndices, GL_UNSIGNED_SHORT,0);
+		glDrawElements(buf.drawMode, buf.noIndices, GL_UNSIGNED_SHORT,0);
 
 	glBindVertexArray(0);
 }

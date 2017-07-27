@@ -139,6 +139,7 @@
     <ClCompile Include="..\src\Sprite.cpp" />
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
+    <ClCompile Include="..\src\terrainPointShader.cpp" />
     <ClCompile Include="..\Src\TexFont.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
+    <ClInclude Include="..\src\terrainPointShader.h" />
     <ClInclude Include="..\Src\TexFont.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
@@ -261,6 +263,7 @@
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\UI\uiRectShader.h" />
     <ClInclude Include="..\src\UI\uiTexShader.h" />
+    <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
     <ClInclude Include="..\Src\Window.h" />

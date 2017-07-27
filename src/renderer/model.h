@@ -7,7 +7,7 @@
 #include "multiBuf.h"
 #include "material.h"
 
-enum  TdrawMode { drawPoints, drawLines, drawTris };
+#include "../userTypes.h"
 
 //class CMaterial;
 
@@ -35,6 +35,7 @@ public:
 	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 	virtual void setDrawMode(TdrawMode drawMode) {};
 	virtual void assignMaterial() {};
+	
 
 
 	int drawMode; ///<Triangles, lines etc

@@ -3,8 +3,11 @@
 #include <glew.h>
 #include <glm/glm.hpp>
 
+
+
 /** Holds all the data necessary to use a buffer of vertices uploaded to the 
 	graphics card.*/
+enum TRendererDrawMode;
 class CBuf : public CBaseBuf
 {
 public:
@@ -19,7 +22,8 @@ public:
 	unsigned int getBufHandle();
 	unsigned int getBufSize();
 	void freeMem();
-
+	void setDrawMode(TdrawMode mode);
+	void getData(unsigned char* data, unsigned int size);
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
 	int colourOffset; ///<Start of colour values in buffer.
@@ -33,5 +37,6 @@ public:
 	unsigned int nTris; ///<Number of triangles
 
 	unsigned int bufSize; ///<Size of vertex data in bytes.
+	TRendererDrawMode drawMode; ///<How this buffer expects to be drawn, if it all.
 };
 

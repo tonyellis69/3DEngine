@@ -23,7 +23,11 @@
 
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
-enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, uiDrawTriStrip=5, uiDrawQuads=7};
+enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, 
+	uiDrawTriStrip=5, uiDrawQuads=7};
+enum  TRendererDrawMode {
+	rDrawPoints = 0, rDrawLines = 1, rDrawLineLoop = 2, rDrawLineStrip = 3, rDrawTris = 4,
+	rDrawTriStrip = 5, rDrawQuads = 7, rDrawLinesAdjacency = 10 };
 
 
 
@@ -84,7 +88,7 @@ public:
 	void initRenderToTexture(int w, int h, renderTextureFormat texType);
 	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
 	void renderTo2DTexture(int shader, int w, int h, int* buf);
-	unsigned int getGeometryFeedback2(CModel& model, CBaseBuf& tempFeedbackBuf, CBaseBuf& destBuf);
+	unsigned int getGeometryFeedback(CBuf& srcBuf, CBuf& destBuf);
 
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
@@ -96,7 +100,7 @@ public:
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
-	void drawBuf(CBuf& buf, const unsigned int& drawMode);
+	void drawBuf(CBuf& buf);
 
 
 	int Width; ///<Width of the view

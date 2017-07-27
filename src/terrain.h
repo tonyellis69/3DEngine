@@ -121,6 +121,8 @@ public:
 	int freeChunkTriCache;
 
 	float worldUnitsPerSampleUnit;
+
+	glm::vec3 tryCorner;
 	};
 
 

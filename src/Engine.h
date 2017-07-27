@@ -137,7 +137,7 @@ public:
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
-	unsigned int acquireFeedbackVerts(CModel& srcModel, CBaseBuf&  tempFeedbackBuf, CBaseBuf& destBuf);
+	unsigned int acquireFeedbackVerts(CBaseBuf& srcBuf, CBaseBuf& destBuf);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
 	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);

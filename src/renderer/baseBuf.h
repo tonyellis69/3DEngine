@@ -1,8 +1,12 @@
 #pragma once
 
+#include "../userTypes.h"
+
 typedef struct {
 	float r, g, b, a;
 } tmpRGBAtype;
+
+
 
 class CBaseBuf {	
 public:
@@ -20,4 +24,6 @@ public:
 	virtual void draw() {};
 	virtual void deleteBlock(unsigned int id) {};
 	virtual void setBlockColour(unsigned int id, tmpRGBAtype& colour) {};
+	virtual void setDrawMode(TdrawMode mode) {};
+	virtual void getData(unsigned char* data, unsigned int size) {};
 };

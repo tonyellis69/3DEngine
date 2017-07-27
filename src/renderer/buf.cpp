@@ -1,7 +1,7 @@
 #include "buf.h"
 #include <glew.h>
 #include <wglew.h>
-
+#include "renderer.h"
 
 CBuf::CBuf() {
 	hBuffer = 0;
@@ -118,6 +118,29 @@ void CBuf::freeMem() {
 	if (hVAO != 0) {
 		glDeleteVertexArrays(1,&hVAO);
 	}
+}
+
+void CBuf::setDrawMode(TdrawMode mode) {
+	if (mode == drawPoints)
+		drawMode = rDrawPoints;
+	if (mode == drawLines)
+		drawMode = rDrawLines;
+	if (mode == drawTris)
+		drawMode = rDrawTris;
+	if (mode == drawLinesAdjacency)
+		drawMode = rDrawLinesAdjacency;
+	if (mode == drawLinesStrip)
+		drawMode = rDrawLineStrip;
+	if (mode == drawTriStrip)
+		drawMode = rDrawTriStrip;
+	if (mode == drawLineLoop)
+		drawMode = rDrawLineLoop;
+}
+
+void CBuf::getData(unsigned char * data, unsigned int size) {
+	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+	glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 

@@ -835,10 +835,10 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 
 
 // pass a CBaseBuf and get it back full of feedback verts
-unsigned int CEngine::acquireFeedbackVerts(CModel& srcModel, CBaseBuf& tempFeedbackBuf, CBaseBuf& destBuf) {
+unsigned int CEngine::acquireFeedbackVerts(CBaseBuf& srcBuf, CBaseBuf& destBuf) {
 
 	unsigned int noPrimitives = 0;
-	noPrimitives = Renderer.getGeometryFeedback2(srcModel, tempFeedbackBuf,destBuf);
+	noPrimitives = Renderer.getGeometryFeedback((CBuf&)srcBuf, (CBuf&)destBuf);
 
 	return noPrimitives;
 }

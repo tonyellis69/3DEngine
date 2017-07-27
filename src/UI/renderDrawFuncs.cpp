@@ -64,7 +64,8 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 	uiRectShader->setColour1((vec4&)control.backColour1);
 	uiRectShader->setColour2((vec4&)control.backColour2);
 	uiRectShader->setOrtho(orthoView);
-	pRenderer->drawBuf(*buf, uiDrawTriStrip);
+	buf->setDrawMode(drawTriStrip);
+	pRenderer->drawBuf(*buf);
 	pRenderer->setShader(0);
 }
 
@@ -74,7 +75,8 @@ void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
 	uiRectShader->setColour1((vec4&)control.borderColour);
 	uiRectShader->setColour2((vec4&)control.borderColour);
 	uiRectShader->setOrtho(orthoView);
-	pRenderer->drawBuf(*buf, uiDrawLineLoop);
+	buf->setDrawMode(drawLineLoop);
+	pRenderer->drawBuf(*buf);
 	pRenderer->setShader(0);
 
 }
@@ -104,7 +106,8 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 	uiTexShader->setTiling(vec2(1,1));
 	uiTexShader->setOffset(vec2(0));
 	uiTexShader->setOrtho(orthoView);
-	pRenderer->drawBuf(*buf, uiDrawTriStrip);
+	buf->setDrawMode(drawTriStrip);
+	pRenderer->drawBuf(*buf);
 
 }
 
