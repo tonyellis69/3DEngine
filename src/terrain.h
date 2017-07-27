@@ -48,11 +48,11 @@ class CTerrain : public CModelMulti  {
 public:
 	CTerrain();
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
-	void createLayers2(float terrainSize, float LoD1extent, int steps);
+	void createLayers(float terrainSize, float LoD1extent, int steps);
 	void createAllChunks();
 	void resize3dArray(T3dArray &scArray, glm::i32vec3& size);
 	void createSuperChunks(T3dArray &scArray, std::vector<CSuperChunk*>& container);
-	void initSuperChunks(T3dArray &scArray, int layerNo, glm::vec3 nwLayerSamplePos,glm::i32vec3& nodeGridSize);
+	void initSuperChunks(T3dArray &scArray, int layerNo, glm::i32vec3& nodeGridSize);
 	void findLayerFaces(T3dArray &scArray, int layerNo);
 	void createInnerLayer(T3dArray xArray, int scPerEdge, glm::vec3& nwLayerPos, glm::vec3& sampleStart);
 	void connectSuperChunks(T3dArray &tmpArray);
@@ -76,6 +76,7 @@ public:
 	void getTris(const glm::vec3& pos, TChunkVert* &buf, unsigned int& noTris);
 	glm::vec3 getChunkPos(const glm::vec3& pos);
 	void clear();
+	void setSampleCentre(glm::vec3& centrePos);
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -122,7 +123,6 @@ public:
 
 	float worldUnitsPerSampleUnit;
 
-	glm::vec3 tryCorner;
 	};
 
 

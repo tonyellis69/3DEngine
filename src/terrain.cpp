@@ -45,7 +45,7 @@ void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float 
 }
 
 /** Create each nested layer of superchunks. */
-void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
+void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 	//calculate dimensions of the innermost layer:
 	int LoDscale = 1;
 	float layerExtent = LoD1extent;
@@ -109,39 +109,6 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 
 	//create layers, working in from the outside
 	vec3 nwLayerPos = vec3(layerSize.front()) * -0.5f;
-	//float baseLayerSampleSize = layerSize.front() / 1280; // = 1 for small terrains, 4 for large, 5120 terrains
-	//1280 = number of world units to one noise unit
-	//So a 5120 terrain explores 4x4 noise units
-	//problem: noise returned is never more than -1 to 1 noise units, so we are never going to fill most of our
-	//4x4 terrain volume vertically. Not as long as it covers 4 noise units in the y direction.
-	//So we have to ensure terrain volume only extends -1 to +1 noise units vertically.
-	//Say we want our in-game cubic terrain volume to be 5000m to a side. That means 2500m = 1 noise unit.
-	//Our bottom nw sample coord will be x,-1,z. Our top se sample coord will be x+2,1,z+2
-	//The number of SCs along the terrain edge give us the noise 'step' of an SC. 4 SCs = 2/4 = 1/2 a noise unit per SC.
-
-	//If we use a smaller terrain volume, such as 1250 on side, we simply can't show our biggest mountain. The scale
-	//of 2500m (world units) to 1 noise unit has to be the same, or we'll be drawing in miniature.
-	//At 1250 a side, 0.5 of a noise unit, 4 SCs to an edge would mean 0.5/4 = a step of 0.125 noise units per SC.
-
-	//To get the right-looking terrain, we scale the xz sample coordinates to ensure they cover a suitable proportion of
-	//noise, eg, enough for 3 major protrusions. There's no use hard-baking this, because different functions are going to
-	//want different-scale numbers anyway. It's all arbitrary.
-
-	//Instead, the shader uses a scaling factor on the xz coordinates to get the spread we need. 
-
-	//If it turns out there is a consistent scale we can hard bake into each chunk's samplePos, fine we do that.
-
-
-	//worldUnitsPerSampleUnit = layerSize[0] / 2;
-
-	//find nw lower samplepos
-	//vec3 nwLayerSamplePos = vec3(layerSize.front() / 1280) * -0.5f;
-	vec3 nwLayerSamplePos = vec3(terrainSize / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
-	nwLayerSamplePos = vec3(layerSize.front() / worldUnitsPerSampleUnit) * -0.5f; // = -1,-1,-1
-
-	nwLayerSamplePos.y += 0.5; //gives it nudge up
-
-	nwLayerSamplePos = tryCorner;
 
 	float gapBetweenLayers = 0;
 	int SCsBetweenLayers = 0;
@@ -159,17 +126,12 @@ void CTerrain::createLayers2(float terrainSize, float LoD1extent, int steps) {
 		layers[layerNo].scSize = LoD1SCsize * LoDscale;
 		layers[layerNo].SCsampleStep = layers[layerNo].scSize / worldUnitsPerSampleUnit;
 		layers[layerNo].chunkSampleStep = (layers[layerNo].cubeSize * cubesPerChunkEdge) / worldUnitsPerSampleUnit;
-
 		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
 		SCsBetweenLayers = (int)gapBetweenLayers / prevSCsize;
 
 		
-	//	nwLayerSamplePos += vec3(SCsBetweenLayers * cubesPerChunkEdge * prevLoDscale * chunksPerSChunkEdge * sampleScale);
-		nwLayerSamplePos += samplesPerPrevSC * (float)SCsBetweenLayers;
-		layers[layerNo].nwSampleCorner = nwLayerSamplePos;
-
 		createSuperChunks(*outerArray, layers[layerNo].superChunks);
-		initSuperChunks(*outerArray, layerNo, nwLayerSamplePos, i32vec3(chunksPerSChunkEdge));
+		initSuperChunks(*outerArray, layerNo,  i32vec3(chunksPerSChunkEdge));
 		connectSuperChunks(*outerArray);
 		findLayerFaces(*outerArray, layerNo);
 
@@ -241,7 +203,7 @@ void CTerrain::createSuperChunks(T3dArray &scArray, vector<CSuperChunk*>& parent
 extern CSuperChunk* dbgSC = NULL;
 
 /** Initialise the given 3d array of superchunks with the correct position, size, lod, etc. */
-void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSamplePos, i32vec3& _sizeInChunks) {
+void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, i32vec3& _sizeInChunks) {
 	float LoDscale = float(1 << (layers[layerNo].LoD-1));
 	int cubesPerSCedge =  chunksPerSChunkEdge * cubesPerChunkEdge;
 
@@ -253,7 +215,6 @@ void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, vec3 nwLayerSampl
 				sChunk->setSizes(_sizeInChunks,cubesPerChunkEdge,layers[layerNo].cubeSize);		
 				sChunk->LoD = layers[layerNo].LoD;
 				sChunk->LoDscale = LoDscale;
-				sChunk->setSamplePos(nwLayerSamplePos + (vec3(x,y,z) * layers[layerNo].SCsampleStep));
 				sChunk->sampleStep = layers[layerNo].SCsampleStep;
 				sChunk->tmpIndex = i32vec3(x,y,z);
 				if (x == 3 && y == 1 && z == 0 && layerNo == 1)
@@ -623,6 +584,20 @@ void CTerrain::clear() {
 			sc->removeAllChunks();
 		}
 	}	
+}
+
+/** Set the point in sample-space that this terrain centres on. */
+void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
+
+	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
+		vec3 nwCorner = (layers[layerNo].nwLayerPos / worldUnitsPerSampleUnit)
+			+ centrePos;
+		layers[layerNo].nwSampleCorner = nwCorner;
+		for (size_t scNo = 0; scNo < layers[layerNo].superChunks.size(); scNo++) {
+			CSuperChunk* sc = layers[layerNo].superChunks[scNo];
+			sc->setSamplePos(nwCorner + vec3(sc->tmpIndex) * sc->sampleStep);
+		}
+	}
 }
 
 CTerrain::~CTerrain() {
