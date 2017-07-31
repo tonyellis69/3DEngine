@@ -100,7 +100,7 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 	pRenderer->setShader(uiTexShader);
 	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
-	pRenderer->attachTexture(0, rendTex->handle);
+	pRenderer->attachTexture(0,  rendTex->handle);
 
 	uiTexShader->setTextureUnit(0);
 	uiTexShader->setTiling(vec2(1,1));

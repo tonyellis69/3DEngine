@@ -509,7 +509,7 @@ void CRenderer::createScreenQuad() {
 	screenQuad.storeVertexes(vert, sizeof(vert), 4);
 	screenQuad.storeIndex(index, sizeof(index), 4);
 	screenQuad.storeLayout(2, 0, 0, 0);
-	screenQuad.setDrawMode(drawLinesStrip);
+	screenQuad.setDrawMode(drawTriStrip);
 }
 
 /** Draw to the given texture using the current shader. */
@@ -524,6 +524,7 @@ void CRenderer::renderToTexture(CBaseTexture& texture) {
 		return;
 	}
 	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
+	screenQuad.setDrawMode(drawTriStrip);
 	drawBuf(screenQuad);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

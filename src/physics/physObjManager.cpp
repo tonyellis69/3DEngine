@@ -40,7 +40,7 @@ void CPhysObjManager::addPhysObj(CBasePhysObj * obj) {
 void CPhysObjManager::update(const float & dT) {
 
 	tmp = tmp + dT;
-	watch::watch1 << tmp;
+	//watch::watch1 << tmp;
 
 
 	CPhysObjManager::dT = dT;
@@ -63,8 +63,7 @@ void CPhysObjManager::update(const float & dT) {
 	
 	
 
-	watch::watch2 << contactList.size();
-
+	
 
 	
 	repositionModels();
