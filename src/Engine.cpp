@@ -782,16 +782,7 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 	return plane;
 }
 
-/** Render a 3D block of pixels of the given volume to a buffer, one pixel-layer after another. */
-void CEngine::renderTo3DTexture(glm::i32vec3 vol, float* buf) {
-	Renderer.renderTo3DTexture(currentProgram,vol.x,vol.y,vol.z,buf);
-}
 
-/** Render a 2D block of pixels of the given size to a buffer. */
-void CEngine::renderTo2DTexture(glm::i32vec2 size, int* buf) {
-	Renderer.renderTo2DTexture(currentProgram,size.x,size.y,buf);
-	//glViewport(0,0,Renderer.Width,Renderer.Height);
-}
 
 /** Send these vertices to the graphics hardware to be buffered, and register them with the given model. */
 void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
@@ -835,10 +826,9 @@ void CEngine::setFeedbackData(int shader, int nVars, const char** strings) {
 
 
 // pass a CBaseBuf and get it back full of feedback verts
-unsigned int CEngine::acquireFeedbackVerts(CBaseBuf& srcBuf, CBaseBuf& destBuf) {
-
+unsigned int CEngine::acquireFeedbackVerts(CBaseBuf& srcBuf, TdrawMode srcDrawMode, CBaseBuf& destBuf, TdrawMode destDrawMode) {
 	unsigned int noPrimitives = 0;
-	noPrimitives = Renderer.getGeometryFeedback((CBuf&)srcBuf, (CBuf&)destBuf);
+	noPrimitives = Renderer.getGeometryFeedback((CBuf&)srcBuf, srcDrawMode, (CBuf&)destBuf, destDrawMode);
 
 	return noPrimitives;
 }

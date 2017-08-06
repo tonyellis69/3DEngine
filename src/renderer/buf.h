@@ -7,7 +7,7 @@
 
 /** Holds all the data necessary to use a buffer of vertices uploaded to the 
 	graphics card.*/
-enum TRendererDrawMode;
+//enum TRendererDrawMode;
 class CBuf : public CBaseBuf
 {
 public:
@@ -22,8 +22,10 @@ public:
 	unsigned int getBufHandle();
 	unsigned int getBufSize();
 	void freeMem();
-	void setDrawMode(TdrawMode mode);
 	void getData(unsigned char* data, unsigned int size);
+	void getLayout(int& attr1, int& attr2, int& attr3, int& attr4);
+	unsigned int getNoVerts();
+	void setNoVerts(unsigned int nVerts);
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
 	int colourOffset; ///<Start of colour values in buffer.
@@ -37,6 +39,6 @@ public:
 	unsigned int nTris; ///<Number of triangles
 
 	unsigned int bufSize; ///<Size of vertex data in bytes.
-	TRendererDrawMode drawMode; ///<How this buffer expects to be drawn, if it all.
+	int attr[4]; ///<Records attribute layout.
 };
 

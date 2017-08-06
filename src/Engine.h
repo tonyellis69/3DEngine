@@ -120,8 +120,6 @@ public:
 	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
 	CModel* createHemisphere(glm::vec3& pos, float radius, int steps);
 	CModel* createPlane(glm::vec3& pos, float width, float height, int steps);
-	void renderTo3DTexture(glm::i32vec3 vol, float* buf);
-	void renderTo2DTexture(glm::i32vec2 size, int* buf);
 	void storeModel(CModel* model, glm::vec3* verts, int noVerts);
 	/** Send these indexed vertices to the graphics hardware to be buffered, and register them with the given model. */
 	template <typename T>
@@ -137,7 +135,7 @@ public:
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
-	unsigned int acquireFeedbackVerts(CBaseBuf& srcBuf, CBaseBuf& destBuf);
+	unsigned int acquireFeedbackVerts(CBaseBuf& srcBuf, TdrawMode srcDrawMode, CBaseBuf& destBuf, TdrawMode destDrawMode);
 	unsigned int drawModelCount(CModel& model);
 	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
 	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);

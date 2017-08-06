@@ -46,7 +46,7 @@ void CMultiBuf::reserve(unsigned int size) {
 }
 
 
-/** Copy the given buffer data into free memory. */
+/** Copy the given buffer data into this multibuffer. */
 void CMultiBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
 	GLuint hSrcBuf = srcBuf.getBufHandle();
 	unsigned int freeBlock = getFreeBlock(size);
@@ -57,7 +57,7 @@ void CMultiBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
 		copyToNewBlock(hSrcBuf, size);
 	}
 
-//	setBlockColour(lastId, glm::vec4(0.5f, 0.5f, 0.5f, 1));
+
 
 //	cerr << "\nNumber of childbufs " << childBufs.size();
 //	cerr << " blocks " << blocks.size();
@@ -78,16 +78,10 @@ void CMultiBuf::setSize(unsigned int size) {
 void CMultiBuf::createChildBuf() {
 
 	CChildBuf newBuf;
-//	newBuf.setSize(maxBufSize);
-//	newBuf.storeLayout(attr[0], attr[1], attr[2], attr[3]);
-
 
 	childBufs.push_back(newBuf);
 	childBufs.back().setSize(maxBufSize);
 	childBufs.back().storeLayout(attr[0], attr[1], attr[2], attr[3]);
-
-	
-
 	noChildBufs++;
 	freeMem = 0;
 }
@@ -210,6 +204,15 @@ unsigned int CMultiBuf::getBlockSize(unsigned int id) {
 	return block->blockSize;
 }
 
+/** Return the vertex data for the given element. */
+void CMultiBuf::getElementData(const unsigned int id, int& firstVert, unsigned int& vertCount, unsigned int& hVAO) {
+	CChildBlock* block = &blocks[id];
+	firstVert = block->arrayFirst;
+	vertCount = block->arrayCount;
+	unsigned int childBufNo = (id >> 16) - 1;
+	hVAO = childBufs[childBufNo].hVAO;
+}
+
 /** Return the id of the nearest larger block than size, or zero. */
 unsigned int CMultiBuf::getFreeBlock(unsigned int size) {
 	std::multimap<unsigned int, unsigned int>::iterator it = freeBlocks.lower_bound(size);
@@ -246,7 +249,7 @@ void CMultiBuf::copyToFreeBlock(unsigned int hSrcBuf, unsigned int freeBlock, un
 	
 }
 
-/** Reserver a new block of memory and copy size bytes of the given buffer to it. */
+/** Reserve a new block of memory and copy size bytes of the given buffer to it. */
 void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 	//do we have room for this many bytes in the current child buffer?
 	if ((freeMem + size) > maxBufSize || !noChildBufs) {
@@ -268,6 +271,7 @@ void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 	//record on blocks list
 	CChildBlock newBlock;
 	newBlock.id = (childBufs.size() << 16) + currentChild->getNextId();
+	//so id  = childBuf number + next free id number of that childbuffer
 
 	newBlock.arrayFirst = currentChild->first.back();
 	newBlock.arrayCount = currentChild->count.back();

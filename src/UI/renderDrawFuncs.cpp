@@ -64,8 +64,7 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 	uiRectShader->setColour1((vec4&)control.backColour1);
 	uiRectShader->setColour2((vec4&)control.backColour2);
 	uiRectShader->setOrtho(orthoView);
-	buf->setDrawMode(drawTriStrip);
-	pRenderer->drawBuf(*buf);
+	pRenderer->drawBuf(*buf, drawTriStrip);
 	pRenderer->setShader(0);
 }
 
@@ -75,8 +74,7 @@ void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
 	uiRectShader->setColour1((vec4&)control.borderColour);
 	uiRectShader->setColour2((vec4&)control.borderColour);
 	uiRectShader->setOrtho(orthoView);
-	buf->setDrawMode(drawLineLoop);
-	pRenderer->drawBuf(*buf);
+	pRenderer->drawBuf(*buf, drawLineLoop);
 	pRenderer->setShader(0);
 
 }
@@ -100,14 +98,14 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 	pRenderer->setShader(uiTexShader);
 	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
-	pRenderer->attachTexture(0,  rendTex->handle);
+	pRenderer->attachTexture(0, texture);
 
 	uiTexShader->setTextureUnit(0);
 	uiTexShader->setTiling(vec2(1,1));
 	uiTexShader->setOffset(vec2(0));
 	uiTexShader->setOrtho(orthoView);
-	buf->setDrawMode(drawTriStrip);
-	pRenderer->drawBuf(*buf);
+	pRenderer->drawBuf(*buf, drawTriStrip);
+	//pRenderer->attachTexture(0, 0);
 
 }
 

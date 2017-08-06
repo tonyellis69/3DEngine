@@ -29,7 +29,10 @@ public:
 
 };
 
-/** Manages a renderer-based buffer for multidraw drawing. */
+/** Manages a renderer-specific structure for storing verts for multidraw drawing.
+	Data is stored in one or more child buffers, created as needed.
+	Each child buffer is divided into blocks of memory storing individual items. 
+	Every block is identifiable by a unique id.*/
 class CMultiBuf : public CBuf {
 public:
 	CMultiBuf();
@@ -49,6 +52,7 @@ public:
 	void setBlockColour(unsigned int id, tmpRGBAtype& colour);
 	void copyBlock(unsigned int id, char* buf);
 	unsigned int getBlockSize(unsigned int id);
+	void getElementData(const unsigned int id, int& firstVert, unsigned int& vertCount, unsigned int& hVAO);
 	
 
 	GLint* first;

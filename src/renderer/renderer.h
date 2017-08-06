@@ -84,12 +84,10 @@ public:
 	void initRenderToTextureBufs();
 	void createFrameBuffer();
 	void createScreenQuad();
-	void renderToTexture(CBaseTexture & texture);
-	void initRenderToTexture(int w, int h, renderTextureFormat texType);
-	void renderTo3DTexture(int shader, int w, int h, int d, float* buf);
-	void renderTo2DTexture(int shader, int w, int h, int* buf);
-	unsigned int getGeometryFeedback(CBuf& srcBuf, CBuf& destBuf);
-
+	void renderToTextureQuad(CBaseTexture & texture);
+	void beginRenderToTexture(CBaseTexture & texture);
+	void endRenderToTexture();
+	unsigned int getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode);
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
@@ -97,11 +95,13 @@ public:
 	void initQuery();
 	unsigned int query();
 	void drawMultiModel(CModelMulti& model);
+	void drawMultBufItem(CMultiBuf & multiBuf, unsigned int itemID);
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
-	void drawBuf(CBuf& buf);
-
+	void attachTexture(unsigned int textureUnit, CBaseTexture& texture);
+	void drawBuf(CBuf& buf, TdrawMode drawMode);
+	unsigned int getGLdrawMode(TdrawMode);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -121,7 +121,10 @@ public:
 
 	CBuf screenQuad; ///<A re-usable quad for rendering to the entire screen.
 	GLuint hFrameBuffer; ///<Handle for our internally used framebuffer.
+
+	unsigned int tmpHandle;
 private:
+
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 
 	//render to texture stuff:

@@ -166,6 +166,8 @@ void CRenderer::init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glClampColor(GL_CLAMP_VERTEX_COLOR, GL_FALSE);
+
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
@@ -509,14 +511,24 @@ void CRenderer::createScreenQuad() {
 	screenQuad.storeVertexes(vert, sizeof(vert), 4);
 	screenQuad.storeIndex(index, sizeof(index), 4);
 	screenQuad.storeLayout(2, 0, 0, 0);
-	screenQuad.setDrawMode(drawTriStrip);
 }
 
-/** Draw to the given texture using the current shader. */
-void CRenderer::renderToTexture(CBaseTexture& texture) {
-	CRenderTexture* glTex = (CRenderTexture*) &texture;
+/** Draw a full-screen quad to the given texture using the current shader. */
+void CRenderer::renderToTextureQuad(CBaseTexture& texture) {
+	beginRenderToTexture(texture);
+	drawBuf(screenQuad, drawTriStrip);
+	endRenderToTexture();
+}
+
+/**	Prepare to render to the given texture, leaving the actual drawing to the user. */
+void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
+	CRenderTexture* glTex = (CRenderTexture*)&texture;
+	glGenFramebuffers(1, &hFrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
+	
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glTex->handle, 0);
+
+
 	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, DrawBuffers);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -524,92 +536,24 @@ void CRenderer::renderToTexture(CBaseTexture& texture) {
 		return;
 	}
 	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
-	screenQuad.setDrawMode(drawTriStrip);
-	drawBuf(screenQuad);
+}
 
+/**	Clean up after rendering to a texture. */
+void CRenderer::endRenderToTexture() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, Width, Height);
-	
 }
-
-/** Do the necessary preparation for a 3D render to texture.*/
-void CRenderer::initRenderToTexture(int w, int h, renderTextureFormat texType) {
-
-	// "Bind" the render texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, r2texTex);
-
-	glEnableVertexAttribArray(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, r2texFrameBuf);
-
- 
-	// Give an empty image to OpenGL
-	if ( texType == floatTex)
-		glTexImage2D(GL_TEXTURE_2D, 0,GL_R32F, w, h, 0,GL_RED, GL_FLOAT, 0);
-	else if ( texType == uintTex)
-		glTexImage2D(GL_TEXTURE_2D, 0,GL_R32UI, w, h, 0,GL_RED_INTEGER, GL_UNSIGNED_INT, 0);
-	else if ( texType == intTex)
-		glTexImage2D(GL_TEXTURE_2D, 0,GL_R32I, w, h, 0,GL_RED_INTEGER, GL_INT, 0);
- 
-	// Poor filtering. Needed !
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	//configure framebuffer with texture
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, r2texTex, 0);
- 
-	// Set the list of draw buffers.
-	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-
-	// Always check that our framebuffer is ok
-	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		cerr << "\nError creating framebuffer.";
-		return ;
-	}
-
-	//attach framebuffer for use
-	glBindFramebuffer(GL_FRAMEBUFFER, r2texFrameBuf);
-	glViewport(0,0,w,h); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
-	glBindBuffer(GL_ARRAY_BUFFER, r2texQuadBuffer);
-}
-
-/** Render a block of pixels to a buffer using the given shader, one layer at a time. */
-void CRenderer::renderTo3DTexture(int shader, int w, int h, int d,float* buf) {
-	initRenderToTexture(w,d,floatTex);
-	int sliceUni = glGetUniformLocation(shader, "slice");
-
-	for (int slice=0; slice<h; slice++) {
-		glUniform1i(sliceUni,slice);
-		glDrawArrays(GL_TRIANGLES,0,6);
-  		glReadPixels(0,0,w,d,GL_RED ,GL_FLOAT,buf + (slice * w * d ));
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER,0);
-	glDisableVertexAttribArray(0);	//do this for legacy compatibility
-
-	glViewport(0,0,Width,Height);
-	
-}
-
-/** Render a 2D array of pixels to a buffer using the given shader. */
-void CRenderer::renderTo2DTexture(int shader, int w, int h, int* buf) {
-	initRenderToTexture(w,h,uintTex);
-	glDrawArrays(GL_TRIANGLES,0,6);
-  	glReadPixels(0,0,w,h,GL_RED_INTEGER ,GL_UNSIGNED_INT,buf );
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER,0);
-	glViewport(0,0,Width,Height);
-}
-
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, CBuf& destBuf) {
+unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode) {
 
 	
 	glEnable(GL_RASTERIZER_DISCARD);
+
 	glEnable(GL_PRIMITIVE_RESTART);
+
 
 	GLint elapsed = 0;
 	GLuint query, speedQuery, primitives;
@@ -618,23 +562,19 @@ unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, CBuf& destBuf) {
 
 	glGenQueries(1, &query);
 	//glGenQueries(1, &speedQuery);
+
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, destBuf.getBufHandle());
 	//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, hDestBuf);
 
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
 	//glBeginQuery(GL_TIME_ELAPSED, speedQuery);
 
-
-	glBeginTransformFeedback(destBuf.drawMode);
-
-	drawBuf( srcBuf);
-
+	glBeginTransformFeedback(getGLdrawMode(destDrawMode));
+	drawBuf( srcBuf, srcDrawMode);
 	glEndTransformFeedback();
-
 
 	//	glEndQuery(GL_TIME_ELAPSED);
 	glEndQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN);
-
 
 	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
 	//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
@@ -678,6 +618,9 @@ CBaseTexture* CRenderer::createDataTexture(renderTextureFormat dataType, int w, 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+
 
 	if (dataType == intTex)
 		glTexImage2D(GL_TEXTURE_2D, 0,GL_R32I, w, h, 0,GL_RED_INTEGER, GL_INT, data);
@@ -733,12 +676,24 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 		childBuf = &model.multiBuf.childBufs[child];
 		glBindVertexArray(model.multiBuf.childBufs[child].hVAO);
 		for (int object = 0; object < childBuf->objCount ; object++) {
-			//setShaderValue(hColour, 1, childBuf->colour[object]);
 			shader->setColour(childBuf->colour[object]);
-			
+			//TO DO: should be model's drawmode, not GL_Triangles
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
 		}
 	}	
+}
+
+/**	Draw the given element stored in this multibuffer. */
+void CRenderer::drawMultBufItem(CMultiBuf& multiBuf, unsigned int elementID) {
+	int firstVert;
+	unsigned int noVerts;
+	unsigned int childNo;
+	unsigned int hVAO;
+	multiBuf.getElementData(elementID, firstVert, noVerts, hVAO);
+
+	//draw item
+	glBindVertexArray(hVAO);
+	glDrawArrays(GL_TRIANGLES, firstVert, noVerts);
 }
 
 void CRenderer::setDepthTest(bool on) {
@@ -761,14 +716,40 @@ void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 	glBindTexture(GL_TEXTURE_2D, hTexture);
 }
 
+void CRenderer::attachTexture(unsigned int textureUnit, CBaseTexture & texture) {
+	CRenderTexture& renderTexture = (CRenderTexture&)texture;
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_2D, renderTexture.handle);
+}
 
-void CRenderer::drawBuf(CBuf& buf) {
+
+
+
+void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
+
 	glBindVertexArray(buf.hVAO);
 	if (buf.hIndex == 0)
-		glDrawArrays(buf.drawMode, 0, buf.noVerts);
+		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
 	else
-		glDrawElements(buf.drawMode, buf.noIndices, GL_UNSIGNED_SHORT,0);
+		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, GL_UNSIGNED_SHORT, 0);
 
 	glBindVertexArray(0);
+}
+
+unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
+	if (iDrawMode == drawPoints)
+		return rDrawPoints;
+	if (iDrawMode == drawLines)
+		return rDrawLines;
+	if (iDrawMode == drawTris)
+		return rDrawTris;
+	if (iDrawMode == drawLinesAdjacency)
+		return rDrawLinesAdjacency;
+	if (iDrawMode == drawLinesStrip)
+		return rDrawLineStrip;
+	if (iDrawMode == drawTriStrip)
+		return rDrawTriStrip;
+	if (iDrawMode == drawLineLoop)
+		return rDrawLineLoop;
 }
 

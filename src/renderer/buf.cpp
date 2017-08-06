@@ -41,6 +41,10 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 	glBindVertexArray(hVAO);
 
+	attr[0] = attr1;
+	attr[1] = attr2;
+	attr[2] = attr3;
+	attr[3] = attr4;
 
 	unsigned int stride = (attr1 * sizeof(float)) + (attr2 * sizeof(float)) + (attr3 * sizeof(float))
 		+ (attr4 * sizeof(float));
@@ -95,11 +99,21 @@ void CBuf::createBuf(unsigned int size) {
 }
 
 void CBuf::copyBuf(CBaseBuf & srcBuf, unsigned int size) {
+	unsigned int srcSize = srcBuf.getBufSize();
+	setSize(srcSize);
+
+	/*if (hBuffer == 0) {
+		glGenBuffers(1, &hBuffer);
+	}*/
 	GLuint hSrcBuf = srcBuf.getBufHandle();
 	glBindBuffer(GL_COPY_READ_BUFFER, hSrcBuf);
 	glBindBuffer(GL_COPY_WRITE_BUFFER, hBuffer);
-	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, size);
-
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, srcSize);
+	int attrs[4];
+	srcBuf.getLayout(attrs[0], attrs[1],attrs[2],attrs[3]);
+	storeLayout(attrs[0], attrs[1], attrs[2], attrs[3]);
+	noVerts = srcBuf.getNoVerts();
+	//bufSize = srcSize;
 }
 
 unsigned int CBuf::getBufHandle() {
@@ -120,27 +134,28 @@ void CBuf::freeMem() {
 	}
 }
 
-void CBuf::setDrawMode(TdrawMode mode) {
-	if (mode == drawPoints)
-		drawMode = rDrawPoints;
-	if (mode == drawLines)
-		drawMode = rDrawLines;
-	if (mode == drawTris)
-		drawMode = rDrawTris;
-	if (mode == drawLinesAdjacency)
-		drawMode = rDrawLinesAdjacency;
-	if (mode == drawLinesStrip)
-		drawMode = rDrawLineStrip;
-	if (mode == drawTriStrip)
-		drawMode = rDrawTriStrip;
-	if (mode == drawLineLoop)
-		drawMode = rDrawLineLoop;
-}
+
 
 void CBuf::getData(unsigned char * data, unsigned int size) {
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 	glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, data);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+/**	Return the vertex layout. */
+void CBuf::getLayout(int& attr1, int& attr2, int& attr3, int& attr4) {
+	attr1 = attr[0];
+	attr2 = attr[1];
+	attr3 = attr[2];
+	attr4 = attr[3];
+}
+
+unsigned int CBuf::getNoVerts() {
+	return noVerts;
+}
+
+void CBuf::setNoVerts(unsigned int nVerts) {
+	noVerts = nVerts;
 }
 
 

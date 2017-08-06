@@ -25,9 +25,10 @@ void ChunkShader::setChunkSamplePos(glm::vec3 & samplePos) {
 }
 
 void ChunkShader::setChunkTriTable(CBaseTexture& dataTexture) {
-	CRenderTexture* tex = (CRenderTexture*) &dataTexture;
-	pRenderer->attachTexture(0, tex->handle);
-	pRenderer->setShaderValue(hChunkTriTable, 1, (int)0);
+	//CRenderTexture* tex = (CRenderTexture*) &dataTexture;
+		
+	pRenderer->attachTexture(5, dataTexture); //TO DO : Magic number!
+	pRenderer->setShaderValue(hChunkTriTable, 1, (int)5);
 }
 
 void ChunkShader::setChunkTerrainPos(glm::vec3 terrainPos) {

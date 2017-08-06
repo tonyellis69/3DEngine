@@ -92,7 +92,6 @@ public:
 	int cubesPerChunkEdge; ///<Number of cubes per edge of a chunk.
 	float LoD1cubeSize; ///<Size of smallest marching cubes in world space units.
 	int chunksPerSChunkEdge;
-	float chunkSize;///<Size of a chunk in world space, ie, cubesPerEdge * cubeSize.
 	int totalChunks; ///<Maximum possible chunks in the chunk array
 
 	std::deque<Chunk*> toSkin; ///<List of chunks that need a mesh created.

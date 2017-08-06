@@ -38,21 +38,7 @@ void CRenderModel::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 }
 
 void CRenderModel::setDrawMode(TdrawMode iDrawMode) {
-	if (iDrawMode == drawPoints)
-		drawMode = rDrawPoints;
-	if (iDrawMode == drawLines)
-		drawMode = rDrawLines;
-	if (iDrawMode == drawTris)
-		drawMode = rDrawTris;
-	if (iDrawMode == drawLinesAdjacency)
-		drawMode = rDrawLinesAdjacency;
-	if (iDrawMode == drawLinesStrip)
-		drawMode = rDrawLineStrip;
-	if (iDrawMode == drawTriStrip)
-		drawMode = rDrawTriStrip;
-	if (iDrawMode == drawLineLoop)
-		drawMode = rDrawLineLoop;
-	buf.setDrawMode(iDrawMode);
+	drawMode = pRenderer->getGLdrawMode(iDrawMode);
 }
 
 

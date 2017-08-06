@@ -91,11 +91,13 @@
     <ClCompile Include="..\src\BBox.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
     <ClCompile Include="..\src\chunkCheckShader.cpp" />
+    <ClCompile Include="..\src\chunkHeightShader.cpp" />
     <ClCompile Include="..\src\chunkShader.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\src\dynBuf.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
+    <ClCompile Include="..\src\findPointHeightShader.cpp" />
     <ClCompile Include="..\Src\ImageLib.cpp" />
     <ClCompile Include="..\src\isoSurface.cpp" />
     <ClCompile Include="..\src\particle.cpp" />
@@ -108,6 +110,7 @@
     <ClCompile Include="..\src\physics\physObjManager.cpp" />
     <ClCompile Include="..\src\physics\terrainPhysObj.cpp" />
     <ClCompile Include="..\src\playerObj.cpp" />
+    <ClCompile Include="..\src\poisson.cpp" />
     <ClCompile Include="..\src\Reader.cpp" />
     <ClCompile Include="..\src\renderer\2d.cpp" />
     <ClCompile Include="..\src\renderer\3d.cpp" />
@@ -178,6 +181,7 @@
     <ClInclude Include="..\src\BBox.h" />
     <ClInclude Include="..\src\chunk.h" />
     <ClInclude Include="..\src\chunkCheckShader.h" />
+    <ClInclude Include="..\src\chunkHeightShader.h" />
     <ClInclude Include="..\src\chunkShader.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
@@ -185,6 +189,7 @@
     <ClInclude Include="..\src\direction.h" />
     <ClInclude Include="..\src\dynBuf.h" />
     <ClInclude Include="..\Src\Engine.h" />
+    <ClInclude Include="..\src\findPointHeightShader.h" />
     <ClInclude Include="..\Src\ImageLib.h" />
     <ClInclude Include="..\src\isoSurface.h" />
     <ClInclude Include="..\Src\Macros.h" />
@@ -198,6 +203,7 @@
     <ClInclude Include="..\src\physics\physObjManager.h" />
     <ClInclude Include="..\src\physics\terrainPhysObj.h" />
     <ClInclude Include="..\src\playerObj.h" />
+    <ClInclude Include="..\src\poisson.h" />
     <ClInclude Include="..\src\Reader.h" />
     <ClInclude Include="..\src\renderer\2d.h" />
     <ClInclude Include="..\src\renderer\3d.h" />
