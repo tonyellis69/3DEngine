@@ -81,19 +81,27 @@ void CMultiBuf::createChildBuf() {
 
 	childBufs.push_back(newBuf);
 	childBufs.back().setSize(maxBufSize);
+	if (instancedBuf) {
+		newBuf.setInstanced(*instancedBuf, nInstancedAttribs);
+	}
 	childBufs.back().storeLayout(attr[0], attr[1], attr[2], attr[3]);
 	noChildBufs++;
 	freeMem = 0;
 }
 
 void CMultiBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
+	attr[0] = attr1; attr[1] = attr2; attr[2] = attr3; attr[3] = attr4;
 	//(re)set this layout for all the child buffers
 	for (size_t child = 0; child < childBufs.size(); child++) {
 		childBufs[child].storeLayout(attr1, attr2, attr3, attr4);
 	}
-	CBuf::storeLayout(attr1, attr2, attr3, attr4);
-	elemSize = (attr1 + attr2 + attr3 + attr4) * sizeof(float);
-	attr[0] = attr1; attr[1] = attr2; attr[2] = attr3; attr[3] = attr4;
+	CBuf::storeLayout(attr1, attr2, attr3, attr4); //TO DO: is this needful???
+	elemSize = 0;
+	for (int attribute = nInstancedAttribs; attribute < 4; attribute++) {
+		elemSize += attr[attribute] * sizeof(float);
+	}
+	//elemSize = (attr1 + attr2 + attr3 + attr4 - ) * sizeof(float);
+	
 }
 
 unsigned int CMultiBuf::getBufHandle() {
@@ -266,7 +274,7 @@ void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 
 	currentChild->first.push_back(freeMem / elemSize);
 	currentChild->count.push_back(size / elemSize);
-	currentChild->colour.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1));
+	currentChild->colour.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1)); //TO DO: kill
 
 	//record on blocks list
 	CChildBlock newBlock;
@@ -285,6 +293,16 @@ void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 
 	currentChild->objCount++;
 	freeMem += size;
+}
+
+/**	Assign a vertex buffer for instanced drawing.  */
+void CMultiBuf::setInstanced(CBaseBuf& buf, int noAttribs) {
+	for (size_t child = 0; child < childBufs.size(); child++) {
+		childBufs[child].setInstanced(buf, noAttribs);
+	}
+	instancedBuf = &buf;
+	hInstancedBuf = buf.getBufHandle();
+	nInstancedAttribs = noAttribs;
 }
 
 

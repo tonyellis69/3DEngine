@@ -15,10 +15,12 @@ public:
 	void setCurrentY( float yValue);
 	void setSamplePosition(glm::vec3 samplePos);
 	void setSampleScale(float sampleScale);
+	void setChunkLocaliser(glm::vec3 chunkLocaliser);
 
 	GLuint hCurrentY;
 	GLuint hChunkSamplePosition;
 	GLuint hSampleScale;
+	GLuint hChunkLocaliser;
 
 
 

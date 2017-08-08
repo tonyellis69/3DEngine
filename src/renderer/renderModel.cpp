@@ -13,8 +13,8 @@ void CRenderModel::drawNew() {
 	material->unAssign();
 }
 
-unsigned int CRenderModel::getBuffer() {
-	return buf.hBuffer;
+CBaseBuf* CRenderModel::getBuffer() {
+	return &buf;
 }
 
 

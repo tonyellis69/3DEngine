@@ -53,7 +53,7 @@ public:
 	void copyBlock(unsigned int id, char* buf);
 	unsigned int getBlockSize(unsigned int id);
 	void getElementData(const unsigned int id, int& firstVert, unsigned int& vertCount, unsigned int& hVAO);
-	
+	void setInstanced(CBaseBuf & buf, int noAttribs);
 
 	GLint* first;
 	GLsizei* count;
@@ -78,6 +78,8 @@ private:
 	unsigned int getFreeBlock(unsigned int size);
 	void copyToFreeBlock(unsigned int hSrcBuf, unsigned int freeBlock, unsigned int size);
 	void copyToNewBlock(unsigned int hSrcBuf, unsigned int size);
+
+
 
 	int tmp;
 };

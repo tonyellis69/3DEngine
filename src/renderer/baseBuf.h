@@ -28,4 +28,8 @@ public:
 	virtual void getLayout(int& attr1, int& attr2, int& attr3, int& attr4) {};
 	virtual unsigned int getNoVerts() { return 0; };
 	virtual void setNoVerts(unsigned int nVerts) {};
+	virtual void setInstanced(CBaseBuf& buf, int noAttribs) {};
+
+
+
 };

@@ -623,8 +623,8 @@ void CRenderTerrain::reserveBuf(unsigned int elementsUsed) {
 
 }
 
-unsigned int CRenderTerrain::getBuffer() {
-	return multiBuf.hBuffer;
+CBaseBuf* CRenderTerrain::getBuffer() {
+	return &multiBuf;
 }
 
 

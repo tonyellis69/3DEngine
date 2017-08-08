@@ -122,6 +122,8 @@ public:
 
 	float worldUnitsPerSampleUnit;
 
+	CMultiBuf grassMultiBuf; ///<Stores grass location points for all chunks.
+
 	};
 
 
@@ -161,7 +163,7 @@ public:
 	
 	/** Create a multidraw buffer of the requested size. */
 	void reserveBuf(unsigned int size);
-	unsigned int getBuffer();
+	CBaseBuf* getBuffer();
 
 
 //	CRenderer* pRenderer; ///<Lets terrain talk to renderer.

@@ -6,6 +6,7 @@ void CFindPointHeightShader::getShaderHandles() {
 	hCurrentY = pRenderer->getShaderDataHandle(hShader, "currentY");
 	hChunkSamplePosition = pRenderer->getShaderDataHandle(hShader, "chunkSamplePosition");
 	hSampleScale = pRenderer->getShaderDataHandle(hShader, "sampleScale");
+	hChunkLocaliser = pRenderer->getShaderDataHandle(hShader, "chunkLocaliser");
 }
 
 void CFindPointHeightShader::setCurrentY(float yValue) {
@@ -19,5 +20,9 @@ void CFindPointHeightShader::setSamplePosition(glm::vec3 samplePos) {
 
 void CFindPointHeightShader::setSampleScale(float sampleScale) {
 	pRenderer->setShaderValue(hSampleScale, 1, sampleScale);
+}
+
+void CFindPointHeightShader::setChunkLocaliser(glm::vec3 chunkLocaliser) {
+	pRenderer->setShaderValue(hChunkLocaliser, 1, chunkLocaliser);
 }
 

@@ -23,7 +23,7 @@ public:
 	CMaterial * getMaterial();
 	virtual void storeIndexed(int noAttribs, vBuf::T3Dvert *verts, unsigned int noVerts, unsigned short* index, int noIndices) {};
 	virtual void drawNew() {};
-	virtual unsigned int getBuffer() { return 0; };
+	virtual CBaseBuf* getBuffer() { return 0; };
 	virtual unsigned int getBuf() { return 0; };
 	virtual void setVertexDetails(int noAttribs, int noIndices, int noVerts) { };
 	virtual void storeVertexData(glm::vec3* data, unsigned int noVerts, unsigned int size) {};

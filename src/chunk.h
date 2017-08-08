@@ -39,6 +39,8 @@ public:
 
 	TChunkStatus status;
 
+	unsigned int grassId; ///<Identifies this chunk's grass verts.
+
 private:
 	CSuperChunk* creatorSC;
 };

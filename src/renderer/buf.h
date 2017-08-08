@@ -26,6 +26,8 @@ public:
 	void getLayout(int& attr1, int& attr2, int& attr3, int& attr4);
 	unsigned int getNoVerts();
 	void setNoVerts(unsigned int nVerts);
+	void setInstanced(CBaseBuf& buf, int noAttribs);
+
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
 	int colourOffset; ///<Start of colour values in buffer.
@@ -40,5 +42,10 @@ public:
 
 	unsigned int bufSize; ///<Size of vertex data in bytes.
 	int attr[4]; ///<Records attribute layout.
+
+	CBaseBuf* instancedBuf; ///If we're drawing an instanced model, this is it.
+	GLuint hInstancedBuf; ///<If we're drawing an instanced model, this is it.
+	int nInstancedAttribs; ///<How many attributes belong to the instanced model, if we have one.
+	unsigned int nInstancedVerts; ///<How many verts belong to the instanced model, if any.
 };
 

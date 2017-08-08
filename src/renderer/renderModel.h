@@ -6,7 +6,7 @@ class CRenderModel : public CModel {
 public:
 	CRenderModel();
 	void drawNew();
-	unsigned int getBuffer();
+	CBaseBuf* getBuffer();
 	void freeBuffers();
 	void storeVertexes(void* verts, unsigned int size, unsigned int nVerts);
 	void storeIndex(unsigned short* indices, unsigned int size, unsigned int nIndices);
