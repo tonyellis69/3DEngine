@@ -10,8 +10,7 @@ using namespace glm;
 /** Check for collisions with this terrain from an AABB collider. */
 void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	collider.groundContact = true;
-	std::cerr << "\ncollider pos " << collider.position.x << " " << collider.position.y << " " << collider.position.z;
-	std::cerr << " velocity " << collider.velocity.x << " " << collider.velocity.y << " " << collider.velocity.z;
+	
 
 	float restitution = 0.01f; 
 	float miniBounceAllowance = 10;
@@ -24,11 +23,11 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 
 	//for each upright of the AABB, perform one or more intersection tests with the nearest column of chunks
 	for (int cornerNo = 4; cornerNo < 8; cornerNo++) {
-		std::cerr << "\nchecking corner " << cornerNo - 4 << " ...";
+
 	
 		segTop = aabb->corner[cornerNo - 4];
 		distance = checkAllWayDown(segTop, contactDir);
-		std::cerr << "\n\tcorner " << cornerNo - 4 << " distance of " << distance << " found.";
+	
 		if (distance < minDistance) {
 			minDistance = distance;
 			minContactDir = contactDir;
@@ -36,10 +35,10 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 	}
 
 	//all four corners checked, soo...
-	std::cerr << "\nFinal min distance of " << minDistance << " found.";
+	
 
 	if (minDistance == FLT_MAX) { //no terrain below any corner, we must have dropped through 
-		std::cerr << "\nNo terrain found below, starting tunnelling check";
+	
 		maxDistance = 0;
 		for (int cornerNo = 4; cornerNo < 8; cornerNo++) { //for each bottom corner
 			segBase = aabb->corner[cornerNo];
@@ -64,11 +63,9 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 
 	if (minDistance < aabbHeight) { //an ordinary intersection, within the aabb
 		penetration = aabbHeight - minDistance ;
-		std::cerr << "\nPenetration of " << penetration << " derived from " << minDistance << " - " << aabbHeight;
 		if (penetration < tinyPenetration)  //0.001f works
 			penetration = 0;
 		collider.currentContactNormal = minContactDir;
-		std::cerr << "\nordindary contact created: ";
 		pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, penetration);
 		return;
 	}
@@ -78,15 +75,13 @@ void CTerrainPhysObj::collisionCheck(CBasePhysObj& collider) {
 		std::cerr << "\nIn the mini-bounce area!";
 		vec3 horizontalVelocity = collider.velocity; horizontalVelocity.y = 0;
 		//check to see if we're running downhill:
-		if (collider.velocity.y < 0 /* && collider.velocity.y > -3.0f */ && length(horizontalVelocity) > 0.5f) { //really crude test
+		if (collider.velocity.y < 0 /*&& collider.velocity.y > -3.0f */ && length(horizontalVelocity) > 0.5f) { //really crude test
 			std::cerr << "\nmini-bounce fix activated!";
 			collider.position.y -= (minDistance - aabbHeight);
 			pManager->addContact(&collider, NULL, vec3(0, 1, 0), restitution, 0);
 			collider.currentContactNormal = minContactDir;
 			return;
 		}
-
-
 	} 
 
 	//still here? Presumably in mid-air, then.
@@ -116,26 +111,21 @@ float CTerrainPhysObj::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contactD
 	scrolledSegBase = scrolledSegTop - vec3(0, veryFarDown, 0);
 	vec3 scrolledSearchTop = scrolledSegTop;
 
-	std::cerr << "\nMaking all-way-down check...";
 	//for each chunk space
 	while (sc = pTerrain->getSC(searchPos)) {
 		//check for chunks
 		pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {
-			std::cerr << "\nChunk found on all-way-down check.";
 			for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
 				if (intersect) {
 					intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
-					std::cerr << "\n\tTri no " << vNo << " intersection " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z;
 					contactDistance = length(scrolledSearchTop - intersectionPoint);
-					std::cerr << " contactDistance " << contactDistance;
 
 					vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
 					vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
 					triNorm = normalize(cross(a, b));
 					contactDir = triNorm;
-					std::cerr << "\n\tcontactDir " << contactDir.x << " " << contactDir.y << " " << contactDir.z;
 					return contactDistance;
 				}
 			}
@@ -165,20 +155,17 @@ float CTerrainPhysObj::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactDi
 	while (sc = pTerrain->getSC(searchPos)) {
 		pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {
-			std::cerr << "\nChunk found on all-way-up check.";
 			for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
 				if (intersect) {
 					intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
-					std::cerr << "\n\tTri no " << vNo << " intersection " << intersectionPoint.x << " " << intersectionPoint.y << " " << intersectionPoint.z;
 					contactDistance = length(scrolledSearchBase - intersectionPoint);
-					std::cerr << " contactDistance " << contactDistance;
+					
 
 					vec3 a = pBuf[vNo + 1].v - pBuf[vNo].v;
 					vec3 b = pBuf[vNo + 2].v - pBuf[vNo].v;
 					triNorm = normalize(cross(a, b));
 					contactDir = triNorm;
-					std::cerr << "\n\tcontactDir " << contactDir.x << " " << contactDir.y << " " << contactDir.z;
 					return contactDistance;
 				}
 			}

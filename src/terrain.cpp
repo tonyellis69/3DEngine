@@ -523,11 +523,8 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 		return;
 
 	//get chunk at this position
-	std::cerr << "\nlooking for chunks at SC " << sc->tmpIndex.x << sc->tmpIndex.y << sc->tmpIndex.z;
-	std::cerr << " position " << pos.x << " " << pos.y << " " << pos.z;
-	Chunk* chunk = getChunk(pos);
+		Chunk* chunk = getChunk(pos);
 	if (!chunk) {
-		std::cerr << " ...none found.";
 	
 		return;
 	}
@@ -535,9 +532,7 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	if (chunk->id == 0) //TO DO: shouldn't get chunks like this, but they seem to happen occassionally. Investigate.
 		return;
 
-	
-	std::cerr << " ... chunk " << chunk->scIndex.x << " " << chunk->scIndex.y << " "
-		<< chunk->scIndex.z << " found";
+
 
 	//check if we already have this chunk in the cache
 	for (int cacheNo = 0; cacheNo < chunkTriCacheSize; cacheNo++) {
@@ -552,7 +547,6 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 	getChunkTris(*chunk, cachedChunkTris[freeChunkTriCache].buf);
 	unsigned int size = multiBuf.getBlockSize(chunk->id);
 	noTris = cachedChunkTris[freeChunkTriCache].noTris = size / (sizeof(TChunkVert) * 3);
-	cerr << "\nRetrieving new chunk data.";
 	cachedChunkTris[freeChunkTriCache].id = chunk->id;
 	buf = cachedChunkTris[freeChunkTriCache].buf;
 

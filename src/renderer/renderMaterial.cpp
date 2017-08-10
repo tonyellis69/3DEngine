@@ -3,7 +3,8 @@
 
 void CRenderMaterial::addImage(std::string filename) {
 	CTextureSlot tex;
-	tex.hTexture = pRenderer->textureManager.getTexture(filename);
+	CRenderTexture* renTex = (CRenderTexture*)pRenderer->textureManager.getTexture(filename);
+	tex.hTexture = renTex->handle;
 	tex.tile = glm::vec2(1);
 	tex.offset = glm::vec2(0);
 //	tex.textureUnit = textures.size();

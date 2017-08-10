@@ -154,6 +154,7 @@ public:
 	void createStandardWireShader();
 	void createStandardBillboardShader();
 	void createWireBoxShader();
+	void createInstancedPhongShader();
 	CBillboard* createBillboard(glm::vec3& pos, glm::vec2 size);
 	void setCurrentCamera(CCamera* camera);
 	CCamera* getCurrentCamera();
@@ -225,8 +226,8 @@ public:
 	CWireShader* wireShader;
 	CBillboardShader* billboardShader;
 	CWireBoxShader* wireBoxShader;
-
 	CGUIrectShader* uiRectShader;
+	CPhongShaderInstanced* phongShaderInstanced; 
 
 	CPhysObjManager physObjManager;
 

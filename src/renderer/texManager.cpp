@@ -11,7 +11,7 @@ CTextureManagerOGL::~CTextureManagerOGL() {
 			delete textures[tex];
 }
 
-GLuint CTextureManagerOGL::getTexture(std::string filename) {
+CBaseTexture* CTextureManagerOGL::getTexture(std::string filename) {
 
 	if (textureStrings.empty() || textureStrings.find(filename) == textureStrings.end()) { //not found
 		CRenderTexture* newTexture = new CRenderTexture;
@@ -31,7 +31,7 @@ GLuint CTextureManagerOGL::getTexture(std::string filename) {
 		addTexture(newTexture,filename);
 	}
 
-	return textureStrings[filename]->handle;
+	return textureStrings[filename];
 }
 
 void CTextureManagerOGL::addTexture(CRenderTexture* texture, std::string filename) {

@@ -130,8 +130,11 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 		}
 	}
 
+	if (instancedBuf)
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, instancedBuf->getIndexHandle());
+	else
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
@@ -220,6 +223,14 @@ void CBuf::setInstanced(CBaseBuf & buf, int noAttribs) {
 	hInstancedBuf = buf.getBufHandle();
 	nInstancedAttribs = noAttribs;
 
+}
+
+unsigned int CBuf::getNoIndices() {
+	return noIndices;
+}
+
+unsigned int CBuf::getIndexHandle() {
+	return hIndex;
 }
 
 

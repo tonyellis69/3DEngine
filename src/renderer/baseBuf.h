@@ -12,6 +12,7 @@ class CBaseBuf {
 public:
 	CBaseBuf();
 	virtual void storeVertexes(void* verts, unsigned int size, unsigned int nVerts) {};
+	virtual void storeIndex(unsigned short * indices, unsigned int size, unsigned int nIndices) {};
 	virtual void setSize(unsigned int size) {};
 	virtual void copyBuf(CBaseBuf& srcBuf, unsigned int size) {};
 	virtual unsigned int getBufHandle() { return 0; };
@@ -29,6 +30,9 @@ public:
 	virtual unsigned int getNoVerts() { return 0; };
 	virtual void setNoVerts(unsigned int nVerts) {};
 	virtual void setInstanced(CBaseBuf& buf, int noAttribs) {};
+	virtual unsigned int getNoIndices() { return 0; };
+	virtual unsigned int getIndexHandle() { return 0; };
+
 
 
 

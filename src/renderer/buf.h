@@ -27,6 +27,9 @@ public:
 	unsigned int getNoVerts();
 	void setNoVerts(unsigned int nVerts);
 	void setInstanced(CBaseBuf& buf, int noAttribs);
+	unsigned int getNoIndices();
+	unsigned int getIndexHandle();
+
 
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.

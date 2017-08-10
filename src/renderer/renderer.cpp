@@ -440,13 +440,13 @@ void CRenderer::setShaderValue(unsigned int floatHandle, int elements, float val
 
 
 void CRenderer::setShader(int program) {
-	glUseProgram(program);
+	glUseProgram(program); 
+
 
 }
 
 void CRenderer::setShader(CShader * shader) {
 	glUseProgram(shader->getShaderHandle());
-	int x = glGetError();
 }
 
 void CRenderer::drawModel(CRenderModel& model) {
@@ -751,5 +751,12 @@ unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
 		return rDrawTriStrip;
 	if (iDrawMode == drawLineLoop)
 		return rDrawLineLoop;
+}
+
+void CRenderer::backFaceCulling(bool on) {
+	if (on)
+		glEnable(GL_CULL_FACE);
+	else
+		glDisable(GL_CULL_FACE);
 }
 

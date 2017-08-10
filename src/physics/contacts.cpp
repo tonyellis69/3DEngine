@@ -57,13 +57,11 @@ void contact::resolveVelocity(float dT) {
 	
 	//Code to prevent vibrations caused by illegal acceleration in a resting object
 	vec3 accCausedVelocity = collider->acceleration;
-	std::cerr << "\naccCausedVelocity = " << accCausedVelocity.x << " " << accCausedVelocity.y << " " << accCausedVelocity.z;
 	if (collidee) 
 		accCausedVelocity -= collidee->acceleration;
 	float accCausedSepVelocity = glm::dot(accCausedVelocity,contactNormal) * dT;
 	//only caused by 'boring into' collidee between frames - wouldn't happen in real life
 
-	std::cerr << "\naccCausedSepVelocity = " << accCausedSepVelocity;
 
 
 	// If we’ve got a closing velocity due to acceleration build-up,
@@ -73,8 +71,7 @@ void contact::resolveVelocity(float dT) {
 		newSeparatingVelocity += restitution * accCausedSepVelocity;
 		//removes from the separating velocity any (small) amount caused by acceleration build-up
 
-		std::cerr << "\nnewSeparatingVelocity = " << newSeparatingVelocity;
-
+	
 		
 	//	std::cerr << "\n" << id << " now considered at rest";
 		resting = true;
@@ -82,8 +79,7 @@ void contact::resolveVelocity(float dT) {
 		// there to remove.
 		if (newSeparatingVelocity < 0) {
 			newSeparatingVelocity = 0;
-			std::cerr << "\nnewSeparatingVelocity was less than 0";
-		}
+			}
 	}
 	
 	
@@ -114,8 +110,6 @@ void contact::resolveVelocity(float dT) {
 	//collider->velocity.z = 0;
 
 	vec3 debugVar = impulsePerUnitMass * collider->inverseMass;
-	std::cerr << "\nImpulse of " << debugVar.x << " " << debugVar.y << " " << debugVar.z;
-	std::cerr << "\changed velocity to " << collider->velocity.x << " " << collider->velocity.y << " " << collider->velocity.z;
 
 
 
@@ -153,8 +147,6 @@ void contact::resolvePenetration(float dT) {
 	//if (depenetrationAggression < 0.09f)
 	//	depenetrationAggression = 0.09f;
 
-
-	std::cerr << "\naggression " << depenetrationAggression;
 
 	// Find the amount of penetration resolution per unit of inverse mass
 	vec3 movePerIMass = contactNormal * (adjPenetration / totalInverseMass);

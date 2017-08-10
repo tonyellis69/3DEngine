@@ -34,7 +34,7 @@ public:
 	CTextureManagerOGL() { internalID = 0; };
 	~CTextureManagerOGL();
 
-	GLuint getTexture(std::string filename);
+	CBaseTexture* getTexture(std::string filename);
 	void addTexture(CRenderTexture* texture, std::string filename);
 	CBaseTexture* createTextureObject();
 	CBaseTexture* createEmptyTexture(int width, int height);

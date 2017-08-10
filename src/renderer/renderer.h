@@ -20,6 +20,7 @@
 #include "phongShader.h"
 #include "wireShader.h"
 #include "billboardShader.h"
+#include "phongShaderInstanced.h"
 
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
@@ -102,6 +103,8 @@ public:
 	void attachTexture(unsigned int textureUnit, CBaseTexture& texture);
 	void drawBuf(CBuf& buf, TdrawMode drawMode);
 	unsigned int getGLdrawMode(TdrawMode);
+
+	void backFaceCulling(bool on);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view

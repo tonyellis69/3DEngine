@@ -89,7 +89,8 @@ void CRenderDrawFuncs::setScreenSize(int width, int height) {
 }
 
 unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName) {
-	return pRenderer->textureManager.getTexture(textureName);
+	CRenderTexture* renTex = (CRenderTexture*)pRenderer->textureManager.getTexture(textureName);
+	return renTex->handle;
 }
 
 void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {

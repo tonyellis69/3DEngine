@@ -281,6 +281,12 @@
     <ClCompile Include="..\src\findPointHeightShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\phongShaderInstanced.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\grassShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -578,6 +584,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\findPointHeightShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\phongShaderInstanced.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\grassShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -40,14 +40,10 @@ void CPhysObj::integrate(float dT) {
 	if (groundContact) {
 		velocity.x *= 0.9f;
 		velocity.z *= 0.9f;
-		std::cerr << "\nreducing horizontal velocity due to ground friction.";
 	}
 
 	//update position from velocity
 	position += velocity * dT;
-
-	std::cerr << "\nIntegration moves collider to " << position.x << " " << position.y << " " << position.z;
-
 
 	//update velocity from acceleration
 	velocity += acceleration * dT;

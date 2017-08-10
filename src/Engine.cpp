@@ -53,6 +53,7 @@ void CEngine::init(HWND& hWnd) {
 	createStandardMultiTexShader();
 	createStandardBillboardShader();
 	createWireBoxShader();
+	createInstancedPhongShader();
 	
 }
 
@@ -1035,6 +1036,21 @@ CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 		 
 	//return it
 	return billboard;
+}
+
+void CEngine::createInstancedPhongShader() {
+	phongShaderInstanced = new CPhongShaderInstanced();
+	phongShaderInstanced->pRenderer = &Renderer;
+	phongShaderInstanced->create(dataPath + "defaultInstanced");
+	phongShaderInstanced->getShaderHandles();
+	phongShaderInstanced->setType(standardPhong);
+	shaderList.push_back(phongShaderInstanced);
+
+	Renderer.setShader(phongShaderInstanced);
+	phongShaderInstanced->setLightDirection(glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
+	phongShaderInstanced->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	phongShaderInstanced->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	phongShaderInstanced->setColour(glm::vec4(1));
 }
 
 void CEngine::setCurrentCamera(CCamera * camera) {

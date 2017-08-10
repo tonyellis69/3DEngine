@@ -53,7 +53,6 @@ void CPhysObjManager::update(const float & dT) {
 	
 	for (auto it = contactList.begin(); it != contactList.end();) {
 		if (it->resolved) {
-			std::cerr << "\nContact " << it->id << " erased.";
 			 it = contactList.erase(it);
 		}
 		else {
@@ -112,7 +111,8 @@ void CPhysObjManager::contactResolver() {
 	if (!contactList.size())
 		return;
 
-	maxIterations = 10; // contactList.size() * 3; //TO DO: should be able to set this
+	maxIterations = 3; // contactList.size() * 3; //TO DO: should be able to set this
+	//was 10, but 3 seems to work fine
 	int currentIteration = 0;
 
 	while (currentIteration < maxIterations) {
