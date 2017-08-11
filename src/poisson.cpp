@@ -113,16 +113,16 @@ namespace pois {
 	/** Return a pointer to the indexed cell, wrapping if necessary. */
 	glm::vec2 * grid2D::cell(int x, int y) {
 		if (x < 0)
-			x = mWidth - x;
+			x = mWidth + x;
 		if (y < 0)
-			y = mHeight - y;
+			y = mHeight + y;
 
 		if (x >= mWidth)
 			x -= mWidth;
 		if (y >= mHeight)
 			y -= mHeight;
 
-		return &cells[y * mWidth + x];
+		return &cells[(y * mWidth) + x];
 	}
 
 }

@@ -675,10 +675,11 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 	for (int child = 0; child <  model.multiBuf.noChildBufs ; child++) {
 		childBuf = &model.multiBuf.childBufs[child];
 		glBindVertexArray(model.multiBuf.childBufs[child].hVAO);
-		for (int object = 0; object < childBuf->objCount ; object++) {
+		for (int object = 0; object < childBuf->objCount; object++) {
 			shader->setColour(childBuf->colour[object]);
 			//TO DO: should be model's drawmode, not GL_Triangles
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
+
 		}
 	}	
 }
