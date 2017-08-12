@@ -9,6 +9,13 @@ class CSuperChunk;
 
 enum  TChunkStatus { chToSkin, chSkinned, chFree, chRemoveOnAlert };
 
+struct TDrawDetails {
+	 int childBufNo;
+	unsigned int vertStart;
+	unsigned int vertCount;
+	glm::vec4 colour;
+};
+
 /** A class for regular cubes of terrain geometry. */
 class Chunk  {
 public:
@@ -40,6 +47,8 @@ public:
 	TChunkStatus status;
 
 	unsigned int grassId; ///<Identifies this chunk's grass verts.
+
+	TDrawDetails drawDetails; ///<Buffer details for drawing this chunk.
 
 private:
 	CSuperChunk* creatorSC;

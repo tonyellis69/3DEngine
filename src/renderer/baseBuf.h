@@ -32,7 +32,9 @@ public:
 	virtual void setInstanced(CBaseBuf& buf, int noAttribs) {};
 	virtual unsigned int getNoIndices() { return 0; };
 	virtual unsigned int getIndexHandle() { return 0; };
-
+	virtual void getElementData(const unsigned int id, unsigned int& firstVert, unsigned int& vertCount,  int& childBufNo) {};
+		
+	
 
 
 

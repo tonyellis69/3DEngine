@@ -52,8 +52,9 @@ public:
 	void setBlockColour(unsigned int id, tmpRGBAtype& colour);
 	void copyBlock(unsigned int id, char* buf);
 	unsigned int getBlockSize(unsigned int id);
-	void getElementData(const unsigned int id, int& firstVert, unsigned int& vertCount, unsigned int& hVAO);
+	void getElementData(const unsigned int id, unsigned int& firstVert, unsigned int& vertCount,  int& childBufNo);
 	void setInstanced(CBaseBuf & buf, int noAttribs);
+	
 
 	GLint* first;
 	GLsizei* count;

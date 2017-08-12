@@ -686,14 +686,16 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 
 /**	Draw the given element stored in this multibuffer. */
 void CRenderer::drawMultBufItem(CMultiBuf& multiBuf, unsigned int elementID) {
-	int firstVert;
+	unsigned int firstVert;
 	unsigned int noVerts;
 	unsigned int childNo;
-	unsigned int hVAO;
-	multiBuf.getElementData(elementID, firstVert, noVerts, hVAO);
+	int childBufNo;
+	multiBuf.getElementData(elementID, firstVert, noVerts, childBufNo);
 
 	//draw item
-	glBindVertexArray(hVAO);
+
+	
+	glBindVertexArray(multiBuf.childBufs[childBufNo].hVAO);
 	glDrawArrays(GL_TRIANGLES, firstVert, noVerts);
 }
 

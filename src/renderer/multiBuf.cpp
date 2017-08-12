@@ -213,12 +213,13 @@ unsigned int CMultiBuf::getBlockSize(unsigned int id) {
 }
 
 /** Return the vertex data for the given element. */
-void CMultiBuf::getElementData(const unsigned int id, int& firstVert, unsigned int& vertCount, unsigned int& hVAO) {
+void CMultiBuf::getElementData(const unsigned int id, unsigned int& firstVert, unsigned int& vertCount,  int& childBufNo) {
 	CChildBlock* block = &blocks[id];
 	firstVert = block->arrayFirst;
 	vertCount = block->arrayCount;
-	unsigned int childBufNo = (id >> 16) - 1;
-	hVAO = childBufs[childBufNo].hVAO;
+	childBufNo = (id >> 16) - 1;
+	//unsigned int childBufNo = (id >> 16) - 1;
+	//hVAO = childBufs[childBufNo].hVAO;
 }
 
 /** Return the id of the nearest larger block than size, or zero. */
@@ -304,6 +305,8 @@ void CMultiBuf::setInstanced(CBaseBuf& buf, int noAttribs) {
 	hInstancedBuf = buf.getBufHandle();
 	nInstancedAttribs = noAttribs;
 }
+
+
 
 
 CMultiBuf::~CMultiBuf() {

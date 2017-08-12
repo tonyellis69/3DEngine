@@ -12,6 +12,9 @@ void Chunk::init() {
 	creatorSC = NULL;
 	overlapDir = none;
 	status = chFree;
+	drawDetails.childBufNo = -1;
+	drawDetails.vertCount = 0;
+	drawDetails.vertStart = 0;
 }
 
 void Chunk::setCreatorSC(CSuperChunk * creator) {
