@@ -12,7 +12,6 @@ public:
 	unsigned short getNextId();
 	std::vector<GLint> first;
 	std::vector<GLsizei> count;
-	std::vector<glm::vec4> colour;
 	unsigned int objCount;
 	unsigned short nextId;
 };
@@ -49,7 +48,6 @@ public:
 	unsigned int getLastId();
 	void draw();
 	void deleteBlock(unsigned int id);
-	void setBlockColour(unsigned int id, tmpRGBAtype& colour);
 	void copyBlock(unsigned int id, char* buf);
 	unsigned int getBlockSize(unsigned int id);
 	void getElementData(const unsigned int id, unsigned int& firstVert, unsigned int& vertCount,  int& childBufNo);

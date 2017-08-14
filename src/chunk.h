@@ -49,6 +49,7 @@ public:
 	unsigned int grassId; ///<Identifies this chunk's grass verts.
 
 	TDrawDetails drawDetails; ///<Buffer details for drawing this chunk.
+	TDrawDetails grassDrawDetails;
 
 private:
 	CSuperChunk* creatorSC;

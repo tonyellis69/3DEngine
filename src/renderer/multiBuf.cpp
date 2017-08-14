@@ -186,15 +186,6 @@ void CMultiBuf::deleteBlock(unsigned int id) {
 	
 }
 
-void CMultiBuf::setBlockColour(unsigned int id, tmpRGBAtype & colour) {
-	//find buf
-	CChildBlock* block = &blocks[id];
-	unsigned short childBufNo = (id >> 16) - 1;
-	unsigned short blockIdx = block->blockIdx;
-	CChildBuf* childBuf = &childBufs[childBufNo];
-	//set colour;
-	childBuf->colour[blockIdx] = glm::vec4(colour.r, colour.g, colour.b, colour.a);
-}
 
 void CMultiBuf::copyBlock(unsigned int id, char * buf) {
 	CChildBlock* block = &blocks[id];
@@ -218,8 +209,6 @@ void CMultiBuf::getElementData(const unsigned int id, unsigned int& firstVert, u
 	firstVert = block->arrayFirst;
 	vertCount = block->arrayCount;
 	childBufNo = (id >> 16) - 1;
-	//unsigned int childBufNo = (id >> 16) - 1;
-	//hVAO = childBufs[childBufNo].hVAO;
 }
 
 /** Return the id of the nearest larger block than size, or zero. */
@@ -248,14 +237,9 @@ void CMultiBuf::copyToFreeBlock(unsigned int hSrcBuf, unsigned int freeBlock, un
 	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, blockStart, size);
 
 	childBuf->count[blockIdx] = size / elemSize;
-	//childBuf->objCount++;
 	block->unAssign = false;
-
 	block->arrayCount = childBuf->count[blockIdx];
-//	block->blockStart = freeMem;
-
 	lastId = freeBlock;
-	
 }
 
 /** Reserve a new block of memory and copy size bytes of the given buffer to it. */
@@ -275,7 +259,6 @@ void CMultiBuf::copyToNewBlock(unsigned int hSrcBuf, unsigned int size) {
 
 	currentChild->first.push_back(freeMem / elemSize);
 	currentChild->count.push_back(size / elemSize);
-	currentChild->colour.push_back(glm::vec4(0.5f, 0.5f, 0.5f, 1)); //TO DO: kill
 
 	//record on blocks list
 	CChildBlock newBlock;
