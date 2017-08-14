@@ -385,6 +385,123 @@ void CSuperChunk::overlapAlert(Tdirection overlap) {
 	}
 }
 
+/**	Returns true if any part of the SC is in front of the given plane.*/
+bool CSuperChunk::inFrontOfPlane(glm::vec3& planePos, glm::vec3& planeNormal) {
+	vec3 corner = nwWorldPos + terrain->layers[layerNo].nwLayerPos;
+	if (glm::dot(corner - planePos, planeNormal) >= 0)
+		return true;
+	vec3 opCorner = corner + vec3(terrain->layers[layerNo].scSize);
+	if (glm::dot(opCorner - planePos, planeNormal) >= 0)
+		return true;
+	return false;
+}
+
+/** Returns true if the SC is entirely outside the fustrum extracted from the given matrix. */
+bool CSuperChunk::isOutsideFustrum(glm::mat4 & mvp) {
+	
+	float scSize = terrain->layers[layerNo].scSize;
+
+	vec3 cornerAdjust = vec3(0);// vec3(faceBoundary[west], faceBoundary[down], faceBoundary[north]);
+	vec3 opCornerAdjust = vec3(0); // vec3(faceBoundary[east] + 1, faceBoundary[up] + 1, faceBoundary[south] + 1);
+
+	//TO DO: seems like we don't need adjustment - not entirely sure why
+	//keep an eye on it for now,
+	
+	vec3 minMax[2];
+	minMax[0] = nwWorldPos + terrain->layers[layerNo].nwLayerPos;
+	minMax[1] = minMax[0] + scSize; // (opCornerAdjust * chunkSize);
+
+	minMax[0] += cornerAdjust * chunkSize;
+
+	
+	vec3 leadingVert;
+	int lvX, lvY, lvZ;
+	float dotProd;
+
+
+
+	vec4 nearP;
+	nearP.x = mvp[0].z + mvp[0].w;
+	nearP.y = mvp[1].z + mvp[1].w;
+	nearP.z = mvp[2].z + mvp[2].w;
+	nearP.w = mvp[3].z + mvp[3].w;
+
+	lvX = nearP.x > 0;
+	lvY = nearP.y > 0;
+	lvZ = nearP.z > 0;
+
+	leadingVert = vec3(minMax[lvX].x, minMax[lvY].y, minMax[lvZ].z);
+	dotProd = glm::dot(vec3(nearP), leadingVert);
+	if (dotProd < -nearP.w)
+		return true;
+
+	vec4 bottomP;
+	bottomP.x = mvp[0].w + mvp[0].y;
+	bottomP.y = mvp[1].w + mvp[1].y;
+	bottomP.z = mvp[2].w + mvp[2].y;
+	bottomP.w = mvp[3].w + mvp[3].y;
+
+	lvX = bottomP.x > 0;
+	lvY = bottomP.y > 0;
+	lvZ = bottomP.z > 0;
+
+	leadingVert = vec3(minMax[lvX].x, minMax[lvY].y, minMax[lvZ].z);
+	dotProd = glm::dot(vec3(bottomP), leadingVert);
+	if (dotProd < -bottomP.w)
+		return true;
+
+
+	vec4 leftP;
+	leftP.x = mvp[0].x + mvp[0].w;
+	leftP.y = mvp[1].x + mvp[1].w;
+	leftP.z = mvp[2].x + mvp[2].w;
+	leftP.w = mvp[3].x + mvp[3].w;
+
+	lvX = leftP.x > 0;
+	lvY = leftP.y > 0;
+	lvZ = leftP.z > 0;
+
+	leadingVert = vec3(minMax[lvX].x, minMax[lvY].y, minMax[lvZ].z);
+
+	dotProd = glm::dot(vec3(leftP), leadingVert);
+	if (dotProd < -leftP.w)
+		return true;
+
+
+	vec4 rightP;
+	rightP.x = mvp[0].w - mvp[0].x;
+	rightP.y = mvp[1].w - mvp[1].x;
+	rightP.z = mvp[2].w - mvp[2].x;
+	rightP.w = mvp[3].w - mvp[3].x;
+
+	lvX = rightP.x > 0;
+	lvY = rightP.y > 0;
+	lvZ = rightP.z > 0;
+
+	leadingVert = vec3(minMax[lvX].x, minMax[lvY].y, minMax[lvZ].z);
+	dotProd = glm::dot(vec3(rightP), leadingVert);
+	if (dotProd < -rightP.w)
+		return true;
+
+
+	vec4 topP;
+	topP.x = mvp[0].w - mvp[0].y;
+	topP.y = mvp[1].w - mvp[1].y;
+	topP.z = mvp[2].w - mvp[2].y;
+	topP.w = mvp[3].w - mvp[3].y;
+
+	lvX = topP.x > 0;
+	lvY = topP.y > 0;
+	lvZ = topP.z > 0;
+
+	leadingVert = vec3(minMax[lvX].x, minMax[lvY].y, minMax[lvZ].z);
+	dotProd = glm::dot(vec3(topP), leadingVert);
+	if (dotProd < -topP.w)
+		return true;
+
+	return false;
+}
+
 
 CSuperChunk::~CSuperChunk() {
 	for (size_t c=0;c<chunkList.size();c++) {

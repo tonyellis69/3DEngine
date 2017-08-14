@@ -22,6 +22,7 @@ public:
 	void keepUpright(const glm::vec3& target);
 	void createClipMatrix();
 	void freeRotate(glm::vec3& axis, float& angle);
+	void getBackPlane(glm::vec3& planePos, glm::vec3& planeNormal);
 
 	glm::mat4 clipMatrix; ///<Transforms coordinates in clip space, ready for rasterizing.
 	glm::mat4 perspectiveMatrix; ///<The perspective transform of this camera.

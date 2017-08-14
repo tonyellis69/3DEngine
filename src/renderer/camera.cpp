@@ -149,6 +149,12 @@ void CCamera::freeRotate(glm::vec3& axis, float& angle) {
 
 }
 
+/** Return the back plane of this camera's frustum. */
+void CCamera::getBackPlane(glm::vec3 & planePos, glm::vec3 & planeNormal) {
+	planePos = getPos();
+	planeNormal = getTargetDir();
+}
+
 //TO DO: camera subclass of rotate must update the camera's clip matrix, because we've changed not just the
 //camera object but how it changes the view
 

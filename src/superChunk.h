@@ -50,6 +50,8 @@ public:
 	void removeAllChunks();
 	void raiseOverlapCount(int chunks, Tdirection faceDir);
 	void overlapAlert(Tdirection overlap);
+	bool inFrontOfPlane(glm::vec3 & planePos, glm::vec3 & planeNormal);
+	bool isOutsideFustrum(glm::mat4& mvp);
 
 	glm::i32vec3 sizeInChunks; ///<Width, height and depth in chunks.
 	int cubesPerChunkEdge; ///<Number of cubes per edge of a chunk.
