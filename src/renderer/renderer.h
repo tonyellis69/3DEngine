@@ -36,10 +36,8 @@ extern int totalbufsize;
 extern int totalchunks;
 
 
-class CRenderTerrain;
+//class CRenderTerrain;
 
-//class CModel;
-//class CRenderModel;
 
 /** The high-level renderer class. */
 class CRenderer {

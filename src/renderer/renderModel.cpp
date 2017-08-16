@@ -25,12 +25,12 @@ void CRenderModel::freeBuffers() {
 	pRenderer->freeVAO(buf.hVAO);
 }
 
-void CRenderModel::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
-	buf.storeVertexes(verts, size, nVerts);
+void CRenderModel::storeVertexes(void * verts, unsigned int vertSize, unsigned int nVerts) {
+	buf.storeVertexes(verts, vertSize  * nVerts, nVerts);
 }
 
-void CRenderModel::storeIndex(unsigned short * indices, unsigned int size, unsigned int nIndices) {
-	buf.storeIndex(indices, size, nIndices);
+void CRenderModel::storeIndex(unsigned short * indices, unsigned int nIndices) {
+	buf.storeIndex(indices, sizeof(unsigned short) * nIndices, nIndices);
 }
 
 void CRenderModel::storeLayout(int attr1, int attr2, int attr3, int attr4) {

@@ -551,8 +551,8 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 		16,19,18,18,17,16,
 		21,20,23,21,23,22}; 
 
-	cube->storeVertexes(v, sizeof(v), 24);
-	cube->storeIndex(index, sizeof(index), indexSize);
+	cube->storeVertexes(v, sizeof(vBuf::T3DnormVert), 24);
+	cube->storeIndex(index, indexSize);
 	cube->storeLayout(3, 3, 0, 0);
 
 	//modelList.push_back(cube);
@@ -650,8 +650,8 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 
 
 
-	cylinder->storeVertexes(v, sizeof(vBuf::T3DnormVert) * noVerts, noVerts);
-	cylinder->storeIndex(index, sizeof(unsigned short) * i, i);
+	cylinder->storeVertexes(v, sizeof(vBuf::T3DnormVert) , noVerts);
+	cylinder->storeIndex(index, i);
 	cylinder->storeLayout(3, 3,0, 0);
 
 	delete[] v;
@@ -713,8 +713,8 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	dome->setPos(pos);
 	dome->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 
-	dome->storeVertexes(v, sizeof(vBuf::T3DnormVert) * noVerts, noVerts);
-	dome->storeIndex(index, sizeof(unsigned short) * i, i);
+	dome->storeVertexes(v, sizeof(vBuf::T3DnormVert) , noVerts);
+	dome->storeIndex(index,  i);
 	dome->storeLayout(3, 3, 0, 0);
 	dome->setDrawMode(drawTris);
 
@@ -771,8 +771,8 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 	plane->setPos(pos);
 	plane->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 
-	plane->storeVertexes(v, sizeof(vBuf::T3DtexVert) * noVerts, noVerts);
-	plane->storeIndex(index, sizeof(unsigned short) * i, i);
+	plane->storeVertexes(v, sizeof(vBuf::T3DtexVert) , noVerts);
+	plane->storeIndex(index,  i);
 	plane->storeLayout(3, 2, 0, 0);
 	plane->setDrawMode(drawTris);
 

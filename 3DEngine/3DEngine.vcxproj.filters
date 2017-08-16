@@ -15,6 +15,9 @@
     <Filter Include="physics">
       <UniqueIdentifier>{68bf13a4-7614-482d-9d7c-c43c43446815}</UniqueIdentifier>
     </Filter>
+    <Filter Include="plants">
+      <UniqueIdentifier>{f8095697-a025-4e4c-a489-51c83798dc72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\2DPolygon.cpp">
@@ -286,6 +289,9 @@
     </ClCompile>
     <ClCompile Include="..\src\grassShader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Plants\fractalTree.cpp">
+      <Filter>plants</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -591,6 +597,9 @@
     </ClInclude>
     <ClInclude Include="..\src\grassShader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plants\fractalTree.h">
+      <Filter>plants</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

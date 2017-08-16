@@ -23,8 +23,8 @@ void CBillboard::setSize(glm::vec2 & size) {
 	
 	unsigned short index[6] = { 0,2,3,0,3,1 };
 
-	storeVertexes(vert, sizeof(vert), 4);
-	storeIndex(index, sizeof(index), 6);
+	storeVertexes(vert, sizeof(vBuf::T3DtexVert), 4);
+	storeIndex(index,  6);
 	storeLayout(3, 2, 0, 0);
 }
 
