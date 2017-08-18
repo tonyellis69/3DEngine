@@ -29,8 +29,8 @@ void CRenderModel::storeVertexes(void * verts, unsigned int vertSize, unsigned i
 	buf.storeVertexes(verts, vertSize  * nVerts, nVerts);
 }
 
-void CRenderModel::storeIndex(unsigned short * indices, unsigned int nIndices) {
-	buf.storeIndex(indices, sizeof(unsigned short) * nIndices, nIndices);
+void CRenderModel::storeIndex(unsigned int * indices, unsigned int nIndices) {
+	buf.storeIndex(indices, nIndices);
 }
 
 void CRenderModel::storeLayout(int attr1, int attr2, int attr3, int attr4) {

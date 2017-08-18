@@ -9,7 +9,7 @@ public:
 	CBaseBuf* getBuffer();
 	void freeBuffers();
 	void storeVertexes(void* verts, unsigned int vertSize, unsigned int nVerts);
-	void storeIndex(unsigned short* indices,  unsigned int nIndices);
+	void storeIndex(unsigned int* indices,  unsigned int nIndices);
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
 	void setDrawMode(TdrawMode drawMode);
 	void setMaterial(CMaterial& iMaterial);

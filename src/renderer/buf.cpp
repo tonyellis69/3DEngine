@@ -12,6 +12,7 @@ CBuf::CBuf() {
 	hInstancedBuf = 0;
 	nInstancedAttribs = 0;
 	instancedBuf = NULL;
+	indexType = GL_UNSIGNED_SHORT;
 }
 
 void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
@@ -23,15 +24,32 @@ void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	noVerts = nVerts;
 	bufSize = size;
+	if (noVerts > 65535)
+		indexType = GL_UNSIGNED_INT;
+	else
+		indexType = GL_UNSIGNED_SHORT;
 }
 
-void CBuf::storeIndex(unsigned short * indices, unsigned int size, unsigned int nIndices) {
+void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
+	unsigned int size; void* indicesPtr; unsigned short* shortBuf = NULL;
+	if (indexType == GL_UNSIGNED_SHORT) {
+		size = nIndices * sizeof(unsigned short);
+		shortBuf = new unsigned short[nIndices];
+		std::copy(indices, indices + nIndices, shortBuf);
+		indicesPtr = shortBuf;
+	}
+	else {
+		size = nIndices * sizeof(unsigned int);
+		indicesPtr = indices;
+	}
 	if (hIndex == 0)
 		glGenBuffers(1, &hIndex);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, (void*)indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indicesPtr, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	noIndices = nIndices;
+	if (shortBuf)
+		delete shortBuf;
 }
 
 void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {

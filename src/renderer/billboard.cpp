@@ -21,7 +21,7 @@ void CBillboard::setSize(glm::vec2 & size) {
 	vert[2].v = glm::vec3(-halfWidth, -halfHeight, 0); vert[2].tex = glm::vec2(0, 0);
 	vert[3].v = glm::vec3(halfWidth, -halfHeight, 0); vert[3].tex = glm::vec2(1, 0);
 	
-	unsigned short index[6] = { 0,2,3,0,3,1 };
+	unsigned int index[6] = { 0,2,3,0,3,1 };
 
 	storeVertexes(vert, sizeof(vBuf::T3DtexVert), 4);
 	storeIndex(index,  6);

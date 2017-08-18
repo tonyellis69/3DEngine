@@ -544,7 +544,7 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 	
 	//fill index with indices
-	unsigned short index[indexSize] = {1,0,3,1,3,2,
+	unsigned int index[indexSize] = {1,0,3,1,3,2,
 		5,4,7,5,7,6,
 		9,8,11,9,11,10,
 		13,12,15,13,15,14,
@@ -629,7 +629,7 @@ CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
 
 
 	const int noTriangles = s*4;
-	unsigned short* index = new unsigned short[noTriangles * 3];
+	unsigned int* index = new unsigned int[noTriangles * 3];
 	int i = 0;
 	const int finalSeg = s-1;
 	for (int seg=0;seg < finalSeg;seg++) {
@@ -690,7 +690,7 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	
 
 	const int noTriangles = (steps * 2 * (noRings - 1)) + steps;
-	unsigned short* index = new unsigned short[noTriangles * 3];
+	unsigned int* index = new unsigned int[noTriangles * 3];
 	//for each ring except the last, use its verts to make two triangles
 	int baseRing, topRing; int i = 0; int seg;
 	for (int ring = 0; ring < noRings - 1; ring++) {
@@ -756,7 +756,7 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 
 	//create indices
 	const int noTriangles = (steps * steps) * 2;
-	unsigned short* index = new unsigned short[noTriangles * 3];
+	unsigned int* index = new unsigned int[noTriangles * 3];
 	int i = 0;
 	const int nextRow = steps + 1;
 

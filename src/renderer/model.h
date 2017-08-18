@@ -31,7 +31,7 @@ public:
 	virtual void storeIndexedData(unsigned short* index) {};
 	virtual void freeBuffers() {};
 	virtual void storeVertexes(void* verts, unsigned int vertSize, unsigned int nVerts) {};
-	virtual void storeIndex(unsigned short* indices,  unsigned int nIndices) {};
+	virtual void storeIndex(unsigned int* indices,  unsigned int nIndices) {};
 	virtual void storeLayout(int attr1, int attr2, int attr3, int attr4) {};
 	virtual void setDrawMode(TdrawMode drawMode) {};
 	virtual void assignMaterial() {};

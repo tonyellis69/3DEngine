@@ -46,14 +46,14 @@ void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
 	corners[2].tex = vec2(0,1);
 	corners[3].tex = vec2(1,1);
 
-	unsigned short index[4] = { 2,3,0,1 };
+	unsigned int index[4] = { 2,3,0,1 };
 	quadBufs[control.uniqueID].rect.storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].rect.storeIndex(index, sizeof(index), 4);
+	quadBufs[control.uniqueID].rect.storeIndex(index,  4);
 	quadBufs[control.uniqueID].rect.storeLayout(2, 2, 0, 0);
 
-	unsigned short index2[4] = { 1,0,2,3 };
+	unsigned int index2 [4] = { 1,0,2,3 };
 	quadBufs[control.uniqueID].border.storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].border.storeIndex(index2, sizeof(index2), 4);
+	quadBufs[control.uniqueID].border.storeIndex(index2,  4);
 	quadBufs[control.uniqueID].border.storeLayout(2, 2,0, 0);
 }
 

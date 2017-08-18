@@ -69,55 +69,23 @@ void CRenderer::attachWindow(HWND& hWnd){
 
 
 void CRenderer::getGLinfo() {
+	cerr << endl;
 	GLenum err = glewInit();
 	if (GLEW_OK != err)	{
-		/* Problem: glewInit failed, something is seriously wrong. */
-		fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+		cerr << "\nglewInit failed, error: %s\n" << glewGetErrorString(err);
 	}
-	fprintf(stderr, "\nStatus: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-
-	const unsigned char *version = (const unsigned char *)glGetString(GL_VERSION);
-	fprintf(stderr,"\nOpenGL version: %s.\n",version);
+	cerr << "\nUsing GLEW " << glewGetString(GLEW_VERSION);
+	cerr << "\nOpenGL version: " << glGetString(GL_VERSION);
 
 	if(	(NULL == strstr( (char const*)glGetString( GL_EXTENSIONS ),
 		"GL_ARB_texture_non_power_of_two" ) ) ) {	
-			fprintf(stderr,"No NPOT\n");
+			cerr << "\nNo NPOT";
 	} else {
-		fprintf(stderr,"Has NPOT\n");
+		cerr << "\nHas NPOT";
 	}
 
-/*	GLint attribs[] =
-	{
-    // Here we ask for OpenGL 2.1
-    WGL_CONTEXT_MAJOR_VERSION_ARB, 2,
-    WGL_CONTEXT_MINOR_VERSION_ARB, 1,
-    // Uncomment this for forward compatibility mode
-    //WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-    // Uncomment this for Compatibility profile
-  //  WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-    // We are using Core profile here
-   // WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,0
-	};
-*/
-	int attribs[] =
-{
-	WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-		WGL_CONTEXT_MINOR_VERSION_ARB, 2,
-	//WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
-	//WGL_CONTEXT_FLAGS_ARB, 0,
-//	0
-// WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-//    0
-};
-
-//	HGLRC CompHRC = wglCreateContextAttribsARB(myhDC, 0, attribs);
-//	if (CompHRC && wglMakeCurrent(myhDC, CompHRC))
-//		myhRC = CompHRC;
-
-//	version = (const unsigned char *)glGetString(GL_VERSION);
-//	fprintf(stderr,"\nOpenGL version: %s.\n",version);
-
-
+	cerr << "\nglsl version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
+	cerr << endl;
 }
 
 
@@ -454,7 +422,7 @@ void CRenderer::drawModel(CRenderModel& model) {
 	if (model.buf.hIndex == 0)
 		glDrawArrays(model.drawMode, 0, model.buf.noVerts);
 	else
-		glDrawElements(model.drawMode, model.buf.noIndices, GL_UNSIGNED_SHORT, 0);
+		glDrawElements(model.drawMode, model.buf.noIndices, model.buf.indexType, 0);
 	glBindVertexArray(0);
 }
 
@@ -506,10 +474,10 @@ void CRenderer::createScreenQuad() {
 	vert[2] = glm::vec2(-1, -1);
 	vert[3] = glm::vec2(1, -1);
 
-	unsigned short index[4] = { 2,3,0,1 };
+	unsigned int index[4] = { 2,3,0,1 };
 
 	screenQuad.storeVertexes(vert, sizeof(vert), 4);
-	screenQuad.storeIndex(index, sizeof(index), 4);
+	screenQuad.storeIndex(index, 4);
 	screenQuad.storeLayout(2, 0, 0, 0);
 }
 
@@ -733,7 +701,7 @@ void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
 	if (buf.hIndex == 0)
 		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
 	else
-		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, GL_UNSIGNED_SHORT, 0);
+		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, buf.indexType, 0);
 
 	glBindVertexArray(0);
 }

@@ -4,37 +4,76 @@
 
 #include <glm/gtx/rotate_vector.hpp>
 
+
+
 CFractalTree::CFractalTree() {
 	currentIndex = 0;
-	stemFaces = 6;
-	maxStages = 6;
+	stemFaces = 4;
+	maxStages =  5;
+	randEngine.seed(740608);
+	stageScale = 0.6f;
+	branchInset = 0.995f;
+	branchAngle = 30.0f;
+	nBranches =  1;
 }
 
-void CFractalTree::createStem(const int stage, const glm::vec3 & pos, const glm::vec3 & angle) {
-	if (stage > maxStages)
-		return;
+/** Create the entire plant. */
+void CFractalTree::create() {
+	TStem baseStem = { 1, glm::vec3(0), glm::vec3(0,1,0), stemLength, stemRadius, 0};
+	createStem(baseStem);
+}
 
-	//glm::vec3 end = createStemWire(stage, pos, angle);
-	glm::vec3 end = createStemSolid(stage, pos, angle);
+void CFractalTree::createStem(TStem& stem) {
 
+	
+	stem.length +=  stemLengthVariance(randEngine) * stem.length;
+	unsigned int endRingStart;
+	glm::vec3 end = createStemSolid(stem, endRingStart);
 
-	//call self 3-4 times
-	glm::vec3 newAngle;
-	glm::vec3 rotationAxis = glm::cross(angle, glm::vec3(0, 0, 1)); //create an axis perpendicular to this stem
-	glm::vec3 branchPoint = pos + angle * stemLength * float(1.49f / stage);
-	for (int branch = 0; branch < 3; branch++) {
-		newAngle = glm::rotate(angle, glm::radians(30.0f), rotationAxis);
-		rotationAxis = glm::rotate(rotationAxis, glm::radians(120.0f), angle);
-		createStem(stage + 1, branchPoint, newAngle);
+	if (stem.stage < maxStages) {
+		glm::vec3 rotationAxis = getNormal(stem.angle); //create an axis perpendicular to this stem
+		glm::vec3 branchPoint = stem.pos + stem.angle * stem.length ;
+		float newLength = stem.length * stageScale;
+		int numBranches = nBranches + branchNumVariance(randEngine);
+		for (int branch = 0; branch < numBranches; branch++) {
+			float variance = branchAngle * branchAngleVariance(randEngine);
+			glm::vec3 newAngle = glm::rotate(stem.angle, glm::radians(branchAngle + variance), rotationAxis);
+
+			TStem childStem = { stem.stage + 1, branchPoint, newAngle, newLength, stem.radius  * stageScale, endRingStart };
+			createStem(childStem);
+			rotationAxis = glm::rotate(rotationAxis, glm::radians(360.0f/ numBranches), stem.angle);
+		}
 	}
 }
 
-void CFractalTree::setStemLength(float length) {
+void CFractalTree::setStemLength(float length, float variation) {
 	stemLength = length;
+	using param_t = std::uniform_real_distribution<>::param_type;
+	param_t p{ -variation, variation };
+	stemLengthVariance.param(p);
+}
+
+void CFractalTree::setStageScale(float scale) {
+	stageScale = scale;
 }
 
 void CFractalTree::setStemRadius(float radius) {
 	stemRadius = radius;
+}
+
+void CFractalTree::setNumBranches(int numBranches, int variation) {
+	nBranches = numBranches;
+	using param_t = std::uniform_int_distribution<>::param_type;
+	param_t p{ -variation, variation };
+	branchNumVariance.param(p);
+}
+
+void CFractalTree::setBranchAngle(float angle, float variation) {
+	branchAngle = angle;
+	using param_t = std::uniform_real_distribution<>::param_type;
+	param_t p{ -variation, variation };
+	branchAngleVariance.param(p);
+
 }
 
 void CFractalTree::setStemFaces(int nFaces) {
@@ -70,31 +109,37 @@ glm::vec3 CFractalTree::createStemWire(const int stage, const glm::vec3 & pos, c
 	return endVert.v;
 }
 
-glm::vec3 CFractalTree::createStemSolid(const int stage, const glm::vec3 & pos, const glm::vec3 & angle) {
-	//find normal to current stem
-	glm::vec3 stemNormal = glm::cross(angle, glm::vec3(0, 0, 1)); //create an axis perpendicular to this stem
-	stemNormal = glm::normalize(stemNormal);
+glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingStart) {
+	glm::vec3 stemNormal = getNormal(stem.angle); //create an axis perpendicular to this stem
 	
-	float currentRadius = stemRadius * float(1.5f / stage);
+	//float currentRadius = stemRadius * float(1.5f / stem.stage);
 	float rot = 360 / stemFaces;
 
 	vBuf::T3DnormVert vert;
-	//Create a ring of base vectors
-	for (int face = 0; face < stemFaces; face++) {
-		vert.v = glm::vec3(0) + (stemNormal * currentRadius );
-		vert.v = glm::rotate(vert.v, glm::radians(-rot * face), angle);
-		vert.normal = glm::normalize(vert.v);
-		vert.v = pos + vert.v;
-		verts.push_back(vert);	
-	}
+	unsigned int baseRingStart;
 
-	currentRadius *= 0.7f;
+	if (!stem.parentEndRing) {
+		//Create a ring of base vectors
+		baseRingStart = verts.size();
+		for (int face = 0; face < stemFaces; face++) {
+			vert.v = glm::vec3(0) + (stemNormal * stem.radius);
+			vert.v = glm::rotate(vert.v, glm::radians(-rot * face), stem.angle);
+			vert.normal = glm::normalize(vert.v);
+			vert.v = stem.pos + vert.v;
+			verts.push_back(vert);
+		}
+	}
+	else
+		baseRingStart = stem.parentEndRing;
+
+	float endRadius = stem.radius * stageScale;
 
 	//create ring of end vectors
-	glm::vec3 end = pos + angle * stemLength * float(1.5f / stage);
+	unsigned int endRingStart = verts.size();
+	glm::vec3 end = stem.pos + stem.angle * stem.length;
 	for (int face = 0; face < stemFaces; face++) {
-		vert.v = glm::vec3(0) + (stemNormal * currentRadius );
-		vert.v = glm::rotate(vert.v, glm::radians(-rot * face), angle);
+		vert.v = glm::vec3(0) + (stemNormal * endRadius);
+		vert.v = glm::rotate(vert.v, glm::radians(-rot * face), stem.angle);
 		vert.normal = glm::normalize(vert.v);
 		vert.v = end + vert.v;
 		verts.push_back(vert);
@@ -102,28 +147,37 @@ glm::vec3 CFractalTree::createStemSolid(const int stage, const glm::vec3 & pos, 
 
 	//stitch them together via indexing
 	int startIndex = currentIndex;
+	int face;
+	for ( face = 0; face < stemFaces-1 ; face++) {
+		index.push_back(baseRingStart + face); //0
+		index.push_back(endRingStart + face); //4
+		index.push_back(baseRingStart + face + 1); //1
 	
-	for (int face = 0; face < stemFaces-1 ; face++) {
-		index.push_back(currentIndex); //0
-		index.push_back(currentIndex + stemFaces); //4
-		index.push_back(currentIndex + 1); //1
-	
-		index.push_back(currentIndex + stemFaces + 1); //5
-		index.push_back(currentIndex + 1); //1
-		index.push_back(currentIndex + stemFaces); //4
-		currentIndex++;
+		index.push_back(endRingStart + 1 + face); //5
+		index.push_back(baseRingStart + 1 + face); //1
+		index.push_back(endRingStart + face); //4
+		//currentIndex++;
 	}
+	
+	index.push_back(baseRingStart + face); //0
+	index.push_back(endRingStart + face); //4
+	index.push_back(baseRingStart); //1
 
-	index.push_back(currentIndex); //0
-	index.push_back(currentIndex + stemFaces); //4
-	index.push_back(startIndex); //1
+	index.push_back(endRingStart); //5
+	index.push_back(baseRingStart); //1
+	index.push_back(endRingStart + face); //4
 
-	index.push_back(startIndex + stemFaces ); //5
-	index.push_back(startIndex  ); //1
-	index.push_back(currentIndex + stemFaces); //4
-
-
-	currentIndex += stemFaces +1;
+	
+	//currentIndex += stemFaces +1;
+	newEndRingStart = endRingStart;
 
 	return end;
 }
+
+glm::vec3 CFractalTree::getNormal(const glm::vec3& v) {
+	glm::vec3 n = glm::cross(v, glm::vec3(0, 0, 1));
+	if (glm::length(n) < 0.00001f)
+		n = glm::cross(v, glm::vec3(1, 0, 0));
+	return glm::normalize(n);
+}
+
