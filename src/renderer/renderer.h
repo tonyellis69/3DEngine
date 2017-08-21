@@ -94,8 +94,7 @@ public:
 	void initQuery();
 	unsigned int query();
 	void drawMultiModel(CModelMulti& model);
-	void drawMultBufItem(CMultiBuf & multiBuf, unsigned int itemID);
-	void drawMultiBufElement(CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
+	void drawMultiBufElement(TdrawMode drawMode, CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);

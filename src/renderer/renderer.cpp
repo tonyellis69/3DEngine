@@ -654,24 +654,11 @@ void CRenderer::drawMultiModel(CModelMulti & model) {
 	}	
 }
 
-/**	Draw the given element stored in this multibuffer. */
-void CRenderer::drawMultBufItem(CMultiBuf& multiBuf, unsigned int elementID) {
-	unsigned int firstVert;
-	unsigned int noVerts;
-	unsigned int childNo;
-	int childBufNo;
-	multiBuf.getElementData(elementID, firstVert, noVerts, childBufNo);
 
-	//draw item
 
-	
+void CRenderer::drawMultiBufElement(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
 	setVAO(multiBuf.childBufs[childBufNo].hVAO);
-	glDrawArrays(GL_TRIANGLES, firstVert, noVerts);
-}
-
-void CRenderer::drawMultiBufElement(CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
-	setVAO(multiBuf.childBufs[childBufNo].hVAO);
-	glDrawArrays(GL_TRIANGLES, vertStart, vertCount);
+	glDrawArrays(getGLdrawMode(drawMode), vertStart, vertCount);
 }
 
 void CRenderer::setDepthTest(bool on) {

@@ -609,6 +609,7 @@ void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 	}
 }
 
+/**	Draw all the chunks belonging to superchunks on the 'visible' list this frame. */
 void CTerrain::drawVisibleChunks() {
 	CSuperChunk* sc;
 	int childBuf = -1;
@@ -620,17 +621,30 @@ void CTerrain::drawVisibleChunks() {
 			Chunk* chunk = sc->chunkList[chunkNo];
 			chunkDrawShader->setColour(chunk->drawDetails.colour);
 			if (chunk->drawDetails.childBufNo == -1)
-				continue; //TO DO why the fuck?
-			pRenderer->drawMultiBufElement(multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
-			/*if (chunk->drawDetails.childBufNo != childBuf && chunk->drawDetails.childBufNo != -1) {
-				childBuf = chunk->drawDetails.childBufNo;
-				pRenderer->setVAO(multiBuf.childBufs[childBuf].hVAO);
-			}		
-			//TO DO: should be model's drawmode, not GL_Triangles
-			glDrawArrays(GL_TRIANGLES, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
-			*/
+				continue; //chunk not skinned yet - TO DO: find a better way to do this
+			pRenderer->drawMultiBufElement(drawTris, multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
 		}
 	}
+}
+
+/** Run through the grass multibuf, drawing instanced grass. */
+void CTerrain::drawGrass(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
+	pRenderer->backFaceCulling(false);
+	 CSuperChunk* sc; 
+	int drawListSize = drawList.size(); int clSize;
+	for (int scNo = 0; scNo < drawListSize; scNo++) {
+		sc = drawList[scNo];
+		if (sc->LoD != 1)
+			continue;
+		clSize = sc->chunkList.size();
+		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) { 
+			Chunk* chunk = sc->chunkList[chunkNo];
+			if (chunk->grassDrawDetails.childBufNo != -1) {
+				pRenderer->drawMultiBufElement(drawPoints, grassMultiBuf, chunk->grassDrawDetails.childBufNo, chunk->grassDrawDetails.vertStart, chunk->grassDrawDetails.vertCount);
+			}
+		}
+	}
+	pRenderer->backFaceCulling(true);
 }
 
 CTerrain::~CTerrain() {
