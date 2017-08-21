@@ -10,7 +10,7 @@ class CSuperChunk;
 enum  TChunkStatus { chToSkin, chSkinned, chFree, chRemoveOnAlert };
 
 struct TDrawDetails {
-	 int childBufNo;
+	int childBufNo;
 	unsigned int vertStart;
 	unsigned int vertCount;
 	glm::vec4 colour;

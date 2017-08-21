@@ -27,7 +27,8 @@ CRenderer::CRenderer() {
 }
 
 CRenderer::~CRenderer() {
-	
+	for (size_t b = 0; b<bufferList.size(); b++)
+		delete bufferList[b];
 }
 
 /** Attach the given window to the renderer, so it can be drawn to. */
@@ -153,6 +154,8 @@ void CRenderer::init() {
 
 	createScreenQuad();
 	createFrameBuffer();
+
+	currentVAO = -1;
 }
 
 
@@ -311,7 +314,7 @@ void CRenderer::storeVertexLayout(unsigned int& hVAO, unsigned int bufferObj, un
 	//GLuint vaoObject;
 	if ( hVAO == 0)
 		glGenVertexArrays(1, &hVAO);
-    glBindVertexArray(hVAO);
+    setVAO(hVAO);
         
     glBindBuffer(GL_ARRAY_BUFFER, bufferObj);
 
@@ -346,7 +349,7 @@ void CRenderer::storeVertexLayout(unsigned int& hVAO, unsigned int bufferObj, un
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
-	glBindVertexArray(0);
+	setVAO(0);
 
 }
 
@@ -418,12 +421,12 @@ void CRenderer::setShader(CShader * shader) {
 }
 
 void CRenderer::drawModel(CRenderModel& model) {
-	glBindVertexArray(model.buf.hVAO);
+	setVAO(model.buf.hVAO);
 	if (model.buf.hIndex == 0)
 		glDrawArrays(model.drawMode, 0, model.buf.noVerts);
 	else
 		glDrawElements(model.drawMode, model.buf.noIndices, model.buf.indexType, 0);
-	glBindVertexArray(0);
+	setVAO(0);
 }
 
 float g_vertex_buffer_data[] = { 
@@ -466,7 +469,7 @@ void CRenderer::createFrameBuffer() {
 
 /** Create a reusable quad in NDC coordinated for when we want to render to the entire screen, */
 void CRenderer::createScreenQuad() {
-
+	screenQuad = (CBuf*)createBuffer();
 	//vBuf::T2DtexVert vert[4];
 	glm::vec2 vert[4];
 	vert[0] = glm::vec2(-1, 1);
@@ -475,16 +478,16 @@ void CRenderer::createScreenQuad() {
 	vert[3] = glm::vec2(1, -1);
 
 	unsigned int index[4] = { 2,3,0,1 };
-
-	screenQuad.storeVertexes(vert, sizeof(vert), 4);
-	screenQuad.storeIndex(index, 4);
-	screenQuad.storeLayout(2, 0, 0, 0);
+	screenQuad->setRenderer(this);
+	screenQuad->storeVertexes(vert, sizeof(vert), 4);
+	screenQuad->storeIndex(index, 4);
+	screenQuad->storeLayout(2, 0, 0, 0);
 }
 
 /** Draw a full-screen quad to the given texture using the current shader. */
 void CRenderer::renderToTextureQuad(CBaseTexture& texture) {
 	beginRenderToTexture(texture);
-	drawBuf(screenQuad, drawTriStrip);
+	drawBuf(*screenQuad, drawTriStrip);
 	endRenderToTexture();
 }
 
@@ -638,11 +641,11 @@ unsigned int CRenderer::query() {
 void CRenderer::drawMultiModel(CModelMulti & model) {
 	CPhongShader* shader = (CPhongShader* ) model.getMaterial()->getShader()->getThisShader();
 	//TO DO: kill the above, it's only there so we can colour-in chunks
-	glBindVertexArray(model.multiBuf.childBufs[0].hVAO);
+	setVAO(model.multiBuf.childBufs[0].hVAO);
 	CChildBuf* childBuf; 
 	for (int child = 0; child <  model.multiBuf.noChildBufs ; child++) {
 		childBuf = &model.multiBuf.childBufs[child];
-		glBindVertexArray(model.multiBuf.childBufs[child].hVAO);
+		setVAO(model.multiBuf.childBufs[child].hVAO);
 		for (int object = 0; object < childBuf->objCount; object++) {
 			//TO DO: should be model's drawmode, not GL_Triangles
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
@@ -662,8 +665,13 @@ void CRenderer::drawMultBufItem(CMultiBuf& multiBuf, unsigned int elementID) {
 	//draw item
 
 	
-	glBindVertexArray(multiBuf.childBufs[childBufNo].hVAO);
+	setVAO(multiBuf.childBufs[childBufNo].hVAO);
 	glDrawArrays(GL_TRIANGLES, firstVert, noVerts);
+}
+
+void CRenderer::drawMultiBufElement(CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
+	setVAO(multiBuf.childBufs[childBufNo].hVAO);
+	glDrawArrays(GL_TRIANGLES, vertStart, vertCount);
 }
 
 void CRenderer::setDepthTest(bool on) {
@@ -697,13 +705,13 @@ void CRenderer::attachTexture(unsigned int textureUnit, CBaseTexture & texture) 
 
 void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
 
-	glBindVertexArray(buf.hVAO);
+	setVAO(buf.hVAO);
 	if (buf.hIndex == 0)
 		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
 	else
 		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, buf.indexType, 0);
 
-	glBindVertexArray(0);
+	setVAO(0);
 }
 
 unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
@@ -723,6 +731,13 @@ unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
 		return rDrawLineLoop;
 }
 
+CBaseBuf* CRenderer::createBuffer() {
+	CBuf* newBuf = new CBuf();
+	newBuf->setRenderer(this);
+	bufferList.push_back(newBuf);
+	return newBuf;
+}
+
 void CRenderer::backFaceCulling(bool on) {
 	if (on)
 		glEnable(GL_CULL_FACE);
@@ -730,3 +745,17 @@ void CRenderer::backFaceCulling(bool on) {
 		glDisable(GL_CULL_FACE);
 }
 
+/** Bind the given Vertex Array Object, if it's not bound already. */
+void CRenderer::setVAO(GLuint newVAO) {
+	if (newVAO != currentVAO) {
+		glBindVertexArray(newVAO);
+		currentVAO = newVAO;
+	}
+}
+
+/** 
+void CRenderer::drawMultiBufInstanced() {
+
+
+
+} */

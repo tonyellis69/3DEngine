@@ -1,7 +1,7 @@
 #pragma once
 #include "model.h"
 
-class CModel;
+//class CModel;
 
 class CModelMulti : public CModel {
 public:

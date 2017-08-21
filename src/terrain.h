@@ -7,6 +7,7 @@
 #include "chunk.h"
 #include "renderer/renderer.h"
 #include "direction.h"
+#include "renderer\phongShader.h"
 
 #include <vector>
 #include <deque>
@@ -77,6 +78,8 @@ public:
 	glm::vec3 getChunkPos(const glm::vec3& pos);
 	void clear();
 	void setSampleCentre(glm::vec3& centrePos);
+	void updateVisibleSClist(glm::mat4& camMatrix);
+	void drawVisibleChunks();
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
@@ -124,6 +127,8 @@ public:
 
 	CMultiBuf grassMultiBuf; ///<Stores grass location points for all chunks.
 
+	std::vector<CSuperChunk*> visibleSClist; ///<SCs considered to be in sight.
+	CPhongShader* chunkDrawShader; ///<Whatever shader we're using to draw chunks.
 	};
 
 

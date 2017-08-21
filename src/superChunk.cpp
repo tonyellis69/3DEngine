@@ -406,6 +406,10 @@ bool CSuperChunk::isOutsideFustrum(glm::mat4 & mvp) {
 
 	//TO DO: seems like we don't need adjustment - not entirely sure why
 	//keep an eye on it for now,
+
+	//TO DO: need to skip culling the nearest bottom-plane-culled superchunk, because this removes its trees too.
+	//May be simplest to just not bottom-plane-cull the LoD1 superchunks at all. There'll be no big hit
+	//because normally all that terrain will be in view anyway.
 	
 	vec3 minMax[2];
 	minMax[0] = nwWorldPos + terrain->layers[layerNo].nwLayerPos;

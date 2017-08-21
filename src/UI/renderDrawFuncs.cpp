@@ -32,8 +32,9 @@ void CRenderDrawFuncs::loadShaders() {
 
 /** Register this control with the uiEngine, storing its details for drawing. */
 void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
-	CBuf rectBuf, borderBuf;
-	quadBufs[control.uniqueID].rect = rectBuf;
+	
+	quadBufs[control.uniqueID].border = (CBuf*)pRenderer->createBuffer();
+	quadBufs[control.uniqueID].rect = (CBuf*)pRenderer->createBuffer();
 	//A B
 	//C D
 	vBuf::T2DtexVert corners[4];
@@ -47,19 +48,19 @@ void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
 	corners[3].tex = vec2(1,1);
 
 	unsigned int index[4] = { 2,3,0,1 };
-	quadBufs[control.uniqueID].rect.storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].rect.storeIndex(index,  4);
-	quadBufs[control.uniqueID].rect.storeLayout(2, 2, 0, 0);
+	quadBufs[control.uniqueID].rect->storeVertexes(corners, sizeof(corners), 4);
+	quadBufs[control.uniqueID].rect->storeIndex(index,  4);
+	quadBufs[control.uniqueID].rect->storeLayout(2, 2, 0, 0);
 
 	unsigned int index2 [4] = { 1,0,2,3 };
-	quadBufs[control.uniqueID].border.storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].border.storeIndex(index2,  4);
-	quadBufs[control.uniqueID].border.storeLayout(2, 2,0, 0);
+	quadBufs[control.uniqueID].border->storeVertexes(corners, sizeof(corners), 4);
+	quadBufs[control.uniqueID].border->storeIndex(index2,  4);
+	quadBufs[control.uniqueID].border->storeLayout(2, 2,0, 0);
 }
 
 /** Draw the drawBox of this control. */
 void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
-	CBuf* buf = &quadBufs[control.uniqueID].rect;
+	CBuf* buf = quadBufs[control.uniqueID].rect;
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setColour1((vec4&)control.backColour1);
 	uiRectShader->setColour2((vec4&)control.backColour2);
@@ -69,7 +70,7 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 }
 
 void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
-	CBuf* buf = &quadBufs[control.uniqueID].border;
+	CBuf* buf = quadBufs[control.uniqueID].border;
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setColour1((vec4&)control.borderColour);
 	uiRectShader->setColour2((vec4&)control.borderColour);
@@ -94,7 +95,7 @@ unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName)
 }
 
 void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {
-	CBuf* buf = &quadBufs[control.uniqueID].rect;
+	CBuf* buf = quadBufs[control.uniqueID].rect;
 	//set shader
 	pRenderer->setShader(uiTexShader);
 	//pass the texture

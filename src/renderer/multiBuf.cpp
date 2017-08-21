@@ -78,8 +78,9 @@ void CMultiBuf::setSize(unsigned int size) {
 void CMultiBuf::createChildBuf() {
 
 	CChildBuf newBuf;
-
+	
 	childBufs.push_back(newBuf);
+	childBufs.back().setRenderer(getRenderer());
 	childBufs.back().setSize(maxBufSize);
 	if (instancedBuf) {
 		childBufs.back().setInstanced(*instancedBuf, nInstancedAttribs);
@@ -127,7 +128,7 @@ void CMultiBuf::draw() {
 		newVao = blocks[b].id >> 16;
 		if (childBufNo != newVao) { //NB this is much faster than rebinding every time
 			childBufNo = newVao;
-			glBindVertexArray(childBufs[childBufNo - 1].hVAO);
+			setVAO(childBufs[childBufNo - 1].hVAO);
 		}
 		glDrawArrays(GL_TRIANGLES,blocks[b].arrayFirst, blocks[b].arrayCount);
 
@@ -135,16 +136,16 @@ void CMultiBuf::draw() {
 	} */
 
 
-	glBindVertexArray(childBufs[0].hVAO);
+/*	pRenderer->setVAO(childBufs[0].hVAO);
 	CChildBuf* childBuf;
 	for (int child = 0; child < noChildBufs; child++) {
 		childBuf = &childBufs[child];
-		glBindVertexArray(childBufs[child].hVAO);
+		pRenderer->setVAO(childBufs[child].hVAO);
 		for (int object = 0; object < childBuf->objCount; object++) {
 			
 			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
 		}
-	}
+	} */
 }
 
 void CMultiBuf::deleteBlock(unsigned int id) {

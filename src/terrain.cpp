@@ -594,6 +594,45 @@ void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
 	}
 }
 
+/** Fill the visibleSClist with SCs that are visible in the given camera frustum. */
+void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
+	CSuperChunk* sc;
+	visibleSClist.clear();
+	for (int layerNo = 0; layerNo < layers.size(); layerNo++) {
+		int slSize = layers[layerNo].superChunks.size();
+		for (int scNo = 0; scNo < slSize; scNo++) {
+			sc = layers[layerNo].superChunks[scNo];
+			if (!sc->isOutsideFustrum(camMatrix)) {
+				visibleSClist.push_back(sc);
+			}
+		}
+	}
+}
+
+void CTerrain::drawVisibleChunks() {
+	CSuperChunk* sc;
+	int childBuf = -1;
+	int scListSize = visibleSClist.size();
+	for (int scNo = 0; scNo < scListSize; scNo++) {
+		sc = visibleSClist[scNo];
+		int clSize = sc->chunkList.size();
+		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) {
+			Chunk* chunk = sc->chunkList[chunkNo];
+			chunkDrawShader->setColour(chunk->drawDetails.colour);
+			if (chunk->drawDetails.childBufNo == -1)
+				continue; //TO DO why the fuck?
+			pRenderer->drawMultiBufElement(multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
+			/*if (chunk->drawDetails.childBufNo != childBuf && chunk->drawDetails.childBufNo != -1) {
+				childBuf = chunk->drawDetails.childBufNo;
+				pRenderer->setVAO(multiBuf.childBufs[childBuf].hVAO);
+			}		
+			//TO DO: should be model's drawmode, not GL_Triangles
+			glDrawArrays(GL_TRIANGLES, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
+			*/
+		}
+	}
+}
+
 CTerrain::~CTerrain() {
 	for (size_t c=0;c<spareChunks.size();c++) {
 		delete spareChunks[c];

@@ -8,8 +8,8 @@
 
 CFractalTree::CFractalTree() {
 	currentIndex = 0;
-	stemFaces = 4;
-	maxStages =  5;
+	stemFaces = 5;
+	maxStages =  4;
 	randEngine.seed(740608);
 	stageScale = 0.6f;
 	branchInset = 0.995f;
@@ -19,7 +19,7 @@ CFractalTree::CFractalTree() {
 
 /** Create the entire plant. */
 void CFractalTree::create() {
-	TStem baseStem = { 1, glm::vec3(0), glm::vec3(0,1,0), stemLength, stemRadius, 0};
+	TStem baseStem = { 1, glm::vec3(0,-2,0), glm::vec3(0,1,0), stemLength, stemRadius, 0};
 	createStem(baseStem);
 }
 
@@ -90,7 +90,7 @@ void CFractalTree::getModel(CModel* pModel) {
 	pModel->storeVertexes(verts.data(), sizeof(vBuf::T3DnormVert), verts.size());
 	pModel->storeIndex(index.data(), index.size());
 	pModel->storeLayout(3, 3, 0, 0);
-	pModel->setDrawMode(drawTris);
+	pModel->setDrawMode(drawTriStrip);
 	pModel->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 }
 
@@ -146,9 +146,8 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingSta
 	}
 
 	//stitch them together via indexing
-	int startIndex = currentIndex;
-	int face;
-	for ( face = 0; face < stemFaces-1 ; face++) {
+	int face = 0;
+/*	for ( face = 0; face < stemFaces-1 ; face++) {
 		index.push_back(baseRingStart + face); //0
 		index.push_back(endRingStart + face); //4
 		index.push_back(baseRingStart + face + 1); //1
@@ -165,8 +164,28 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingSta
 
 	index.push_back(endRingStart); //5
 	index.push_back(baseRingStart); //1
-	index.push_back(endRingStart + face); //4
+	index.push_back(endRingStart + face); //4 */
 
+
+	//first tri:
+	index.push_back(baseRingStart + face); //0
+	index.push_back(endRingStart + face); //4
+	index.push_back(baseRingStart + face + 1); //1
+
+	//first tri strip vert
+	index.push_back(endRingStart + 1 + face); //5
+
+	
+	for (face = 1; face < stemFaces - 2; face++) {
+		index.push_back(baseRingStart + face + 1);
+		index.push_back(endRingStart + 1 + face);
+	}
+
+	//stitch-up face
+	index.push_back(baseRingStart); //0
+	index.push_back(endRingStart ); //4
+
+	index.push_back(65535); //signals the end of this sequence
 	
 	//currentIndex += stemFaces +1;
 	newEndRingStart = endRingStart;

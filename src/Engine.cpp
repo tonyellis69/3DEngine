@@ -861,7 +861,8 @@ void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noInd
 /**	Create a CModel (subclassed to CRenderModel) and return a pointer to it. */
 CModel * CEngine::createModel() {
 	CRenderModel* model = new CRenderModel();
-	model->pRenderer = &Renderer;
+	model->pRenderer = &Renderer; //TO DO: do in a setter!
+	model->buf.setRenderer(&Renderer); //TO DO: above setter should handle this!
 	CMaterial* material = createMaterial();
 	model->setMaterial(*material);
 	modelList.push_back(model);
@@ -889,9 +890,7 @@ void CEngine::drawMultiModel(CModelMulti& model) {
 }
 
 CBaseBuf * CEngine::createBuffer() {
-	CBuf* newBuf = new CBuf();
-	bufferList.push_back(newBuf);
-	return newBuf;
+	return Renderer.createBuffer();
 }
 
 CSkyDome * CEngine::createSkyDome() {
@@ -1027,8 +1026,8 @@ void CEngine::createWireBoxShader() {
 
 CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 	//create the object
-	CBillboard* billboard = new CBillboard(pos, size);
-	billboard->pRenderer = &Renderer;
+	CBillboard* billboard = new CBillboard(pos, size,&Renderer);
+	//billboard->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
 	material->setShader(texShader);
 	billboard->setMaterial(*material);
@@ -1085,7 +1084,6 @@ CEngine::~CEngine(void) {
 		delete materialList[m];
 	for (size_t s = 0; s<shaderList.size(); s++)
 		delete shaderList[s];
-	for (size_t b = 0; b<bufferList.size(); b++)
-		delete bufferList[b];
+
 	Renderer.detachWindow();
 }

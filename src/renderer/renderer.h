@@ -95,14 +95,17 @@ public:
 	unsigned int query();
 	void drawMultiModel(CModelMulti& model);
 	void drawMultBufItem(CMultiBuf & multiBuf, unsigned int itemID);
+	void drawMultiBufElement(CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
 	void attachTexture(unsigned int textureUnit, CBaseTexture& texture);
 	void drawBuf(CBuf& buf, TdrawMode drawMode);
 	unsigned int getGLdrawMode(TdrawMode);
+	CBaseBuf* createBuffer();
 
 	void backFaceCulling(bool on);
+	void setVAO(GLuint newVAO);
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
@@ -120,7 +123,7 @@ public:
 
 	std::string dataPath;
 
-	CBuf screenQuad; ///<A re-usable quad for rendering to the entire screen.
+	CBuf* screenQuad; ///<A re-usable quad for rendering to the entire screen.
 	GLuint hFrameBuffer; ///<Handle for our internally used framebuffer.
 
 	unsigned int tmpHandle;
@@ -135,5 +138,8 @@ private:
 
 	GLuint primitivesQuery; ///<Used in primitives generated queries.
 
+	GLuint currentVAO; ///<The currently bound VAO. Used to avoid expensive rebinds. 
+	
+	std::vector<CBuf*> bufferList; ///<Kill list of renderer-created buffers.
 
 };

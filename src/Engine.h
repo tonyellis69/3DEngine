@@ -210,8 +210,7 @@ public:
 	C2DVector userScale; ///<Scaling factor applied to user drawing, every frame.
 	TSpriteSheet* CurrentTileSet; ///<Points to the last-used SpriteSheet.
 	
-	std::vector<CBuf*> bufferList; ///<Kill list of engine-created buffers.
-
+	
 	CSkyDome* skyDome;
 
 	//TO DO: make a new image manager or resource manager for this kind of stuff:

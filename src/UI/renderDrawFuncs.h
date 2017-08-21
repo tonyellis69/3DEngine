@@ -13,8 +13,8 @@ UIengine removed altogether, as there's too much overlap of
 functionality. */
 
 struct controlRects {
-	CBuf rect;
-	CBuf border;
+	CBuf* rect;
+	CBuf* border;
 };
 
 class CRenderDrawFuncs : public CDrawFuncs {

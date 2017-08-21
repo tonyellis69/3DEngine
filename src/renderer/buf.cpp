@@ -62,7 +62,7 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 		glBindBuffer(GL_ARRAY_BUFFER, hInstancedBuf);
 	else
 		glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-	glBindVertexArray(hVAO);
+	pRenderer->setVAO(hVAO);
 
 	attr[0] = attr1;
 	attr[1] = attr2;
@@ -155,7 +155,7 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glBindVertexArray(0);
+	pRenderer->setVAO(0);
 }
 
 /** Create a OGL buffer of the requested size. Note that this will erase any existing buffer attached to this CBuf.*/
@@ -249,6 +249,14 @@ unsigned int CBuf::getNoIndices() {
 
 unsigned int CBuf::getIndexHandle() {
 	return hIndex;
+}
+
+void CBuf::setRenderer(CRenderer * renderer) {
+	pRenderer = renderer;
+}
+
+CRenderer * CBuf::getRenderer() {
+	return pRenderer;
 }
 
 

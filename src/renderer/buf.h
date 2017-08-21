@@ -2,12 +2,14 @@
 #include "baseBuf.h"
 #include <glew.h>
 #include <glm/glm.hpp>
-
+//#include "renderer.h"
 
 
 /** Holds all the data necessary to use a buffer of vertices uploaded to the 
 	graphics card.*/
 //enum TRendererDrawMode;
+class CRenderer;
+
 class CBuf : public CBaseBuf
 {
 public:
@@ -29,8 +31,8 @@ public:
 	void setInstanced(CBaseBuf& buf, int noAttribs);
 	unsigned int getNoIndices();
 	unsigned int getIndexHandle();
-
-
+	void setRenderer(CRenderer* renderer);
+	CRenderer* getRenderer();
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
 	int colourOffset; ///<Start of colour values in buffer.
@@ -52,5 +54,8 @@ public:
 	unsigned int nInstancedVerts; ///<How many verts belong to the instanced model, if any.
 
 	GLuint indexType; ///<unsigned short or unsigned int
+
+private:
+	CRenderer* pRenderer;
 };
 
