@@ -580,7 +580,7 @@ void CTerrain::clear() {
 	}	
 }
 
-/** Set the point in sample-space that this terrain centres on. */
+/** Set the point in sample-space that this terrain will centre on when created. */
 void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
 
 	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
@@ -622,12 +622,12 @@ void CTerrain::drawVisibleChunks() {
 			chunkDrawShader->setColour(chunk->drawDetails.colour);
 			if (chunk->drawDetails.childBufNo == -1)
 				continue; //chunk not skinned yet - TO DO: find a better way to do this
-			pRenderer->drawMultiBufElement(drawTris, multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
+			pRenderer->drawMultiBufChildVerts(drawTris, multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);
 		}
 	}
 }
 
-/** Run through the grass multibuf, drawing instanced grass. */
+/** Run through the grass multibuf, drawing grass. */
 void CTerrain::drawGrass(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 	pRenderer->backFaceCulling(false);
 	 CSuperChunk* sc; 
@@ -640,11 +640,40 @@ void CTerrain::drawGrass(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) { 
 			Chunk* chunk = sc->chunkList[chunkNo];
 			if (chunk->grassDrawDetails.childBufNo != -1) {
-				pRenderer->drawMultiBufElement(drawPoints, grassMultiBuf, chunk->grassDrawDetails.childBufNo, chunk->grassDrawDetails.vertStart, chunk->grassDrawDetails.vertCount);
+				pRenderer->drawMultiBufChildVerts(drawPoints, grassMultiBuf, chunk->grassDrawDetails.childBufNo, chunk->grassDrawDetails.vertStart, chunk->grassDrawDetails.vertCount);
 			}
 		}
 	}
 	pRenderer->backFaceCulling(true);
+}
+
+/** Run through the grass multibuf, drawing instanced trees. */
+void CTerrain::drawTrees(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
+	CSuperChunk* sc;
+	int drawListSize = drawList.size(); int clSize;
+	for (int scNo = 0; scNo < drawListSize; scNo++) {
+		sc = drawList[scNo];
+		if (sc->LoD != 1)
+			continue;
+		clSize = sc->chunkList.size();
+		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) {
+			Chunk* chunk = sc->chunkList[chunkNo];
+			if (chunk->grassDrawDetails.childBufNo != -1) {
+				pRenderer->drawMultiBufChildInstanced(drawTriStrip, grassMultiBuf, chunk->grassDrawDetails.childBufNo, chunk->grassDrawDetails.vertStart, chunk->grassDrawDetails.vertCount);
+			}
+		}
+	}
+}
+
+/** The draw-yourself function. */
+void CTerrain::draw() {
+	//pRenderer->setShader(Engine.phongShader);
+	material->assign();
+
+	//Engine.phongShader->setNormalModelToCameraMatrix(tmp); //why am I doing this?
+	//Engine.phongShader->setMVP(mvp);
+
+
 }
 
 CTerrain::~CTerrain() {

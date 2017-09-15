@@ -638,28 +638,22 @@ unsigned int CRenderer::query() {
 
 
 
-void CRenderer::drawMultiModel(CModelMulti & model) {
-	CPhongShader* shader = (CPhongShader* ) model.getMaterial()->getShader()->getThisShader();
-	//TO DO: kill the above, it's only there so we can colour-in chunks
-	setVAO(model.multiBuf.childBufs[0].hVAO);
-	CChildBuf* childBuf; 
-	for (int child = 0; child <  model.multiBuf.noChildBufs ; child++) {
-		childBuf = &model.multiBuf.childBufs[child];
-		setVAO(model.multiBuf.childBufs[child].hVAO);
-		for (int object = 0; object < childBuf->objCount; object++) {
-			//TO DO: should be model's drawmode, not GL_Triangles
-			glDrawArrays(GL_TRIANGLES, childBuf->first[object], childBuf->count[object]);
 
-		}
-	}	
-}
-
-
-
-void CRenderer::drawMultiBufElement(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
+/** Draw a range of geometry from the given childbuffer of a multibuffer. */
+void CRenderer::drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
 	setVAO(multiBuf.childBufs[childBufNo].hVAO);
 	glDrawArrays(getGLdrawMode(drawMode), vertStart, vertCount);
 }
+
+/** Draw an instanced model using instancing data from the given childbuffer of a multibuffer. */
+void CRenderer::drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
+	setVAO(multiBuf.childBufs[childBufNo].hVAO);
+	int nIndices = multiBuf.instancedBuf->getNoIndices();
+	glDrawElementsInstancedBaseInstance(getGLdrawMode(drawMode), nIndices, multiBuf.indexType, 0,
+		vertCount, vertStart);
+}
+
+
 
 void CRenderer::setDepthTest(bool on) {
 	

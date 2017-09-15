@@ -141,7 +141,6 @@ public:
 	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);
 	CModel* createModel();
 	CTerrain* createTerrain();
-	void drawMultiModel(CModelMulti& model);
 	CBaseBuf* createBuffer();
 	CSkyDome* createSkyDome();
 	CMaterial* createMaterial(std::string filename);

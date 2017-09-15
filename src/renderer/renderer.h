@@ -93,8 +93,8 @@ public:
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	void initQuery();
 	unsigned int query();
-	void drawMultiModel(CModelMulti& model);
-	void drawMultiBufElement(TdrawMode drawMode, CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
+	void drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
+	void drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);

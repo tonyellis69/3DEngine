@@ -81,6 +81,8 @@ public:
 	void updateVisibleSClist(glm::mat4& camMatrix);
 	void drawVisibleChunks();
 	void drawGrass(glm::mat4 & mvp, std::vector<CSuperChunk*>& drawList);
+	void drawTrees(glm::mat4 & mvp, std::vector<CSuperChunk*>& drawList);
+	void draw();
 	~CTerrain();
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.

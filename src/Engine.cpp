@@ -885,9 +885,7 @@ CTerrain * CEngine::createTerrain() {
 	return terrain;
 }
 
-void CEngine::drawMultiModel(CModelMulti& model) {
-	Renderer.drawMultiModel(model);
-}
+
 
 CBaseBuf * CEngine::createBuffer() {
 	return Renderer.createBuffer();

@@ -14,13 +14,5 @@ void CModelMulti::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 	multiBuf.storeLayout(attr1, attr2, attr3, attr4);
 }
 
-void CModelMulti::drawNew() {
 
-
-	material->assign();
-
-	pRenderer->drawMultiModel(*this);
-
-	material->unAssign();
-}
 

@@ -13,7 +13,7 @@ public:
 	virtual GLint* getFirstArray() { return 0; };
 	virtual GLsizei* getCountArray() { return 0; };
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
-	void drawNew();
+
 
 
 	virtual void reserveBuf(unsigned int elementsUsed) {};
