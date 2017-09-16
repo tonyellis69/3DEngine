@@ -48,6 +48,7 @@ const int chunkTriCacheSize = 6;
 class CTerrain : public CModel  {
 public:
 	CTerrain();
+	void reserveBuf(unsigned int elementsUsed);
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
 	void createLayers(float terrainSize, float LoD1extent, int steps);
 	void createAllChunks();
@@ -167,18 +168,3 @@ public:
 
 
 
-class CRenderer;
-
-class CRenderTerrain: public CTerrain {
-public:
-	
-	/** Create a multidraw buffer of the requested size. */
-	void reserveBuf(unsigned int size);
-	CBaseBuf* getBuffer();
-
-
-//	CRenderer* pRenderer; ///<Lets terrain talk to renderer.
-	unsigned int hBuffer; ///<Handle for the (OpenGL) multidraw buffer.
-	unsigned int freeMem; ///<Offset into the buffer at which free memory starts;
-	
-};

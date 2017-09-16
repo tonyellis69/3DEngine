@@ -5,6 +5,7 @@
 //#include "renderer.h"
 
 
+
 /** Holds all the data necessary to use a buffer of vertices uploaded to the 
 	graphics card.*/
 //enum TRendererDrawMode;

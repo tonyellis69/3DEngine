@@ -9,7 +9,7 @@ CSprite::CSprite(void) {
 	Velocity.y = 0;
 	Counter = 0;
 	Status =0;
-	Scale.set(1,1);
+	Scale = glm::vec2(1.0f,1.0f);
 	AnimStart = 0;
 	AnimEnd = 0;
 	AnimInterval = 0;
@@ -69,10 +69,11 @@ void CSprite::DecrementFrame() {
 
 /** Set the size of this sprite's bounding box. */
 void CSprite::SetBoundingBox(float x, float y) {
-	AABB.set(-x,-y,x,y);
+//	AABB.set(-x,-y,x,y);
 }
 
 /** Check for a simple bounding box collision with the given sprite. */
+/*
 bool CSprite::BBCollision(CSprite& Sprite) {
 	int xdiff = (int) abs(pos.x - Sprite.pos.x);
 	int ydiff = (int) abs(pos.y - Sprite.pos.y);
@@ -82,7 +83,7 @@ bool CSprite::BBCollision(CSprite& Sprite) {
 		return true;
 
 	return false;
-}
+} */
 
 /** Set up the basic animation cycle, if any.
 void CSprite::SetAnimation(int Start, int End, double Interval, bool Fwd) {

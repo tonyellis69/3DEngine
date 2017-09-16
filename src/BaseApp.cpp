@@ -195,7 +195,7 @@ void CBaseApp::AppTasks() {
 
 	Engine.drawModels();
 	
-	Engine.drawSceneLayers();
+//	Engine.drawSceneLayers();
 	Engine.drawRegisteredSprites();
 	draw(); //Do user drawing
 

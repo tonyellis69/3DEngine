@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Types.h"
-#include "2DVector.h"
+//#include "2DVector.h"
 #include <vector>
-#include "BBox.h"
+//#include "BBox.h"
+
+#include <glm\glm.hpp>
 
 class TSpriteSheet {
 public:
@@ -43,7 +45,7 @@ public:
 	void IncrementFrame();
 	void DecrementFrame();
 	void SetBoundingBox(float x, float y);
-	bool BBCollision(CSprite& Sprite);
+	//bool BBCollision(CSprite& Sprite);
 	//void SetAnimation(int Start, int End, double Interval, bool Fwd);
 	int AddAnimation(int Start,int End,double Interval,bool loops);
 //	void UpdateAnimation(const double& dT);
@@ -52,7 +54,7 @@ public:
 	void setAnim(int animNo);
 	void updateAnimation(const double& dT);
 	
-	C2DVector Scale;
+	glm::vec2 Scale;
 
 	TRect Rect;
 	//SetVectorint XOffset;
@@ -66,9 +68,9 @@ public:
 
 
 	float Rotation; ///< Rotation of sprite, in degrees.
-	C2DVector Velocity; ///< Velocity of sprite.
+	glm::vec2 Velocity; ///< Velocity of sprite.
 	float Speed; ///<The velocity multiplier. 
-	C2DVector pos; ///<Sprite's position, stored as a vector.
+	glm::vec2 pos; ///<Sprite's position, stored as a vector.
 	bool Live; ///<User flag indicating if the sprite is in play.
 	int Counter; ///<General purpose counter.
 	float FloatCounter; ///<Floating point counter
@@ -84,7 +86,7 @@ public:
 	std::vector<SpriteAnim> AnimList;
 
 	bool hFlip; ///<True if the image should be horizontally flipped.
-	CBBox AABB; ///<Axis-aligned bounding box for this sprite.
+	//CBBox AABB; ///<Axis-aligned bounding box for this sprite.
 
 	~CSprite(void);
 

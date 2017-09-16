@@ -48,7 +48,7 @@ void CFractalTree::createStem(TStem& stem) {
 
 void CFractalTree::setStemLength(float length, float variation) {
 	stemLength = length;
-	using param_t = std::uniform_real_distribution<>::param_type;
+	using param_t = std::uniform_real_distribution<float>::param_type;
 	param_t p{ -variation, variation };
 	stemLengthVariance.param(p);
 }
@@ -63,14 +63,14 @@ void CFractalTree::setStemRadius(float radius) {
 
 void CFractalTree::setNumBranches(int numBranches, int variation) {
 	nBranches = numBranches;
-	using param_t = std::uniform_int_distribution<>::param_type;
+	using param_t = std::uniform_int_distribution<int>::param_type;
 	param_t p{ -variation, variation };
 	branchNumVariance.param(p);
 }
 
 void CFractalTree::setBranchAngle(float angle, float variation) {
 	branchAngle = angle;
-	using param_t = std::uniform_real_distribution<>::param_type;
+	using param_t = std::uniform_real_distribution<float>::param_type;
 	param_t p{ -variation, variation };
 	branchAngleVariance.param(p);
 
@@ -113,7 +113,7 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingSta
 	glm::vec3 stemNormal = getNormal(stem.angle); //create an axis perpendicular to this stem
 	
 	//float currentRadius = stemRadius * float(1.5f / stem.stage);
-	float rot = 360 / stemFaces;
+	float rot = 360.0f / stemFaces;
 
 	vBuf::T3DnormVert vert;
 	unsigned int baseRingStart;

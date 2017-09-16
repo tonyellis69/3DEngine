@@ -121,7 +121,7 @@ void CPhysObjManager::contactResolver() {
 		//keep track of the lowest
 		float max = 0;
 		int maxIndex = contactList.size()-1;
-		for (int i = 0; i < contactList.size(); i++)
+		for (size_t i = 0; i < contactList.size(); i++)
 		{
 			float sepVel = contactList[i].calcSeparatingVelocity(); 
 			if (sepVel < max &&
@@ -145,7 +145,7 @@ void CPhysObjManager::contactResolver() {
 		// Update the interpenetrations for all contacts the particles of this contact are involved in
 		vec3 colliderMove = contactList[maxIndex].colliderMovement;
 		vec3 collideeMove = contactList[maxIndex].collideeMovement;
-		for (int i = 0; i < contactList.size(); i++)
+		for (size_t i = 0; i < contactList.size(); i++)
 		{
 			if (contactList[i].collider == contactList[maxIndex].collider )
 			{
@@ -199,7 +199,7 @@ void CPhysObjManager::addContact(CBasePhysObj * collider, CBasePhysObj * collide
 	newContact.id = nextID++;
 	contactList.push_back(newContact);
 	collider->lastContact = collider->position;
-	if (contactList.size() > maxContacts)
+	if (int(contactList.size()) > maxContacts)
 		contactList.pop_front();
 	std::cerr << "\nNew contact " << newContact.id << ", penetration " << penetration << " collider " << collider;
 }

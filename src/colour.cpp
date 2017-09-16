@@ -3,7 +3,7 @@
 
 namespace col {
 
-	float h = 0.5f;
+	double h = 0.5f;
 	double golden_ratio_conjugate = 0.618033988749895;
 
 

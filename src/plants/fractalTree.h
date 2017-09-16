@@ -51,9 +51,9 @@ public:
 
 private:
 	std::mt19937 randEngine{};
-	std::uniform_real_distribution<> stemLengthVariance;
-	std::uniform_int_distribution<> branchNumVariance;
-	std::uniform_real_distribution<> branchAngleVariance;
+	std::uniform_real_distribution<float> stemLengthVariance;
+	std::uniform_int_distribution<int> branchNumVariance;
+	std::uniform_real_distribution<float> branchAngleVariance;
 
 	float currentStemLength; ///<Stem length of the current stem.
 	float branchInset;

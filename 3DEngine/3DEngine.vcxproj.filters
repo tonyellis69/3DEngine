@@ -20,25 +20,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\2DPolygon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\2DVector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\BaseApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\BBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\chunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\colour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\dynBuf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\Engine.cpp">
@@ -95,12 +83,6 @@
     <ClCompile Include="..\Src\ImageLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\isoSurface.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\particle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -126,9 +108,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\TileLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UIengine.cpp">
@@ -298,16 +277,7 @@
     <ClInclude Include="..\Src\Window.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\2DPolygon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\2DVector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\BaseApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\BBox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\chunk.h">
@@ -320,9 +290,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Delegate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\dynBuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Engine.h">
@@ -385,13 +352,7 @@
     <ClInclude Include="..\Src\ImageLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\isoSurface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\particle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Reader.h">
@@ -407,9 +368,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\SoundLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\superChunk.h">
@@ -428,9 +386,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\TileLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\Timer.h">
@@ -600,6 +555,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Plants\fractalTree.h">
       <Filter>plants</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Sprite.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

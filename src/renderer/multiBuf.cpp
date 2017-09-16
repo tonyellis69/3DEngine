@@ -294,8 +294,8 @@ void CMultiBuf::setInstanced(CBaseBuf& buf, int noAttribs) {
 
 
 CMultiBuf::~CMultiBuf() {
-	delete first;
-	delete count;
+	//delete first;
+	//delete count;
 
 }
 

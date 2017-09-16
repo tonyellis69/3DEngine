@@ -529,7 +529,8 @@ unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode,
 
 
 	GLint elapsed = 0;
-	GLuint query, speedQuery, primitives;
+	GLuint query,  primitives;
+//	GLuint speedQuery;
 
 	
 
@@ -712,6 +713,7 @@ unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
 		return rDrawTriStrip;
 	if (iDrawMode == drawLineLoop)
 		return rDrawLineLoop;
+	return NULL;
 }
 
 CBaseBuf* CRenderer::createBuffer() {

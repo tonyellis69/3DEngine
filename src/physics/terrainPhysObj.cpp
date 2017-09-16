@@ -116,7 +116,7 @@ float CTerrainPhysObj::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contactD
 		//check for chunks
 		pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {
-			for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
+			for (size_t vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
 				if (intersect) {
 					intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);
@@ -155,7 +155,7 @@ float CTerrainPhysObj::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactDi
 	while (sc = pTerrain->getSC(searchPos)) {
 		pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {
-			for (int vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
+			for (size_t vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
 				if (intersect) {
 					intersectionPoint = (pBuf[vNo].v * u) + (pBuf[vNo + 1].v * v) + (pBuf[vNo + 2].v * w);

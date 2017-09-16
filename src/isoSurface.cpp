@@ -300,7 +300,7 @@ void CIsoSurfer::setSample(float* _data) {
 
 /** Create 3D vertices for given volume by analysing the data sample/*/
 void CIsoSurfer::createGeometry(int width, int height,int depth) {
-	volWidth = width; volHeight = height; volDepth = depth;
+	volWidth = float(width); volHeight = float(height); volDepth = float(depth);
 	noVerts = 0;
 
 	//colour = glm::vec4(col::randHue(),1);
@@ -424,7 +424,7 @@ float CIsoSurfer::fGetOffset(float fValue1, float fValue2, float fValueDesired) 
 //	fValue2 = int((fValue2 - 0.48) * frac);
 //	fValueDesired = int(  (fValueDesired - 0.48) * frac);
 //	cerr << "\n" << fValue1 <<  " " << fValue2;
-		double fDelta = fValue2 - fValue1;
+		float fDelta = fValue2 - fValue1;
 
 		
 		
@@ -449,7 +449,7 @@ float CIsoSurfer::fSample(float x, float y, float z) {
 	//float height = data[ integral];
 
 	
-	float height = scaled_octave_noise_2d(4,0.3,1, 0,254,localPoint.x/200,float(iz)/200);
+	float height = scaled_octave_noise_2d(4.0f,0.3f,1.0f, 0.0f,254.0f,localPoint.x/200.0f,float(iz)/200.0f);
 	float result = localPoint.y / height;
 	return result;//height;//result;
 
@@ -467,9 +467,9 @@ float CIsoSurfer::fSample2(float x, float y, float z) {
 //vGetNormal() finds the gradient of the scalar field at a point
 //This gradient can be used as a very accurate vertx normal for lighting calculations
 void CIsoSurfer::vGetNormal(glm::vec3 &rfNormal, float fX, float fY, float fZ) {
-        rfNormal.x = fSample(fX-0.01, fY, fZ) - fSample(fX+0.01, fY, fZ);
-        rfNormal.y = fSample(fX, fY-0.01, fZ) - fSample(fX, fY+0.01, fZ);
-        rfNormal.z = fSample(fX, fY, fZ-0.01) - fSample(fX, fY, fZ+0.01);
+        rfNormal.x = fSample(fX-0.01f, fY, fZ) - fSample(fX+0.01f, fY, fZ);
+        rfNormal.y = fSample(fX, fY-0.01f, fZ) - fSample(fX, fY+0.01f, fZ);
+        rfNormal.z = fSample(fX, fY, fZ-0.01f) - fSample(fX, fY, fZ+0.01f);
 		rfNormal = glm::normalize(rfNormal);
 }
 

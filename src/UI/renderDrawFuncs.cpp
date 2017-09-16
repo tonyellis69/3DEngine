@@ -81,8 +81,8 @@ void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
 void CRenderDrawFuncs::setScreenSize(int width, int height) {
 	mat4 flip;
 	flip[1].y = -1;
-	flip[2].y = height;
-	orthoView = flip * glm::ortho<float>(0, width, 0, height) ;
+	flip[2].y = float(height);
+	orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height) ;
 
 	screenWidth = width; screenHeight = height;
 }

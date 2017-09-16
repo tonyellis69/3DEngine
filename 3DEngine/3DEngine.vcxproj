@@ -62,6 +62,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>OpenGL32.lib;soil.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -86,23 +87,17 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\2DPolygon.cpp" />
-    <ClCompile Include="..\src\2DVector.cpp" />
     <ClCompile Include="..\Src\BaseApp.cpp" />
-    <ClCompile Include="..\src\BBox.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
     <ClCompile Include="..\src\chunkCheckShader.cpp" />
     <ClCompile Include="..\src\chunkHeightShader.cpp" />
     <ClCompile Include="..\src\chunkShader.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
-    <ClCompile Include="..\src\dynBuf.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
     <ClCompile Include="..\src\findPointHeightShader.cpp" />
     <ClCompile Include="..\src\grassShader.cpp" />
     <ClCompile Include="..\Src\ImageLib.cpp" />
-    <ClCompile Include="..\src\isoSurface.cpp" />
-    <ClCompile Include="..\src\particle.cpp" />
     <ClCompile Include="..\src\physics\aabb.cpp" />
     <ClCompile Include="..\src\physics\basePhysObj.cpp" />
     <ClCompile Include="..\src\physics\bsphere.cpp" />
@@ -150,7 +145,6 @@
     <ClCompile Include="..\Src\TexFont.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
-    <ClCompile Include="..\src\TileLayer.cpp" />
     <ClCompile Include="..\src\UIengine.cpp" />
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbetterBase.cpp" />
@@ -179,10 +173,7 @@
     <ClCompile Include="..\src\wireBoxShader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\2DPolygon.h" />
-    <ClInclude Include="..\src\2DVector.h" />
     <ClInclude Include="..\Src\BaseApp.h" />
-    <ClInclude Include="..\src\BBox.h" />
     <ClInclude Include="..\src\chunk.h" />
     <ClInclude Include="..\src\chunkCheckShader.h" />
     <ClInclude Include="..\src\chunkHeightShader.h" />
@@ -191,14 +182,11 @@
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\Delegate.h" />
     <ClInclude Include="..\src\direction.h" />
-    <ClInclude Include="..\src\dynBuf.h" />
     <ClInclude Include="..\Src\Engine.h" />
     <ClInclude Include="..\src\findPointHeightShader.h" />
     <ClInclude Include="..\src\grassShader.h" />
     <ClInclude Include="..\Src\ImageLib.h" />
-    <ClInclude Include="..\src\isoSurface.h" />
     <ClInclude Include="..\Src\Macros.h" />
-    <ClInclude Include="..\src\particle.h" />
     <ClInclude Include="..\src\physics\aabb.h" />
     <ClInclude Include="..\src\physics\basePhysObj.h" />
     <ClInclude Include="..\src\physics\bsphere.h" />
@@ -249,7 +237,6 @@
     <ClInclude Include="..\Src\TexFont.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
-    <ClInclude Include="..\src\TileLayer.h" />
     <ClInclude Include="..\Src\Timer.h" />
     <ClInclude Include="..\Src\Types.h" />
     <ClInclude Include="..\src\UIengine.h" />

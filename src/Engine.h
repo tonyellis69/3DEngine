@@ -6,8 +6,8 @@
 #include "SoundLib.h"
 #include "Timer.h"
 #include "Sprite.h"
-#include "2DPolygon.h"
-#include "TileLayer.h"
+//#include "2DPolygon.h"
+//#include "TileLayer.h"
 #include "Config.h"
 #include "renderer\camera.h"
 #include "renderer\model.h"
@@ -53,9 +53,6 @@ public:
 	void drawCursor(float x, float y, char* Text);
 	void drawStringWithCursor(int x, int y, int c, char* Text);
 	int loadTexture( const string& Filename);
-	void setBackdrop(int Texture);
-	void setBackdrop(char* Filename);
-	void setBackdropTiling(float u, float v, float s, float t);
 	void makeFit(int PixW, int PixH, bool Centre);
 	void registerSprite(const CSprite& Sprite);
 	template<class TYPE>
@@ -69,9 +66,9 @@ public:
 	void updateRegisteredSprites(const double& dT);
 	void clearRegisteredSpriteList();
 	void setFont(int FontNo);
-	void CreateTileLayer(char* TileData, TSpriteSheet& Sheet, int Width, int Height);
-	void drawSceneLayers();
-	C2DVector ScrollBackdrop(float x, float y);
+	//void CreateTileLayer(char* TileData, TSpriteSheet& Sheet, int Width, int Height);
+	//void drawSceneLayers();
+	//C2DVector ScrollBackdrop(float x, float y);
 
 	void setDrawColour(const rgba& colour);
 	void setSecondaryDrawColour(const rgba& colour);
@@ -163,7 +160,7 @@ public:
 	CImageLib ImageLib;
 	CSoundLib SoundLib;
 	CTimer Time;
-	CSceneObj Scene; 
+//	CSceneObj Scene; 
 
 	std::string dataPath; ///<Path to the data folder.
 	int currentProgram;///<Handle for the shader program currently in use.
@@ -210,7 +207,7 @@ public:
 	std::vector<CModel*> modelList;///<Engine-created models to delete at closedowm.
 	
 	public:
-	C2DVector userScale; ///<Scaling factor applied to user drawing, every frame.
+	glm::vec2 userScale; ///<Scaling factor applied to user drawing, every frame.
 	TSpriteSheet* CurrentTileSet; ///<Points to the last-used SpriteSheet.
 	
 	

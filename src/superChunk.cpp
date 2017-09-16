@@ -204,6 +204,7 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
 	case (up) : return uSChunk;
 	case (down) : return dSChunk;
 	}
+	return nSChunk;
 }
 
 /** Return the adjacent superchunk in the opposite direction to the one given.*/
@@ -216,6 +217,7 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
 	case (up) : return dSChunk;
 	case (down) : return uSChunk;
 	}
+	return nSChunk;
  }
 
  /** Acquire as a new face layer in the inFace direction, the face chunks (if any), of the neighbouring superchunk
@@ -358,7 +360,7 @@ void CSuperChunk::raiseOverlapCount(int chunks, Tdirection faceDir) {
 		int zAxis = getAxis(faceDir);
 		int zPos = outerLayer(faceDir);
 		vector<Chunk*>::iterator it;
-		for (int ch = 0; ch < chunkList.size(); ch++) {
+		for (size_t ch = 0; ch < chunkList.size(); ch++) {
 			if (chunkList[ch]->scIndex[zAxis] == zPos) {
 				chunkList[ch]->status = chRemoveOnAlert;
 			}

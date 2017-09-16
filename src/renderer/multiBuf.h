@@ -54,8 +54,8 @@ public:
 	void setInstanced(CBaseBuf & buf, int noAttribs);
 	
 
-	GLint* first;
-	GLsizei* count;
+	//GLint* first;
+	//GLsizei* count;
 	unsigned int freeMem;
 	unsigned int maxBufSize;
 	unsigned int minBufSize; ///<Minimum space that should always be available.

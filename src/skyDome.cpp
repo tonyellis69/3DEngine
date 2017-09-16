@@ -48,7 +48,7 @@ void CSkyDome::setModel(CModel * model) {
 }
 
 void CSkyDome::update(double & dT) {
-	float move = dT * 0.05;
+	float move = float( dT * 0.05);
 
 	cloudOffset += move;
 	cloud->setOffset(0, cloudOffset);

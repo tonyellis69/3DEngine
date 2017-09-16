@@ -36,6 +36,10 @@ CTerrain::CTerrain() : CModel() {
 
 }
 
+void CTerrain::reserveBuf(unsigned int elementsUsed) {
+		multiBuf.reserve(elementsUsed);
+}
+
 /** Set the dimensions and building block sizes of this terrain. */
 void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize) {
 	float superChunkSize = _cubeSize * _cubesPerChunkEdge * _chunksPerSChunkEdge ;
@@ -48,7 +52,7 @@ void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float 
 /** Create each nested layer of superchunks. */
 void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 	//calculate dimensions of the innermost layer:
-	int LoDscale = 1;
+	float LoDscale = 1.0f;
 	float layerExtent = LoD1extent;
 	float layerCubeSize = LoD1cubeSize;
 	float LoD1SCsize = layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge;
@@ -128,7 +132,7 @@ void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 		layers[layerNo].SCsampleStep = layers[layerNo].scSize / worldUnitsPerSampleUnit;
 		layers[layerNo].chunkSampleStep = (layers[layerNo].cubeSize * cubesPerChunkEdge) / worldUnitsPerSampleUnit;
 		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
-		SCsBetweenLayers = (int)gapBetweenLayers / prevSCsize;
+		SCsBetweenLayers = int(gapBetweenLayers / prevSCsize);
 
 		
 		createSuperChunks(*outerArray, layers[layerNo].superChunks);
@@ -140,7 +144,7 @@ void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 
 		if (layerNo > 0) { //stitch this layer into previous, outer layer
 			gapBetweenLayers = abs(layers[layerNo - 1].nwLayerPos.x - layers[layerNo].nwLayerPos.x);
-			SCsBetweenLayers = gapBetweenLayers / prevSCsize;// layerSCsize[layerNo - 1];
+			SCsBetweenLayers = int(gapBetweenLayers / prevSCsize);// layerSCsize[layerNo - 1];
 		
 			insertLayer(*innerArray, *outerArray, SCsBetweenLayers);
 
@@ -398,7 +402,7 @@ void CTerrain::update() {
 void CTerrain::advance(Tdirection dir) {
 	i32vec3 scrollVec = dirToVec(dir);
 
-	size_t inner = layers.size()-1;
+	int inner = layers.size()-1;
 	//for (int l=inner;l>=0;l--) {
 	for (int layerNo=0; layerNo <= inner; layerNo++) {  //from outer layer to inner
 			Tdirection outgoingDir = flipDir(dir);
@@ -450,7 +454,6 @@ void CTerrain::freeChunkModel(CModel* chunk) {
 void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 	int zAxis = getAxis(face);
 	i32vec3 facePos;
-	Chunk* newChunk;
 
 	Tdirection xStart,xEnd,yStart,yEnd;
 	xStart = getXstart(face); xEnd = flipDir(xStart);
@@ -599,7 +602,7 @@ void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
 void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 	CSuperChunk* sc;
 	visibleSClist.clear();
-	for (int layerNo = 0; layerNo < layers.size(); layerNo++) {
+	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
 		int slSize = layers[layerNo].superChunks.size();
 		for (int scNo = 0; scNo < slSize; scNo++) {
 			sc = layers[layerNo].superChunks[scNo];
@@ -693,19 +696,6 @@ CTerrain::~CTerrain() {
 
 
 
-
-
-void CRenderTerrain::reserveBuf(unsigned int elementsUsed) {
-	multiBuf.reserve(elementsUsed);
-
-}
-
-CBaseBuf* CRenderTerrain::getBuffer() {
-	return &multiBuf;
-}
-
-
-
 CTerrainLayer::CTerrainLayer() {
 	scrollState = i32vec3(0);
 	resetState = i32vec3(0);
@@ -722,7 +712,7 @@ bool CTerrainLayer::advance(i32vec3& scrollVec) {
 
 	//If this layer has been advanced to its scrolling point, scroll it
 	int scrollAxis = getAxis(scrollVec);
-	int scrollPoint = 1 << (int)LoD-1;
+	int scrollPoint = 1 << (LoD-1);
 	if (abs(scrollState[scrollAxis]) == scrollPoint ) {
 		scrollState[scrollAxis] = 0;
 		scroll(scrollVec);
@@ -741,7 +731,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	float LoDscale = (float) (1 << (LoD-1));
 	vec3 scrollStep = vec3(scrollVec ) * LoD1chunkSize * LoDscale;
 	for (size_t s=0;s<superChunks.size();s++) { 
-		for (int c=0;c<superChunks[s]->chunkList.size();c++) {
+		for (size_t c=0;c<superChunks[s]->chunkList.size();c++) {
 			superChunks[s]->chunkList[c]->scIndex += -scrollVec;
 		}
 		superChunks[s]->retractChunkSpace(scrollDir); //shrink boundary where we've moved chunks out

@@ -11,6 +11,7 @@ Tdirection flipDir(Tdirection dir) {
 	case up : return down;
 	case down : return up;
 	}
+	return north;
 }
 
 
@@ -24,6 +25,7 @@ glm::vec3 dirToVec(Tdirection dir) {
 		case up: return vec3(0,1,0);
 		case down: return vec3(0,-1,0);
 	}
+	return vec3(0);
 }
 
 glm::i32vec3 rotateByDir(i32vec3 vec, Tdirection dir) {
@@ -68,6 +70,7 @@ Tdirection vecToDir(glm::i32vec3& vec) {
 		return south;
 	if (vec.z == -1)
 		return north;
+	return north;
 }
 
 int getSign(Tdirection dir) {

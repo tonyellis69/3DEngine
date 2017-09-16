@@ -21,7 +21,7 @@ namespace pois {
 		//random radius between mindist and 2 * mindist
 		float radius = mindist * (r1 + 1);
 		//random angle
-		float angle = 2 * PI * r2;
+		float angle = 2.0f * float(PI) * r2;
 		//the new point is generated around the point (x, y)
 		float newX = point.x + radius * cos(angle);
 		float newY = point.y + radius * sin(angle);
@@ -55,9 +55,9 @@ namespace pois {
 
 	std::vector <glm::vec2> generate_poisson(int width, int height, float min_dist, int new_points_count) {
 		//Create the grid
-		float cellSize = min_dist / sqrt(2);
+		float cellSize = min_dist / sqrt(2.0f);
 
-		grid2D grid(width / cellSize, height / cellSize);
+		grid2D grid(int(width / cellSize), int(height / cellSize));
 
 		std::vector <glm::vec2> processList; //random
 		std::vector <glm::vec2> samplePoints;

@@ -26,7 +26,7 @@ CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 	BackdropOn = false;
 	cursorFlash = 0;
 	tmpCursorPos = -1;
-	userScale.set(1,1);
+	userScale = glm::vec2(1.0f,1.0f);
 	p2dR = &Renderer.rend2d;
 	skyDome = NULL;
 }
@@ -63,7 +63,7 @@ void CEngine::resizeView(int x, int y, int width, int height) {
 	if (MakingFit) 
 		scaleToFit();
 	//ensure any scene layers are up to date.
-	Scene.Resize((float)Renderer.Width,(float) Renderer.Height);	
+	//Scene.Resize((float)Renderer.Width,(float) Renderer.Height);	
 	currentCamera->setAspectRatio((float)width,(float)height);
 }
 
@@ -256,15 +256,7 @@ int CEngine::loadTexture(const string& Filename) {
 	return ImageLib.CreateTextureFromImage(Filename.c_str(), &TexWidth, &TexHeight, true);
 }
 
-/** Set the texture of the backdrop. */
-void CEngine::setBackdrop(int Texture) {
-	Scene.setBackdropLayer(Texture);
-}
 
-void CEngine::setBackdrop(char* Filename) {
-	int BackdropTex = loadTexture(Filename);
-	Scene.CreateBackdropLayer(BackdropTex);
-}
 
 
 /** Tell engine to scale all drawing to fit these dimensions, if they lie outside the current screensize. */
@@ -348,6 +340,7 @@ void CEngine::setFont(int FontNo) {
 
 
 /** Draw the various backround layers of the scene, such as tile scenery. */
+/*
 void CEngine::drawSceneLayers() {
 	int NoLayers = Scene.LayerList.size();
 
@@ -359,11 +352,12 @@ void CEngine::drawSceneLayers() {
 		p2dR->drawRect(&Rect,x,y);
 	}
 }
-
+*/
 /** TO DO: this scrolls the whole scene, not just the backdrop. */
+/*
 C2DVector CEngine::ScrollBackdrop(float x, float y) {
 	return Scene.Scroll(x, y);
-}
+} */
 
 void CEngine::setDrawColour(const rgba& colour) {
 	p2dR->setDrawColour(colour);
@@ -392,12 +386,12 @@ void CEngine::applyUserScale() {
 }
 /** Set the current user scale values, but don't apply them. */
 void CEngine::setUserScale(float x, float y) {
-	userScale.set(x,y);
+	userScale = glm::vec2(x,y);
 }
 
 /** Adjust the current user scale, without first resetting it to 1.*/
 void CEngine::changeUserScale(float x, float y) {
-	C2DVector scale(x,y);
+	glm::vec2 scale(x,y);
 	userScale = userScale + scale;
 }
 
@@ -870,10 +864,8 @@ CModel * CEngine::createModel() {
 
 /**	Create a CTerrain (subclassed to CRenderTerrain) and return a pointer to it. */
 CTerrain * CEngine::createTerrain() {
-	CRenderTerrain* terrain = new CRenderTerrain();
-//	terrain->pRenderer = &Renderer;
+	CTerrain* terrain = new CTerrain();
 	CMaterial* material = createMaterial();
-//	terrain->setMaterial(*material);
 
 	CTerrainPhysObj* terrainPhysObj = new CTerrainPhysObj();
 	terrainPhysObj->attachModel(terrain);
