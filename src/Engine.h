@@ -185,7 +185,11 @@ public:
 
 	~CEngine(void);
 
-	CRenderer Renderer;
+	CRenderer& Renderer;
+	//CRenderer* Renderer;
+
+
+
 	C2dRenderer* p2dR; ///<Convenience pointer to the 2d renderer.
 
 

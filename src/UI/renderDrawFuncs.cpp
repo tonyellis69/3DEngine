@@ -13,14 +13,12 @@ void CRenderDrawFuncs::setRenderer(CRenderer * renderer) {
 
 void CRenderDrawFuncs::loadShaders() {
 	uiRectShader = new CGUIrectShader();
-	uiRectShader->pRenderer = pRenderer;
 	uiRectShader->create(pRenderer->dataPath + "uiRect");
 	uiRectShader->getShaderHandles();
 	uiRectShader->setType(uiRect);
 	shaderList.push_back(uiRectShader);
 
 	uiTexShader = new CGUItexShader();
-	uiTexShader->pRenderer = pRenderer;
 	uiTexShader->create(pRenderer->dataPath + "uiTexture");
 	uiTexShader->getShaderHandles();
 	uiTexShader->setType(uiTex);

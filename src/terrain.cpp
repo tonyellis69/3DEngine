@@ -20,7 +20,8 @@ using namespace watch;
  int totalbufsize = 0;
  int totalchunks = 1;
 
-CTerrain::CTerrain() : CModelMulti() {
+CTerrain::CTerrain() : CModel() {
+	pRenderer = &CRenderer::getInstance();
 	totalTris = 0; totalSCs = 0;
 	chunkOrigin = glm::translate(glm::mat4(1), getPos());
 	scrollTriggerPoint = vec3(0);
@@ -668,7 +669,7 @@ void CTerrain::drawTrees(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 /** The draw-yourself function. */
 void CTerrain::draw() {
 	//pRenderer->setShader(Engine.phongShader);
-	material->assign();
+	//material->assign();
 
 	//Engine.phongShader->setNormalModelToCameraMatrix(tmp); //why am I doing this?
 	//Engine.phongShader->setMVP(mvp);

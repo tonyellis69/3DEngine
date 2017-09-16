@@ -13,7 +13,7 @@ class CRenderer;
 class CBuf : public CBaseBuf
 {
 public:
-	CBuf();
+	CBuf() ;
 	~CBuf();
 	void storeVertexes(void* verts, unsigned int size, unsigned int nVerts);
 	void storeIndex(unsigned int * indices, unsigned int nIndices);
@@ -31,7 +31,6 @@ public:
 	void setInstanced(CBaseBuf& buf, int noAttribs);
 	unsigned int getNoIndices();
 	unsigned int getIndexHandle();
-	void setRenderer(CRenderer* renderer);
 	CRenderer* getRenderer();
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.

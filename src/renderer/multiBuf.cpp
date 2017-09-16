@@ -80,7 +80,7 @@ void CMultiBuf::createChildBuf() {
 	CChildBuf newBuf;
 	
 	childBufs.push_back(newBuf);
-	childBufs.back().setRenderer(getRenderer());
+	//childBufs.back().setRenderer(getRenderer());
 	childBufs.back().setSize(maxBufSize);
 	if (instancedBuf) {
 		childBufs.back().setInstanced(*instancedBuf, nInstancedAttribs);

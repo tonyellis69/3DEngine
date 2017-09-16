@@ -2,6 +2,11 @@
 #include "renderer.h"
 #include <fstream>
 
+CRenderShader::CRenderShader() {
+	noFeedbackSettings = 0;
+	pRenderer = &CRenderer::getInstance();
+}
+
 void CRenderShader::load(shaderType shader, std::string shaderFile) {
 	pRenderer->loadShader(shader, shaderFile);
 	if (shader == vertex)

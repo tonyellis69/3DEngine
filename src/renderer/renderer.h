@@ -7,7 +7,6 @@
 
 #include "..\soil.h"
 
-//#include "model.h"
 #include "camera.h"
 #include "modelMulti.h"
 #include "renderModel.h"
@@ -40,10 +39,18 @@ extern int totalchunks;
 
 
 /** The high-level renderer class. */
+
+class CBaseBuf;
+
 class CRenderer {
 public:
 	CRenderer();
 	~CRenderer();
+	/** Return a reference to the renderer singleton, initialising it if necessary. */
+	static CRenderer & CRenderer::getInstance() {
+		static CRenderer *instance = new CRenderer();
+		return *instance;
+	}
 	void attachWindow(HWND& hWnd);
 	void getGLinfo();
 	void detachWindow();
@@ -128,6 +135,8 @@ public:
 	unsigned int tmpHandle;
 private:
 
+	//static CRenderer* instance;
+
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 
 	//render to texture stuff:
@@ -142,3 +151,5 @@ private:
 	std::vector<CBuf*> bufferList; ///<Kill list of renderer-created buffers.
 
 };
+
+//CRenderer* CRenderer::instance = 0;

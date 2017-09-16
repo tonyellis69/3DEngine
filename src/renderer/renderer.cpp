@@ -29,7 +29,10 @@ CRenderer::CRenderer() {
 CRenderer::~CRenderer() {
 	for (size_t b = 0; b<bufferList.size(); b++)
 		delete bufferList[b];
+	_CrtDumpMemoryLeaks();
 }
+
+
 
 /** Attach the given window to the renderer, so it can be drawn to. */
 void CRenderer::attachWindow(HWND& hWnd){
@@ -478,7 +481,6 @@ void CRenderer::createScreenQuad() {
 	vert[3] = glm::vec2(1, -1);
 
 	unsigned int index[4] = { 2,3,0,1 };
-	screenQuad->setRenderer(this);
 	screenQuad->storeVertexes(vert, sizeof(vert), 4);
 	screenQuad->storeIndex(index, 4);
 	screenQuad->storeLayout(2, 0, 0, 0);
@@ -714,7 +716,7 @@ unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
 
 CBaseBuf* CRenderer::createBuffer() {
 	CBuf* newBuf = new CBuf();
-	newBuf->setRenderer(this);
+	//newBuf->setRenderer(this);
 	bufferList.push_back(newBuf);
 	return newBuf;
 }

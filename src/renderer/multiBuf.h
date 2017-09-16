@@ -4,7 +4,7 @@
 #include "glew.h"
 #include "buf.h"
 
-class CRenderer;
+//class CRenderer;
 
 class CChildBuf : public CBuf {
 public:

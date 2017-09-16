@@ -4,9 +4,9 @@
 #include "..\vertBufs.h"
 #include "renderer.h"
 
-CBillboard::CBillboard(glm::vec3 & pos, glm::vec2 & size, CRenderer* renderer) {
-	pRenderer = renderer; //TO DO: ugh
-	buf.setRenderer(renderer); 
+CBillboard::CBillboard(glm::vec3 & pos, glm::vec2 & size) {
+	//pRenderer = renderer; //TO DO: ugh
+	//buf.setRenderer(renderer); 
 	setPos(pos);
 	setSize(size);
 }

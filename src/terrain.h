@@ -45,7 +45,7 @@ public:
 const int chunkTriCacheSize = 6;
 
 
-class CTerrain : public CModelMulti  {
+class CTerrain : public CModel  {
 public:
 	CTerrain();
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
@@ -84,6 +84,9 @@ public:
 	void drawTrees(glm::mat4 & mvp, std::vector<CSuperChunk*>& drawList);
 	void draw();
 	~CTerrain();
+
+	CMultiBuf multiBuf;
+	CRenderer* pRenderer;
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
 

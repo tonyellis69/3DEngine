@@ -8,7 +8,7 @@
 //can then be tidily initialised with the renderer.
 class CBillboard : public CRenderModel {
 public:
-	CBillboard(glm::vec3& pos, glm::vec2& size, CRenderer* renderer);
+	CBillboard(glm::vec3& pos, glm::vec2& size);
 	void setSize(glm::vec2& size);
 	void drawNew();
 

@@ -14,6 +14,7 @@ public:
 class CShader;
 class CRenderMaterial : public CMaterial {
 public:
+	CRenderMaterial();
 	void addImage(std::string filename);
 	unsigned int getTexture(int texNo);
 	void assign();
@@ -24,10 +25,13 @@ public:
 	void unAssign();
 	CShader* getShader();
 
-	CRenderer* pRenderer;
+	
 	
 	std::vector<CTextureSlot> textures;
 	glm::vec4 colour;
 	//unsigned int hShader;
 	CShader* shader;
+
+protected:
+	CRenderer* pRenderer;
 };

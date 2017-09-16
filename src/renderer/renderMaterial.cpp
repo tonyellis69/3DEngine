@@ -1,6 +1,10 @@
 #include "renderMaterial.h"
 
 
+CRenderMaterial::CRenderMaterial() {
+	pRenderer = &CRenderer::getInstance();
+}
+
 void CRenderMaterial::addImage(std::string filename) {
 	CTextureSlot tex;
 	CRenderTexture* renTex = (CRenderTexture*)pRenderer->textureManager.getTexture(filename);

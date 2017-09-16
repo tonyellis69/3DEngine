@@ -4,6 +4,7 @@
 #include "renderer.h"
 
 CBuf::CBuf() {
+	pRenderer = &CRenderer::getInstance();
 	hBuffer = 0;
 	hVAO = 0;
 	hIndex = 0;
@@ -251,9 +252,7 @@ unsigned int CBuf::getIndexHandle() {
 	return hIndex;
 }
 
-void CBuf::setRenderer(CRenderer * renderer) {
-	pRenderer = renderer;
-}
+
 
 CRenderer * CBuf::getRenderer() {
 	return pRenderer;

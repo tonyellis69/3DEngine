@@ -8,7 +8,7 @@ using namespace std;
 class CRenderer;
 class CRenderShader : public CShader {
 public:
-	CRenderShader() { noFeedbackSettings = 0; };
+	CRenderShader();
 	void load(shaderType shader, std::string shaderFile);
 	void create(std::string shaderName);
 	void attach();
@@ -19,13 +19,17 @@ public:
 	unsigned int getShaderHandle();
 	void recompile();
 
-	CRenderer* pRenderer;
+	
 	unsigned int hShader; ///<OpenGL shader handle.
 
 	const char* feedbackVaryings[10];
+
+protected:
+	CRenderer* pRenderer;
 private:
 	void loadFiles();
 	unsigned int noFeedbackSettings;
+
 };
 
 

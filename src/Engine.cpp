@@ -15,8 +15,7 @@
 //using namespace glm;
 using namespace vBuf;
 
-CEngine::CEngine() {
-	
+CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 
 	CurrentTileSet = 0; //TO DO - should be the built-in default;
 	CurrentTexture = 0; //TO DO - should be the built-in default;
@@ -861,8 +860,8 @@ void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noInd
 /**	Create a CModel (subclassed to CRenderModel) and return a pointer to it. */
 CModel * CEngine::createModel() {
 	CRenderModel* model = new CRenderModel();
-	model->pRenderer = &Renderer; //TO DO: do in a setter!
-	model->buf.setRenderer(&Renderer); //TO DO: above setter should handle this!
+	//model->pRenderer = &Renderer; //TO DO: do in a setter!
+	//model->buf.setRenderer(&Renderer); //TO DO: above setter should handle this!
 	CMaterial* material = createMaterial();
 	model->setMaterial(*material);
 	modelList.push_back(model);
@@ -872,9 +871,9 @@ CModel * CEngine::createModel() {
 /**	Create a CTerrain (subclassed to CRenderTerrain) and return a pointer to it. */
 CTerrain * CEngine::createTerrain() {
 	CRenderTerrain* terrain = new CRenderTerrain();
-	terrain->pRenderer = &Renderer;
+//	terrain->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
-	terrain->setMaterial(*material);
+//	terrain->setMaterial(*material);
 
 	CTerrainPhysObj* terrainPhysObj = new CTerrainPhysObj();
 	terrainPhysObj->attachModel(terrain);
@@ -905,7 +904,6 @@ CSkyDome * CEngine::createSkyDome() {
 	//load skyDome shader
 	skyDome->skyShader = new CSkyShader();
 	shaderList.push_back(skyDome->skyShader);
-	skyDome->skyShader->pRenderer = &Renderer;
 	skyDome->skyShader->create(dataPath + "skyDome");
 	
 
@@ -940,7 +938,6 @@ CMaterial * CEngine::createMaterial(std::string filename) {
 
 CMaterial * CEngine::createMaterial() {
 	CRenderMaterial* material = new CRenderMaterial();
-	material->pRenderer = &Renderer;
 	material->setShader(phongShader);
 	materialList.push_back(material);
 	return material;
@@ -954,14 +951,12 @@ CShader * CEngine::createShader(std::string name) {
 
 CShader * CEngine::createShader() {
 	CRenderShader* shader = new CRenderShader();
-	shader->pRenderer = &Renderer;
 	shaderList.push_back(shader);
 	return shader;
 }
 
 void CEngine::createStandardTexShader() {
 	texShader = new CTexShader();
-	texShader->pRenderer = &Renderer;
 	texShader->create(dataPath + "texture");
 	texShader->getShaderHandles();
 	texShader->setType(standardTex);
@@ -970,7 +965,6 @@ void CEngine::createStandardTexShader() {
 
 void CEngine::createStandardMultiTexShader() {
 	multiTexShader = new CMultiTexShader();
-	multiTexShader->pRenderer = &Renderer;
 	multiTexShader->create(dataPath + "multiTexture");
 	multiTexShader->getShaderHandles();
 	multiTexShader->setType(standardMultiTex);
@@ -979,7 +973,6 @@ void CEngine::createStandardMultiTexShader() {
 
 void CEngine::createStandardPhongShader() {
 	phongShader = new CPhongShader();
-	phongShader->pRenderer = &Renderer;
 	phongShader->create(dataPath + "default");
 	phongShader->getShaderHandles();
 	phongShader->setType(standardPhong);
@@ -992,10 +985,8 @@ void CEngine::createStandardPhongShader() {
 	phongShader->setColour(glm::vec4(1));
 }
 
-void CEngine::createStandardWireShader()
-{
+void CEngine::createStandardWireShader() {
 	wireShader = new CWireShader();
-	wireShader->pRenderer = &Renderer;
 	wireShader->create(dataPath + "wire");
 	wireShader->getShaderHandles();
 	wireShader->setType(standardWire);
@@ -1004,7 +995,6 @@ void CEngine::createStandardWireShader()
 
 void CEngine::createStandardBillboardShader() {
 	billboardShader = new CBillboardShader();
-	billboardShader->pRenderer = &Renderer;
 	billboardShader->create(dataPath + "billboard");
 	billboardShader->getShaderHandles();
 	billboardShader->setType(standardBillboard);
@@ -1013,7 +1003,6 @@ void CEngine::createStandardBillboardShader() {
 
 void CEngine::createWireBoxShader() {
 	wireBoxShader = new CWireBoxShader();
-	wireBoxShader->pRenderer = &Renderer;
 	wireBoxShader->create(dataPath + "wireBox");
 	wireBoxShader->getShaderHandles();
 	wireBoxShader->setType(userShader);
@@ -1024,7 +1013,7 @@ void CEngine::createWireBoxShader() {
 
 CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 	//create the object
-	CBillboard* billboard = new CBillboard(pos, size,&Renderer);
+	CBillboard* billboard = new CBillboard(pos, size);
 	//billboard->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
 	material->setShader(texShader);
@@ -1037,7 +1026,6 @@ CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 
 void CEngine::createInstancedPhongShader() {
 	phongShaderInstanced = new CPhongShaderInstanced();
-	phongShaderInstanced->pRenderer = &Renderer;
 	phongShaderInstanced->create(dataPath + "defaultInstanced");
 	phongShaderInstanced->getShaderHandles();
 	phongShaderInstanced->setType(standardPhong);

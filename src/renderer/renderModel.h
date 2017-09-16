@@ -19,7 +19,10 @@ public:
 
 	
 
-	CRenderer* pRenderer; ///<Lets models talk to renderer.
+	
 	CBuf buf; ///<Holds the details of this model's vertex buffer.
 		unsigned int hMVP;
+
+protected:
+	CRenderer* pRenderer; ///<Lets models talk to renderer.
 };
