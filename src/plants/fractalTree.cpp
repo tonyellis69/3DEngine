@@ -19,27 +19,29 @@ CFractalTree::CFractalTree() {
 
 /** Create the entire plant. */
 void CFractalTree::create() {
-	TStem baseStem = { 1, glm::vec3(0,-2,0), glm::vec3(0,1,0), stemLength, stemRadius, 0};
+	TStem baseStem = { 1, glm::vec3(0,-2,0), glm::vec3(0,1,0), stemLength, stemRadius, 0, glm::vec3(0,0,-1) };
 	createStem(baseStem);
 }
 
+/** Recursively create this stem and any sub-stems. */
 void CFractalTree::createStem(TStem& stem) {
-
-	
 	stem.length +=  stemLengthVariance(randEngine) * stem.length;
-	unsigned int endRingStart;
-	glm::vec3 end = createStemSolid(stem, endRingStart);
 
+	unsigned int endRingIndexPos;
+	glm::vec3 end = createStemSolid(stem, endRingIndexPos);
 	if (stem.stage < maxStages) {
-		glm::vec3 rotationAxis = getNormal(stem.angle); //create an axis perpendicular to this stem
+		glm::vec3 rotationAxis = stem.normal;//  getNormal(stem.angle); //create an axis perpendicular to this stem
 		glm::vec3 branchPoint = stem.pos + stem.angle * stem.length ;
-		float newLength = stem.length * stageScale;
+		float childStemLength = stem.length * stageScale;
 		int numBranches = nBranches + branchNumVariance(randEngine);
 		for (int branch = 0; branch < numBranches; branch++) {
 			float variance = branchAngle * branchAngleVariance(randEngine);
-			glm::vec3 newAngle = glm::rotate(stem.angle, glm::radians(branchAngle + variance), rotationAxis);
+			glm::vec3 childStemAngle = glm::rotate(stem.angle, glm::radians(branchAngle + variance), rotationAxis);
+			glm::vec3 childStemNormal = glm::rotate(stem.normal, glm::radians(branchAngle + variance), rotationAxis);
+			childStemNormal = glm::normalize(childStemNormal);
 
-			TStem childStem = { stem.stage + 1, branchPoint, newAngle, newLength, stem.radius  * stageScale, endRingStart };
+			TStem childStem = { stem.stage + 1, branchPoint, childStemAngle, childStemLength, stem.radius  * stageScale, endRingIndexPos,
+				childStemNormal };
 			createStem(childStem);
 			rotationAxis = glm::rotate(rotationAxis, glm::radians(360.0f/ numBranches), stem.angle);
 		}
@@ -92,6 +94,7 @@ void CFractalTree::getModel(CModel* pModel) {
 	pModel->storeLayout(3, 3, 0, 0);
 	pModel->setDrawMode(drawTriStrip);
 	pModel->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
+	
 }
 
 glm::vec3 CFractalTree::createStemWire(const int stage, const glm::vec3 & pos, const glm::vec3 & angle) {
@@ -109,8 +112,8 @@ glm::vec3 CFractalTree::createStemWire(const int stage, const glm::vec3 & pos, c
 	return endVert.v;
 }
 
-glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingStart) {
-	glm::vec3 stemNormal = getNormal(stem.angle); //create an axis perpendicular to this stem
+glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newendRingIndexPos) {
+	glm::vec3 stemNormal = stem.normal;// getNormal(stem.angle); //create an axis perpendicular to this stem
 	
 	//float currentRadius = stemRadius * float(1.5f / stem.stage);
 	float rot = 360.0f / stemFaces;
@@ -118,7 +121,8 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingSta
 	vBuf::T3DnormVert vert;
 	unsigned int baseRingStart;
 
-	if (!stem.parentEndRing) {
+	if (!stem.parentEndRing) 
+	{
 		//Create a ring of base vectors
 		baseRingStart = verts.size();
 		for (int face = 0; face < stemFaces; face++) {
@@ -135,7 +139,7 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingSta
 	float endRadius = stem.radius * stageScale;
 
 	//create ring of end vectors
-	unsigned int endRingStart = verts.size();
+	unsigned int endRingIndexPos = verts.size();
 	glm::vec3 end = stem.pos + stem.angle * stem.length;
 	for (int face = 0; face < stemFaces; face++) {
 		vert.v = glm::vec3(0) + (stemNormal * endRadius);
@@ -149,46 +153,46 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newEndRingSta
 	int face = 0;
 /*	for ( face = 0; face < stemFaces-1 ; face++) {
 		index.push_back(baseRingStart + face); //0
-		index.push_back(endRingStart + face); //4
+		index.push_back(endRingIndexPos + face); //4
 		index.push_back(baseRingStart + face + 1); //1
 	
-		index.push_back(endRingStart + 1 + face); //5
+		index.push_back(endRingIndexPos + 1 + face); //5
 		index.push_back(baseRingStart + 1 + face); //1
-		index.push_back(endRingStart + face); //4
+		index.push_back(endRingIndexPos + face); //4
 		//currentIndex++;
 	}
 	
 	index.push_back(baseRingStart + face); //0
-	index.push_back(endRingStart + face); //4
+	index.push_back(endRingIndexPos + face); //4
 	index.push_back(baseRingStart); //1
 
-	index.push_back(endRingStart); //5
+	index.push_back(endRingIndexPos); //5
 	index.push_back(baseRingStart); //1
-	index.push_back(endRingStart + face); //4 */
+	index.push_back(endRingIndexPos + face); //4 */
 
 
 	//first tri:
 	index.push_back(baseRingStart + face); //0
-	index.push_back(endRingStart + face); //4
+	index.push_back(endRingIndexPos + face); //4
 	index.push_back(baseRingStart + face + 1); //1
 
 	//first tri strip vert
-	index.push_back(endRingStart + 1 + face); //5
+	index.push_back(endRingIndexPos + 1 + face); //5
 
 	
 	for (face = 1; face < stemFaces - 2; face++) {
 		index.push_back(baseRingStart + face + 1);
-		index.push_back(endRingStart + 1 + face);
+		index.push_back(endRingIndexPos + 1 + face);
 	}
 
 	//stitch-up face
 	index.push_back(baseRingStart); //0
-	index.push_back(endRingStart ); //4
+	index.push_back(endRingIndexPos ); //4
 
 	index.push_back(65535); //signals the end of this sequence
 	
 	//currentIndex += stemFaces +1;
-	newEndRingStart = endRingStart;
+	newendRingIndexPos = endRingIndexPos;
 
 	return end;
 }

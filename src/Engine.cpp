@@ -862,20 +862,6 @@ CModel * CEngine::createModel() {
 	return model;
 }
 
-/**	Create a CTerrain (subclassed to CRenderTerrain) and return a pointer to it. */
-CTerrain * CEngine::createTerrain() {
-	CTerrain* terrain = new CTerrain();
-	CMaterial* material = createMaterial();
-
-	CTerrainPhysObj* terrainPhysObj = new CTerrainPhysObj();
-	terrainPhysObj->attachModel(terrain);
-	terrainPhysObj->setCollides(false);
-	physObjManager.addPhysObj(terrainPhysObj);
-	
-
-	return terrain;
-}
-
 
 
 CBaseBuf * CEngine::createBuffer() {
@@ -975,6 +961,8 @@ void CEngine::createStandardPhongShader() {
 	phongShader->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f, 1));
 	phongShader->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
 	phongShader->setColour(glm::vec4(1));
+
+	Renderer.phongShader = phongShader;
 }
 
 void CEngine::createStandardWireShader() {

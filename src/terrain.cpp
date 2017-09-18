@@ -423,16 +423,17 @@ void CTerrain::advance(Tdirection dir) {
 
 
 /** Call an external function that returns true if the isosurface doesn't intersect the given superChunk position.*/
-bool CTerrain::superChunkIsEmpty(CSuperChunk& SC) {
+/* bool CTerrain::superChunkIsEmpty(CSuperChunk& SC) {
 	return EXTsuperChunkIsEmpty(SC);
-}
+} */
 
 
 /** Call an external function that returns true if the isosurface intersects the given chunk position.*/
+/*
 bool CTerrain::chunkExists(vec3& samplePos, int LoD) {
 	return EXTchunkExists(samplePos, LoD);
 }
-
+*/
 
 
 /** Call an external function that creates geometry for the given chunk.*/

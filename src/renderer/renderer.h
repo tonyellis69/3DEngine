@@ -133,9 +133,12 @@ public:
 	GLuint hFrameBuffer; ///<Handle for our internally used framebuffer.
 
 	unsigned int tmpHandle;
+
+	CPhongShader* phongShader; ///<The standard phong shader
+
 private:
 
-	//static CRenderer* instance;
+	
 
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 

@@ -15,6 +15,7 @@ struct TStem {
 	float length;
 	float radius;
 	unsigned int parentEndRing;
+	glm::vec3 normal;
 };
 
 /** The base class for creating fractal tree models. */
