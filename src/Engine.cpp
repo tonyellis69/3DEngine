@@ -11,6 +11,7 @@
 #include "renderer\renderShader.h"
 #include "physics\physObj.h"
 
+#include "shapes.h"
 
 //using namespace glm;
 using namespace vBuf;
@@ -46,11 +47,8 @@ void CEngine::init(HWND& hWnd) {
 	defaultCamera = createCamera(glm::vec3(0,2,4));
 	setCurrentCamera(defaultCamera);
 
-	createStandardTexShader();
-	createStandardPhongShader();
 	createStandardWireShader();
 	createStandardMultiTexShader();
-	createStandardBillboardShader();
 	createWireBoxShader();
 	createInstancedPhongShader();
 	
@@ -501,6 +499,19 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 	CModel* cube = createModel();
 	cube->setPos(pos);
 
+	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
+
+
+	std::vector<glm::vec3> verts, normals; std::vector<unsigned int> index;
+	shape::cube(verts, normals, index);
+	shape::scale(verts, size);
+
+	cube->getBuffer()->storeVertexes(verts, normals);
+	cube->getBuffer()->storeIndex(index.data(), index.size());
+	cube->getBuffer()->storeLayout(3, 3, 0, 0);
+
+	return cube;
+
 	float w = size.x * 0.5f;
 	float h = size.y * 0.5f;
 	float d = size.z * 0.5f;
@@ -534,10 +545,10 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 	v[20].normal = v[21].normal = v[22].normal = v[23].normal=glm::vec3(0,-1,0);
 	
 
-	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
+
 	
 	//fill index with indices
-	unsigned int index[indexSize] = {1,0,3,1,3,2,
+	unsigned int index2[indexSize] = {1,0,3,1,3,2,
 		5,4,7,5,7,6,
 		9,8,11,9,11,10,
 		13,12,15,13,15,14,
@@ -545,7 +556,7 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 		21,20,23,21,23,22}; 
 
 	cube->storeVertexes(v, sizeof(vBuf::T3DnormVert), 24);
-	cube->storeIndex(index, indexSize);
+	cube->storeIndex(index2, indexSize);
 	cube->storeLayout(3, 3, 0, 0);
 
 	//modelList.push_back(cube);
@@ -564,13 +575,13 @@ void CEngine::drawModels() {
 }
 
 void CEngine::drawModelDefaultShader(CModel& model) {
-	Renderer.setShader(phongShader);
+	Renderer.setShader(Renderer.phongShader);
 	glm::mat4 mvp = currentCamera->clipMatrix * model.worldMatrix;
-	phongShader->setMVP(mvp);
+	Renderer.phongShader->setShaderValue(Renderer.hMVP,mvp);
 
 	glm::mat3 normMatrix(model.worldMatrix); //converting 4m to m3. TO DO: inefficient?
 
-	phongShader->setNormalModelToCameraMatrix(normMatrix);
+	Renderer.phongShader->setShaderValue(Renderer.hNormalModelToCameraMatrix,normMatrix);
 
 //	model.assignMaterial();
 	model.drawNew();
@@ -778,11 +789,7 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 
 
 
-/** Send these vertices to the graphics hardware to be buffered, and register them with the given model. */
-void CEngine::storeModel(CModel* model, glm::vec3* verts, int noVerts ) {
-	model->storeVertexes(verts,  sizeof(glm::vec3), noVerts);
-	model->storeVertexLayout(0);
-}
+
 
 
 
@@ -834,22 +841,7 @@ unsigned int CEngine::drawModelCount(CModel& model) {
 	return Renderer.query();
 }
 
-/** Set the details the renderer needs to store the vertices of this model in graphics memory. */
-void CEngine::setVertexDetails(CModel * model, int noAttribs, int noIndices, int noVerts) {
-	model->setVertexDetails(noAttribs, noIndices, noVerts);
-}
 
-/** Set the details the renderer needs to store the vertices of this multidraw model in graphics memory. */
-void CEngine::setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices, unsigned int bufSize) {
-	//set usual vertex details
-	setVertexDetails(&model, noAttribs, noIndices, 0);
-
-	//reserve the requested block of graphics memory
-	//have to ask renderer to do this, because it's OpenGL related. It may as well have a wrapper class to
-	//handle all the issues. Rest of engine can refer to it via a handle.
-	//We ask the render to create an instance of this multibuffer
-	//and reserve the graphics memory at the same time
-}
 
 /**	Create a CModel (subclassed to CRenderModel) and return a pointer to it. */
 CModel * CEngine::createModel() {
@@ -881,7 +873,7 @@ CSkyDome * CEngine::createSkyDome() {
 
 	//load skyDome shader
 	skyDome->skyShader = new CSkyShader();
-	shaderList.push_back(skyDome->skyShader);
+	Renderer.shaderList.push_back(skyDome->skyShader);
 	skyDome->skyShader->create(dataPath + "skyDome");
 	
 
@@ -903,7 +895,7 @@ CSkyDome * CEngine::createSkyDome() {
 	//create sun billboard
 	skyDome->sunBoard = createBillboard(glm::vec3(0, 400, -400), glm::vec2(50, 50));
 	skyDome->sunMat = createMaterial(dataPath + "sun2.png");
-	skyDome->sunMat->setShader(billboardShader);
+	skyDome->sunMat->setShader(Renderer.billboardShader);
 	skyDome->sunBoard->setMaterial(*skyDome->sunMat);
 	return skyDome;
 }
@@ -916,7 +908,7 @@ CMaterial * CEngine::createMaterial(std::string filename) {
 
 CMaterial * CEngine::createMaterial() {
 	CRenderMaterial* material = new CRenderMaterial();
-	material->setShader(phongShader);
+	material->setShader(Renderer.phongShader);
 	materialList.push_back(material);
 	return material;
 }
@@ -929,64 +921,37 @@ CShader * CEngine::createShader(std::string name) {
 
 CShader * CEngine::createShader() {
 	CRenderShader* shader = new CRenderShader();
-	shaderList.push_back(shader);
+	Renderer.shaderList.push_back(shader);
 	return shader;
 }
 
-void CEngine::createStandardTexShader() {
-	texShader = new CTexShader();
-	texShader->create(dataPath + "texture");
-	texShader->getShaderHandles();
-	texShader->setType(standardTex);
-	shaderList.push_back(texShader);
-}
 
 void CEngine::createStandardMultiTexShader() {
 	multiTexShader = new CMultiTexShader();
 	multiTexShader->create(dataPath + "multiTexture");
 	multiTexShader->getShaderHandles();
 	multiTexShader->setType(standardMultiTex);
-	shaderList.push_back(multiTexShader);
+	Renderer.shaderList.push_back(multiTexShader);
 }
 
-void CEngine::createStandardPhongShader() {
-	phongShader = new CPhongShader();
-	phongShader->create(dataPath + "default");
-	phongShader->getShaderHandles();
-	phongShader->setType(standardPhong);
-	shaderList.push_back(phongShader);
 
-	Renderer.setShader(phongShader);
-	phongShader->setLightDirection(glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
-	phongShader->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f, 1));
-	phongShader->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
-	phongShader->setColour(glm::vec4(1));
-
-	Renderer.phongShader = phongShader;
-}
 
 void CEngine::createStandardWireShader() {
 	wireShader = new CWireShader();
 	wireShader->create(dataPath + "wire");
 	wireShader->getShaderHandles();
 	wireShader->setType(standardWire);
-	shaderList.push_back(wireShader);
+	Renderer.shaderList.push_back(wireShader);
 }
 
-void CEngine::createStandardBillboardShader() {
-	billboardShader = new CBillboardShader();
-	billboardShader->create(dataPath + "billboard");
-	billboardShader->getShaderHandles();
-	billboardShader->setType(standardBillboard);
-	shaderList.push_back(billboardShader);
-}
+
 
 void CEngine::createWireBoxShader() {
 	wireBoxShader = new CWireBoxShader();
 	wireBoxShader->create(dataPath + "wireBox");
 	wireBoxShader->getShaderHandles();
 	wireBoxShader->setType(userShader);
-	shaderList.push_back(wireBoxShader);
+	Renderer.shaderList.push_back(wireBoxShader);
 
 
 }
@@ -996,7 +961,7 @@ CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 	CBillboard* billboard = new CBillboard(pos, size);
 	//billboard->pRenderer = &Renderer;
 	CMaterial* material = createMaterial();
-	material->setShader(texShader);
+	material->setShader(Renderer.billboardShader);
 	billboard->setMaterial(*material);
 	modelList.push_back(billboard);
 		 
@@ -1009,7 +974,7 @@ void CEngine::createInstancedPhongShader() {
 	phongShaderInstanced->create(dataPath + "defaultInstanced");
 	phongShaderInstanced->getShaderHandles();
 	phongShaderInstanced->setType(standardPhong);
-	shaderList.push_back(phongShaderInstanced);
+	Renderer.shaderList.push_back(phongShaderInstanced);
 
 	Renderer.setShader(phongShaderInstanced);
 	phongShaderInstanced->setLightDirection(glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
@@ -1032,8 +997,8 @@ CBasePhysObj * CEngine::addPhysics(C3dObject * model) {
 }
 
 void CEngine::recompileShaders() {
-	for (size_t s = 0; s < shaderList.size(); s++)
-		shaderList[s]->recompile();
+	for (size_t s = 0; s < Renderer.shaderList.size(); s++)
+		Renderer.shaderList[s]->recompile();
 }
 
 
@@ -1048,8 +1013,8 @@ CEngine::~CEngine(void) {
 		delete skyDome;
 	for (size_t m = 0; m<materialList.size(); m++)
 		delete materialList[m];
-	for (size_t s = 0; s<shaderList.size(); s++)
-		delete shaderList[s];
+	for (size_t s = 0; s<Renderer.shaderList.size(); s++)
+		delete Renderer.shaderList[s];
 
 	Renderer.detachWindow();
 }

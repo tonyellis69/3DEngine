@@ -179,12 +179,6 @@
     <ClCompile Include="..\src\renderer\renderShader.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\texShader.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\phongShader.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\skyShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -201,9 +195,6 @@
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\multiTexShader.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\billboardShader.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\wireBoxShader.cpp">
@@ -271,6 +262,12 @@
     </ClCompile>
     <ClCompile Include="..\src\Plants\fractalTree.cpp">
       <Filter>plants</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\shapes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\createShape.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -460,12 +457,6 @@
     <ClInclude Include="..\src\renderer\renderShader.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\texShader.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\phongShader.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\skyShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -482,9 +473,6 @@
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\multiTexShader.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\billboardShader.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\wireBoxShader.h">
@@ -557,6 +545,12 @@
       <Filter>plants</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\shapes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\createShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

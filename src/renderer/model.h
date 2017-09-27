@@ -25,10 +25,10 @@ public:
 	virtual void drawNew() {};
 	virtual CBaseBuf* getBuffer() { return 0; };
 	virtual unsigned int getBuf() { return 0; };
-	virtual void setVertexDetails(int noAttribs, int noIndices, int noVerts) { };
-	virtual void storeVertexData(glm::vec3* data, unsigned int noVerts, unsigned int size) {};
-	virtual void storeVertexLayout(unsigned int hIndex) {};
-	virtual void storeIndexedData(unsigned short* index) {};
+//	virtual void setVertexDetails(int noAttribs, int noIndices, int noVerts) { };
+//	virtual void storeVertexData(glm::vec3* data, unsigned int noVerts, unsigned int size) {};
+//	virtual void storeVertexLayout(unsigned int hIndex) {};
+//	virtual void storeIndexedData(unsigned short* index) {};
 	virtual void freeBuffers() {};
 	virtual void storeVertexes(void* verts, unsigned int vertSize, unsigned int nVerts) {};
 	virtual void storeIndex(unsigned int* indices,  unsigned int nIndices) {};

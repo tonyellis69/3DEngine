@@ -93,6 +93,7 @@
     <ClCompile Include="..\src\chunkHeightShader.cpp" />
     <ClCompile Include="..\src\chunkShader.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
+    <ClCompile Include="..\src\createShape.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
     <ClCompile Include="..\src\findPointHeightShader.cpp" />
@@ -115,7 +116,6 @@
     <ClCompile Include="..\src\renderer\3dobject.cpp" />
     <ClCompile Include="..\src\renderer\baseBuf.cpp" />
     <ClCompile Include="..\src\renderer\billboard.cpp" />
-    <ClCompile Include="..\src\renderer\billboardShader.cpp" />
     <ClCompile Include="..\src\renderer\buf.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
@@ -124,7 +124,6 @@
     <ClCompile Include="..\src\renderer\modelMulti.cpp" />
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
     <ClCompile Include="..\src\renderer\multiTexShader.cpp" />
-    <ClCompile Include="..\src\renderer\phongShader.cpp" />
     <ClCompile Include="..\src\renderer\phongShaderInstanced.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
     <ClCompile Include="..\src\renderer\renderMaterial.cpp" />
@@ -132,8 +131,8 @@
     <ClCompile Include="..\src\renderer\renderShader.cpp" />
     <ClCompile Include="..\src\renderer\shader.cpp" />
     <ClCompile Include="..\src\renderer\texManager.cpp" />
-    <ClCompile Include="..\src\renderer\texShader.cpp" />
     <ClCompile Include="..\src\renderer\wireShader.cpp" />
+    <ClCompile Include="..\src\shapes.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
     <ClCompile Include="..\src\skyDome.cpp" />
     <ClCompile Include="..\src\skyShader.cpp" />
@@ -180,6 +179,7 @@
     <ClInclude Include="..\src\chunkShader.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
+    <ClInclude Include="..\src\createShape.h" />
     <ClInclude Include="..\src\Delegate.h" />
     <ClInclude Include="..\src\direction.h" />
     <ClInclude Include="..\Src\Engine.h" />
@@ -204,7 +204,6 @@
     <ClInclude Include="..\src\renderer\3dobject.h" />
     <ClInclude Include="..\src\renderer\baseBuf.h" />
     <ClInclude Include="..\src\renderer\billboard.h" />
-    <ClInclude Include="..\src\renderer\billboardShader.h" />
     <ClInclude Include="..\src\renderer\buf.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
     <ClInclude Include="..\src\renderer\light.h" />
@@ -213,7 +212,6 @@
     <ClInclude Include="..\src\renderer\modelMulti.h" />
     <ClInclude Include="..\src\renderer\multiBuf.h" />
     <ClInclude Include="..\src\renderer\multiTexShader.h" />
-    <ClInclude Include="..\src\renderer\phongShader.h" />
     <ClInclude Include="..\src\renderer\phongShaderInstanced.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
     <ClInclude Include="..\src\renderer\renderMaterial.h" />
@@ -221,8 +219,8 @@
     <ClInclude Include="..\src\renderer\renderShader.h" />
     <ClInclude Include="..\src\renderer\shader.h" />
     <ClInclude Include="..\src\renderer\texManager.h" />
-    <ClInclude Include="..\src\renderer\texShader.h" />
     <ClInclude Include="..\src\renderer\wireShader.h" />
+    <ClInclude Include="..\src\shapes.h" />
     <ClInclude Include="..\src\simplexnoise.h" />
     <ClInclude Include="..\src\skyDome.h" />
     <ClInclude Include="..\src\skyShader.h" />

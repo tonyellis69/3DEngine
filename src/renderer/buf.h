@@ -17,6 +17,7 @@ public:
 	CBuf() ;
 	~CBuf();
 	void storeVertexes(void* verts, unsigned int size, unsigned int nVerts);
+	void storeVertexes(vert3_t& verts, vert3_t& normals);
 	void storeIndex(unsigned int * indices, unsigned int nIndices);
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
 	void setSize(unsigned int size);

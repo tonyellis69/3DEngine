@@ -14,9 +14,7 @@
 #include "texManager.h"
 #include "..\terrain.h"
 
-#include "texShader.h"
 #include "multiTexShader.h"
-#include "phongShader.h"
 #include "wireShader.h"
 #include "billboardShader.h"
 #include "phongShaderInstanced.h"
@@ -78,7 +76,6 @@ public:
 	unsigned int getShaderDataHandle(int program, std::string varName);
 	void setShaderValue(unsigned int matrixHandle,int elements, glm::mat4& matrix);
 	void setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix);
-
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec2& vector);
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector);
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec4& vector);
@@ -109,6 +106,11 @@ public:
 	void drawBuf(CBuf& buf, TdrawMode drawMode);
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();
+	void createStandardPhongShader();
+	void createStandardTexShader();
+	void createStandardBillboardShader();
+
+	CShader * createShader(std::string name);
 
 	void backFaceCulling(bool on);
 	void setVAO(GLuint newVAO);
@@ -134,11 +136,39 @@ public:
 
 	unsigned int tmpHandle;
 
-	CPhongShader* phongShader; ///<The standard phong shader
+	CShader* phongShader; ///<The standard phong shader
+	CShader* texShader; ///<The standard texture shader
+	CShader* billboardShader;
+
+	std::vector<CShader*> shaderList; ///<Tracks all shaders
+
+	//TO DO: phongshader handles, hopefully temp
+	GLuint hNormalModelToCameraMatrix;
+	GLuint hLightDirection;
+	GLuint hLightIntensity;
+	GLuint hAmbientLight;
+	GLuint hColour;
+	GLuint hMVP;
+
+	//texture shader, hopefully temp
+	GLuint hTexTexture;
+	GLuint hTile;
+	GLuint hOffset;
+	GLuint hTexMVP;
+
+	//billboard
+	GLuint hBillTexture;
+	GLuint hBillTile;
+	GLuint hBillOffset;
+	GLuint hBillMVP;
+	GLuint hBillCentre; ///<Handle for position of billboard centre.
+	GLuint hBillCamWorldMatrix;
+	GLuint hBillboardSize;
 
 private:
 
 	
+
 
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 

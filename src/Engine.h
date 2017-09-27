@@ -134,8 +134,6 @@ public:
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	unsigned int acquireFeedbackVerts(CBaseBuf& srcBuf, TdrawMode srcDrawMode, CBaseBuf& destBuf, TdrawMode destDrawMode);
 	unsigned int drawModelCount(CModel& model);
-	void setVertexDetails(CModel* model, int noAttribs, int noIndices, int noVerts);
-	void setVertexDetailsMulti(CModelMulti& model, int noAttribs, int noIndices,unsigned int bufSize);
 	CModel* createModel();
 	CBaseBuf* createBuffer();
 	CSkyDome* createSkyDome();
@@ -145,7 +143,6 @@ public:
 	CShader* createShader();
 	void createStandardTexShader();
 	void createStandardMultiTexShader();
-	void createStandardPhongShader();
 	void createStandardWireShader();
 	void createStandardBillboardShader();
 	void createWireBoxShader();
@@ -215,14 +212,12 @@ public:
 	//TO DO: make a new image manager or resource manager for this kind of stuff:
 	std::vector<CRenderMaterial*> materialList; ///<Simple list to track all engine-created materials.
 
-	std::vector<CShader*> shaderList; ///<Tracks engine-created shaders
-
 	
-	CTexShader* texShader; ///<The standard texture shader
+	
+
 	CMultiTexShader* multiTexShader; ///<The standard multi-texture shader
-	CPhongShader* phongShader; ///<The standard phong shader
 	CWireShader* wireShader;
-	CBillboardShader* billboardShader;
+
 	CWireBoxShader* wireBoxShader;
 	CGUIrectShader* uiRectShader;
 	CPhongShaderInstanced* phongShaderInstanced; 

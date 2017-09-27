@@ -1,6 +1,10 @@
 #pragma once
 
+#include <vector>
+
 #include "../userTypes.h"
+
+#include "glm\glm.hpp"
 
 typedef struct {
 	float r, g, b, a;
@@ -8,11 +12,14 @@ typedef struct {
 
 
 
+using  vert3_t = std::vector<glm::vec3>;
 class CBaseBuf {	
+	
 public:
 	CBaseBuf();
 	virtual void storeVertexes(void* verts, unsigned int size, unsigned int nVerts) {};
-	virtual void storeIndex(unsigned short * indices, unsigned int nIndices) {};
+	virtual void storeVertexes(vert3_t& verts, vert3_t& normals) {};
+	virtual void storeIndex(unsigned int * indices, unsigned int nIndices) {};
 	virtual void setSize(unsigned int size) {};
 	virtual void copyBuf(CBaseBuf& srcBuf, unsigned int size) {};
 	virtual unsigned int getBufHandle() { return 0; };

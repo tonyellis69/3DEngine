@@ -14,42 +14,132 @@ CFractalTree::CFractalTree() {
 	stageScale = 0.6f;
 	branchInset = 0.995f;
 	branchAngle = 30.0f;
-	nBranches =  1;
+	branchesPerStage =  1;
+	branchType = split;
+	maxJoints = 0;
+	leadingBranch = false;
+	taper2 = 0.7f; //=reduction over stage length
+	leadingBranchDominance = 0.75f;
+	lateralPointsPerStage = 0;
 }
 
 /** Create the entire plant. */
 void CFractalTree::create() {
-	TStem baseStem = { 1, glm::vec3(0,-2,0), glm::vec3(0,1,0), stemLength, stemRadius, 0, glm::vec3(0,0,-1) };
-	createStem(baseStem);
+	float distToNextLateral = stage1stemLength / lateralPointsPerStage;
+	taperFactor = taper2 / (maxJoints + 1);
+	float stemDivisor = maxJoints + 1;
+	if (leadingBranch) 
+		stemDivisor++; //avoid branches getting too disproportionate.
+	stage1stemLength = stage1stemLength / stemDivisor;
+	
+	TStem stage1Stem = { 1, glm::vec3(0,-2,0), glm::vec3(0,1,0), stage1stemLength, stage1stemRadius, 0, 
+		glm::vec3(0,0,-1), maxJoints,  stageScale, 0, 0 };
+	createStem(stage1Stem);
 }
 
 /** Recursively create this stem and any sub-stems. */
 void CFractalTree::createStem(TStem& stem) {
-	stem.length +=  stemLengthVariance(randEngine) * stem.length;
+	stem.length +=  stemLengthVariance(randEngine) * stem.length;//TO DO: do this before creating stem
+	float endRadius = stem.baseRadius - stem.baseRadius * (taperFactor);
 
 	unsigned int endRingIndexPos;
-	glm::vec3 end = createStemSolid(stem, endRingIndexPos);
-	if (stem.stage < maxStages) {
-		glm::vec3 rotationAxis = stem.normal;//  getNormal(stem.angle); //create an axis perpendicular to this stem
-		glm::vec3 branchPoint = stem.pos + stem.angle * stem.length ;
-		float childStemLength = stem.length * stageScale;
-		int numBranches = nBranches + branchNumVariance(randEngine);
-		for (int branch = 0; branch < numBranches; branch++) {
-			float variance = branchAngle * branchAngleVariance(randEngine);
-			glm::vec3 childStemAngle = glm::rotate(stem.angle, glm::radians(branchAngle + variance), rotationAxis);
-			glm::vec3 childStemNormal = glm::rotate(stem.normal, glm::radians(branchAngle + variance), rotationAxis);
-			childStemNormal = glm::normalize(childStemNormal);
-
-			TStem childStem = { stem.stage + 1, branchPoint, childStemAngle, childStemLength, stem.radius  * stageScale, endRingIndexPos,
-				childStemNormal };
-			createStem(childStem);
-			rotationAxis = glm::rotate(rotationAxis, glm::radians(360.0f/ numBranches), stem.angle);
-		}
+	glm::vec3 end = createStemSolid(stem, endRadius,  endRingIndexPos);
+	float offset = 0;
+	if (stem.stage < maxStages && branchType == lateral) {
+		addLateralBranches(stem);
+	}
+	
+	//create an appending segment, if required
+	if (stem.jointCount > 0) {
+		addAppendingSegment(stem, endRadius, endRingIndexPos);
+		return;
+	} 
+	
+	//end this run of segments in some way
+	if (stem.stage < maxStages && branchType == split) {
+		glm::vec3 branchPoint = end - (stem.direction * stem.length * 0.05f);
+		createBranches(stem, branchPoint);
 	}
 }
 
-void CFractalTree::setStemLength(float length, float variation) {
-	stemLength = length;
+/** Add a segment to the end of the current one. */
+void CFractalTree::addAppendingSegment(TStem & stem, float startRadius, unsigned int endRingIndexPos) {
+	glm::vec3 startPoint = stem.basePos + stem.direction * stem.length;
+
+	//give the new segment a slight, random angle change
+	glm::vec3 jointAxis = stem.normal; 
+	jointAxis = glm::rotate(jointAxis, glm::radians(getRandAngle(360)), stem.direction); //create axis
+	glm::vec3 childStemAngle = glm::rotate(stem.direction, glm::radians(jointAngle), jointAxis); //tilt it on that axix
+	glm::vec3 childStemNormal = glm::rotate(stem.normal, glm::radians(jointAngle), jointAxis);
+	childStemNormal = glm::normalize(childStemNormal);
+
+	float childStemLength = stem.length;
+	
+	TStem childStem = { stem.stage, startPoint, childStemAngle, childStemLength, startRadius , endRingIndexPos,
+		childStemNormal, stem.jointCount - 1,  stem.branchScale, stem.distFromLastLateral, stem.extension + childStemLength };
+	createStem(childStem);
+}
+
+
+/** Recursively create a new stage of branches at the given point. */
+void CFractalTree::createBranches(TStem& stem, glm::vec3 branchPoint) {
+	/* To create child branches, we need to know their size: length and radius+. Both depend on user-set proportions, but also on
+	where we are in the tree. We can use the stage number, which gives proportions for a stage as a whole, modified by the distance 
+	down the parent branch. The later raises problems, as the child may be growing from a segment several segments down the length
+	of the parent branch, so how do we know the distance? Segments mostly only carry information about themselves, not parents.
+		Solution: each segment needs to carry a value of how distant it personally is from the start of its branch. Let's call it
+	'extension'. As extension grows, segments need to become smaller, so it needs to be divided into some constant.
+		+We also need to know much the radius of the branch shrinks from one end to the other. This is also a user-set value, eg,
+	'1 in every 20'. But we don't need to modify this value, it's a general rule. Call it 'taper'.
+		For simplicity, the user specifies how much he wants a branch radius to decrease over its entire stage, eg, 0.1. */
+
+
+
+	int numBranches = branchesPerStage + branchNumVariance(randEngine);
+
+	float childStemLength = stem.length * stem.branchScale;
+
+	float endRadius = stem.baseRadius - stem.baseRadius * (taperFactor);
+	float childStartRadius = endRadius; //TO DO, not entirely accurate, should be affected by distance from base
+	childStartRadius *= stem.branchScale;
+
+	glm::vec3 branchAxis = stem.normal;
+	for (int branch = 0; branch < numBranches; branch++) {
+		branchAxis = glm::rotate(branchAxis, glm::radians(360.0f / numBranches), stem.direction);
+		float finalAngle = branchAngle + (branchAngle * branchAngleVariance(randEngine));  // - + ???
+		glm::vec3 childStemAngle = glm::rotate(stem.direction, glm::radians(finalAngle), branchAxis);
+		glm::vec3 childStemNormal = glm::rotate(stem.normal, glm::radians(finalAngle), branchAxis);
+		childStemNormal = glm::normalize(childStemNormal);
+
+		TStem childStem = { stem.stage + 1, branchPoint, childStemAngle, childStemLength, childStartRadius , 0,
+			childStemNormal, maxJoints,  stem.branchScale,0,0 };
+		createStem(childStem);
+	}
+} 
+
+/**	Grow one or more stems off of this one, without otherwise affecting it. */
+void CFractalTree::addLateralBranches(TStem& stem) {
+	/* To add lateral branches, we need to know the point at which they occur on the parent stage. The
+	user sets the number of lateral points per stage - this is a general rule.  */
+	float approxStageLength = stem.length * (maxJoints + 1);
+	float gapNetweenLaterals = approxStageLength / lateralPointsPerStage;
+	gapNetweenLaterals *= 0.9f; //adjust down to avoid laterals too near the end of the parent stage
+	float distToNextLateral = gapNetweenLaterals - stem.distFromLastLateral;
+	
+
+	glm::vec3 branchPos = stem.basePos + (stem.direction * distToNextLateral);
+	float travel = distToNextLateral;
+	while (travel < stem.length) {
+		createBranches(stem, branchPos);
+		travel += gapNetweenLaterals;
+		branchPos += stem.direction * gapNetweenLaterals;
+	}
+	float offset = stem.length - (travel - gapNetweenLaterals);
+	stem.distFromLastLateral = offset;
+}
+
+void CFractalTree::setLength(float length, float variation) {
+	stage1stemLength = length;
 	using param_t = std::uniform_real_distribution<float>::param_type;
 	param_t p{ -variation, variation };
 	stemLengthVariance.param(p);
@@ -60,11 +150,11 @@ void CFractalTree::setStageScale(float scale) {
 }
 
 void CFractalTree::setStemRadius(float radius) {
-	stemRadius = radius;
+	stage1stemRadius = radius;
 }
 
 void CFractalTree::setNumBranches(int numBranches, int variation) {
-	nBranches = numBranches;
+	branchesPerStage = numBranches;
 	using param_t = std::uniform_int_distribution<int>::param_type;
 	param_t p{ -variation, variation };
 	branchNumVariance.param(p);
@@ -75,7 +165,38 @@ void CFractalTree::setBranchAngle(float angle, float variation) {
 	using param_t = std::uniform_real_distribution<float>::param_type;
 	param_t p{ -variation, variation };
 	branchAngleVariance.param(p);
+}
 
+void CFractalTree::setMaxJoints(int nJoints) {
+	maxJoints = nJoints;
+}
+
+void CFractalTree::setJointAngle(float angle, float variation) {
+	jointAngle = angle;
+}
+
+void CFractalTree::setLeadingBranch(bool onOff) {
+	leadingBranch = onOff;
+}
+
+
+float CFractalTree::getRandAngle(float maxAngle) {
+	std::uniform_real_distribution<float> d{};
+	using param_t = decltype(d)::param_type;
+	return d(randEngine, param_t{ -maxAngle, maxAngle });
+}
+
+void CFractalTree::setBranchType(Tbranch bType) {
+	branchType = bType;
+}
+
+/** Set the number of lateral branching points per stage. */
+void CFractalTree::setNumLateralPoints(int nPoints) {
+	lateralPointsPerStage = nPoints;
+}
+
+void CFractalTree::setMaxStages(int nStages) {
+	maxStages = nStages;
 }
 
 void CFractalTree::setStemFaces(int nFaces) {
@@ -106,13 +227,13 @@ glm::vec3 CFractalTree::createStemWire(const int stage, const glm::vec3 & pos, c
 
 	//end vector
 	vBuf::T3DnormVert endVert;
-	endVert.v = pos + angle * stemLength * float(1.5f / stage);
+	endVert.v = pos + angle * stage1stemLength * float(1.5f / stage);
 	verts.push_back(endVert);
 	index.push_back(currentIndex++);
 	return endVert.v;
 }
 
-glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newendRingIndexPos) {
+glm::vec3 CFractalTree::createStemSolid(TStem& stem, float endRadius, unsigned int& newendRingIndexPos) {
 	glm::vec3 stemNormal = stem.normal;// getNormal(stem.angle); //create an axis perpendicular to this stem
 	
 	//float currentRadius = stemRadius * float(1.5f / stem.stage);
@@ -121,29 +242,29 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newendRingInd
 	vBuf::T3DnormVert vert;
 	unsigned int baseRingStart;
 
-	if (!stem.parentEndRing) 
+	if (!stem.parentEndRingIndexPos) 
 	{
 		//Create a ring of base vectors
 		baseRingStart = verts.size();
 		for (int face = 0; face < stemFaces; face++) {
-			vert.v = glm::vec3(0) + (stemNormal * stem.radius);
-			vert.v = glm::rotate(vert.v, glm::radians(-rot * face), stem.angle);
+			vert.v = glm::vec3(0) + (stemNormal * stem.baseRadius);
+			vert.v = glm::rotate(vert.v, glm::radians(-rot * face), stem.direction);
 			vert.normal = glm::normalize(vert.v);
-			vert.v = stem.pos + vert.v;
+			vert.v = stem.basePos + vert.v;
 			verts.push_back(vert);
 		}
 	}
 	else
-		baseRingStart = stem.parentEndRing;
+		baseRingStart = stem.parentEndRingIndexPos;
 
-	float endRadius = stem.radius * stageScale;
+	//float endRadius = stem.radius *  stem.scaleFactor; // stageScale;
 
 	//create ring of end vectors
 	unsigned int endRingIndexPos = verts.size();
-	glm::vec3 end = stem.pos + stem.angle * stem.length;
+	glm::vec3 end = stem.basePos + stem.direction * stem.length;
 	for (int face = 0; face < stemFaces; face++) {
 		vert.v = glm::vec3(0) + (stemNormal * endRadius);
-		vert.v = glm::rotate(vert.v, glm::radians(-rot * face), stem.angle);
+		vert.v = glm::rotate(vert.v, glm::radians(-rot * face), stem.direction);
 		vert.normal = glm::normalize(vert.v);
 		vert.v = end + vert.v;
 		verts.push_back(vert);
@@ -151,24 +272,7 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newendRingInd
 
 	//stitch them together via indexing
 	int face = 0;
-/*	for ( face = 0; face < stemFaces-1 ; face++) {
-		index.push_back(baseRingStart + face); //0
-		index.push_back(endRingIndexPos + face); //4
-		index.push_back(baseRingStart + face + 1); //1
-	
-		index.push_back(endRingIndexPos + 1 + face); //5
-		index.push_back(baseRingStart + 1 + face); //1
-		index.push_back(endRingIndexPos + face); //4
-		//currentIndex++;
-	}
-	
-	index.push_back(baseRingStart + face); //0
-	index.push_back(endRingIndexPos + face); //4
-	index.push_back(baseRingStart); //1
 
-	index.push_back(endRingIndexPos); //5
-	index.push_back(baseRingStart); //1
-	index.push_back(endRingIndexPos + face); //4 */
 
 
 	//first tri:
@@ -191,7 +295,6 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, unsigned int& newendRingInd
 
 	index.push_back(65535); //signals the end of this sequence
 	
-	//currentIndex += stemFaces +1;
 	newendRingIndexPos = endRingIndexPos;
 
 	return end;

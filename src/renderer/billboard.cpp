@@ -33,10 +33,11 @@ void CBillboard::setSize(glm::vec2 & size) {
 void CBillboard::drawNew() {
 	material->assign();
 
-	CBillboardShader* billboardShader = (CBillboardShader*) material->getShader();
-	billboardShader->setCentrePos(getPos());
-	billboardShader->setCamWorldMatrix(pRenderer->currentCamera->worldMatrix);
-	billboardShader->setBillboardSize(size.x);
+	CShader* billboardShader = (CRenderShader*)pRenderer->billboardShader;
+	
+	billboardShader->setShaderValue(pRenderer->hBillCentre,getPos());
+	//billboardShader->setShaderValue(pRenderer->hBillMVP, pRenderer->currentCamera->worldMatrix);
+	billboardShader->setShaderValue(pRenderer->hBillboardSize, size.x);
 	
 	pRenderer->drawModel(*this);
 

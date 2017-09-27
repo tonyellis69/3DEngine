@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-
+#include "glm\glm.hpp"
 enum shaderType { vertex, frag, geometry };
 
 enum TStandardShaderType { standardTex, standardPhong, standardWire, standardMultiTex, standardBillboard,
@@ -27,6 +27,16 @@ public:
 	TStandardShaderType getType();
 	void setType(TStandardShaderType ident);
 	virtual void getShaderHandles() {};
+	virtual unsigned int getUniformHandle(std::string name) { return 0; };
+
+	virtual void setShaderValue(unsigned int matrixHandle, glm::mat4& matrix) {};
+	virtual void setShaderValue(unsigned int matrixHandle,  glm::mat3& matrix) {};
+	virtual void setShaderValue(unsigned int vecHandle, glm::vec2& vector) {};
+	virtual void setShaderValue(unsigned int vecHandle,  glm::vec3& vector) {};
+	virtual void setShaderValue(unsigned int vecHandle, glm::vec4& vector) {};
+	virtual void setShaderValue(unsigned int intHandle,  int value) {};
+	virtual void setShaderValue(unsigned int floatHandle,  float value) {};
+
 
 	TStandardShaderType ident;
 

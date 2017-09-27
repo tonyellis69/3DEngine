@@ -7,7 +7,7 @@
 #include "chunk.h"
 #include "renderer/renderer.h"
 #include "direction.h"
-#include "renderer\phongShader.h"
+
 
 #include <vector>
 #include <deque>
@@ -135,7 +135,7 @@ public:
 	CMultiBuf grassMultiBuf; ///<Stores grass location points for all chunks.
 
 	std::vector<CSuperChunk*> visibleSClist; ///<SCs considered to be in sight.
-	CPhongShader* chunkDrawShader; ///<Whatever shader we're using to draw chunks.
+	CShader* chunkDrawShader; ///<Whatever shader we're using to draw chunks.
 	};
 
 

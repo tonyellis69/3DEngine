@@ -4,7 +4,6 @@
 
 
 void CBillboardShader::getShaderHandles() {
-	CTexShader::getShaderHandles();
 	hCentre = pRenderer->getShaderDataHandle(hShader, "centrePos");
 	hCamWorldMatrix = pRenderer->getShaderDataHandle(hShader, "camWorldMatrix");
 	hBillboardSize = pRenderer->getShaderDataHandle(hShader, "size");

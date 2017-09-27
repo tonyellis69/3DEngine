@@ -31,6 +31,19 @@ void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
 		indexType = GL_UNSIGNED_SHORT;
 }
 
+/**	Merge separate arrays of vertex data into this buf. */
+void CBuf::storeVertexes(vert3_t & verts, vert3_t & normals) {
+	std::vector<vBuf::T3DnormVert> normVerts;
+	int i = 0;
+	for (auto v : verts) {
+		vBuf::T3DnormVert nv;
+		nv.v = v; nv.normal = normals[i++];
+		normVerts.push_back(nv);
+	}
+	unsigned int nVerts = normVerts.size();
+	storeVertexes(normVerts.data(), sizeof(vBuf::T3DnormVert) * nVerts, nVerts);
+}
+
 void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
 	unsigned int size; void* indicesPtr; unsigned short* shortBuf = NULL;
 	if (indexType == GL_UNSIGNED_SHORT) {

@@ -159,6 +159,9 @@ void CRenderer::init() {
 	createFrameBuffer();
 
 	currentVAO = -1;
+	createStandardPhongShader();
+	createStandardTexShader();
+	createStandardBillboardShader();
 }
 
 
@@ -721,6 +724,60 @@ CBaseBuf* CRenderer::createBuffer() {
 	//newBuf->setRenderer(this);
 	bufferList.push_back(newBuf);
 	return newBuf;
+}
+
+void CRenderer::createStandardPhongShader() {
+	phongShader = createShader(dataPath + "default");
+	phongShader->setType(standardPhong);
+
+	setShader(phongShader);
+	hNormalModelToCameraMatrix = phongShader->getUniformHandle("normalModelToCameraMatrix");
+	hLightDirection = phongShader->getUniformHandle("lightDirection");
+	hLightIntensity = phongShader->getUniformHandle("lightIntensity");
+	hAmbientLight = phongShader->getUniformHandle("ambientLight");
+	hColour = phongShader->getUniformHandle("colour");
+	hMVP = phongShader->getUniformHandle("mvpMatrix");
+
+	phongShader->setShaderValue(hLightDirection,glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
+	phongShader->setShaderValue(hLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	phongShader->setShaderValue(hAmbientLight, glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	phongShader->setShaderValue(hColour, glm::vec4(1));
+
+	//modify to accept list of feedback vars
+}
+
+void CRenderer::createStandardTexShader() {
+	texShader = createShader(dataPath + "texture");
+	texShader->setType(standardTex);
+
+	setShader(texShader);
+	hTexTexture = texShader->getUniformHandle("mySampler");
+	hTile = texShader->getUniformHandle("tile");
+	hOffset = texShader->getUniformHandle("offset");
+	hTexMVP = texShader->getUniformHandle("mvpMatrix");
+}
+
+void CRenderer::createStandardBillboardShader() {
+	billboardShader = createShader(dataPath + "billboard");
+	billboardShader->setType(standardBillboard);
+
+	setShader(billboardShader);
+	hBillTexture = billboardShader->getUniformHandle("mySampler");
+	hBillTile = billboardShader->getUniformHandle("tile");
+	hBillOffset = billboardShader->getUniformHandle("offset");
+	hBillMVP = billboardShader->getUniformHandle("mvpMatrix");
+	hBillCentre = billboardShader->getUniformHandle("centrePos");
+	hBillCamWorldMatrix = billboardShader->getUniformHandle("camWorldMatrix");
+	hBillboardSize = billboardShader->getUniformHandle("size");
+
+}
+
+/** Compile the given shader, create a wrapper instance for it and return a pointer to it. */
+CShader* CRenderer::createShader(std::string name) {
+	CRenderShader* shader = new CRenderShader();
+	shader->create( name);
+	shaderList.push_back(shader);
+	return shader;
 }
 
 void CRenderer::backFaceCulling(bool on) {

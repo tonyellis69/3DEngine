@@ -3,12 +3,12 @@
 
 #include <glew.h>
 #include <glm/glm.hpp>
-#include "texShader.h"
+#include "renderShader.h"
 
 
 
 /** A wrapper for the standard billboard shader. */
-class CBillboardShader : public CTexShader {
+class CBillboardShader : public CRenderShader {
 public:
 	CBillboardShader() {};
 	void getShaderHandles();

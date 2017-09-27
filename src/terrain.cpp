@@ -624,7 +624,7 @@ void CTerrain::drawVisibleChunks() {
 		int clSize = sc->chunkList.size();
 		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) {
 			Chunk* chunk = sc->chunkList[chunkNo];
-			chunkDrawShader->setColour(chunk->drawDetails.colour);
+			chunkDrawShader->setShaderValue(pRenderer->hColour,chunk->drawDetails.colour);
 			if (chunk->drawDetails.childBufNo == -1)
 				continue; //chunk not skinned yet - TO DO: find a better way to do this
 			pRenderer->drawMultiBufChildVerts(drawTris, multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);

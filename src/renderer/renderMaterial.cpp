@@ -24,8 +24,8 @@ void CRenderMaterial::assign() {
 	pRenderer->setShader(shader);
 
 	if (currentShaderType == standardPhong) {
-		CPhongShader* subShader = (CPhongShader*)shader->getThisShader();
-		subShader->setColour(colour);
+		CShader* subShader = (CRenderShader*)shader->getThisShader();
+		subShader->setShaderValue(pRenderer->hColour,colour);
 	}
 	
 	else if (currentShaderType == standardMultiTex) {
@@ -41,22 +41,21 @@ void CRenderMaterial::assign() {
 		}
 	}
 	else if (currentShaderType == standardTex) {
-		CTexShader* subShader = (CTexShader*)shader->getThisShader();
+		CShader* subShader = (CRenderShader*)shader->getThisShader();
 
 			pRenderer->attachTexture(0, textures[0].hTexture);
 
-			subShader->setTextureUnit(0);
-			subShader->setTiling(textures[0].tile);
-			subShader->setOffset(textures[0].offset);
+			subShader->setShaderValue(pRenderer->hTexTexture,0);
+			subShader->setShaderValue(pRenderer->hTile,textures[0].tile);
+			subShader->setShaderValue(pRenderer->hOffset,textures[0].offset);
 	}
 	else if (currentShaderType == standardBillboard) {
-		CBillboardShader* subShader = (CBillboardShader*)shader->getThisShader();
-
+		CShader* subShader = (CRenderShader*)shader->getThisShader();
 		pRenderer->attachTexture(0, textures[0].hTexture);
 
-		subShader->setTextureUnit(0);
-		subShader->setTiling(textures[0].tile);
-		subShader->setOffset(textures[0].offset);
+		subShader->setShaderValue(pRenderer->hBillTexture,(int)0);
+		subShader->setShaderValue(pRenderer->hBillTile,textures[0].tile);
+		subShader->setShaderValue(pRenderer->hBillOffset,textures[0].offset);
 	}
 
 }

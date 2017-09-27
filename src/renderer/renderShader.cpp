@@ -56,6 +56,41 @@ void CRenderShader::recompile() {
 	getShaderHandles();
 }
 
+unsigned int CRenderShader::getUniformHandle(std::string name) {
+	return pRenderer->getShaderDataHandle(hShader, name);
+
+}
+
+void CRenderShader::setShaderValue(unsigned int matrixHandle, glm::mat3 & matrix) {
+	pRenderer->setShaderValue(matrixHandle, 1, matrix);
+}
+
+void CRenderShader::setShaderValue(unsigned int vecHandle, glm::vec2 & vector) {
+	pRenderer->setShaderValue(vecHandle, 1, vector);
+}
+
+void CRenderShader::setShaderValue(unsigned int vecHandle, glm::vec3 & vector) {
+	pRenderer->setShaderValue(vecHandle, 1, vector);
+}
+
+void CRenderShader::setShaderValue(unsigned int vecHandle, glm::vec4 & vector) {
+	pRenderer->setShaderValue(vecHandle, 1, vector);
+}
+
+void CRenderShader::setShaderValue(unsigned int intHandle, int value) {
+	pRenderer->setShaderValue(intHandle, 1, value);
+}
+
+
+
+void CRenderShader::setShaderValue(unsigned int matrixHandle, glm::mat4 & matrix) {
+	pRenderer->setShaderValue(matrixHandle, 1, matrix);
+}
+
+void CRenderShader::setShaderValue(unsigned int floatHandle, float value) {
+	pRenderer->setShaderValue(floatHandle, 1, value);
+}
+
 void CRenderShader::loadFiles() {
 	load(vertex, vertFile);
 
@@ -79,3 +114,5 @@ void CRenderShader::getDataHandles() {
 CShader * CRenderShader::getThisShader() {
 	return this;
 }
+
+

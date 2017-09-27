@@ -279,9 +279,13 @@ void CBaseApp::drawSkyDome() {
 
 	Engine.skyDome->sunBoard->setPos(currentCamera->getPos() + glm::vec3(0,200, -400));
 	mvp = currentCamera->clipMatrix * Engine.skyDome->sunBoard->worldMatrix;
-	Engine.Renderer.setShader(Engine.billboardShader);
-	Engine.billboardShader->setMVP(mvp);
+	Engine.Renderer.setShader(Engine.Renderer.billboardShader);
+	Engine.Renderer.billboardShader->setShaderValue(Engine.Renderer.hBillMVP,mvp);
+	Engine.Renderer.billboardShader->setShaderValue(Engine.Renderer.hBillCamWorldMatrix, Engine.Renderer.currentCamera->worldMatrix);
+
 	Engine.skyDome->sunBoard->drawNew();
+
+
 
 
 	//draw cloud plane
