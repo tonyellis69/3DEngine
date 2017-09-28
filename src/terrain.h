@@ -66,7 +66,7 @@ public:
 	void advance(Tdirection direction);
 	virtual bool superChunkIsEmpty(CSuperChunk& SC) { return false; };
 	virtual bool chunkExists(glm::vec3& samplePos,int LoD) { return false; };
-	void createChunkMesh(Chunk& chunk);
+	virtual void createChunkMesh(Chunk& chunk) {};
 	void freeChunkModel(CModel* chunk);
 	void addTwoIncomingLayers(int layerNo, Tdirection face);
 	void newChunkRequest(glm::vec3& samplePos, CSuperChunk* parentSC, glm::i32vec3& index);

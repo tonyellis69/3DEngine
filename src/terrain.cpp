@@ -437,9 +437,10 @@ bool CTerrain::chunkExists(vec3& samplePos, int LoD) {
 
 
 /** Call an external function that creates geometry for the given chunk.*/
+/*
 void CTerrain::createChunkMesh(Chunk& chunk) {
-	EXTcreateChunkMesh(chunk);
-}
+	//EXTcreateChunkMesh(chunk);
+} */
 
 /** Call an external function to release the memory used by this chunk when it was registed.*/
 void CTerrain::freeChunkModel(CModel* chunk) {
