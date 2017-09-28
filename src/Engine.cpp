@@ -496,11 +496,12 @@ CCamera* CEngine::createCamera(glm::vec3& pos) {
 
 /** Create a cube model. */
 CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
+	//TO DO: one day, this should move to a separate class: createShape. But this means passing
+	//the model list to some other class too, yet to be created. Something like a scene manager.
 	CModel* cube = createModel();
 	cube->setPos(pos);
 
 	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
-
 
 	std::vector<glm::vec3> verts, normals; std::vector<unsigned int> index;
 	shape::cube(verts, normals, index);
@@ -510,57 +511,6 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 	cube->getBuffer()->storeIndex(index.data(), index.size());
 	cube->getBuffer()->storeLayout(3, 3, 0, 0);
 
-	return cube;
-
-	float w = size.x * 0.5f;
-	float h = size.y * 0.5f;
-	float d = size.z * 0.5f;
-	glm::vec3 A(-w,h,d);
-	glm::vec3 B(w,h,d);
-	glm::vec3 C(w,-h,d);
-	glm::vec3 D(-w,-h,d);
-	glm::vec3 E(-w,h,-d);
-	glm::vec3 F(w,h,-d);
-	glm::vec3 G(w,-h,-d);
-	glm::vec3 H(-w,-h,-d);
-
-
-
-
-
-	const int indexSize = 36;
-
-	vBuf::T3DnormVert v[24];
-	v[0].v=A;v[1].v=B;v[2].v=C;v[3].v=D;//front face
-	v[0].normal = v[1].normal = v[2].normal = v[3].normal=glm::vec3(0,0,1);
-	v[4].v=B;v[5].v=F;v[6].v=G;v[7].v=C;//right face
-	v[4].normal = v[5].normal = v[6].normal = v[7].normal=glm::vec3(1,0,0);
-	v[8].v=F;v[9].v=E;v[10].v=H;v[11].v=G;//back face
-	v[8].normal = v[9].normal = v[10].normal = v[11].normal=glm::vec3(0,0,-1);
-	v[12].v=E;v[13].v=A;v[14].v=D;v[15].v=H;//left face
-	v[12].normal = v[13].normal = v[14].normal = v[15].normal=glm::vec3(-1,0,0);
-	v[16].v=E;v[17].v=F;v[18].v=B;v[19].v=A;//top face
-	v[16].normal = v[17].normal = v[18].normal = v[19].normal=glm::vec3(0,1,0);
-	v[20].v=D;v[21].v=C;v[22].v=G;v[23].v=H;//bottom face
-	v[20].normal = v[21].normal = v[22].normal = v[23].normal=glm::vec3(0,-1,0);
-	
-
-
-	
-	//fill index with indices
-	unsigned int index2[indexSize] = {1,0,3,1,3,2,
-		5,4,7,5,7,6,
-		9,8,11,9,11,10,
-		13,12,15,13,15,14,
-		16,19,18,18,17,16,
-		21,20,23,21,23,22}; 
-
-	cube->storeVertexes(v, sizeof(vBuf::T3DnormVert), 24);
-	cube->storeIndex(index2, indexSize);
-	cube->storeLayout(3, 3, 0, 0);
-
-	//modelList.push_back(cube);
-	//modelDrawList.push_back(cube);
 	return cube;
 }
 

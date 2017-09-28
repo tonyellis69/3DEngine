@@ -53,8 +53,7 @@ public:
 	void getModel(CModel* pModel);
 	glm::vec3 createStemWire(const int stage, const glm::vec3 & pos, const glm::vec3 & angle);
 	glm::vec3 createStemSolid(TStem& stem, float endRadius, unsigned int& newEndRingStart);
-
-	glm::vec3 getNormal(const glm::vec3& v);
+	void addHead(TStem& stem, glm::vec3 headPos);
 
 	float stage1stemLength; ///<Length of initial stem.
 	float stageScale; ///<Proportion by which successive stages scale.

@@ -1,10 +1,11 @@
 #include "fractalTree.h"
 #include "..\3DEngine\src\colour.h"
 #include "..\3DEngine\src\renderer\material.h"
+#include "..\shapes.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
-
+#include <vector>
 
 CFractalTree::CFractalTree() {
 	currentIndex = 0;
@@ -59,6 +60,11 @@ void CFractalTree::createStem(TStem& stem) {
 	if (stem.stage < maxStages && branchType == split) {
 		glm::vec3 branchPoint = end - (stem.direction * stem.length * 0.05f);
 		createBranches(stem, branchPoint);
+	}
+
+	if (stem.stage == maxStages) {
+		addHead(stem, end);
+
 	}
 }
 
@@ -300,10 +306,61 @@ glm::vec3 CFractalTree::createStemSolid(TStem& stem, float endRadius, unsigned i
 	return end;
 }
 
-glm::vec3 CFractalTree::getNormal(const glm::vec3& v) {
-	glm::vec3 n = glm::cross(v, glm::vec3(0, 0, 1));
-	if (glm::length(n) < 0.00001f)
-		n = glm::cross(v, glm::vec3(1, 0, 0));
-	return glm::normalize(n);
+void CFractalTree::addHead(TStem & stem, glm::vec3 headPos) {
+
+	//get the verts for a head.
+	//scale them
+	//add to existing verts. Will need to use primitive restart for every tri
+
+	std::vector<glm::vec3> headVerts, normals;
+	std::vector<unsigned int> headIndex;
+	float scale = stem.baseRadius * 20.0f; //or something
+	shape::cube(headVerts, normals, headIndex);
+	shape::scale(headVerts,glm::vec3(scale));
+
+	//rotate to stem angle
+	float angle = glm::dot(stem.direction, glm::vec3(0, 1, 0));
+	angle = glm::acos(angle);
+	angle = glm::degrees(angle);
+
+	glm::vec3 rotAxis = glm::cross(stem.direction, glm::vec3(0, 1, 0));
+	glm::mat3 rotMat = glm::rotate(angle, rotAxis);
+
+	int i = 0;
+	for (auto& v : headVerts) {
+		v = rotMat * v;
+		normals[i] = rotMat * normals[i];
+		i++;
+	}
+
+	//translate to end of stem
+	for (auto& v : headVerts) {
+		v = v + headPos;
+	}
+
+
+
+
+	int offset = verts.size();
+
+	vBuf::T3DnormVert nv;
+	i = 0;
+	for (auto& v : headVerts) {
+		nv.v = v; nv.normal = normals[i++];
+		verts.push_back(nv);
+	}
+
+	i = 0;
+	for (auto& ind : headIndex) {
+		index.push_back(ind + offset);
+		i++;
+		if (i == 3) {
+			i = 0;
+			index.push_back(65535);
+		}
+	}
+
+
 }
+
 
