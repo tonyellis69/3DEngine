@@ -11,6 +11,7 @@ public:
 	CRenderShader();
 	void load(shaderType shader, std::string shaderFile);
 	void create(std::string shaderName);
+	void create(std::string shaderName, int nFeedbacks);
 	void attach();
 	void setFeedbackData(unsigned int nVars);
 	void link();
@@ -31,13 +32,13 @@ public:
 	
 	unsigned int hShader; ///<OpenGL shader handle.
 
-	const char* feedbackVaryings[10];
+
 
 protected:
 	CRenderer* pRenderer;
 private:
 	void loadFiles();
-	unsigned int noFeedbackSettings;
+
 
 };
 

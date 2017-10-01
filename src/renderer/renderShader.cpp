@@ -29,6 +29,20 @@ void CRenderShader::create(std::string shaderName) {
 	link();
 }
 
+/**	Load, compile and link a feedback shader. */
+void CRenderShader::create(std::string shaderName, int nFeedbacks) {
+
+	vertFile = shaderName + ".vert";
+	geomFile = shaderName + ".geom";
+	fragFile = shaderName + ".frag";
+
+	loadFiles();
+	attach();
+
+	setFeedbackData(nFeedbacks);
+	link();
+}
+
 void CRenderShader::attach() {
 	hShader = pRenderer->attachShaders();
 }

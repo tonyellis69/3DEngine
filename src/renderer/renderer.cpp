@@ -780,6 +780,15 @@ CShader* CRenderer::createShader(std::string name) {
 	return shader;
 }
 
+CShader * CRenderer::createShader(std::string name,  char** strings,int nFeedbacks) {
+	CRenderShader* shader = new CRenderShader();
+	for (int s=0; s < nFeedbacks; s++)
+		shader->feedbackVaryings[s] = strings[s];
+	shader->create(name, nFeedbacks);
+	shaderList.push_back(shader);
+	return shader;
+}
+
 void CRenderer::backFaceCulling(bool on) {
 	if (on)
 		glEnable(GL_CULL_FACE);

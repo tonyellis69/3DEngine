@@ -588,7 +588,7 @@ void CTerrain::clear() {
 
 /** Set the point in sample-space that this terrain will centre on when created. */
 void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
-
+	sampleOffset = centrePos;
 	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
 		vec3 nwCorner = (layers[layerNo].nwLayerPos / worldUnitsPerSampleUnit)
 			+ centrePos;
@@ -664,8 +664,8 @@ void CTerrain::drawTrees(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 		clSize = sc->chunkList.size();
 		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) {
 			Chunk* chunk = sc->chunkList[chunkNo];
-			if (chunk->grassDrawDetails.childBufNo != -1) {
-				pRenderer->drawMultiBufChildInstanced(drawTriStrip, grassMultiBuf, chunk->grassDrawDetails.childBufNo, chunk->grassDrawDetails.vertStart, chunk->grassDrawDetails.vertCount);
+			if (chunk->treeDrawDetails.childBufNo != -1) {
+				pRenderer->drawMultiBufChildInstanced(drawTriStrip, treeMultiBuf, chunk->treeDrawDetails.childBufNo, chunk->treeDrawDetails.vertStart, chunk->treeDrawDetails.vertCount);
 			}
 		}
 	}

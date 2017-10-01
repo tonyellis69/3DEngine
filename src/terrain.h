@@ -91,10 +91,8 @@ public:
 
 	std::vector<Chunk*> spareChunks; ///<Stores unused chunks to recycle.
 
-	DelegateP<bool, CSuperChunk&> EXTsuperChunkIsEmpty;
-	DelegatePP<bool,glm::vec3&, int> EXTchunkExists;
 	DelegateP<void,CModel*> EXTfreeChunkModel;
-	DelegateP<void,Chunk&> EXTcreateChunkMesh;
+
 
 
 	glm::i32vec3 sizeInChunks; ///<Width, height and depth in chunks.
@@ -132,11 +130,15 @@ public:
 
 	float worldUnitsPerSampleUnit;
 
+	CMultiBuf treeMultiBuf; ///<Stores grass location points for all chunks.
 	CMultiBuf grassMultiBuf; ///<Stores grass location points for all chunks.
 
 	std::vector<CSuperChunk*> visibleSClist; ///<SCs considered to be in sight.
 	CShader* chunkDrawShader; ///<Whatever shader we're using to draw chunks.
-	};
+
+	glm::vec3 sampleOffset; ///<Offset of sample space origin from world space.
+
+};
 
 
 

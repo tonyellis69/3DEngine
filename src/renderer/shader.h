@@ -16,6 +16,7 @@ public:
 	~CShader() {};
 	virtual void load(shaderType shader, std::string shaderFile) {};
 	virtual void create(std::string shaderName) {};
+	virtual void create(std::string shaderName, int nFeedbacks) {};
 	virtual void attach() {};
 	virtual void setFeedbackData(int nVars, const char** strings) {};
 	virtual void link() {};
@@ -44,5 +45,6 @@ public:
 	std::string geomFile;
 	std::string fragFile;
 
-
+	const char* feedbackVaryings[10];
+	unsigned int noFeedbackSettings;
 };

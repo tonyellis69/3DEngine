@@ -15,6 +15,9 @@ void Chunk::init() {
 	drawDetails.childBufNo = -1;
 	drawDetails.vertCount = 0;
 	drawDetails.vertStart = 0;
+	treeDrawDetails.childBufNo = -1;
+	treeDrawDetails.vertCount = 0;
+	treeDrawDetails.vertStart = 0;
 	grassDrawDetails.childBufNo = -1;
 	grassDrawDetails.vertCount = 0;
 	grassDrawDetails.vertStart = 0;

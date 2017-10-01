@@ -111,6 +111,7 @@ public:
 	void createStandardBillboardShader();
 
 	CShader * createShader(std::string name);
+	CShader * createShader(std::string name,   char** strings, int nFeedbacks);
 
 	void backFaceCulling(bool on);
 	void setVAO(GLuint newVAO);

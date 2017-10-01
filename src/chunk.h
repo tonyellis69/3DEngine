@@ -46,9 +46,11 @@ public:
 
 	TChunkStatus status;
 
-	unsigned int grassId; ///<Identifies this chunk's grass verts.
+	unsigned int treeId; ///<Identifies this chunk's tree verts.
+	unsigned int grassId;
 
 	TDrawDetails drawDetails; ///<Buffer details for drawing this chunk.
+	TDrawDetails treeDrawDetails;
 	TDrawDetails grassDrawDetails;
 
 private:
