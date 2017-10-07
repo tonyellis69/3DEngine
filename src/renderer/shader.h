@@ -2,6 +2,9 @@
 
 #include <string>
 #include "glm\glm.hpp"
+
+#include "texManager.h"
+
 enum shaderType { vertex, frag, geometry };
 
 enum TStandardShaderType { standardTex, standardPhong, standardWire, standardMultiTex, standardBillboard,
@@ -37,6 +40,7 @@ public:
 	virtual void setShaderValue(unsigned int vecHandle, glm::vec4& vector) {};
 	virtual void setShaderValue(unsigned int intHandle,  int value) {};
 	virtual void setShaderValue(unsigned int floatHandle,  float value) {};
+	virtual void setShaderValue(unsigned int textureHandle, CBaseTexture& texture) {};
 
 
 	TStandardShaderType ident;

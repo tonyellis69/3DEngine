@@ -29,6 +29,8 @@ public:
 	void setShaderValue(unsigned int intHandle, int value);
 	void setShaderValue(unsigned int floatHandle, float value);
 
+	void setShaderValue(unsigned int textureHandle, CBaseTexture & texture);
+
 	
 	unsigned int hShader; ///<OpenGL shader handle.
 

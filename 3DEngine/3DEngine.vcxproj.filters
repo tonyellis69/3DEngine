@@ -182,12 +182,6 @@
     <ClCompile Include="..\src\skyShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\chunkShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\chunkCheckShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\wireShader.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
@@ -249,9 +243,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\chunkHeightShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\findPointHeightShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\phongShaderInstanced.cpp">
@@ -460,12 +451,6 @@
     <ClInclude Include="..\src\skyShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\chunkShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\chunkCheckShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\wireShader.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
@@ -530,9 +515,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\chunkHeightShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\findPointHeightShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\phongShaderInstanced.h">

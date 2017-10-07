@@ -89,14 +89,11 @@
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
-    <ClCompile Include="..\src\chunkCheckShader.cpp" />
     <ClCompile Include="..\src\chunkHeightShader.cpp" />
-    <ClCompile Include="..\src\chunkShader.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\createShape.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
-    <ClCompile Include="..\src\findPointHeightShader.cpp" />
     <ClCompile Include="..\src\grassShader.cpp" />
     <ClCompile Include="..\Src\ImageLib.cpp" />
     <ClCompile Include="..\src\physics\aabb.cpp" />
@@ -174,16 +171,13 @@
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h" />
     <ClInclude Include="..\src\chunk.h" />
-    <ClInclude Include="..\src\chunkCheckShader.h" />
     <ClInclude Include="..\src\chunkHeightShader.h" />
-    <ClInclude Include="..\src\chunkShader.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\createShape.h" />
     <ClInclude Include="..\src\Delegate.h" />
     <ClInclude Include="..\src\direction.h" />
     <ClInclude Include="..\Src\Engine.h" />
-    <ClInclude Include="..\src\findPointHeightShader.h" />
     <ClInclude Include="..\src\grassShader.h" />
     <ClInclude Include="..\Src\ImageLib.h" />
     <ClInclude Include="..\Src\Macros.h" />

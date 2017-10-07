@@ -105,6 +105,12 @@ void CRenderShader::setShaderValue(unsigned int floatHandle, float value) {
 	pRenderer->setShaderValue(floatHandle, 1, value);
 }
 
+void CRenderShader::setShaderValue(unsigned int textureHandle, CBaseTexture& texture) {
+	pRenderer->attachTexture(5, texture); //TO DO : Magic number!
+	pRenderer->setShaderValue(textureHandle, 1, (int)5);
+};
+
+
 void CRenderShader::loadFiles() {
 	load(vertex, vertFile);
 
