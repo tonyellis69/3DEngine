@@ -162,6 +162,8 @@ void CRenderer::init() {
 	createStandardPhongShader();
 	createStandardTexShader();
 	createStandardBillboardShader();
+	createStandardMultiTexShader();
+	createInstancedPhongShader();
 }
 
 
@@ -769,7 +771,37 @@ void CRenderer::createStandardBillboardShader() {
 	hBillCentre = billboardShader->getUniformHandle("centrePos");
 	hBillCamWorldMatrix = billboardShader->getUniformHandle("camWorldMatrix");
 	hBillboardSize = billboardShader->getUniformHandle("size");
+}
 
+void CRenderer::createStandardMultiTexShader() {
+	multiTexShader = createShader(dataPath + "multiTexture");
+	multiTexShader->setType(standardMultiTex);
+	setShader(multiTexShader);
+	
+	hMultTextureUnit[0] = multiTexShader->getUniformHandle("mySampler1");
+	hMultTextureUnit[1] = multiTexShader->getUniformHandle("mySampler2");
+	hMultTile[0] = multiTexShader->getUniformHandle("tile1");
+	hMultTile[1] = multiTexShader->getUniformHandle("tile2");
+	hMultOffset[0] = multiTexShader->getUniformHandle("offset1");
+	hMultOffset[1] = multiTexShader->getUniformHandle("offset2");
+	hMultMVP = multiTexShader->getUniformHandle("mvpMatrix");
+}
+
+void CRenderer::createInstancedPhongShader() {
+	phongShaderInstanced = createShader(dataPath + "defaultInstanced");
+	phongShaderInstanced->setType(standardPhong);
+	setShader(phongShaderInstanced);
+	hPhongInstNormalModelToCameraMatrix = phongShaderInstanced->getUniformHandle("normalModelToCameraMatrix");
+	hPhongInstLightDirection = phongShaderInstanced->getUniformHandle("lightDirection");
+	hPhongInstLightIntensity = phongShaderInstanced->getUniformHandle("lightIntensity");
+	hPhongInstAmbientLight = phongShaderInstanced->getUniformHandle("ambientLight");
+	hPhongInstColour = phongShaderInstanced->getUniformHandle("colour");
+	hPhongInstMVP = phongShaderInstanced->getUniformHandle("mvpMatrix");
+
+	phongShaderInstanced->setShaderValue(hPhongInstLightDirection, glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
+	phongShaderInstanced->setShaderValue(hPhongInstLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	phongShaderInstanced->setShaderValue(hPhongInstAmbientLight,glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	phongShaderInstanced->setShaderValue(hPhongInstColour,glm::vec4(1));
 }
 
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */

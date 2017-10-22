@@ -19,11 +19,10 @@
 #include "renderer\material.h"
 #include "renderer\renderMaterial.h"
 #include "renderer\billboard.h"
-#include "wireBoxShader.h"
 #include "physics\physObjManager.h"
 #include "physics\terrainPhysObj.h"
 
-#include "UI\uiRectShader.h"
+//#include "UI\uiRectShader.h"
 
 typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
@@ -141,12 +140,8 @@ public:
 	CMaterial * createMaterial();
 	CShader* createShader(std::string name);
 	CShader* createShader();
-	void createStandardTexShader();
-	void createStandardMultiTexShader();
-	void createStandardWireShader();
-	void createStandardBillboardShader();
-	void createWireBoxShader();
-	void createInstancedPhongShader();
+	
+
 	CBillboard* createBillboard(glm::vec3& pos, glm::vec2 size);
 	void setCurrentCamera(CCamera* camera);
 	CCamera* getCurrentCamera();
@@ -215,12 +210,12 @@ public:
 	
 	
 
-	CMultiTexShader* multiTexShader; ///<The standard multi-texture shader
-	CWireShader* wireShader;
+	
+	//CWireShader* wireShader;
 
-	CWireBoxShader* wireBoxShader;
-	CGUIrectShader* uiRectShader;
-	CPhongShaderInstanced* phongShaderInstanced; 
+
+	//CGUIrectShader* uiRectShader;
+
 
 	CPhysObjManager physObjManager;
 

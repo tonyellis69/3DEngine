@@ -45,8 +45,8 @@ void CRenderModel::setDrawMode(TdrawMode iDrawMode) {
 
 void CRenderModel::setMaterial(CMaterial & iMaterial) {
 	material = &iMaterial;
-	if (material->getShader()) //TO DO 
-		hMVP = material->getShader()->getMVPhandle();
+//	if (material->getShader()) //TO DO 
+	//	hMVP = material->getShader()->getMVPhandle();
 }
 
 void CRenderModel::assignMaterial() {

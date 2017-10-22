@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "skyShader.h"
+//#include "skyShader.h"
 #include "renderer\model.h"
 #include "renderer\billboard.h"
 
@@ -28,7 +28,9 @@ public:
 	CMaterial* cloud;
 	glm::vec2 cloudOffset;
 
-	CSkyShader* skyShader;
+	CShader* skyShader;
+	GLuint hSkyDomeHeightColours;
+	GLuint hSkyDomeMVP;
 
 	CBillboard* sunBoard;
 	CMaterial* sunMat;

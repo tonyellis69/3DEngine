@@ -15,8 +15,6 @@ public:
 	void attach();
 	void setFeedbackData(unsigned int nVars);
 	void link();
-	void getDataHandles();
-	CShader * getThisShader();
 	unsigned int getShaderHandle();
 	void recompile();
 	unsigned int getUniformHandle(std::string name);
@@ -28,6 +26,8 @@ public:
 	void setShaderValue(unsigned int vecHandle, glm::vec4& vector);
 	void setShaderValue(unsigned int intHandle, int value);
 	void setShaderValue(unsigned int floatHandle, float value);
+	void setTextureUnit(unsigned int textureUnit, unsigned int textureHandle);
+
 
 	void setShaderValue(unsigned int textureHandle, CBaseTexture & texture);
 

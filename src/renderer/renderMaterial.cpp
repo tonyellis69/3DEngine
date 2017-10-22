@@ -24,38 +24,36 @@ void CRenderMaterial::assign() {
 	pRenderer->setShader(shader);
 
 	if (currentShaderType == standardPhong) {
-		CShader* subShader = (CRenderShader*)shader->getThisShader();
-		subShader->setShaderValue(pRenderer->hColour,colour);
+		shader->setShaderValue(pRenderer->hColour,colour);
 	}
 	
 	else if (currentShaderType == standardMultiTex) {
-		CMultiTexShader* subShader = (CMultiTexShader*)shader->getThisShader();
-
+	
 		//if we have textures, assign them
 		for (size_t texNo = 0; texNo < textures.size(); texNo++) {
 			pRenderer->attachTexture(texNo, textures[texNo].hTexture);
 
-			subShader->setTextureUnit(texNo, texNo);
-			subShader->setTiling(texNo, textures[texNo].tile);
-			subShader->setOffset(texNo, textures[texNo].offset);
+			shader->setTextureUnit(texNo, texNo);//
+			//shader->setTiling(texNo, textures[texNo].tile);
+			shader->setShaderValue(pRenderer->hMultTile[texNo], textures[texNo].tile);
+			//shader->setOffset(texNo, textures[texNo].offset);
+			shader->setShaderValue(pRenderer->hMultOffset[texNo], textures[texNo].offset);
 		}
 	}
 	else if (currentShaderType == standardTex) {
-		CShader* subShader = (CRenderShader*)shader->getThisShader();
 
 			pRenderer->attachTexture(0, textures[0].hTexture);
 
-			subShader->setShaderValue(pRenderer->hTexTexture,0);
-			subShader->setShaderValue(pRenderer->hTile,textures[0].tile);
-			subShader->setShaderValue(pRenderer->hOffset,textures[0].offset);
+			shader->setShaderValue(pRenderer->hTexTexture,0);
+			shader->setShaderValue(pRenderer->hTile,textures[0].tile);
+			shader->setShaderValue(pRenderer->hOffset,textures[0].offset);
 	}
 	else if (currentShaderType == standardBillboard) {
-		CShader* subShader = (CRenderShader*)shader->getThisShader();
 		pRenderer->attachTexture(0, textures[0].hTexture);
 
-		subShader->setShaderValue(pRenderer->hBillTexture,(int)0);
-		subShader->setShaderValue(pRenderer->hBillTile,textures[0].tile);
-		subShader->setShaderValue(pRenderer->hBillOffset,textures[0].offset);
+		shader->setShaderValue(pRenderer->hBillTexture,(int)0);
+		shader->setShaderValue(pRenderer->hBillTile,textures[0].tile);
+		shader->setShaderValue(pRenderer->hBillOffset,textures[0].offset);
 	}
 
 }

@@ -179,20 +179,8 @@
     <ClCompile Include="..\src\renderer\renderShader.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\skyShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\wireShader.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\billboard.cpp">
       <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\multiTexShader.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\wireBoxShader.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\physics\physObj.cpp">
       <Filter>physics</Filter>
@@ -230,25 +218,7 @@
     <ClCompile Include="..\src\UI\GUIimage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\uiRectShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\uiTexShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\terrainPointShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\poisson.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\chunkHeightShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\phongShaderInstanced.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\grassShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plants\fractalTree.cpp">
@@ -448,20 +418,8 @@
     <ClInclude Include="..\src\renderer\renderShader.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\skyShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\wireShader.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\billboard.h">
       <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\multiTexShader.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\wireBoxShader.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\physics\physObj.h">
       <Filter>physics</Filter>
@@ -499,28 +457,10 @@
     <ClInclude Include="..\src\UI\GUIimage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\uiRectShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\uiTexShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrainPointShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\userTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\poisson.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\chunkHeightShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\phongShaderInstanced.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\grassShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plants\fractalTree.h">

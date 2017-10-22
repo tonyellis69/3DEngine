@@ -47,10 +47,7 @@ void CEngine::init(HWND& hWnd) {
 	defaultCamera = createCamera(glm::vec3(0,2,4));
 	setCurrentCamera(defaultCamera);
 
-	createStandardWireShader();
-	createStandardMultiTexShader();
-	createWireBoxShader();
-	createInstancedPhongShader();
+
 	
 }
 
@@ -822,13 +819,10 @@ CSkyDome * CEngine::createSkyDome() {
 	skyDome->setModel(dome);
 
 	//load skyDome shader
-	skyDome->skyShader = new CSkyShader();
-	Renderer.shaderList.push_back(skyDome->skyShader);
-	skyDome->skyShader->create(dataPath + "skyDome");
-	
-
-	skyDome->skyShader->getShaderHandles();
+	skyDome->skyShader = Renderer.createShader(dataPath + "skyDome");
 	skyDome->skyShader->setType(userShader);
+	skyDome->hSkyDomeHeightColours = skyDome->skyShader->getUniformHandle("heightColour");
+	skyDome->hSkyDomeMVP = skyDome->skyShader->getUniformHandle("mvpMatrix");
 	dome->getMaterial()->setShader(skyDome->skyShader);
 
 	//cloud plane:
@@ -836,7 +830,7 @@ CSkyDome * CEngine::createSkyDome() {
 
 	//create cloud material
 	skyDome->cloud = createMaterial(dataPath + "cloud001.png");
-	skyDome->cloud->setShader(multiTexShader);
+	skyDome->cloud->setShader(Renderer.multiTexShader);
 	skyDome->cloud->setTile(0, glm::vec2(20));
 	skyDome->cloud->addImage(dataPath + "cloud002.png");
 	skyDome->cloud->setTile(1, glm::vec2(20));
@@ -876,35 +870,10 @@ CShader * CEngine::createShader() {
 }
 
 
-void CEngine::createStandardMultiTexShader() {
-	multiTexShader = new CMultiTexShader();
-	multiTexShader->create(dataPath + "multiTexture");
-	multiTexShader->getShaderHandles();
-	multiTexShader->setType(standardMultiTex);
-	Renderer.shaderList.push_back(multiTexShader);
-}
 
 
 
-void CEngine::createStandardWireShader() {
-	wireShader = new CWireShader();
-	wireShader->create(dataPath + "wire");
-	wireShader->getShaderHandles();
-	wireShader->setType(standardWire);
-	Renderer.shaderList.push_back(wireShader);
-}
 
-
-
-void CEngine::createWireBoxShader() {
-	wireBoxShader = new CWireBoxShader();
-	wireBoxShader->create(dataPath + "wireBox");
-	wireBoxShader->getShaderHandles();
-	wireBoxShader->setType(userShader);
-	Renderer.shaderList.push_back(wireBoxShader);
-
-
-}
 
 CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 	//create the object
@@ -919,19 +888,6 @@ CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 	return billboard;
 }
 
-void CEngine::createInstancedPhongShader() {
-	phongShaderInstanced = new CPhongShaderInstanced();
-	phongShaderInstanced->create(dataPath + "defaultInstanced");
-	phongShaderInstanced->getShaderHandles();
-	phongShaderInstanced->setType(standardPhong);
-	Renderer.shaderList.push_back(phongShaderInstanced);
-
-	Renderer.setShader(phongShaderInstanced);
-	phongShaderInstanced->setLightDirection(glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
-	phongShaderInstanced->setLightIntensity(glm::vec4(0.8f, 0.8f, 0.8f, 1));
-	phongShaderInstanced->setAmbientLight(glm::vec4(0.2f, 0.2f, 0.2f, 1));
-	phongShaderInstanced->setColour(glm::vec4(1));
-}
 
 void CEngine::setCurrentCamera(CCamera * camera) {
 	currentCamera = camera;

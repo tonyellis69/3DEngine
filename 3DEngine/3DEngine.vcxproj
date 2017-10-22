@@ -89,12 +89,10 @@
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
-    <ClCompile Include="..\src\chunkHeightShader.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\createShape.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
-    <ClCompile Include="..\src\grassShader.cpp" />
     <ClCompile Include="..\Src\ImageLib.cpp" />
     <ClCompile Include="..\src\physics\aabb.cpp" />
     <ClCompile Include="..\src\physics\basePhysObj.cpp" />
@@ -120,24 +118,19 @@
     <ClCompile Include="..\src\renderer\model.cpp" />
     <ClCompile Include="..\src\renderer\modelMulti.cpp" />
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
-    <ClCompile Include="..\src\renderer\multiTexShader.cpp" />
-    <ClCompile Include="..\src\renderer\phongShaderInstanced.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
     <ClCompile Include="..\src\renderer\renderMaterial.cpp" />
     <ClCompile Include="..\src\renderer\renderModel.cpp" />
     <ClCompile Include="..\src\renderer\renderShader.cpp" />
     <ClCompile Include="..\src\renderer\shader.cpp" />
     <ClCompile Include="..\src\renderer\texManager.cpp" />
-    <ClCompile Include="..\src\renderer\wireShader.cpp" />
     <ClCompile Include="..\src\shapes.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
     <ClCompile Include="..\src\skyDome.cpp" />
-    <ClCompile Include="..\src\skyShader.cpp" />
     <ClCompile Include="..\Src\SoundLib.cpp" />
     <ClCompile Include="..\src\Sprite.cpp" />
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
-    <ClCompile Include="..\src\terrainPointShader.cpp" />
     <ClCompile Include="..\Src\TexFont.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
@@ -161,24 +154,19 @@
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
-    <ClCompile Include="..\src\UI\uiRectShader.cpp" />
-    <ClCompile Include="..\src\UI\uiTexShader.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
     <ClCompile Include="..\Src\Window.cpp" />
-    <ClCompile Include="..\src\wireBoxShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h" />
     <ClInclude Include="..\src\chunk.h" />
-    <ClInclude Include="..\src\chunkHeightShader.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\createShape.h" />
     <ClInclude Include="..\src\Delegate.h" />
     <ClInclude Include="..\src\direction.h" />
     <ClInclude Include="..\Src\Engine.h" />
-    <ClInclude Include="..\src\grassShader.h" />
     <ClInclude Include="..\Src\ImageLib.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\physics\aabb.h" />
@@ -205,19 +193,15 @@
     <ClInclude Include="..\src\renderer\model.h" />
     <ClInclude Include="..\src\renderer\modelMulti.h" />
     <ClInclude Include="..\src\renderer\multiBuf.h" />
-    <ClInclude Include="..\src\renderer\multiTexShader.h" />
-    <ClInclude Include="..\src\renderer\phongShaderInstanced.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
     <ClInclude Include="..\src\renderer\renderMaterial.h" />
     <ClInclude Include="..\src\renderer\renderModel.h" />
     <ClInclude Include="..\src\renderer\renderShader.h" />
     <ClInclude Include="..\src\renderer\shader.h" />
     <ClInclude Include="..\src\renderer\texManager.h" />
-    <ClInclude Include="..\src\renderer\wireShader.h" />
     <ClInclude Include="..\src\shapes.h" />
     <ClInclude Include="..\src\simplexnoise.h" />
     <ClInclude Include="..\src\skyDome.h" />
-    <ClInclude Include="..\src\skyShader.h" />
     <ClInclude Include="..\src\smallsysf.h" />
     <ClInclude Include="..\Src\SOIL.h" />
     <ClInclude Include="..\Src\SoundLib.h" />
@@ -225,7 +209,6 @@
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
-    <ClInclude Include="..\src\terrainPointShader.h" />
     <ClInclude Include="..\Src\TexFont.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
@@ -253,13 +236,10 @@
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
     <ClInclude Include="..\src\UI\GUItextbox.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
-    <ClInclude Include="..\src\UI\uiRectShader.h" />
-    <ClInclude Include="..\src\UI\uiTexShader.h" />
     <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
     <ClInclude Include="..\Src\Window.h" />
-    <ClInclude Include="..\src\wireBoxShader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

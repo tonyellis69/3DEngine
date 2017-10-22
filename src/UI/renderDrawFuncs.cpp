@@ -12,17 +12,18 @@ void CRenderDrawFuncs::setRenderer(CRenderer * renderer) {
 }
 
 void CRenderDrawFuncs::loadShaders() {
-	uiRectShader = new CGUIrectShader();
-	uiRectShader->create(pRenderer->dataPath + "uiRect");
-	uiRectShader->getShaderHandles();
+	uiRectShader = pRenderer->createShader(pRenderer->dataPath + "uiRect");
 	uiRectShader->setType(uiRect);
-	shaderList.push_back(uiRectShader);
+	hOrtho = uiRectShader->getUniformHandle("orthoMatrix");
+	hColour1 = uiRectShader->getUniformHandle("colour1");
+	hColour2 = uiRectShader->getUniformHandle("colour2");
 
-	uiTexShader = new CGUItexShader();
-	uiTexShader->create(pRenderer->dataPath + "uiTexture");
-	uiTexShader->getShaderHandles();
+	uiTexShader = pRenderer->createShader(pRenderer->dataPath + "uiTexture");
 	uiTexShader->setType(uiTex);
-	shaderList.push_back(uiTexShader);
+	hTexOrtho = uiTexShader->getUniformHandle("orthoMatrix");
+	hTextureUnit = uiTexShader->getUniformHandle("textureUnit");
+	hTile = uiTexShader->getUniformHandle("tile");
+	hOffset = uiTexShader->getUniformHandle("offset");
 
 }
 
@@ -60,9 +61,9 @@ void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
 void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 	CBuf* buf = quadBufs[control.uniqueID].rect;
 	pRenderer->setShader(uiRectShader);
-	uiRectShader->setColour1((vec4&)control.backColour1);
-	uiRectShader->setColour2((vec4&)control.backColour2);
-	uiRectShader->setOrtho(orthoView);
+	uiRectShader->setShaderValue(hColour1,(vec4&)control.backColour1);
+	uiRectShader->setShaderValue(hColour2,(vec4&)control.backColour2);
+	uiRectShader->setShaderValue(hOrtho,orthoView);
 	pRenderer->drawBuf(*buf, drawTriStrip);
 	pRenderer->setShader(0);
 }
@@ -70,9 +71,9 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
 	CBuf* buf = quadBufs[control.uniqueID].border;
 	pRenderer->setShader(uiRectShader);
-	uiRectShader->setColour1((vec4&)control.borderColour);
-	uiRectShader->setColour2((vec4&)control.borderColour);
-	uiRectShader->setOrtho(orthoView);
+	uiRectShader->setShaderValue(hColour1, (vec4&)control.borderColour);
+	uiRectShader->setShaderValue(hColour2, (vec4&)control.borderColour);
+	uiRectShader->setShaderValue(hOrtho,orthoView);
 	pRenderer->drawBuf(*buf, drawLineLoop);
 	pRenderer->setShader(0);
 
@@ -100,10 +101,11 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
 	pRenderer->attachTexture(0, texture);
 
-	uiTexShader->setTextureUnit(0);
-	uiTexShader->setTiling(vec2(1,1));
-	uiTexShader->setOffset(vec2(0));
-	uiTexShader->setOrtho(orthoView);
+	//uiTexShader->setShaderValue(hTextureUnit, rendTex);
+	uiTexShader->setTextureUnit(hTextureUnit, 0);
+	uiTexShader->setShaderValue(hTile,vec2(1,1));
+	uiTexShader->setShaderValue(hOffset,vec2(0));
+	uiTexShader->setShaderValue(hTexOrtho,orthoView);
 	pRenderer->drawBuf(*buf, drawTriStrip);
 	//pRenderer->attachTexture(0, 0);
 

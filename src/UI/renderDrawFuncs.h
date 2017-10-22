@@ -2,8 +2,7 @@
 
 #include "GUIbase.h"
 #include "GUIbetterBase.h"
-#include "uiRectShader.h"
-#include "uiTexShader.h"
+
 
 #include "..\renderer\renderer.h"
 
@@ -35,8 +34,16 @@ private:
 
 	std::map<unsigned int, controlRects> quadBufs;
 
-	CGUIrectShader* uiRectShader;
-	CGUItexShader* uiTexShader;
+	CShader* uiRectShader;
+	GLuint hOrtho; ///<Handle to  orthographic view matrix
+	GLuint hColour1;
+	GLuint hColour2;
+
+	CShader* uiTexShader;
+	GLuint hTexOrtho; ///<Handle to  orthographic view matrix
+	GLuint hTextureUnit; ///<
+	GLuint hTile;
+	GLuint hOffset;
 
 	std::vector<CShader*> shaderList; ///<Tracks ui shaders
 

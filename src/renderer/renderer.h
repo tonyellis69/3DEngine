@@ -14,11 +14,11 @@
 #include "texManager.h"
 #include "..\terrain.h"
 
-#include "multiTexShader.h"
-#include "wireShader.h"
-#include "billboardShader.h"
-#include "phongShaderInstanced.h"
-
+//#include "multiTexShader.h"
+//#include "wireShader.h"
+//#include "billboardShader.h"
+///#include "phongShaderInstanced.h"
+#include "renderShader.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, 
@@ -109,6 +109,8 @@ public:
 	void createStandardPhongShader();
 	void createStandardTexShader();
 	void createStandardBillboardShader();
+	void createStandardMultiTexShader();
+	void createInstancedPhongShader();
 
 	CShader * createShader(std::string name);
 	CShader * createShader(std::string name,   char** strings, int nFeedbacks);
@@ -165,6 +167,21 @@ public:
 	GLuint hBillCentre; ///<Handle for position of billboard centre.
 	GLuint hBillCamWorldMatrix;
 	GLuint hBillboardSize;
+
+
+	CShader* multiTexShader; ///<The standard multi-texture shader
+	GLuint hMultTextureUnit[16]; ///<Handle to standard texture shader texture units;
+	GLuint hMultTile[16]; ///<Handle to standard texture shader texture tiling
+	GLuint hMultOffset[16]; ///<Handle to standard texture shader texture tiling
+	GLuint hMultMVP; ///<Handle to standard texture shader MVP matrix
+
+	CShader* phongShaderInstanced;
+	GLuint hPhongInstNormalModelToCameraMatrix;
+	GLuint hPhongInstLightDirection;
+	GLuint hPhongInstLightIntensity;
+	GLuint hPhongInstAmbientLight;
+	GLuint hPhongInstColour;
+	GLuint hPhongInstMVP;
 
 private:
 

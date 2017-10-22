@@ -23,14 +23,12 @@ public:
 	virtual void attach() {};
 	virtual void setFeedbackData(int nVars, const char** strings) {};
 	virtual void link() {};
-	virtual void getDataHandles() {};
 	virtual unsigned int getShaderHandle() { return 0; };
-	virtual CShader* getThisShader() { return 0; };
-	virtual unsigned int getMVPhandle() { return 0; };
+//	virtual unsigned int getMVPhandle() { return 0; };
 	virtual void recompile() {};
 	TStandardShaderType getType();
 	void setType(TStandardShaderType ident);
-	virtual void getShaderHandles() {};
+//	virtual void getShaderHandles() {};
 	virtual unsigned int getUniformHandle(std::string name) { return 0; };
 
 	virtual void setShaderValue(unsigned int matrixHandle, glm::mat4& matrix) {};
@@ -41,8 +39,7 @@ public:
 	virtual void setShaderValue(unsigned int intHandle,  int value) {};
 	virtual void setShaderValue(unsigned int floatHandle,  float value) {};
 	virtual void setShaderValue(unsigned int textureHandle, CBaseTexture& texture) {};
-
-
+	virtual void setTextureUnit(unsigned int textureUnit, unsigned int textureHandle) {}
 	TStandardShaderType ident;
 
 	std::string vertFile;
