@@ -96,7 +96,7 @@ public:
 	int layerNo;
 
 	float sampleStep;
-	bool tmp;
+	bool nonEmpty;
 
 private:
 	glm::i32vec3 faceWalkPos, faceWalkStart, faceWalkEnd;

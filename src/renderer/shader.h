@@ -3,12 +3,13 @@
 #include <string>
 #include "glm\glm.hpp"
 
+#include "renderTexture.h"
 #include "texManager.h"
 
 enum shaderType { vertex, frag, geometry };
 
 enum TStandardShaderType { standardTex, standardPhong, standardWire, standardMultiTex, standardBillboard,
-	uiRect, uiTex, userShader};
+	uiRect, uiTex, text, userShader};
 
 /**	Encapsulates a shader, to conveniently gather the various data handles it needs
 	and also hide OpenGL specifics from user. */
@@ -39,7 +40,7 @@ public:
 	virtual void setShaderValue(unsigned int intHandle,  int value) {};
 	virtual void setShaderValue(unsigned int floatHandle,  float value) {};
 	virtual void setShaderValue(unsigned int textureHandle, CBaseTexture& texture) {};
-	virtual void setTextureUnit(unsigned int textureUnit, unsigned int textureHandle) {}
+	virtual void setTextureUnit(unsigned int samplerHandle,  int textureUnit) {}
 	TStandardShaderType ident;
 
 	std::string vertFile;

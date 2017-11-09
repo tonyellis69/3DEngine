@@ -16,7 +16,7 @@ CSuperChunk::CSuperChunk()  {
 	LoD = 0;
 	overlapCount = 0;
 	chunksToSkin = 0;
-	tmp = false;
+	nonEmpty = false;
 }
 
 /** Set the dimensions and building block sizes of this superChunk. */

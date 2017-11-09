@@ -6,7 +6,8 @@ struct Glyph
   {
     float tex_x1, tex_y1, tex_x2;
     size_t advance;
-	TRect Rect;
+	TRect Rect; //width, lineheight, originX=0,originY=lineheight
+	//map.u = left, t=top, s = r, v = b
   };
 
 // This is how glyphs are stored in the file.

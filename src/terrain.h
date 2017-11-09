@@ -123,7 +123,7 @@ public:
 
 	std::vector<Chunk*> toFree; ///<List of chunks to be taken out of play.
 
-	int totalSCs;
+
 
 	TChunkTriBuf cachedChunkTris[chunkTriCacheSize]; ///<Chunk triangles recently downloaded from graphics memory.
 	int freeChunkTriCache;
@@ -138,6 +138,8 @@ public:
 
 	glm::vec3 sampleOffset; ///<Offset of sample space origin from world space.
 
+	int totalScs;
+	int passedSCs;
 };
 
 
@@ -166,6 +168,8 @@ public:
 	float SCsampleStep;
 	float chunkSampleStep;
 	glm::vec3 nwSampleCorner;
+
+
 };
 
 

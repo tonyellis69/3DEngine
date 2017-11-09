@@ -14,6 +14,7 @@
 #include "UI\GUIcontainer.h"
 #include "UI\GUIpanelContainer.h"
 #include "UI\GUIimageGrid.h"
+#include "UI\GUIlabel2.h"
 #include <stdio.h>
 #include "Reader.h"
 #include "UIengine.h"

@@ -164,6 +164,7 @@ void CRenderer::init() {
 	createStandardBillboardShader();
 	createStandardMultiTexShader();
 	createInstancedPhongShader();
+	createTextShader();
 }
 
 
@@ -498,12 +499,22 @@ void CRenderer::renderToTextureQuad(CBaseTexture& texture) {
 	endRenderToTexture();
 }
 
+/** Draw the given buffer of tris to the texture using the current shader. */
+void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
+	beginRenderToTexture(texture);
+	drawBuf(buffer, drawTris);
+	endRenderToTexture();
+}
+
+
 /**	Prepare to render to the given texture, leaving the actual drawing to the user. */
 void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 	CRenderTexture* glTex = (CRenderTexture*)&texture;
+	glDisable(GL_BLEND); //Otherwise this messes up text texture alpha
 	glGenFramebuffers(1, &hFrameBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
 	
+	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
+
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glTex->handle, 0);
 
 
@@ -521,6 +532,7 @@ void CRenderer::endRenderToTexture() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, Width, Height);
+	glEnable(GL_BLEND);
 }
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
@@ -699,7 +711,6 @@ void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
 		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
 	else
 		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, buf.indexType, 0);
-
 	setVAO(0);
 }
 
@@ -802,6 +813,15 @@ void CRenderer::createInstancedPhongShader() {
 	phongShaderInstanced->setShaderValue(hPhongInstLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
 	phongShaderInstanced->setShaderValue(hPhongInstAmbientLight,glm::vec4(0.2f, 0.2f, 0.2f, 1));
 	phongShaderInstanced->setShaderValue(hPhongInstColour,glm::vec4(1));
+}
+
+void CRenderer::createTextShader() {
+	textShader = createShader(dataPath + "text");
+	textShader->setType(text);
+	setShader(textShader);
+	hTextTexture = textShader->getUniformHandle("fontTexture");
+	hTextColour = textShader->getUniformHandle("textColour");
+	hTextOrthoMatrix = textShader->getUniformHandle("orthoMatrix");
 }
 
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */

@@ -105,9 +105,9 @@ void CRenderShader::setShaderValue(unsigned int floatHandle, float value) {
 	pRenderer->setShaderValue(floatHandle, 1, value);
 }
 
-void CRenderShader::setTextureUnit(unsigned int textureUnit, unsigned int textureHandle)
+void CRenderShader::setTextureUnit(unsigned int samplerHandle, int textureUnit)
 {
-	pRenderer->setShaderValue(textureHandle, 1, (int)textureUnit);
+	pRenderer->setShaderValue(samplerHandle, 1, (int)textureUnit);
 
 }
 

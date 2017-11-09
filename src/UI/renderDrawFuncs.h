@@ -29,7 +29,7 @@ public:
 	unsigned int getTextureHandle(const std::string& textureName);
 	void drawTexture(CGUIbetterBase & control, CBaseTexture& texture);
 
-private:
+//private:
 	CRenderer* pRenderer;
 
 	std::map<unsigned int, controlRects> quadBufs;

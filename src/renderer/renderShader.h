@@ -26,7 +26,7 @@ public:
 	void setShaderValue(unsigned int vecHandle, glm::vec4& vector);
 	void setShaderValue(unsigned int intHandle, int value);
 	void setShaderValue(unsigned int floatHandle, float value);
-	void setTextureUnit(unsigned int textureUnit, unsigned int textureHandle);
+	void setTextureUnit(unsigned int samplerHandle,  int textureUnit);
 
 
 	void setShaderValue(unsigned int textureHandle, CBaseTexture & texture);

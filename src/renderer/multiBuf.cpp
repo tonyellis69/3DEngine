@@ -12,6 +12,7 @@ CMultiBuf::CMultiBuf() {
 	noChildBufs = 0;
 	minBufSize = 0;
 	tmp = 0;
+	attr[0] = attr[1] = attr[2] = attr[3] = 0;
 }
 
 void CMultiBuf::setMultiBufferSize(unsigned int bufSize) {
@@ -76,18 +77,19 @@ void CMultiBuf::setSize(unsigned int size) {
 }
 
 void CMultiBuf::createChildBuf() {
-
 	CChildBuf newBuf;
 	
 	childBufs.push_back(newBuf);
 	//childBufs.back().setRenderer(getRenderer());
 	childBufs.back().setSize(maxBufSize);
+	
 	if (instancedBuf) {
 		childBufs.back().setInstanced(*instancedBuf, nInstancedAttribs);
 	}
 	childBufs.back().storeLayout(attr[0], attr[1], attr[2], attr[3]);
 	noChildBufs++;
 	freeMem = 0;
+	
 }
 
 void CMultiBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {

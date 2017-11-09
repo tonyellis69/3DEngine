@@ -11,13 +11,10 @@
 #include "modelMulti.h"
 #include "renderModel.h"
 #include "buf.h"
+//#include "baseTexture.h"
 #include "texManager.h"
 #include "..\terrain.h"
 
-//#include "multiTexShader.h"
-//#include "wireShader.h"
-//#include "billboardShader.h"
-///#include "phongShaderInstanced.h"
 #include "renderShader.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
@@ -37,7 +34,7 @@ extern int totalchunks;
 
 
 /** The high-level renderer class. */
-
+//class CBaseTexture;
 class CBaseBuf;
 
 class CRenderer {
@@ -88,6 +85,7 @@ public:
 	void createFrameBuffer();
 	void createScreenQuad();
 	void renderToTextureQuad(CBaseTexture & texture);
+	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
 	void beginRenderToTexture(CBaseTexture & texture);
 	void endRenderToTexture();
 	unsigned int getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode);
@@ -111,6 +109,7 @@ public:
 	void createStandardBillboardShader();
 	void createStandardMultiTexShader();
 	void createInstancedPhongShader();
+	void createTextShader();
 
 	CShader * createShader(std::string name);
 	CShader * createShader(std::string name,   char** strings, int nFeedbacks);
@@ -142,6 +141,7 @@ public:
 	CShader* phongShader; ///<The standard phong shader
 	CShader* texShader; ///<The standard texture shader
 	CShader* billboardShader;
+	CShader* textShader;
 
 	std::vector<CShader*> shaderList; ///<Tracks all shaders
 
@@ -158,6 +158,11 @@ public:
 	GLuint hTile;
 	GLuint hOffset;
 	GLuint hTexMVP;
+
+	//text shader
+	GLuint hTextTexture;
+	GLuint hTextColour;
+	GLuint hTextOrthoMatrix;
 
 	//billboard
 	GLuint hBillTexture;

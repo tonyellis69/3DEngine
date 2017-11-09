@@ -6,25 +6,7 @@
 #include "glew.h"
 #include "glm\glm.hpp"
 
-class CBaseTexture {
-public:
-	virtual glm::uvec4 getPixel(int x, int y) { return glm::uvec4(0); };
-	int width;
-	int height;
-
-	int channels;
-
-};
-
-class CRenderTexture : public CBaseTexture {
-public:
-	CRenderTexture() {};
-	glm::uvec4 getPixel(int x, int y);
-
-	unsigned int handle;
-};
-
-
+#include "renderTexture.h"
 
 /** Keeps track of all textures currently loaded. It is OpenGL based. In theory another texture manager
 class could be created for objects subclassed to use a different manager.*/

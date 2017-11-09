@@ -46,6 +46,11 @@ void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
 	corners[2].tex = vec2(0,1);
 	corners[3].tex = vec2(1,1);
 
+//	corners[0].tex = vec2(0,1);
+//	corners[1].tex = vec2(1, 1);
+//	corners[2].tex = vec2(0, 0);
+//	corners[3].tex = vec2(1, 0);
+
 	unsigned int index[4] = { 2,3,0,1 };
 	quadBufs[control.uniqueID].rect->storeVertexes(corners, sizeof(corners), 4);
 	quadBufs[control.uniqueID].rect->storeIndex(index,  4);
@@ -84,6 +89,7 @@ void CRenderDrawFuncs::setScreenSize(int width, int height) {
 	flip[1].y = -1;
 	flip[2].y = float(height);
 	orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height) ;
+	orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height);
 
 	screenWidth = width; screenHeight = height;
 }
@@ -99,7 +105,9 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 	pRenderer->setShader(uiTexShader);
 	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
-	pRenderer->attachTexture(0, texture);
+	pRenderer->attachTexture(0, rendTex->handle);
+	//pRenderer->attachTexture(0, 1);
+	//pRenderer->attachTexture(0, 16);
 
 	//uiTexShader->setShaderValue(hTextureUnit, rendTex);
 	uiTexShader->setTextureUnit(hTextureUnit, 0);
@@ -108,6 +116,10 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 	uiTexShader->setShaderValue(hTexOrtho,orthoView);
 	pRenderer->drawBuf(*buf, drawTriStrip);
 	//pRenderer->attachTexture(0, 0);
+
+
+///	glm::vec4 tmp = glm::vec4(chars[0].v, 0, 1);
+//	tmp = tmp * glm::mat4(1);
 
 }
 

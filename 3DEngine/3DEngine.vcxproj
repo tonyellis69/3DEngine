@@ -110,6 +110,7 @@
     <ClCompile Include="..\src\renderer\3d.cpp" />
     <ClCompile Include="..\src\renderer\3dobject.cpp" />
     <ClCompile Include="..\src\renderer\baseBuf.cpp" />
+    <ClCompile Include="..\src\renderer\baseTexture.cpp" />
     <ClCompile Include="..\src\renderer\billboard.cpp" />
     <ClCompile Include="..\src\renderer\buf.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
@@ -122,6 +123,7 @@
     <ClCompile Include="..\src\renderer\renderMaterial.cpp" />
     <ClCompile Include="..\src\renderer\renderModel.cpp" />
     <ClCompile Include="..\src\renderer\renderShader.cpp" />
+    <ClCompile Include="..\src\renderer\renderTexture.cpp" />
     <ClCompile Include="..\src\renderer\shader.cpp" />
     <ClCompile Include="..\src\renderer\texManager.cpp" />
     <ClCompile Include="..\src\shapes.cpp" />
@@ -146,12 +148,14 @@
     <ClCompile Include="..\src\UI\GUIimage.cpp" />
     <ClCompile Include="..\src\UI\GUIimageGrid.cpp" />
     <ClCompile Include="..\src\UI\GUIlabel.cpp" />
+    <ClCompile Include="..\src\UI\GUIlabel2.cpp" />
     <ClCompile Include="..\src\UI\GUInumeric.cpp" />
     <ClCompile Include="..\src\UI\GUIpanel.cpp" />
     <ClCompile Include="..\src\UI\GUIpanelContainer.cpp" />
     <ClCompile Include="..\src\UI\GUIradio.cpp" />
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
+    <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
@@ -185,6 +189,7 @@
     <ClInclude Include="..\src\renderer\3d.h" />
     <ClInclude Include="..\src\renderer\3dobject.h" />
     <ClInclude Include="..\src\renderer\baseBuf.h" />
+    <ClInclude Include="..\src\renderer\baseTexture.h" />
     <ClInclude Include="..\src\renderer\billboard.h" />
     <ClInclude Include="..\src\renderer\buf.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
@@ -197,6 +202,7 @@
     <ClInclude Include="..\src\renderer\renderMaterial.h" />
     <ClInclude Include="..\src\renderer\renderModel.h" />
     <ClInclude Include="..\src\renderer\renderShader.h" />
+    <ClInclude Include="..\src\renderer\renderTexture.h" />
     <ClInclude Include="..\src\renderer\shader.h" />
     <ClInclude Include="..\src\renderer\texManager.h" />
     <ClInclude Include="..\src\shapes.h" />
@@ -227,6 +233,7 @@
     <ClInclude Include="..\src\UI\GUIimage.h" />
     <ClInclude Include="..\src\UI\GUIimageGrid.h" />
     <ClInclude Include="..\src\UI\GUIlabel.h" />
+    <ClInclude Include="..\src\UI\GUIlabel2.h" />
     <ClInclude Include="..\src\UI\GUImouse.h" />
     <ClInclude Include="..\src\UI\GUInumeric.h" />
     <ClInclude Include="..\src\UI\GUIpanel.h" />
@@ -234,6 +241,7 @@
     <ClInclude Include="..\src\UI\GUIradio.h" />
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
+    <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\GUItextbox.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\userTypes.h" />

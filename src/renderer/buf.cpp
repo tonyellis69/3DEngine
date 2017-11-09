@@ -67,6 +67,7 @@ void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
 }
 
 void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
+	
 	if (hVAO != 0)
 		glDeleteVertexArrays(1, &hVAO);
 
@@ -77,7 +78,6 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 	else
 		glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 	pRenderer->setVAO(hVAO);
-
 	attr[0] = attr1;
 	attr[1] = attr2;
 	attr[2] = attr3;
@@ -97,12 +97,13 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 
 
 	nAttribs = 1;
-
+	
 	int pointer = 0; index = 0;
 	while (attr[index] !=0 && index < 4) {
 		glEnableVertexAttribArray(index);
 		glVertexAttribPointer(index, attr[index], GL_FLOAT, GL_FALSE, stride, (void*)pointer);
 		glVertexAttribDivisor(index, 0);
+		
 		pointer += attr[index] * sizeof(float);
 		nAttribs++;
 		index++;
@@ -110,35 +111,6 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 			break;
 	}
 
-	/*
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, attr1, GL_FLOAT, GL_FALSE, stride, (void*)pointer);
-	glVertexAttribDivisor(0, 0);
-
-	if (attr2) {
-		pointer += attr1 * sizeof(float);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, attr2, GL_FLOAT, GL_FALSE, stride, (void*)pointer);
-		glVertexAttribDivisor(1, 0);
-		nAttribs++;
-	}
-
-	if (attr3) {
-		pointer += attr2 * sizeof(float);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, attr3, GL_FLOAT, GL_FALSE, stride, (void*)pointer);
-		glVertexAttribDivisor(2, 0);
-		nAttribs++;
-	}
-
-	if (attr4) {
-		pointer += attr3 * sizeof(float);
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, attr4, GL_FLOAT, GL_FALSE, stride, (void*)pointer);
-		glVertexAttribDivisor(3, 0);
-		nAttribs++;
-	}
-	*/
 
 	//Any instancing attributes to take care of?
 	if (nInstancedAttribs) {

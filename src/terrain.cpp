@@ -22,7 +22,7 @@ using namespace watch;
 
 CTerrain::CTerrain() : CModel() {
 	pRenderer = &CRenderer::getInstance();
-	totalTris = 0; totalSCs = 0;
+	totalTris = 0; 
 	chunkOrigin = glm::translate(glm::mat4(1), getPos());
 	scrollTriggerPoint = vec3(0);
 	chunkOriginInt = i32vec3(0);
@@ -166,7 +166,6 @@ void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 		samplesPerPrevSC = vec3(layers[layerNo].scSize / worldUnitsPerSampleUnit);
 		LoDscale = LoDscale / 2;
 	}
-	cerr << "\ntotal superchnks " << totalSCs;
 }
 
 
@@ -174,9 +173,12 @@ void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 /** Create chunks where needed for all layers. */
 void CTerrain::createAllChunks() {
 	for (size_t l=0;l<layers.size();l++) {
-		for (size_t s=0;s<layers[l].superChunks.size();s++)
+		for (size_t s = 0; s < layers[l].superChunks.size(); s++) {
 			layers[l].superChunks[s]->createAllChunks();
+		}
 	}
+	cerr << "\nTotal SCs " << totalScs;
+	cerr << "\nPassed SCs " << passedSCs;
 }
 
 /** Utility function to resize 3d vectors/ */
@@ -196,7 +198,6 @@ void CTerrain::createSuperChunks(T3dArray &scArray, vector<CSuperChunk*>& parent
 		for (size_t y=0; y<scArray[0].size(); ++y) {
 			for (size_t z=0;z<scArray[0][0].size(); ++z) {
 				CSuperChunk* sChunk = new CSuperChunk();
-				totalSCs++;
 				sChunk->terrain = this;
 				scArray[x][y][z] = sChunk;
 				parentLayer.push_back(sChunk);
@@ -608,9 +609,9 @@ void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 		int slSize = layers[layerNo].superChunks.size();
 		for (int scNo = 0; scNo < slSize; scNo++) {
 			sc = layers[layerNo].superChunks[scNo];
-			if (!sc->isOutsideFustrum(camMatrix)) {
+			//if (!sc->isOutsideFustrum(camMatrix)) {
 				visibleSClist.push_back(sc);
-			}
+			//}
 		}
 	}
 }
