@@ -2,15 +2,14 @@
 
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
-#include "glm\gtc\matrix_access.hpp"
 
 
- float xAdj = 0;
- float yAdj = 0;;
 
-CTextBuffer::CTextBuffer()  {
+CTextBuffer::CTextBuffer() {
 	pRenderer = &CRenderer::getInstance();
 	textColour = glm::vec4(1, 1, 1, 1);
+	multiLine = true;
+	TextAlign = tleft;
 }
 
 void CTextBuffer::setSize(int w, int h) {
@@ -28,6 +27,7 @@ void CTextBuffer::setText(std::string & str) {
 
 void CTextBuffer::setFont(CTexFont & newFont) {
 	font = &newFont;
+	glyphHeight = font->table[0]->Rect.height; //TO DO: kludge, do beter
 	renderText();
 }
 
@@ -42,40 +42,79 @@ void CTextBuffer::renderText() {
 	chars.resize(text.size() * 4);
 
 	float baseLine = 0;
-	glm::vec2 blCorner = glm::vec2(-1.0f, baseLine) + glm::vec2(0, font->table[0]->Rect.height/2.0f) ;
 
-	int v = 0;
-	for (int c = 0; c < text.size(); c ++) {
-		Glyph* glyph = font->table[text[c]]; 
+	glm::vec2 blCorner = glm::vec2(-1.0f, 0.0f);
+
+	int v = 0; float lineWidth = 0; int nextBreak = text.size();
+	if (multiLine)
+		nextBreak = nextLineBreak(0);
+	
+	for (int c = 0; c < text.size(); c++) {
+		Glyph* glyph = font->table[text[c]];
 		//construct quads
 		chars[v].v = blCorner; //A
-		chars[v+1].v = blCorner + glm::vec2(glyph->Rect.width, 0.0f); //B
-		chars[v+2].v = blCorner + glm::vec2(0.0f, -glyph->Rect.height); //C
-		chars[v+3].v = blCorner + glm::vec2(glyph->Rect.width, -glyph->Rect.height); //D
+		chars[v + 1].v = blCorner + glm::vec2(glyph->Rect.width, 0.0f); //B
+		chars[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->Rect.height); //C
+		chars[v + 3].v = blCorner + glm::vec2(glyph->Rect.width, -glyph->Rect.height); //D
 		chars[v].tex = glm::vec2(glyph->Rect.Map.u, glyph->Rect.Map.v);
-		chars[v+1].tex = glm::vec2(glyph->Rect.Map.s, glyph->Rect.Map.v);
-		chars[v+2].tex = glm::vec2(glyph->Rect.Map.u, glyph->Rect.Map.t);
-		chars[v+3].tex = glm::vec2(glyph->Rect.Map.s, glyph->Rect.Map.t);
+		chars[v + 1].tex = glm::vec2(glyph->Rect.Map.s, glyph->Rect.Map.v);
+		chars[v + 2].tex = glm::vec2(glyph->Rect.Map.u, glyph->Rect.Map.t);
+		chars[v + 3].tex = glm::vec2(glyph->Rect.Map.s, glyph->Rect.Map.t);
 
 		index.push_back(v + 2); index.push_back(v + 3); index.push_back(v);
 		index.push_back(v); index.push_back(v + 3); index.push_back(v + 1);
 
-		blCorner += glm::vec2(glyph->Rect.width, 0) ;
+		if (c == nextBreak) {
+			lineWidth = 0;
+			blCorner = glm::vec2(0, blCorner.y + glyphHeight);
+			nextBreak = nextLineBreak(c+1);
+		}
+		else {
+			blCorner += glm::vec2(glyph->Rect.width, 0);
+			lineWidth += glyph->Rect.width;
+		}
 		v += 4;
 	}
 
 	CBuf buf;
 	buf.storeVertexes(chars.data(), sizeof(vBuf::T2DtexVert) * chars.size(), chars.size());
-	buf.storeIndex(index.data(), index.size()); 
+	buf.storeIndex(index.data(), index.size());
 	buf.storeLayout(2, 2, 0, 0);
 
-	writeToTexture(buf);
+	writeToTexture(buf, lineWidth);
+}
+
+/** Returns the point at which whitespace lets us wrap the text onto the next line. */
+int CTextBuffer::nextLineBreak(int lineStart) {
+	float breakDist = 0; float dist = 0;
+	//while there are characters, when we reach a break record it, until we go over the allotted width;
+	int c = lineStart;
+	while (c < text.size() && dist < size.x) {
+		
+		if (isspace(text[c]))
+			breakDist = c;
+		dist += font->table[text[c]]->Rect.width;
+		c++;
+	}
+	return breakDist;
 }
 
 /** Write the given series of text-quads to the storage texture. */
-void CTextBuffer::writeToTexture(CBuf& glyphQuads) {
+void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
-	glm::mat4 orthoMatrix = glm::ortho<float>(0, size.x, -halfSize.y, halfSize.y);
+	float xOffset = 0; float yOffset = 0 - (glyphHeight/2.0f);
+	if (TextAlign == tcentred) {
+		xOffset = (size.x - lineWidth) / 2.0f;
+	}
+	if (TextAlign == tright) {
+		xOffset = size.x - lineWidth;
+	}
+
+	if (multiLine) {
+		yOffset = halfSize.y - glyphHeight;
+	}
+
+	glm::mat4 orthoMatrix = glm::ortho<float>(-xOffset, size.x-xOffset, -halfSize.y + yOffset, halfSize.y + yOffset);
 
 	pRenderer->setShader(pRenderer->textShader);
 	pRenderer->attachTexture(0, font->textureNo + 1); //attach texture to textureUnit (0)

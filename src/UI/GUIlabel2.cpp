@@ -11,6 +11,8 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	type = uiLabel;
 	textColour = vec4(1, 1, 1, 1);
 
+	
+
 	pDrawFuncs->registerControl(*this);
 }
 
