@@ -8,7 +8,7 @@
 CTextBuffer::CTextBuffer() {
 	pRenderer = &CRenderer::getInstance();
 	textColour = glm::vec4(1, 1, 1, 1);
-	multiLine = true;
+	multiLine = false;
 	TextAlign = tleft;
 }
 
@@ -37,6 +37,7 @@ void CTextBuffer::setTextColour(glm::vec4 & newColour) {
 
 /** Draw the current text to the buffer (texture). */
 void CTextBuffer::renderText() {
+	
 	vector<vBuf::T2DtexVert> chars;
 	vector<unsigned int> index;
 	chars.resize(text.size() * 4);
@@ -86,7 +87,7 @@ void CTextBuffer::renderText() {
 
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */
 int CTextBuffer::nextLineBreak(int lineStart) {
-	float breakDist = 0; float dist = 0;
+	int breakDist = text.size(); float dist = 0;
 	//while there are characters, when we reach a break record it, until we go over the allotted width;
 	int c = lineStart;
 	while (c < text.size() && dist < size.x) {
@@ -99,8 +100,13 @@ int CTextBuffer::nextLineBreak(int lineStart) {
 	return breakDist;
 }
 
+void CTextBuffer::setMultiLine(bool onOff) {
+	multiLine = onOff;
+}
+
 /** Write the given series of text-quads to the storage texture. */
 void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
+
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
 	float xOffset = 0; float yOffset = 0 - (glyphHeight/2.0f);
 	if (TextAlign == tcentred) {
@@ -115,9 +121,9 @@ void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
 	}
 
 	glm::mat4 orthoMatrix = glm::ortho<float>(-xOffset, size.x-xOffset, -halfSize.y + yOffset, halfSize.y + yOffset);
-
+	
 	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, font->textureNo + 1); //attach texture to textureUnit (0)
+	pRenderer->attachTexture(0, 0 + 1); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);

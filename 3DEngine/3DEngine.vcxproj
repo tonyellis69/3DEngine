@@ -137,6 +137,7 @@
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\UIengine.cpp" />
+    <ClCompile Include="..\src\UI\font.cpp" />
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbetterBase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="..\Src\Timer.h" />
     <ClInclude Include="..\Src\Types.h" />
     <ClInclude Include="..\src\UIengine.h" />
+    <ClInclude Include="..\src\UI\font.h" />
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbetterBase.h" />
     <ClInclude Include="..\src\UI\GUIbutton.h" />

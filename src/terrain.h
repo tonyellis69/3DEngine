@@ -83,6 +83,7 @@ public:
 	void drawVisibleChunks();
 	void drawGrass(glm::mat4 & mvp, std::vector<CSuperChunk*>& drawList);
 	void drawTrees(glm::mat4 & mvp, std::vector<CSuperChunk*>& drawList);
+	void drawTrees2(glm::mat4 & mvp, std::vector<CSuperChunk*>& drawList);
 	void draw();
 	~CTerrain();
 

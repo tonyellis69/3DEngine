@@ -11,6 +11,7 @@ public:
 	void setText(std::string newText);
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
+	void setMultiLine(bool onOff);
 	void DrawSelf();
 
 	CTextBuffer textBuf;

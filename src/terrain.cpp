@@ -609,9 +609,9 @@ void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 		int slSize = layers[layerNo].superChunks.size();
 		for (int scNo = 0; scNo < slSize; scNo++) {
 			sc = layers[layerNo].superChunks[scNo];
-			//if (!sc->isOutsideFustrum(camMatrix)) {
+			if (!sc->isOutsideFustrum(camMatrix)) {
 				visibleSClist.push_back(sc);
-			//}
+			}
 		}
 	}
 }
@@ -658,7 +658,9 @@ void CTerrain::drawGrass(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 void CTerrain::drawTrees(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 	CSuperChunk* sc;
 	int drawListSize = drawList.size(); int clSize;
-	for (int scNo = 0; scNo < drawListSize; scNo++) {
+	int callsPerFrame = 0;
+	for (int scNo = 0; scNo < drawListSize ; scNo++) 
+	{
 		sc = drawList[scNo];
 		if (sc->LoD != 1)
 			continue;
@@ -667,10 +669,14 @@ void CTerrain::drawTrees(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 			Chunk* chunk = sc->chunkList[chunkNo];
 			if (chunk->treeDrawDetails.childBufNo != -1) {
 				pRenderer->drawMultiBufChildInstanced(drawTriStrip, treeMultiBuf, chunk->treeDrawDetails.childBufNo, chunk->treeDrawDetails.vertStart, chunk->treeDrawDetails.vertCount);
+				callsPerFrame++;
 			}
 		}
 	}
+	cerr << "\nCalls per frame " << callsPerFrame;
+	pRenderer->setVAO(0);
 }
+
 
 /** The draw-yourself function. */
 void CTerrain::draw() {

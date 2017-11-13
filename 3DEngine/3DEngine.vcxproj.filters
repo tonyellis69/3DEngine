@@ -242,6 +242,9 @@
     <ClCompile Include="..\src\renderer\baseTexture.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -498,6 +501,9 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\baseTexture.h">
       <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\font.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

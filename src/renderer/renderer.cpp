@@ -509,14 +509,15 @@ void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
 
 /**	Prepare to render to the given texture, leaving the actual drawing to the user. */
 void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
+
+	
 	CRenderTexture* glTex = (CRenderTexture*)&texture;
 	glDisable(GL_BLEND); //Otherwise this messes up text texture alpha
 	glGenFramebuffers(1, &hFrameBuffer);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
-
+	
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glTex->handle, 0);
-
 
 	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, DrawBuffers);
@@ -531,6 +532,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 void CRenderer::endRenderToTexture() {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &hFrameBuffer);
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_BLEND);
 }
@@ -671,7 +673,8 @@ void CRenderer::drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multi
 	int nIndices = multiBuf.instancedBuf->getNoIndices();
 	glDrawElementsInstancedBaseInstance(getGLdrawMode(drawMode), nIndices, multiBuf.indexType, 0,
 		vertCount, vertStart);
-}
+//	cerr << "\nnIndices " << nIndices << " vertCount" << vertCount << " vertStart " << vertStart;
+} 
 
 
 

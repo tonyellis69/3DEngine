@@ -65,4 +65,12 @@ glm::uvec4  CRenderTexture::getPixel(int x, int y) {
 	return returnData;
 }
 
+/** Create an RGBA texture from data. */
+void CRenderTexture::create(unsigned char * data, int w, int h) {
+	handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, 0);
+	width = w;
+	height = h;
+	channels = 4;
+}
+
 

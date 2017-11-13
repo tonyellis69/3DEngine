@@ -11,7 +11,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	type = uiLabel;
 	textColour = vec4(1, 1, 1, 1);
 
-	
+	drawBorder = false;
 
 	pDrawFuncs->registerControl(*this);
 }
@@ -33,6 +33,10 @@ void CGUIlabel2::setTextColour(float r, float g, float b, float a) {
 
 void CGUIlabel2::setTextColour(UIcolour  colour) {
 	setTextColour(colour.r, colour.g, colour.b, colour.a);
+}
+
+void CGUIlabel2::setMultiLine(bool onOff) {
+	textBuf.setMultiLine(onOff);
 }
 
 void CGUIlabel2::DrawSelf() {

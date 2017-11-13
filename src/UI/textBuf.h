@@ -20,9 +20,10 @@ public:
 	void setTextColour(glm::vec4& newColour);
 	void renderText();
 	int nextLineBreak(int lineStart);
+	void setMultiLine(bool onOff);
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
-
+	
 private:
 	void writeToTexture(CBuf& buf, float lineWidth);
 

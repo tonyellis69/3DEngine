@@ -23,7 +23,7 @@ CBaseApp::CBaseApp(void)  {
 
 	cerr << "\nBaseApp constructor.";
 
-	initWatches();
+	
 
 	Engine.dataPath = homeDir + "Data\\";
 	Engine.Renderer.dataPath = homeDir + "Data\\";
@@ -33,8 +33,6 @@ CBaseApp::CBaseApp(void)  {
 	EatKeys();
 
 	UIeng.pEngine = &Engine;
-	
-	
 
 	Time = LastTime = 0;
 	mouseX = mouseY = 0;
@@ -44,10 +42,12 @@ CBaseApp::CBaseApp(void)  {
 	
 	//Set up engine for rendering
 	Engine.init(Window.hWnd);
+	loadSystemFonts();
 
 	RegisterUIfunctors();
 	
 	quitOnEsc = true;
+	initWatches();
 }
 
 void CBaseApp::RegisterHandlers() {
@@ -344,40 +344,40 @@ void CBaseApp::exit() {
 
 
 void CBaseApp::initWatches() {
-	wLabel1 = new CGUIlabel(800,100,400,50);
-	wLabel1->txtColour = UIwhite;
-	wLabel1->TextFont = 0;
+	wLabel1 = new CGUIlabel2(800,100,400,50);
+	wLabel1->setTextColour(UIwhite);
+	wLabel1->setFont(*Engine.CurrentFont);
 	GUIroot.Add(wLabel1);
 
-	wLabel2 = new CGUIlabel(800,150,400,50);
-	wLabel2->txtColour = UIwhite;
-	wLabel2->TextFont = 0;
+	wLabel2 = new CGUIlabel2(800,150,400,50);
+	wLabel2->setTextColour(UIwhite);
+	wLabel2->setFont(*Engine.CurrentFont);
 	GUIroot.Add(wLabel2);
 
-	wLabel3 = new CGUIlabel(800,200,400,50);
-	wLabel3->txtColour = UIwhite;
-	wLabel3->TextFont = 0;
+	wLabel3 = new CGUIlabel2(800,200,400,50);
+	wLabel3->setTextColour(UIwhite);
+	wLabel3->setFont(*Engine.CurrentFont);
 	GUIroot.Add(wLabel3);
 
-	consoleLbl = new CGUIlabel(10,10,100,100);
-	consoleLbl->txtColour = UIwhite;
+	consoleLbl = new CGUIlabel2(10,10,100,100);
+	consoleLbl->setTextColour(UIwhite);
 	consoleLbl->anchorBottom = 10;
 	consoleLbl->anchorRight = 10;
-	consoleLbl->multiLine = true;
-	consoleLbl->TextFont = 0;
+	consoleLbl->setMultiLine(true);
+	consoleLbl->setFont(*Engine.CurrentFont);
 	GUIroot.Add(consoleLbl);
 
 	pTimer = &Engine.Time;
 }
 
 void CBaseApp::updateWatches() {
-	wLabel1->Text = watch::watch1.str();
+	wLabel1->setText(watch::watch1.str());
 	watch::watch1.str("");
-	wLabel2->Text = watch::watch2.str();
+	wLabel2->setText(watch::watch2.str());
 	watch::watch2.str("");
-	wLabel3->Text = watch::watch3.str();
+	wLabel3->setText(watch::watch3.str());
 	watch::watch3.str("");
-	consoleLbl->Text = watch::con.str();
+	consoleLbl->setText(watch::con.str());
 //	watch::con.str("");
 	//TO DO: how to handle? messages to the console made every frame will quickly flood it
 	//unless we clear it every frame. But occasional messages will vanish every frame if

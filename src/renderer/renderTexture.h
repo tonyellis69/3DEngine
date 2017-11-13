@@ -14,6 +14,7 @@ public:
 	~CRenderTexture();
 	void resize(int w, int h);
 	glm::uvec4 getPixel(int x, int y);
+	void create(unsigned char* data, int w, int h);
 
 	unsigned int handle;
 	CRenderer* pRenderer;	

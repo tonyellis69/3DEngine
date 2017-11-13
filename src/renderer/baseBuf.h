@@ -21,6 +21,7 @@ public:
 	virtual void storeVertexes(vert3_t& verts, vert3_t& normals) {};
 	virtual void storeIndex(unsigned int * indices, unsigned int nIndices) {};
 	virtual void setSize(unsigned int size) {};
+	virtual void reduceReportedSize(unsigned int size) {};
 	virtual void copyBuf(CBaseBuf& srcBuf, unsigned int size) {};
 	virtual unsigned int getBufHandle() { return 0; };
 	virtual unsigned int getBufSize() { return 0; };

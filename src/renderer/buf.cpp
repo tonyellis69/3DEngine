@@ -151,6 +151,11 @@ void CBuf::setSize(unsigned int size) {
 	bufSize = size;
 }
 
+/** Change the reported size of the buffer without erasing memory. */
+void CBuf::reduceReportedSize(unsigned int size) {
+	bufSize = size;
+}
+
 void CBuf::createBuf(unsigned int size) {	
 	if (hBuffer)
 		glDeleteBuffers(1, &hBuffer);
@@ -193,6 +198,10 @@ void CBuf::freeMem() {
 	}
 	if (hVAO != 0) {
 		glDeleteVertexArrays(1,&hVAO);
+	}
+	if (hIndex != 0) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
+		glDeleteBuffers(1, &hIndex);
 	}
 }
 
@@ -246,5 +255,5 @@ CRenderer * CBuf::getRenderer() {
 
 
 CBuf::~CBuf() {
-//	freeMem();
+	freeMem();
 }

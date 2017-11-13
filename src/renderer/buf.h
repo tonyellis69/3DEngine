@@ -21,6 +21,7 @@ public:
 	void storeIndex(unsigned int * indices, unsigned int nIndices);
 	void storeLayout(int attr1, int attr2, int attr3, int attr4);
 	void setSize(unsigned int size);
+	void reduceReportedSize(unsigned int size);
 	void createBuf(unsigned int size);
 	void copyBuf(CBaseBuf& srcBuf, unsigned int size);
 	unsigned int getBufHandle();

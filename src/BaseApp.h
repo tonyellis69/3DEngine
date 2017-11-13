@@ -113,10 +113,10 @@ public:
 
 	int viewWidth, viewHeight;
 
-	CGUIlabel* wLabel1;
-	CGUIlabel* wLabel2;
-	CGUIlabel* wLabel3;
-	CGUIlabel* consoleLbl;
+	CGUIlabel2* wLabel1;
+	CGUIlabel2* wLabel2;
+	CGUIlabel2* wLabel3;
+	CGUIlabel2* consoleLbl;
 
 
 	unsigned int hTextureShader;
