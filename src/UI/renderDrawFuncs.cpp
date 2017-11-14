@@ -31,9 +31,15 @@ void CRenderDrawFuncs::loadShaders() {
 
 /** Register this control with the uiEngine, storing its details for drawing. */
 void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
-	
+
 	quadBufs[control.uniqueID].border = (CBuf*)pRenderer->createBuffer();
 	quadBufs[control.uniqueID].rect = (CBuf*)pRenderer->createBuffer();
+
+	setScreenDimensions(control);
+}
+
+void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
+
 	//A B
 	//C D
 	vBuf::T2DtexVert corners[4];
@@ -46,10 +52,7 @@ void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
 	corners[2].tex = vec2(0,1);
 	corners[3].tex = vec2(1,1);
 
-//	corners[0].tex = vec2(0,1);
-//	corners[1].tex = vec2(1, 1);
-//	corners[2].tex = vec2(0, 0);
-//	corners[3].tex = vec2(1, 0);
+
 
 	unsigned int index[4] = { 2,3,0,1 };
 	quadBufs[control.uniqueID].rect->storeVertexes(corners, sizeof(corners), 4);
@@ -121,6 +124,12 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 ///	glm::vec4 tmp = glm::vec4(chars[0].v, 0, 1);
 //	tmp = tmp * glm::mat4(1);
 
+}
+
+/** Update the vertexes defining the dimensions of this control. */
+void CRenderDrawFuncs::updateScreenDimensions(CGUIbetterBase & control) {
+	setScreenDimensions(control);
+	//TO DO: more elegant and efficient to update matrix, not all the verts!
 }
 
 CRenderDrawFuncs::~CRenderDrawFuncs() {

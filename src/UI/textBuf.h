@@ -5,6 +5,7 @@
 #include "glm\glm.hpp"
 
 #include "..\TexFont.h"
+#include "font.h"
 #include "..\renderer\renderer.h"
 
 #include "renderDrawFuncs.h"
@@ -16,7 +17,7 @@ public:
 	CTextBuffer();
 	void setSize(int w, int h);
 	void setText(std::string& str);
-	void setFont(CTexFont& newFont);
+	void setFont(CFont& newFont);
 	void setTextColour(glm::vec4& newColour);
 	void renderText();
 	int nextLineBreak(int lineStart);
@@ -30,7 +31,7 @@ private:
 	glm::i32vec2 size;
 	CRenderer* pRenderer;
 	std::string text;
-	CTexFont* font;
+	CFont* font;
 	glm::vec4 textColour;
 
 	TTextAlign TextAlign; ///<Records whether the text is centred, etc, in its area.

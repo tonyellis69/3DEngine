@@ -10,6 +10,7 @@ CTextBuffer::CTextBuffer() {
 	textColour = glm::vec4(1, 1, 1, 1);
 	multiLine = false;
 	TextAlign = tleft;
+	font = NULL;
 }
 
 void CTextBuffer::setSize(int w, int h) {
@@ -25,9 +26,9 @@ void CTextBuffer::setText(std::string & str) {
 	renderText();
 }
 
-void CTextBuffer::setFont(CTexFont & newFont) {
+void CTextBuffer::setFont(CFont & newFont) {
 	font = &newFont;
-	glyphHeight = font->table[0]->Rect.height; //TO DO: kludge, do beter
+	glyphHeight = (float)font->lineHeight; 
 	renderText();
 }
 
@@ -37,7 +38,10 @@ void CTextBuffer::setTextColour(glm::vec4 & newColour) {
 
 /** Draw the current text to the buffer (texture). */
 void CTextBuffer::renderText() {
-	
+	if (!font) {
+		std::cerr << "\nAttempt to render to textbuffer before font assigned.";
+		return;
+	}
 	vector<vBuf::T2DtexVert> chars;
 	vector<unsigned int> index;
 	chars.resize(text.size() * 4);
@@ -51,16 +55,16 @@ void CTextBuffer::renderText() {
 		nextBreak = nextLineBreak(0);
 	
 	for (int c = 0; c < text.size(); c++) {
-		Glyph* glyph = font->table[text[c]];
+		glyph* glyph = font->table[text[c]];
 		//construct quads
 		chars[v].v = blCorner; //A
-		chars[v + 1].v = blCorner + glm::vec2(glyph->Rect.width, 0.0f); //B
-		chars[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->Rect.height); //C
-		chars[v + 3].v = blCorner + glm::vec2(glyph->Rect.width, -glyph->Rect.height); //D
-		chars[v].tex = glm::vec2(glyph->Rect.Map.u, glyph->Rect.Map.v);
-		chars[v + 1].tex = glm::vec2(glyph->Rect.Map.s, glyph->Rect.Map.v);
-		chars[v + 2].tex = glm::vec2(glyph->Rect.Map.u, glyph->Rect.Map.t);
-		chars[v + 3].tex = glm::vec2(glyph->Rect.Map.s, glyph->Rect.Map.t);
+		chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
+		chars[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->height); //C
+		chars[v + 3].v = blCorner + glm::vec2(glyph->width, -glyph->height); //D
+		chars[v].tex = glm::vec2(glyph->u, glyph->v);
+		chars[v + 1].tex = glm::vec2(glyph->s, glyph->v);
+		chars[v + 2].tex = glm::vec2(glyph->u, glyph->t);
+		chars[v + 3].tex = glm::vec2(glyph->s, glyph->t);
 
 		index.push_back(v + 2); index.push_back(v + 3); index.push_back(v);
 		index.push_back(v); index.push_back(v + 3); index.push_back(v + 1);
@@ -71,8 +75,8 @@ void CTextBuffer::renderText() {
 			nextBreak = nextLineBreak(c+1);
 		}
 		else {
-			blCorner += glm::vec2(glyph->Rect.width, 0);
-			lineWidth += glyph->Rect.width;
+			blCorner += glm::vec2(glyph->width, 0);
+			lineWidth += glyph->width;
 		}
 		v += 4;
 	}
@@ -94,7 +98,7 @@ int CTextBuffer::nextLineBreak(int lineStart) {
 		
 		if (isspace(text[c]))
 			breakDist = c;
-		dist += font->table[text[c]]->Rect.width;
+		dist += font->table[text[c]]->width;
 		c++;
 	}
 	return breakDist;
@@ -123,7 +127,7 @@ void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
 	glm::mat4 orthoMatrix = glm::ortho<float>(-xOffset, size.x-xOffset, -halfSize.y + yOffset, halfSize.y + yOffset);
 	
 	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, 0 + 1); //attach texture to textureUnit (0)
+	pRenderer->attachTexture(0,font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);

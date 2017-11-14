@@ -129,9 +129,11 @@
     <ClCompile Include="..\src\shapes.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
     <ClCompile Include="..\src\skyDome.cpp" />
+    <ClCompile Include="..\src\smallsysf.cpp" />
     <ClCompile Include="..\Src\SoundLib.cpp" />
     <ClCompile Include="..\src\Sprite.cpp" />
     <ClCompile Include="..\src\superChunk.cpp" />
+    <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
     <ClCompile Include="..\Src\TexFont.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
@@ -141,6 +143,7 @@
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbetterBase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton.cpp" />
+    <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
     <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
     <ClCompile Include="..\src\UI\GUIdlg.cpp" />
@@ -226,6 +229,7 @@
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbetterBase.h" />
     <ClInclude Include="..\src\UI\GUIbutton.h" />
+    <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
     <ClInclude Include="..\src\UI\GUIcontainer.h" />
     <ClInclude Include="..\src\UI\GUIdlg.h" />

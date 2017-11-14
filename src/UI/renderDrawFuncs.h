@@ -28,6 +28,8 @@ public:
 	void setScreenSize(int width, int height);
 	unsigned int getTextureHandle(const std::string& textureName);
 	void drawTexture(CGUIbetterBase & control, CBaseTexture& texture);
+	void setScreenDimensions(CGUIbetterBase & control);
+	void updateScreenDimensions(CGUIbetterBase& control);
 
 //private:
 	CRenderer* pRenderer;

@@ -245,6 +245,15 @@
     <ClCompile Include="..\src\UI\font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\SysFnt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\smallsysf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIbutton2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -332,9 +341,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\simplexnoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\smallsysf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\SOIL.h">
@@ -503,6 +509,12 @@
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\smallsysf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIbutton2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

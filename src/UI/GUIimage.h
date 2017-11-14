@@ -8,6 +8,9 @@ public:
 	CGUIimage(int x, int y, int w, int h);
 	void DrawSelf();
 	void setTexture(CBaseTexture& imageTexture);
+	
 
 	CBaseTexture* texture;
+
+
 };

@@ -30,3 +30,5 @@ void CGUIimage::DrawSelf() {
 void CGUIimage::setTexture(CBaseTexture& imageTexture) {
 	texture = &imageTexture;
 }
+
+

@@ -43,11 +43,28 @@ CBaseApp::CBaseApp(void)  {
 	//Set up engine for rendering
 	Engine.init(Window.hWnd);
 	loadSystemFonts();
+	GUIroot.setDefaultFont(smallSysFont);
 
 	RegisterUIfunctors();
 	
 	quitOnEsc = true;
 	initWatches();
+}
+
+
+
+/** Load the default fonts, currently stored as static data. */
+void CBaseApp::loadSystemFonts() {
+	std::istringstream ss;
+	std::string tmp((char*)SysFnt + 2, 33600);
+	ss.str(tmp);
+	sysFont.loadFromStream(ss);
+
+	ss.clear();
+	tmp.clear();
+	tmp = std::string((char*)SmallSysFnt + 2, 17728);
+	ss.str(tmp);
+	smallSysFont.loadFromStream(ss);
 }
 
 void CBaseApp::RegisterHandlers() {
@@ -345,27 +362,27 @@ void CBaseApp::exit() {
 
 void CBaseApp::initWatches() {
 	wLabel1 = new CGUIlabel2(800,100,400,50);
+	wLabel1->setFont(sysFont);
 	wLabel1->setTextColour(UIwhite);
-	wLabel1->setFont(*Engine.CurrentFont);
 	GUIroot.Add(wLabel1);
 
 	wLabel2 = new CGUIlabel2(800,150,400,50);
+	wLabel2->setFont(sysFont);
 	wLabel2->setTextColour(UIwhite);
-	wLabel2->setFont(*Engine.CurrentFont);
 	GUIroot.Add(wLabel2);
 
 	wLabel3 = new CGUIlabel2(800,200,400,50);
+	wLabel3->setFont(sysFont);
 	wLabel3->setTextColour(UIwhite);
-	wLabel3->setFont(*Engine.CurrentFont);
 	GUIroot.Add(wLabel3);
 
-	consoleLbl = new CGUIlabel2(10,10,100,100);
+	consoleLbl = new CGUIlabel2(10,10,100,100);	
+	consoleLbl->setFont(sysFont);
 	consoleLbl->setTextColour(UIwhite);
 	consoleLbl->anchorBottom = 10;
 	consoleLbl->anchorRight = 10;
 	consoleLbl->setMultiLine(true);
-	consoleLbl->setFont(*Engine.CurrentFont);
-	GUIroot.Add(consoleLbl);
+	//GUIroot.Add(consoleLbl); //anchor makes this screen size, so it masks all other controls. Rethink
 
 	pTimer = &Engine.Time;
 }

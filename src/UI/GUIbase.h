@@ -3,6 +3,7 @@
 #include <vector>
 #include "..\Delegate.h"
 #include "..\renderer\texManager.h"
+#include "font.h"
 
 //#include "GUIbetterBase.h"
 
@@ -101,13 +102,14 @@ public:
 	virtual void drawCtrlBorder(CGUIbetterBase& control) {};
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
 	virtual void drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {};
+	virtual void updateScreenDimensions(CGUIbetterBase& control) {};
 };
 
 
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
-			uiImage,uiLabel};
+			uiImage,uiLabel,uiButton};
 
 
 
@@ -145,13 +147,17 @@ public:
 	int getControlNo();
 	virtual void message(CGUIbase& sender, CMessage& msg);
 	virtual void setEnabled(bool onOff);
+	virtual bool getEnabled();
 	virtual void captureKeyboard();
 	virtual void uncaptureKeyboard();
+	virtual void setVisible(bool onOff);
+	virtual bool getVisible();
 
 
 	void GenName(char* NameStr, int Count);
 	void SetName(char* NameStr);
 
+	void setDefaultFont(CFont& font);
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -206,9 +212,11 @@ public:
 	static CGUIroot* rootUI; ///<Points to root UI control.
 	static CGUImouse* mouse; ///<Points to the current mouse object.
 
+	bool mousePassthru;
+
 protected:
 	bool enabled; ///<False if this control has been deactivated.
-
+	static CFont defaultFont;
 public:
 	//static DelegateP<void,int> setFont;
 };

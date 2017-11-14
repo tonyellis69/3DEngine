@@ -673,7 +673,7 @@ void CTerrain::drawTrees(glm::mat4& mvp, std::vector<CSuperChunk*>& drawList) {
 			}
 		}
 	}
-	cerr << "\nCalls per frame " << callsPerFrame;
+	//cerr << "\nCalls per frame " << callsPerFrame;
 	pRenderer->setVAO(0);
 }
 

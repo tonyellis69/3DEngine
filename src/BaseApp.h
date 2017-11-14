@@ -20,7 +20,11 @@
 #include "UIengine.h"
 
 #include "UI\renderDrawFuncs.h"
+#include "UI\font.h"
 
+#include "SysFnt.h"
+#include "smallsysf.h"
+//extern unsigned char SysFnt;
 
 #include <iostream> //for cerr
 using namespace std;
@@ -33,6 +37,7 @@ public:
 	CBaseApp(void);
 	~CBaseApp(void);
 
+	void loadSystemFonts();
 	void RegisterHandlers();
 	void start();
 	void SetWindow(int width, int height);
@@ -122,6 +127,9 @@ public:
 	unsigned int hTextureShader;
 	unsigned int hTexture;
 	unsigned int hTextureMVP;
+
+	CFont sysFont; ///<Default font
+	CFont smallSysFont;
 
 	};
 

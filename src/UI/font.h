@@ -24,7 +24,8 @@ class CFont {
 public:
 	CFont();
 	void loadFromStream(std::istream &input);
-
+	
+	int lineHeight;
 	std::vector<glyph> glyphs;
 	glyph* table[256];
 	CRenderTexture texture;

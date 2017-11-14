@@ -36,6 +36,8 @@ CGUIbase::CGUIbase()  {
 	xPos = 0; yPos = 0; width = 30; height = 20;
 
 	enabled = true;
+
+	mousePassthru = false;
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
@@ -55,10 +57,11 @@ CDrawFuncs* CGUIbase::pDrawFuncs;
 CGUImouse* CGUIbase::mouse;
 CGUIbaseEngine* CGUIbase::pGUIeng;
 
+CFont CGUIbase::defaultFont;
 
 /** Returns true if the given point is inside this control's area. */
 bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY) {
-	if (!Control.visible || !Control.enabled)
+	if (!Control.visible || !Control.enabled || Control.mousePassthru)
 		return false;
 	return ( (Control.xPos < mouseX) && ((Control.xPos + Control.width) > mouseX)
 		&& (Control.yPos < mouseY) && ((Control.yPos + Control.height) > mouseY));
@@ -71,11 +74,12 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		return;
 
 	//otherwise, recursively test message against this control's child controls
-	for (size_t i=0;i < Control.size();i++)
-		if ( IsOnControl( *Control[i],mouseX, mouseY) ) {
-			Control[i]->MouseMsg(Msg,mouseX - Control[i]->xPos, mouseY - Control[i]->yPos,key); 
+	for (size_t i = 0; i < Control.size(); i++) {
+		if (IsOnControl(*Control[i], mouseX, mouseY)) {
+			Control[i]->MouseMsg(Msg, mouseX - Control[i]->xPos, mouseY - Control[i]->yPos, key);
 			return;
 		}
+	}
 	//Still here? Message is for this control
 	switch (Msg) {
 	case WM_MOUSEMOVE : {
@@ -190,6 +194,7 @@ void CGUIbase::updateAppearance() {
 	//3. Recalculate screen position
 	screenPos.x = parent->screenPos.x + xPos; screenPos.y = parent->screenPos.y + yPos;
 
+
 	//repeat through children
 	for (size_t i=0;i < Control.size();i++)
 		Control[i]->updateAppearance();
@@ -262,6 +267,10 @@ void CGUIbase::SetName(char* NameStr) {
 	delete Name;
 	Name =  new char[l+1];
 	strcpy(Name,NameStr);
+}
+
+void CGUIbase::setDefaultFont(CFont & font) {
+	defaultFont = font;
 }
 
 
@@ -364,6 +373,11 @@ void CGUIbase::setEnabled(bool onOff) {
 	enabled = onOff;
 }
 
+bool CGUIbase::getEnabled()
+{
+	return enabled;
+}
+
 /**Capture the keyboard for this control, forcing any other control holding
 	it to lose it.*/
 void CGUIbase::captureKeyboard() {
@@ -378,5 +392,13 @@ void CGUIbase::uncaptureKeyboard() {
 	if (KeyCapture != NULL)
 		KeyCapture->message(*this,msg);
 	KeyCapture = NULL;
+}
+
+void CGUIbase::setVisible(bool onOff) {
+	visible = onOff;
+}
+
+bool CGUIbase::getVisible() {
+	return visible;
 }
 

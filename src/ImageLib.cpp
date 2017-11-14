@@ -185,14 +185,14 @@ CTexFont* CImageLib::loadFont(char* Filename) {
 
 CTexFont* CImageLib::LoadSysFont() {
 	std::istringstream ss;
-	std::string tmp((char*) SysFnt+2, sizeof(SysFnt));
+	std::string tmp((char*) SysFnt+2, 33600);
 	ss.str(tmp);
 	return loadFontFromStream(  ss);
 }
 
 CTexFont* CImageLib::LoadSmallSysFont() {
 	std::istringstream ss;
-	std::string tmp((char*) SmallSysFnt+2, sizeof(SmallSysFnt));
+	std::string tmp((char*) SmallSysFnt+2, 17728);
 	ss.str(tmp);
 	return loadFontFromStream(  ss);
 }

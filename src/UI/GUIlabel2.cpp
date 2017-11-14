@@ -5,18 +5,18 @@ using namespace glm;
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	xPos = x; yPos = y; width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
-	
+	textBuf.setFont(defaultFont);
 	textBuf.setSize(w, h);
 
 	type = uiLabel;
 	textColour = vec4(1, 1, 1, 1);
 
 	drawBorder = false;
-
+	mousePassthru = true;
 	pDrawFuncs->registerControl(*this);
 }
 
-void CGUIlabel2::setFont(CTexFont & font) {
+void CGUIlabel2::setFont(CFont& font) {
 	textBuf.setFont(font);
 	textBuf.renderText();
 }

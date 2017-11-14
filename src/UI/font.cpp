@@ -14,13 +14,14 @@ CFont::CFont() {
 /** Create font from the given stream. */
 void CFont::loadFromStream(std::istream & input) {
 
-	int width, height, nChars, lineHeight;
+	int width, height, nChars;
 	float texLineHeight;
 	readObject(width, input);
 	readObject(height, input);
 	readObject(lineHeight, input);
 	readObject(nChars, input);
 	texLineHeight = static_cast<float>(lineHeight) / height;
+
 
 	// Read every glyph, store it in the glyph array and set the right
 	// pointer in the table.
