@@ -15,8 +15,13 @@ public:
 class CGUIbetterBase : public CGUIbase{
 public:
 	CGUIbetterBase();
-	void setBorderColour(UIcolour colour);
+	void setBorderColour(const UIcolour& colour);
+	void setBackColour1(const UIcolour& colour);
+	void setBackColour2(const UIcolour& colour);
 	void updateAppearance();
+
+	void SetPos(int x, int y, int w, int h);
+	void setPos(int x, int y);
 
 	unsigned int uniqueID; ///<Unique identifier for each control;
 	guiRect drawBox; ///<Defines the dimensions of the control for drawing (replaces screenPos).

@@ -3,7 +3,7 @@
 #include "GUIicons.h"
 #include "GUIlabel.h"
 
-
+#include "GUIlabel2.h"
 
 /** Simple check button control. */
 
@@ -17,5 +17,7 @@ public:
 	RadioOrientationType Orientation; ///<Which way around the label and icon go.
 	bool Set; ///<Whether this button is selected or not.
 	int iconset; ///<Identifies what tileset icons will be taken from.
+
+	CGUIlabel2* label;
 };
 

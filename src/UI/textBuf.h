@@ -22,6 +22,8 @@ public:
 	void renderText();
 	int nextLineBreak(int lineStart);
 	void setMultiLine(bool onOff);
+	void setHorizontalAlignment(TTextAlign align);
+	TTextAlign getJustification();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	

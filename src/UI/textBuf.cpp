@@ -86,6 +86,7 @@ void CTextBuffer::renderText() {
 	buf.storeIndex(index.data(), index.size());
 	buf.storeLayout(2, 2, 0, 0);
 
+	textTexture.clear();
 	writeToTexture(buf, lineWidth);
 }
 
@@ -108,9 +109,17 @@ void CTextBuffer::setMultiLine(bool onOff) {
 	multiLine = onOff;
 }
 
+void CTextBuffer::setHorizontalAlignment(TTextAlign align) {
+	TextAlign = align;
+}
+
+TTextAlign CTextBuffer::getJustification()
+{
+	return TextAlign;
+}
+
 /** Write the given series of text-quads to the storage texture. */
 void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
-
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
 	float xOffset = 0; float yOffset = 0 - (glyphHeight/2.0f);
 	if (TextAlign == tcentred) {

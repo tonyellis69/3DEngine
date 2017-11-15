@@ -11,7 +11,15 @@ CGUIbetterBase::CGUIbetterBase() {
 	visible = true;
 }
 
-void CGUIbetterBase::setBorderColour(UIcolour colour) {
+void CGUIbetterBase::setBackColour1(const UIcolour & colour) {
+	backColour1 = colour;
+}
+
+void CGUIbetterBase::setBackColour2(const UIcolour & colour) {
+	backColour1 = colour;
+}
+
+void CGUIbetterBase::setBorderColour(const UIcolour& colour) {
 	borderColour = colour;
 }
 
@@ -64,4 +72,18 @@ void CGUIbetterBase::updateAppearance() {
 	//repeat through children
 	for (size_t i = 0; i < Control.size(); i++)
 		Control[i]->updateAppearance();
+}
+
+/** Set the dimensions and relative position of the control. */
+void CGUIbetterBase::SetPos(int x, int y, int w, int h) {
+	xPos = x; yPos = y; width = w; height = h;
+	drawBox.pos = glm::i32vec2(x, y);
+	drawBox.size = glm::i32vec2(w, h);
+	updateAppearance();
+}
+
+void CGUIbetterBase::setPos(int x, int y) {
+	xPos = x; yPos = y;
+	drawBox.pos = glm::i32vec2(x, y);
+	updateAppearance();
 }

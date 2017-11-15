@@ -9,7 +9,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	textBuf.setSize(w, h);
 
 	type = uiLabel;
-	textColour = vec4(1, 1, 1, 1);
+	setTextColour(0, 0, 0, 1);
 
 	drawBorder = false;
 	mousePassthru = true;
@@ -39,6 +39,16 @@ void CGUIlabel2::setMultiLine(bool onOff) {
 	textBuf.setMultiLine(onOff);
 }
 
+void CGUIlabel2::setHorizontalAlignment(TTextAlign align) {
+	textBuf.setHorizontalAlignment(align);
+	textBuf.renderText();
+}
+
+TTextAlign CGUIlabel2::getJustification() {
+	return textBuf.getJustification();
+}
+
+
 void CGUIlabel2::DrawSelf() {
 	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
 
@@ -48,4 +58,18 @@ void CGUIlabel2::DrawSelf() {
 	}
 
 
+}
+
+void CGUIlabel2::borderOn(bool onOff) {
+	drawBorder = onOff;
+}
+
+/** Set the dimensions and relative position of the control. */
+void CGUIlabel2::SetPos(int x, int y, int w, int h) {
+	xPos = x; yPos = y; width = w; height = h;
+	drawBox.pos = glm::i32vec2(x, y);
+	drawBox.size = glm::i32vec2(w, h);
+	textBuf.setSize(w, h);
+	//textBuf.renderText();
+	updateAppearance();
 }

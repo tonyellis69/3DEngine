@@ -1,3 +1,5 @@
+
+
 #include "GUIbutton2.h"
 
 using namespace glm;
@@ -10,8 +12,9 @@ CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) {
 
 	pDrawFuncs->registerControl(*this);
 
-	label = new CGUIlabel2(5, 5, w - 5, h - 5);
+	label = new CGUIlabel2(5, 5, w - 10, h - 10);
 	label->setText("Button");
+	label->setHorizontalAlignment(tcentred);
 	Add(label);
 }
 
@@ -22,7 +25,23 @@ void CGUIbutton2::DrawSelf() {
 	else
 		setBorderColour(UIlightGrey);
 	pDrawFuncs->drawCtrlBorder(*this);
+
+	if (MouseDown == this) {
+		setBackColour1(oldbackColour2);
+		setBackColour2(oldbackColour1);
+	}
+	else {
+		setBackColour1(oldbackColour1);
+		setBackColour2(oldbackColour2);
+	}
 	
-	//draw button
 	pDrawFuncs->drawCtrlRect(*this);
+}
+
+
+void CGUIbutton2::OnClick(const int mouseX, const int mouseY) {
+	CMessage msg;
+	msg.Msg = uiClick;
+	pDrawFuncs->handleUImsg(*this, msg);
+
 }

@@ -13,7 +13,11 @@ public:
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
 	void setMultiLine(bool onOff);
+	void setHorizontalAlignment(TTextAlign align);
+	TTextAlign getJustification();
 	void DrawSelf();
+	void borderOn(bool onOff);
+	void SetPos(int x, int y, int w, int h);
 
 	CTextBuffer textBuf;
 	glm::vec4 textColour;

@@ -65,7 +65,7 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
 	quadBufs[control.uniqueID].border->storeLayout(2, 2,0, 0);
 }
 
-/** Draw the drawBox of this control. */
+/** Draw the drawBox rectangle of this control. */
 void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 	CBuf* buf = quadBufs[control.uniqueID].rect;
 	pRenderer->setShader(uiRectShader);

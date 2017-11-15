@@ -1,5 +1,7 @@
 #include "GUIcheckButton.h"
 
+
+
 const int checked = 2;
 const int unChecked = 0;
 
@@ -12,6 +14,13 @@ CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
 	Set = false;
 	type = checkButton;
 	iconset = defaultIconset;
+
+	label = new CGUIlabel2(5, 5, w - (10 + iconOffset), h - 10);
+	label->setText("check");
+	label->setHorizontalAlignment(tright);
+	//label->borderOn(true);
+	Add(label);
+
 }
 
 void CGUIcheckButton::DrawSelf( ) {
@@ -20,22 +29,24 @@ void CGUIcheckButton::DrawSelf( ) {
 
 	int w = 0; int reducedWidth = width - iconOffset;
 
-	if (TextAlign == tcentred)
+	if (label->getJustification() == tcentred)
 		w = reducedWidth;
-	if (TextAlign == tright)
+	if (label->getJustification() == tright)
 		w = -reducedWidth;
 
 	int lblPos, iconPos;
 	if (Orientation == lblFirst) {
 		iconPos =  screenPos.x + reducedWidth + (iconOffset >> 1) ;
 		lblPos = screenPos.x;
+		label->setPos(5,5);
 	} else {
 		lblPos =  screenPos.x + iconOffset;
 		iconPos = screenPos.x + (iconOffset >> 1);
+		label->setPos(10 + iconOffset, 5);
 	}
  
 	//Write the text at the given point
-	pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
+	//pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
 	//draw the icon
 	pDrawFuncs->setIconset(iconset);
 	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
@@ -43,6 +54,8 @@ void CGUIcheckButton::DrawSelf( ) {
 		pDrawFuncs->drawIcon(checked, iconPos,screenPos.y + (height >> 1));
 	else
 		pDrawFuncs->drawIcon(unChecked, iconPos,screenPos.y + (height >> 1));
+	
+	pDrawFuncs->drawBorder(screenPos.x, screenPos.y, width, height);
 }
 
 void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {

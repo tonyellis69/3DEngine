@@ -73,4 +73,8 @@ void CRenderTexture::create(unsigned char * data, int w, int h) {
 	channels = 4;
 }
 
+void CRenderTexture::clear() {
+	resize(width, height);
+}
+
 
