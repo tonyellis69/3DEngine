@@ -2,7 +2,9 @@
 #include "GUIbase.h"
 #include "GUIpanel.h"
 #include "GUIlabel.h"
+#include "GUIlabel2.h"
 #include "GUIbutton.h"
+#include "GUIbutton2.h"
 
 
 /** Base class for creating dialogue boxes. */
@@ -14,7 +16,7 @@ public:
 	void setHeader(const string& text);
 	//void DrawSelf();
 
-	CGUIlabel* header; ///<Dialogue heading.
+	CGUIlabel2* header; ///<Dialogue heading.
 
 };
 
@@ -23,18 +25,18 @@ public:
 	CGUIsysDlg();
 	void setText(const string& text);
 
-	CGUIlabel* body; ///<Dialogue body text.
+	CGUIlabel2* body; ///<Dialogue body text.
 };
 
 class CGUIyesNoDlg : public CGUIsysDlg {
 public:
 	CGUIyesNoDlg();
 
-	CGUIbutton* yes; //TO DO: do we even need these?
-	CGUIbutton* no;
+	CGUIbutton2* yes; //TO DO: do we even need these?
+	CGUIbutton2* no;
 };
 
-class CGUIdlgButton : public CGUIbutton {
+class CGUIdlgButton : public CGUIbutton2 {
 public:
 	CGUIdlgButton(int x, int y, int w, int h);
 	void OnClick(const  int mouseX, const  int mouseY);

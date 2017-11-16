@@ -19,13 +19,8 @@ CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) {
 }
 
 void CGUIbutton2::DrawSelf() {
-	
-	if (MouseOver == this)
-		setBorderColour(UIdarkGrey);
-	else
-		setBorderColour(UIlightGrey);
-	pDrawFuncs->drawCtrlBorder(*this);
 
+	//draw rectangle
 	if (MouseDown == this) {
 		setBackColour1(oldbackColour2);
 		setBackColour2(oldbackColour1);
@@ -34,8 +29,13 @@ void CGUIbutton2::DrawSelf() {
 		setBackColour1(oldbackColour1);
 		setBackColour2(oldbackColour2);
 	}
-	
 	pDrawFuncs->drawCtrlRect(*this);
+
+	if (MouseOver == this)
+		setBorderColour(UIdarkGrey);
+	else
+		setBorderColour(UIlightGrey);
+	pDrawFuncs->drawCtrlBorder(*this);
 }
 
 
@@ -44,4 +44,8 @@ void CGUIbutton2::OnClick(const int mouseX, const int mouseY) {
 	msg.Msg = uiClick;
 	pDrawFuncs->handleUImsg(*this, msg);
 
+}
+
+void CGUIbutton2::setText(const std::string & text) {
+	label->setText(text);
 }

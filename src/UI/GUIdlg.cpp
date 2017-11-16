@@ -5,9 +5,10 @@ CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	type = dlgCtrl;
 	xPos = 0; yPos = 0; width = w; height = h;
 	hFormat = hCentre; vFormat = vCentre;
-	header = new CGUIlabel(0,10,width,30);
+	header = new CGUIlabel2(0,10,width,30);
+	header->setText("Header");
 	header->hFormat = hSpan;
-	header->TextAlign = tcentred;
+	header->setHorizontalAlignment(tcentred);
 	Add(header);
 
 	backColour1 = oldbackColour1;
@@ -16,38 +17,39 @@ CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 }
 
 void CGUIdlg::setHeader(const string& text) {
-	header->SetText(text);
+	header->setText(text);
 }
 
 
 
 CGUIsysDlg::CGUIsysDlg() : CGUIdlg(0,0,defaultDlgWidth,defaultDlgHeight)  {
-	body = new CGUIlabel(20,50,width -20,70);
-	body->multiLine = true;
+	body = new CGUIlabel2(20,50,width -20,70);
+	body->setText("Body text");
+	body->setMultiLine(true);
 	body->hFormat = hCentre;
 	Add(body);	
 }
 
 
 void CGUIsysDlg::setText(const string& text) {
-	body->SetText(text);
+	body->setText(text);
 }
 
 
 
 CGUIyesNoDlg::CGUIyesNoDlg() {
-	yes = new CGUIbutton(20,defaultDlgHeight-40,100,30);
-	yes->SetText("Yes");
+	yes = new CGUIbutton2(20,defaultDlgHeight-40,100,30);
+	yes->setText("Yes");
 	yes->id = dlgYesID;
 	Add(yes);
 
-	no = new CGUIbutton(defaultDlgWidth - 120,defaultDlgHeight-40,100,30);
-	no->SetText("No");
+	no = new CGUIbutton2(defaultDlgWidth - 120,defaultDlgHeight-40,100,30);
+	no->setText("No");
 	no->id = dlgNoID;
 	Add(no);
 }
 
-CGUIdlgButton::CGUIdlgButton(int x, int y, int w, int h) : CGUIbutton(x,y,w,h) {
+CGUIdlgButton::CGUIdlgButton(int x, int y, int w, int h) : CGUIbutton2(x,y,w,h) {
 
 }
 
@@ -63,7 +65,7 @@ CGUIokDlg::CGUIokDlg(int w, int h)  : CGUIsysDlg()  {
 	width = w;
 	height = h;
 	ok = new CGUIdlgButton(10,20,100,30);
-	ok->SetText("OK");
+	ok->setText("OK");
 	ok->hFormat = hCentre;
 	ok->yPos = parent->height - 50;
 	ok->id = dlgOKID;

@@ -16,7 +16,7 @@ void CGUIbetterBase::setBackColour1(const UIcolour & colour) {
 }
 
 void CGUIbetterBase::setBackColour2(const UIcolour & colour) {
-	backColour1 = colour;
+	backColour2 = colour;
 }
 
 void CGUIbetterBase::setBorderColour(const UIcolour& colour) {

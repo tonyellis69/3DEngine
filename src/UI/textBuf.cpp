@@ -15,10 +15,7 @@ CTextBuffer::CTextBuffer() {
 
 void CTextBuffer::setSize(int w, int h) {
 	size = glm::i32vec2(w, h);
-
-	//resize texture
 	textTexture.resize(w, h);
-
 }
 
 void CTextBuffer::setText(std::string & str) {
@@ -93,10 +90,9 @@ void CTextBuffer::renderText() {
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */
 int CTextBuffer::nextLineBreak(int lineStart) {
 	int breakDist = text.size(); float dist = 0;
-	//while there are characters, when we reach a break record it, until we go over the allotted width;
+	//while there are characters, when we reach a word break record it, until we go over the allotted width;
 	int c = lineStart;
 	while (c < text.size() && dist < size.x) {
-		
 		if (isspace(text[c]))
 			breakDist = c;
 		dist += font->table[text[c]]->width;
@@ -113,8 +109,7 @@ void CTextBuffer::setHorizontalAlignment(TTextAlign align) {
 	TextAlign = align;
 }
 
-TTextAlign CTextBuffer::getJustification()
-{
+TTextAlign CTextBuffer::getJustification() {
 	return TextAlign;
 }
 
@@ -132,6 +127,9 @@ void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
 	if (multiLine) {
 		yOffset = halfSize.y - glyphHeight;
 	}
+
+	yOffset = int(yOffset); //Because drawing on a fractional pixel causes blurred text
+	xOffset = int(xOffset);
 
 	glm::mat4 orthoMatrix = glm::ortho<float>(-xOffset, size.x-xOffset, -halfSize.y + yOffset, halfSize.y + yOffset);
 	
