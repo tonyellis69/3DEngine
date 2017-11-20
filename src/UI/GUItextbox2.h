@@ -12,6 +12,7 @@ public:
 	void setText( std::string newText);
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
+	void setHorizontalAlignment(TTextAlign align);
 	void DrawSelf();
 	void OnClick(const  int mouseX, const  int mouseY);
 	void OnKeyPress(unsigned int Key, long Mod);

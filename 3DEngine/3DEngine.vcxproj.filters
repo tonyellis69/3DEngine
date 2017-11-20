@@ -257,6 +257,9 @@
     <ClCompile Include="..\src\UI\GUItextbox2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUInumeric2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Window.h">
@@ -521,6 +524,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUItextbox2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUInumeric2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -119,8 +119,6 @@ void CGUInumericTextbox::dataEnteredAlert() {
 }
 
 
-
-
 /** Overload the usual onclick message, to alert the numeric control instead. */
 void CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
 	//float direction = (id == downButtonID)? -1 : 1;

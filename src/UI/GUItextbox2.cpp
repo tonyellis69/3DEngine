@@ -37,6 +37,11 @@ void CGUItextbox2::setTextColour(UIcolour  colour) {
 	setTextColour(colour.r, colour.g, colour.b, colour.a);
 }
 
+void CGUItextbox2::setHorizontalAlignment(TTextAlign align) {
+	textBuf.setHorizontalAlignment(align);
+	textBuf.renderText();
+}
+
 void CGUItextbox2::DrawSelf() {
 	pDrawFuncs->setClip(Clipbox);
 

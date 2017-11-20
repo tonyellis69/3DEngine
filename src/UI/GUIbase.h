@@ -111,7 +111,7 @@ public:
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
-			uiImage,uiLabel,uiButton,uiTextbox};
+			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric};
 
 
 

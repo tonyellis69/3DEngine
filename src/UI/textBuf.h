@@ -30,6 +30,7 @@ public:
 	void moveCursor(int x, int y);
 	void backSpace();
 	void insert(std::string inText);
+	std::string getText();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	

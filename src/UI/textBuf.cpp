@@ -173,6 +173,10 @@ void CTextBuffer::insert(std::string inText) {
 	renderText();
 }
 
+std::string CTextBuffer::getText() {
+	return text;
+}
+
 
 /** Write the given series of text-quads to the storage texture. */
 void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
