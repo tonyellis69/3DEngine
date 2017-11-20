@@ -11,6 +11,8 @@ CTextBuffer::CTextBuffer() {
 	multiLine = false;
 	TextAlign = tleft;
 	font = NULL;
+	cursorTextPos = 0;
+	borderWidth = 5;
 }
 
 void CTextBuffer::setSize(int w, int h) {
@@ -19,7 +21,8 @@ void CTextBuffer::setSize(int w, int h) {
 }
 
 void CTextBuffer::setText(std::string & str) {
-	text = str;
+	text = str; 
+	cursorTextPos = text.size();
 	renderText();
 }
 
@@ -85,6 +88,8 @@ void CTextBuffer::renderText() {
 
 	textTexture.clear();
 	writeToTexture(buf, lineWidth);
+
+	calcCursorPosition();
 }
 
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */
@@ -113,6 +118,62 @@ TTextAlign CTextBuffer::getJustification() {
 	return TextAlign;
 }
 
+float CTextBuffer::getTextWidth() {
+	float dist = 0;
+	for (int c=0; c < text.size(); c++) {
+		dist += font->table[text[c]]->width;
+	}
+	return dist;
+}
+
+
+CBuf * CTextBuffer::getCursorPos() {
+	return &cursor;
+}
+
+void CTextBuffer::calcCursorPosition() {
+	//lazily assuming single line text for now
+	float dist = 0;
+	for (int c = 0; c < cursorTextPos; c++) {
+		dist += font->table[text[c]]->width;
+	}
+	dist += borderWidth;
+	float halfHeight = size.y / 2.0f;
+	float yOffset = int(0 - (glyphHeight / 2.0f) + halfHeight);
+	vBuf::T2DtexVert cursorVert[2];
+	cursorVert[0].v = glm::vec2(dist, yOffset);
+	cursorVert[1].v = glm::vec2(dist, yOffset + font->lineHeight);
+	cursor.storeVertexes(cursorVert, sizeof(cursorVert), 2);
+	cursor.storeLayout(2, 2, 0, 0);
+}
+
+/** For now, lazily assume one-line text. */
+void CTextBuffer::moveCursor(int x, int y) {
+	if (x < 0 && cursorTextPos > 0)
+		cursorTextPos--;
+	if (x > 0 && cursorTextPos < text.size())
+		cursorTextPos++;
+
+	calcCursorPosition();
+}
+
+/** Delete the character at the cursor position. */
+void CTextBuffer::backSpace() {
+	if (cursorTextPos > 0) {
+		text.erase(cursorTextPos - 1, 1);
+		cursorTextPos--;
+		renderText();
+	}
+}
+
+/** Insert the given string at the cursor position. */
+void CTextBuffer::insert(std::string inText) {
+	text.insert(cursorTextPos, inText);
+	cursorTextPos++;
+	renderText();
+}
+
+
 /** Write the given series of text-quads to the storage texture. */
 void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
@@ -129,7 +190,7 @@ void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
 	}
 
 	yOffset = int(yOffset); //Because drawing on a fractional pixel causes blurred text
-	xOffset = int(xOffset);
+	xOffset = int(xOffset) + borderWidth;
 
 	glm::mat4 orthoMatrix = glm::ortho<float>(-xOffset, size.x-xOffset, -halfSize.y + yOffset, halfSize.y + yOffset);
 	

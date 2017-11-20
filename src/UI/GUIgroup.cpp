@@ -14,17 +14,16 @@ CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 	isDrawn = true;
 	headerHeight = defaultHeaderHeight;
 	headerIndent = defaultHeaderIndent + 5;
-	header = new CGUIsysLbl();
-	header->SetPos(headerIndent,0,width-headerIndent,headerHeight);
+	header = new CGUIlabel2(headerIndent,0,width-headerIndent,headerHeight);
 	Add(header);
 	SetText(Name);
 }
 
 /** Set the text of the group's header label. */
 void CGUIgroup::SetText(const std::string& TextStr) {
-	header->SetText(TextStr);
-	pDrawFuncs->setFont(header->TextFont);
-	headerWidth = pDrawFuncs->getTextWidth((char*)TextStr.c_str());
+	header->setText(TextStr);
+//	pDrawFuncs->setFont(header->TextFont);
+	headerWidth = (int)header->getTextWidth();
 }
 
 /** User may want to change header height from default if they change font. */

@@ -6,10 +6,15 @@ CGUIradio::CGUIradio(int x , int y, int w, int h) {
 	xPos = x;yPos = y;width = w;height = h;
 	GenName("Radio",Count++);
 	SetText(Name);
-	Orientation = iconFirst;
+	Orientation = lblFirst;
 	Set = false;
 	type = radioButton;
 	iconset = defaultIconset;
+
+	label = new CGUIlabel2(5, 5, w - (10 + iconOffset), h - 10);
+	label->setText("radio");
+	label->setHorizontalAlignment(tright);
+	Add(label);
 }
 
 
@@ -24,22 +29,24 @@ void CGUIradio::DrawSelf( ) {
 		pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
 	}
 
-	if (TextAlign == tcentred)
+	if (label->getJustification() == tcentred)
 		w = reducedWidth;
-	if (TextAlign == tright)
+	if (label->getJustification() == tright)
 		w = -reducedWidth;
 
 	int lblPos, iconPos;
 	if (Orientation == lblFirst) {
 		iconPos =  screenPos.x + reducedWidth + (iconOffset >> 1) ;
 		lblPos = screenPos.x;
+		label->setPos(5, 5);
 	} else {
 		lblPos =  screenPos.x + iconOffset;
 		iconPos = screenPos.x + (iconOffset >> 1);
+		label->setPos(10 + iconOffset, 5);
 	}
  
 	//Write the text at the given point
-	pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
+	//pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
 	//draw the icon
 	pDrawFuncs->setIconset(iconset);
 	pDrawFuncs->setDrawColours(UIwhite,UIwhite);

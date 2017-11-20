@@ -24,6 +24,12 @@ public:
 	void setMultiLine(bool onOff);
 	void setHorizontalAlignment(TTextAlign align);
 	TTextAlign getJustification();
+	float getTextWidth();
+	CBuf* getCursorPos();
+	void calcCursorPosition();
+	void moveCursor(int x, int y);
+	void backSpace();
+	void insert(std::string inText);
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	
@@ -39,4 +45,7 @@ private:
 	TTextAlign TextAlign; ///<Records whether the text is centred, etc, in its area.
 	bool multiLine; ///<If true, text is not height-centred.
 	float glyphHeight;
+	int cursorTextPos; ///<String index of character cursor precedes.
+	CBuf cursor; ///<Holds verts for the cursor position and size.
+	int borderWidth;
 };

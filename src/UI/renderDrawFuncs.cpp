@@ -6,6 +6,11 @@
 
 using namespace glm;
 
+CRenderDrawFuncs::CRenderDrawFuncs() {
+	cursorOn = false;
+	lastCursorFlash = chrono::system_clock::now();
+}
+
 
 void CRenderDrawFuncs::setRenderer(CRenderer * renderer) {
 	pRenderer = renderer;
@@ -52,8 +57,6 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
 	corners[2].tex = vec2(0,1);
 	corners[3].tex = vec2(1,1);
 
-
-
 	unsigned int index[4] = { 2,3,0,1 };
 	quadBufs[control.uniqueID].rect->storeVertexes(corners, sizeof(corners), 4);
 	quadBufs[control.uniqueID].rect->storeIndex(index,  4);
@@ -63,6 +66,8 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
 	quadBufs[control.uniqueID].border->storeVertexes(corners, sizeof(corners), 4);
 	quadBufs[control.uniqueID].border->storeIndex(index2,  4);
 	quadBufs[control.uniqueID].border->storeLayout(2, 2,0, 0);
+
+	quadBufs[control.uniqueID].posM = glm::translate(orthoView, vec3(control.drawBox.pos,0));
 }
 
 /** Draw the drawBox rectangle of this control. */
@@ -131,6 +136,31 @@ void CRenderDrawFuncs::updateScreenDimensions(CGUIbetterBase & control) {
 	setScreenDimensions(control);
 	//TO DO: more elegant and efficient to update matrix, not all the verts!
 }
+
+/** Assuming this is an interactive text control, draw its cursor. */
+void CRenderDrawFuncs::drawCursor(CGUIbetterBase& control,CBuf& cursorPos) {
+	chrono::system_clock::time_point currentTime = chrono::system_clock::now();
+	chrono::duration<float> time_span = chrono::duration_cast<chrono::duration<float>>(currentTime - lastCursorFlash);
+	if (time_span.count() > cursorFlashDelay) {
+		cursorOn = !cursorOn;
+		lastCursorFlash = currentTime;
+	}
+	if (!cursorOn)
+		return;
+	pRenderer->setShader(uiRectShader);
+	uiRectShader->setShaderValue(hColour1, (vec4&)UIblack); //TO DO: pass colour choice as parameter
+	uiRectShader->setShaderValue(hColour2, (vec4&)UIblack);
+	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
+	pRenderer->drawBuf(cursorPos, drawLineLoop);
+	pRenderer->setShader(0);
+}
+
+float CRenderDrawFuncs::getTime() {
+	time_t currentTime = time(NULL);
+	return 0.0f;
+}
+
+
 
 CRenderDrawFuncs::~CRenderDrawFuncs() {
 	for (size_t s = 0; s < shaderList.size(); s++) {

@@ -609,9 +609,9 @@ void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 		int slSize = layers[layerNo].superChunks.size();
 		for (int scNo = 0; scNo < slSize; scNo++) {
 			sc = layers[layerNo].superChunks[scNo];
-			if (!sc->isOutsideFustrum(camMatrix)) {
+			//if (!sc->isOutsideFustrum(camMatrix)) {
 				visibleSClist.push_back(sc);
-			}
+			//}
 		}
 	}
 }

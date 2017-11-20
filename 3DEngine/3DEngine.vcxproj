@@ -159,6 +159,7 @@
     <ClCompile Include="..\src\UI\GUIradio.cpp" />
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
+    <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="..\src\UI\GUIradio.h" />
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
+    <ClInclude Include="..\src\UI\GUItextbox2.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\GUItextbox.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />

@@ -73,3 +73,7 @@ void CGUIlabel2::SetPos(int x, int y, int w, int h) {
 	//textBuf.renderText();
 	updateAppearance();
 }
+
+float CGUIlabel2::getTextWidth() {
+	return textBuf.getTextWidth();
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "GUIbase.h"
 #include "GUIbetterBase.h"
 
@@ -14,11 +16,12 @@ functionality. */
 struct controlRects {
 	CBuf* rect;
 	CBuf* border;
+	glm::mat4 posM; 
 };
 
 class CRenderDrawFuncs : public CDrawFuncs {
 public:
-	CRenderDrawFuncs() {};
+	CRenderDrawFuncs();
 	~CRenderDrawFuncs();
 	void setRenderer(CRenderer* renderer);
 	void loadShaders();
@@ -30,6 +33,8 @@ public:
 	void drawTexture(CGUIbetterBase & control, CBaseTexture& texture);
 	void setScreenDimensions(CGUIbetterBase & control);
 	void updateScreenDimensions(CGUIbetterBase& control);
+	void drawCursor(CGUIbetterBase& control,CBuf& cursorPos);
+	float getTime();
 
 //private:
 	CRenderer* pRenderer;
@@ -51,4 +56,9 @@ public:
 
 	glm::mat4 orthoView; ///<A matrix for viewing 2D drawing;
 	int screenWidth, screenHeight;
+
+	bool cursorOn;
+	chrono::system_clock::time_point lastCursorFlash;
 };
+
+const float cursorFlashDelay = 0.5f;

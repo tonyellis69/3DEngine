@@ -1,6 +1,7 @@
 #pragma once
 #include "GUIbase.h"
 #include "GUIlabel.h"
+#include "GUIlabel2.h"
 
 
 
@@ -17,7 +18,7 @@ public:
 	void DrawSelf();
 
 	static int Count;
-	CGUIsysLbl* header; ///<Text header indentifying this group.
+	CGUIlabel2* header; ///<Text header indentifying this group.
 	int headerWidth; ///<The width of the header text int pixels. Used when drawing the outline box.
 	int headerHeight; ///<The height of the header text in pixels.
 	int headerIndent; ///<Indent of the header label from the side of the control.

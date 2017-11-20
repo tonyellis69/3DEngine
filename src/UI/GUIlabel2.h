@@ -18,6 +18,7 @@ public:
 	void DrawSelf();
 	void borderOn(bool onOff);
 	void SetPos(int x, int y, int w, int h);
+	float getTextWidth();
 
 	CTextBuffer textBuf;
 	glm::vec4 textColour;

@@ -4,6 +4,7 @@
 #include "..\Delegate.h"
 #include "..\renderer\texManager.h"
 #include "font.h"
+#include "..\renderer\buf.h"
 
 //#include "GUIbetterBase.h"
 
@@ -103,13 +104,14 @@ public:
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
 	virtual void drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {};
 	virtual void updateScreenDimensions(CGUIbetterBase& control) {};
+	virtual void drawCursor(CGUIbetterBase& control, CBuf& cursorPos) {};
 };
 
 
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
-			uiImage,uiLabel,uiButton};
+			uiImage,uiLabel,uiButton,uiTextbox};
 
 
 

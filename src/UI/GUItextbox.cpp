@@ -70,7 +70,6 @@ void CGUIsysTextbox::OnKeyPress(unsigned int Key, long Mod) {
 						break;
 	case VK_RETURN  :	dataEnteredAlert();
 						break;
-
 	};
 }
 
