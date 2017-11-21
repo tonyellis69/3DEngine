@@ -5,12 +5,13 @@
 
 C2dRenderer::C2dRenderer() {
 	xScale = yScale = 1;
-	initText();
+//	initText();
 	setDrawColour(1,1,1,1);
 }
 
 /** Initialise the text writing system. The index array is set up to read any vertex array
 	as quads.*/
+/*
 void C2dRenderer::initText() {
 	textBuffPos = 0;
 	for (int i=0;i<textBufSize;i++) {
@@ -19,7 +20,7 @@ void C2dRenderer::initText() {
 		textIndices[ix+3] = v+2; textIndices[ix+4] = v+3;  textIndices[ix+5] = v;
 	}
 }
-
+*/
 
 /** Translate the origin to X,Y, so that all subsequent drawing operations are offset by this vector. */
 void C2dRenderer::setPosition(float x, float y){
@@ -39,11 +40,13 @@ void C2dRenderer::drawRect(TRect* rect,float x, float y) {
 }
 
 /** Reset the text buffer. */
+/*
 void C2dRenderer::initTextBuffer() {
 	textBuffPos = 0;
 }
-
+*/
 /** Send text drawing data to a buffer for later drawing. If the buffer becomes full, draw the contents and reset it.*/
+/*
 void C2dRenderer::drawToTextBuffer(TRect* rect,float x, float y) {
 	textQuadBuf[textBuffPos].x1 = x +  (-rect->originX * xScale); textQuadBuf[textBuffPos].y1 = y + (-rect->originY * yScale);
 	textQuadBuf[textBuffPos].x2 = x + ((-rect->originX + rect->width) * xScale); textQuadBuf[textBuffPos].y2 = y + (-rect->originY * yScale);
@@ -59,6 +62,7 @@ void C2dRenderer::drawToTextBuffer(TRect* rect,float x, float y) {
 		textBuffPos = 0;
 	} 		
 }
+*/
 /*
 void C2dRenderer::drawToTextBuffer(TRect* rect,float x, float y) {
 	textVertBuf[textBuffPos].x1 = x +  (-rect->originX * xScale); textVertBuf[textBuffPos].y1 = y + (-rect->originY * yScale);
@@ -77,6 +81,7 @@ void C2dRenderer::drawToTextBuffer(TRect* rect,float x, float y) {
 } */
 
 /** Draw the contents of the text buffer. */
+/*
 void C2dRenderer::drawTextBuffer() {
 	glBindVertexArray(0);
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -93,7 +98,7 @@ void C2dRenderer::drawTextBuffer() {
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 }
-
+*/
 /** Scale the modelview matrix by the given amount. */
 void C2dRenderer::scale2D(float x, float y) {
 	glMatrixMode(GL_MODELVIEW);

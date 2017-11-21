@@ -1,20 +1,12 @@
 #include "UIengine.h"
 
 
-/*
-void CGUIengine::setFont(int font) {
-	pEngine->setFont(font);
-}
-*/
+
 void CGUIengine::setDrawColours(const UIcolour& colour1,const UIcolour& colour2 ) {
 	pEngine->setDrawColour((rgba&)colour1);
 	pEngine->setSecondaryDrawColour((rgba&)colour2);
 }
-/*
-int CGUIengine::getTextWidth(char* text) {
-	return pEngine->findTextWidth(text);
-}
-*/
+
 void CGUIengine::drawIcon(int icon, int x, int y) {
 	pEngine->drawTile(icon,(float)x,pEngine->flipY((float)y));
 }
@@ -48,16 +40,7 @@ void CGUIengine::DrawBorder(int x, int y, int width, int height) {
 void CGUIengine::setClip(UIrect& clipbox) {
 	;//	pEngine->setClip(clipbox.x, clipbox.y, clipbox.width, clipbox.height);
 }
-/*
-void CGUIengine::drawText(int x, int y, int w,char* Text) {
-	y = y - (int)((pEngine->CurrentFont->Glyphs->Rect.height/2.0f) );
-	pEngine->drawString(Text,(float)x,(float) y,w);
-}
 
-void CGUIengine::drawTextMultiLine(int x, int y, int w,char* Text) {
-	pEngine->drawString(Text,(float)x, (float)y,w);
-}
-*/
 
 void CGUIengine::drawLine(int x, int y, int x2, int y2) {
 	pEngine->enableLineMode(true);

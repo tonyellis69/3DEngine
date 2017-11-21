@@ -11,7 +11,6 @@
 
 #include <vector>
 #include "Types.h"
-//#include "TexFont.h"
 #include "Sprite.h"
 #include "Texture.h"
 
@@ -38,11 +37,6 @@ public:
 	TSpriteSheet* GetTileSet(int TileSetID);
 	int CreateTextureFromImage(const char* Filename,int* TexWidth, int* TexHeight, bool UsePOT);
 	CSprite* loadSprite(char* Filename);
-	//CTexFont* loadFont(char* Filename);
-	//CTexFont* LoadSysFont();
-	//CTexFont* LoadSmallSysFont();
-	//CTexFont* loadFontFromStream(std::istream &input);
-
 	TRect* GetTileData(TSpriteSheet* TileSet, int TileNo);
 	unsigned int MakeDefaultTexture(int* TexW, int* TexH);
 
@@ -50,15 +44,11 @@ public:
 
 	TSpriteSheetList TileSetList;
 	CSpriteList SpriteList;
-	//CFontList FontList;
 	std::vector<CTexture*> textureList;
 	int TileSetID; ///<Next free SpriteSheet ID number
 	int SpriteID; ///<Next free billboard ID number.
-	int FontID; ///<Next free font ID number.
 
 private:
-//	int Width; ///<Width of most recently loaded image file.
-//	int Height; ///<Height of most recently loaded image file.
 	int Channels; ///<Channels of most recently loaded image file.
 	int NoTextures; ///<Number of textures held
 };

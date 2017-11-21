@@ -53,9 +53,9 @@ void CGUIlabel2::DrawSelf() {
 	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
 
 
-	//if (drawBorder) {
+	if (drawBorder) {
 		pDrawFuncs->drawCtrlBorder(*this);
-	//}
+	}
 
 
 }

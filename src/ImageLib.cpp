@@ -3,7 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ImageLib.h"
-//#include "Sprite.h"
 #include "TexLoader.h"
 #include <stdio.h>
 #include <fstream>
@@ -54,7 +53,6 @@ CImageLib::CImageLib()
 {
 	TileSetID = 0;
 	SpriteID = 0;
-	FontID = 0;
 	NoTextures = 0;
 	TileSetList.reserve(5);
 }

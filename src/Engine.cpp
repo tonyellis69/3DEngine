@@ -1,9 +1,9 @@
 #include "Engine.h"
 #include <math.h>
 
-#include <direct.h>
+//#include <direct.h>
 #include <iostream>
-#include <gl/gl.h>
+//#include <gl/gl.h>
 #include "vertBufs.h"
 #include <glm/gtx/color_space.hpp>
 #include "colour.h"
@@ -21,7 +21,6 @@ CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 	CurrentTileSet = 0; //TO DO - should be the built-in default;
 	CurrentTexture = 0; //TO DO - should be the built-in default;
 	CurrentSprite = 0;
-	//CurrentFont = 0;
 	MakingFit = false;
 	DrawCentred = false;
 	BackdropOn = false;
@@ -136,124 +135,6 @@ void CEngine::drawSprite(const CSprite& Sprite) {
 }
 
 
-/** Load a font from file. */
-/*
-unsigned int CEngine::loadFont(const std::string& filename) {
-	CurrentFont = ImageLib.loadFont((char*)filename.c_str());
-	return CurrentFont->ID;
-}*/
-
-/** Draw a string at the given position, in the current font.*/
-/*
-void CEngine::drawString(char* Str, float x, float y, int w) {
-
-
-	setCurrentTexture(CurrentFont->textureNo);
-	float fontHeight = CurrentFont->Glyphs->Rect.height;
-
-	if (w != 0) { //we're not printing left-justified
-		int textWidth = findTextWidth(Str); //so find the width of our text
-		int adj;
-		if (w > 0 )  //draw centred
-			adj = (w - textWidth) / 2;
-		else
-			adj = (abs(w) -  textWidth);
-		if (adj > 0)
-			x  += adj;
-	}
-	float startX = x;
-	float topY = Renderer.Height - y;
-	p2dR->initTextBuffer();
-	int buffPos = 0;
-	for (size_t i = 0; i != strlen(Str); ++i){
-		if (Str[i] == '\n') { //newline
-			x = startX;
-			topY -= (int)fontHeight +2;
-			continue;
-		}
-		x += drawCharacter(Str[i],x,topY);
-	}
-	p2dR->drawTextBuffer();
-	//draw cursor if needed
-	if (tmpCursorPos != -1)
-		drawCursor( startX,  y, Str);
-}
-*/
-/*
-/** Draw a character in the current font at the given point, and return its width in pixels. */
-/*
-int CEngine::drawCharacter(char letter, float x, float y) {
-	Glyph* glyph = CurrentFont->table[letter];
-	p2dR->drawToTextBuffer(&glyph->Rect, x, y);
-	return (int)(glyph->Rect.width * p2dR->xScale); 
-}
-*/
-/** Find the width in pixels of this string, in the current font. */
-/*
-int CEngine::findTextWidth(const char* Str) {
-	int textWidth = 0;
-	for (size_t i = 0; i != strlen(Str); ++i) {
-		if (Str[i] == '\n') continue;
-		textWidth += (int)(CurrentFont->table[Str[i]]->Rect.width * p2dR->xScale) ;
-	}
-	return textWidth;
-}
-*/
-/** Draw a text cursor at the given position, sized to the current font. */
-/*
-void CEngine::drawCursor(float x, float y, char* Text) {
-	//Is time to draw the cursor?
-	cursorFlash += dT;
-	if (cursorFlash < 500) {
-		//find the distance of the cursor from the start of the text
-		char copyText[100];
-		strcpy(copyText,Text);
-		copyText[tmpCursorPos] = 0;
-		int cursDistance = findTextWidth(copyText);
-		//Draw it
-		x+= cursDistance;
-		int cursorHeight = (int) (CurrentFont->Glyphs->Rect.height-1 * p2dR->yScale);
-		Renderer.setTextureMode(false);
-		y = Renderer.Height - y;
-		p2dR->drawLine(x,y,x,y - cursorHeight );
-		Renderer.setTextureMode(true);
-		return;
-	}
-	if (cursorFlash > 1000)
-		cursorFlash = 0;
-}
-*/
-
-
-/** Draw a formatted string at the given position, in the current font, with justification possible. */
-/*
-void CEngine::drawString(float x, float y, int w, const char* format, ...) {
-  char buffer[256];
-  va_list args;
-  va_start (args, format);
-  vsprintf (buffer,format, args);
-  perror (buffer);
-  va_end (args);
-  drawString(buffer,x,y,w);
-}
-*/
-/** Draw a formatted string at the given position. */
-/*
-void CEngine::drawString(float x, float y, const char* format, ...) {
-  char buffer[256];
-  va_list args;
-  va_start (args, format);
-  vsprintf (buffer,format, args);
-  perror (buffer);
-  va_end (args);
-  drawString(buffer,x,y,0);
-}
-*/
-/*
-void CEngine::drawString( char* text,float x, float y ) {
-	drawString(text,x,y,0);
-}
-*/
 /** Create a texture from an image file, and return its texture index. */
 int CEngine::loadTexture(const string& Filename) {
 	int TexWidth, TexHeight;
@@ -336,13 +217,6 @@ void CEngine::clearRegisteredSpriteList() {
 		RegisteredSpriteList.clear();
 }
 
-/** Make the given font the curretn font used for rendering text. */
-/*
-void CEngine::setFont(int FontNo) {
-	CTexFont* Font = ImageLib.FontList[FontNo];
-	CurrentFont = Font;
-}
-*/
 
 /** Draw the various backround layers of the scene, such as tile scenery. */
 /*

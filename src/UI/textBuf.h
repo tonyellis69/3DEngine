@@ -4,7 +4,7 @@
 
 #include "glm\glm.hpp"
 
-#include "..\TexFont.h"
+//#include "..\TexFont.h"
 #include "font.h"
 #include "..\renderer\renderer.h"
 

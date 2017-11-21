@@ -24,7 +24,7 @@
 
 #include "SysFnt.h"
 #include "smallsysf.h"
-//extern unsigned char SysFnt;
+
 
 #include <iostream> //for cerr
 using namespace std;
@@ -78,7 +78,6 @@ public:
 
 	FILE* ErrStream;	///<Filestream error messages are written to.
 
-	//CDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
 	CRenderDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
 
 
@@ -129,7 +128,7 @@ public:
 	unsigned int hTextureMVP;
 
 	CFont sysFont; ///<Default font
-	CFont smallSysFont;
+	CFont smallSysFont; ///<Default font for GUI
 
 	};
 

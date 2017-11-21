@@ -260,16 +260,12 @@ void CBaseApp::RegisterUIfunctors() {
 	drawFuncs->loadShaders();
 
 
-	//drawFuncs->setFont.Set(&UIeng,&CGUIengine::setFont);
 	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
-//	drawFuncs->getTextWidth.Set(&UIeng, &CGUIengine::getTextWidth);
 	drawFuncs->drawIcon.Set(&UIeng, &CGUIengine::drawIcon);
 	drawFuncs->handleUImsg.Set(this, &CBaseApp::HandleUImsg);
 	drawFuncs->drawRect.Set(&UIeng, &CGUIengine::drawRect);
 	drawFuncs->drawBorder.Set(&UIeng, &CGUIengine::DrawBorder);
 	drawFuncs->setClip.Set(&UIeng, &CGUIengine::setClip);
-//	drawFuncs->drawText.Set(&UIeng, &CGUIengine::drawText);
-//	drawFuncs->drawTextMultiLine.Set(&UIeng, &CGUIengine::drawTextMultiLine);
 	drawFuncs->drawLine.Set(&UIeng, &CGUIengine::drawLine);
 	drawFuncs->setIconset.Set(&UIeng, &CGUIengine::setIconset);
 	drawFuncs->drawTile.Set(&UIeng, &CGUIengine::drawTile);
@@ -291,7 +287,6 @@ void CBaseApp::drawSkyDome() {
 	glm::mat4 mvp = currentCamera->clipMatrix * Engine.skyDome->dome->worldMatrix;
 	Engine.Renderer.setShader(Engine.skyDome->skyShader);
 	Engine.skyDome->skyShader->setShaderValue(Engine.skyDome->hSkyDomeMVP,mvp);
-	//Engine.skyDome->skyShader->setShaderValue(Engine.skyDome->hSkyDomeHeightColours,Engine.skyDome->heightColours);
 	Engine.Renderer.setShaderValue(Engine.skyDome->hSkyDomeHeightColours, 4, (glm::vec3&)Engine.skyDome->heightColours);
 	Engine.skyDome->dome->drawNew();
 
