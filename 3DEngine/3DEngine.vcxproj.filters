@@ -101,9 +101,6 @@
     <ClCompile Include="..\src\terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\TexFont.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\TexLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -362,9 +359,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\terrain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\TexFont.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\TexLoader.h">

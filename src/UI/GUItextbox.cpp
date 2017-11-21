@@ -15,7 +15,7 @@ void CGUIsysTextbox::DrawSelf( ) {
 	pDrawFuncs->drawRect(screenPos,width,height);
 
 	//Set the font
-	pDrawFuncs->setFont(TextFont);
+//////////////	pDrawFuncs->setFont(TextFont);
 	//Set the colour
 	pDrawFuncs->setDrawColoursConditional(txtColour, txtColour,enabled);
 	//draw text
@@ -28,12 +28,12 @@ void CGUIsysTextbox::DrawSelf( ) {
 
 	if (KeyCapture == this) {
 		pDrawFuncs->setCursor(CursorPos);
-		pDrawFuncs->drawText(screenPos.x + textIndent,screenPos.y + (height/2),w,(char*)Text.c_str());;
+		/////////////////////////		pDrawFuncs->drawText(screenPos.x + textIndent,screenPos.y + (height/2),w,(char*)Text.c_str());;
 
 		pDrawFuncs->setCursor(NONE);
 	}
-	else 
-		pDrawFuncs->drawText(screenPos.x  + textIndent,screenPos.y + (height/2),w,(char*)Text.c_str());
+	else
+		;///////////////////////////		pDrawFuncs->drawText(screenPos.x + textIndent, screenPos.y + (height / 2), w, (char*)Text.c_str());
 
 	if ((MouseOver == this)||(KeyCapture == this)) {
 		pDrawFuncs->setDrawColours(UIdarkGrey, UIdarkGrey);

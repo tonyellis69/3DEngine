@@ -19,7 +19,7 @@ CGUIradio::CGUIradio(int x , int y, int w, int h) {
 
 
 void CGUIradio::DrawSelf( ) {
-	pDrawFuncs->setFont(TextFont);
+///////////	pDrawFuncs->setFont(TextFont);
 	pDrawFuncs->setDrawColours(txtColour, txtColour);
 
 	int w = 0; int reducedWidth = width - iconOffset;

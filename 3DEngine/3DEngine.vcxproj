@@ -135,7 +135,6 @@
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
-    <ClCompile Include="..\Src\TexFont.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\UIengine.cpp" />
@@ -221,7 +220,6 @@
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
-    <ClInclude Include="..\Src\TexFont.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
     <ClInclude Include="..\Src\Timer.h" />

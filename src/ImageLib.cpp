@@ -170,115 +170,6 @@ CSprite* CImageLib::loadSprite(char* Filename) {
 	return &SpriteList[SpriteID-1];
 }
 
-/** Load a font. */
-CTexFont* CImageLib::loadFont(char* Filename) {
-	//open font file
-	std::ifstream input(Filename, std::ios::binary);
-	if (input.fail() || input.get() != 'F' || input.get() != '0') {
-		fprintf(stderr,"\nNot a proper font file: %s.",Filename);
-		exit(EXIT_FAILURE );
-		//TO DO: use default font instead
-		//return SysFont;
-	}
-	return loadFontFromStream(input);
-}
-
-CTexFont* CImageLib::LoadSysFont() {
-	std::istringstream ss;
-	std::string tmp((char*) SysFnt+2, 33600);
-	ss.str(tmp);
-	return loadFontFromStream(  ss);
-}
-
-CTexFont* CImageLib::LoadSmallSysFont() {
-	std::istringstream ss;
-	std::string tmp((char*) SmallSysFnt+2, 17728);
-	ss.str(tmp);
-	return loadFontFromStream(  ss);
-}
-
-CTexFont* CImageLib::loadFontFromStream(std::istream &input) {
-	// Get the texture size, the number of glyphs and the line height.
-	
-	int width, height, n_chars, line_height;
-	float tex_line_height;
-	Read_Object(width, input);
-	Read_Object(height, input);
-	Read_Object(line_height, input);
-	Read_Object(n_chars, input);
-	tex_line_height = static_cast<float>(line_height) / height;
-
-	CTexFont* Font = new CTexFont();
-
-	// Make the glyph table.
-	Font->Glyphs = new Glyph[n_chars];
-	for (int i = 0; i != 256; ++i)
-		Font->table[i] = NULL;
-
-	// Read every glyph, store it in the glyph array and set the right
-	// pointer in the table.
-	Glyph_Buffer buffer;
-	for (int i = 0; i < n_chars; ++i){
-		Read_Object(buffer, input);
-		Font->Glyphs[i].Rect.Map.u = static_cast<float>(buffer.x) / width;
-		Font->Glyphs[i].Rect.Map.s = static_cast<float>(buffer.x + buffer.width) / width;
-		Font->Glyphs[i].Rect.Map.t = static_cast<float>(buffer.y) / height;
-		Font->Glyphs[i].Rect.Map.v = Font->Glyphs[i].Rect.Map.t + tex_line_height;
-
-		Font->Glyphs[i].Rect.width = (float)buffer.width; 
-		Font->Glyphs[i].Rect.height = (float)line_height;
-		Font->Glyphs[i].Rect.originX = 0;
-		Font->Glyphs[i].Rect.originY = (float)line_height;
-
-		Font->table[buffer.ascii] = Font->Glyphs + i;
-	};
-
-
-	// All chars that do not have their own glyph are set to point to the default glyph.
-	Glyph* default_glyph = Font->table[(unsigned char)'\xFF'];
-	// We must have the default character (stored under '\xFF')
-	if (default_glyph == NULL) {
-		fprintf(stderr,"\nNo defaut character found in font file.");
-		exit(EXIT_FAILURE );
-	}
-	for (int i = 0; i != 256; ++i){
-		if (Font->table[i] == NULL)
-			Font->table[i] = default_glyph;
-	}
-
-	// Store the actual texture in an array.
-	//unsigned char* tex_data = new unsigned char[width * height];
-	//input.read(reinterpret_cast<char*>(tex_data), width * height);
-	
-
-	unsigned char* RGBA = new unsigned char[width * height * 4];
-	char c ; int t;
-	for (int h =0; h<height;h++) {
-		for (int w = 0; w<width; w++)  {
-			input.read(&c,1);
-			t = ((h*width)+w)*4 ;
-			RGBA[t] = RGBA[t+1] = RGBA[t+2] = 255;
-			RGBA[t+3] = c;
-		}
-	}
-
-	// Generate an alpha texture with it.
-	//Font.TextureNo = CreateAlphaTextureFromLuminanceData(RGBA, width, height);
-	int texHandle = SOIL_create_OGL_texture(RGBA,width, height, SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID,0 ); 
-
-	CTexture* texture = new CTexture(texHandle,width,height);
-	textureList.push_back(texture);
-	Font->textureNo = NoTextures++;
-	
-	// And delete the texture memory block
-	//	delete[] tex_data;
-	delete[] RGBA;
-	Font->ID = FontID++;
-
-	//add font to the list
-	FontList.push_back(Font);
-	return FontList[FontID-1]; //just return last
-}
 
 unsigned int CImageLib::MakeDefaultTexture(int* TexW, int* TexH) {
 	unsigned char data[3*64*64*3]; int  p = 0;
@@ -313,11 +204,11 @@ CImageLib::~CImageLib()
 	}
 
 	SpriteList.clear();
-	ListSize = FontList.size();
+	//ListSize = FontList.size();
 //	for (int i=0; i<ListSize; ++i)
 //		delete[] FontList[i].Glyphs; 
-	for (int f=0;f<ListSize;f++)
-		delete FontList[f];
+	//for (int f=0;f<ListSize;f++)
+	//	delete FontList[f];
 
 	ListSize = textureList.size();
 	for (int i=0; i<ListSize; ++i)

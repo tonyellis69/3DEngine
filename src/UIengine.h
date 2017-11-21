@@ -12,8 +12,8 @@ public:
 	void drawRect(UIcoord pos, int width, int height);
 	void DrawBorder(int x, int y, int width, int height);
 	void setClip(UIrect& clipbox);
-	void drawText(int x, int y, int w,char* Text);
-	void drawTextMultiLine(int x, int y, int w,char* Text);
+//	void drawText(int x, int y, int w,char* Text);
+//	void drawTextMultiLine(int x, int y, int w,char* Text);
 	void drawLine(int x, int y, int x2, int y2);
 	void setIconset(int iconset);
 	void drawTile(int tileNo, UIrect& tileRect);

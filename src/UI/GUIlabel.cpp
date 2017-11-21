@@ -9,7 +9,7 @@ void CGUIbaseLbl::SetText(const std::string& TextStr) {
 
 void CGUIsysLbl::DrawSelf( ) {
 	//Set the font
-	pDrawFuncs->setFont(TextFont);
+///////////	pDrawFuncs->setFont(TextFont);
 
 	//Set the colour
 	pDrawFuncs->setDrawColoursConditional(txtColour, txtColour,enabled);
@@ -20,10 +20,10 @@ void CGUIsysLbl::DrawSelf( ) {
 	if (TextAlign == tright)
 		w = -width;
 	//Write the text at the given point
-	if (multiLine) 
-		pDrawFuncs->drawTextMultiLine(screenPos.x,screenPos.y,w,(char*)Text.c_str());
+	if (multiLine)
+		;///////////		pDrawFuncs->drawTextMultiLine(screenPos.x,screenPos.y,w,(char*)Text.c_str());
 	else
-		pDrawFuncs->drawText(screenPos.x,screenPos.y+(height/2),w,(char*)Text.c_str());
+		;/////////////	pDrawFuncs->drawText(screenPos.x,screenPos.y+(height/2),w,(char*)Text.c_str());
 
 	//uncomment this to see where label is.
 //	pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);

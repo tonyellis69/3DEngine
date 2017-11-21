@@ -11,7 +11,7 @@
 
 #include <vector>
 #include "Types.h"
-#include "TexFont.h"
+//#include "TexFont.h"
 #include "Sprite.h"
 #include "Texture.h"
 
@@ -20,7 +20,7 @@
 
 typedef std::vector<TSpriteSheet*> TSpriteSheetList; ///<Defines a vector type for holding pointers to SpriteSheets.
 typedef std::vector<CSprite> CSpriteList; ///<Defines a vector type for holding sprites.
-typedef std::vector<CTexFont*> CFontList; ///<Defines a vector type for holding fonts.
+//typedef std::vector<CTexFont*> CFontList; ///<Defines a vector type for holding fonts.
 ///<Defines a vector type for holding textures
 
 // Helper function to read a piece of data from a stream.
@@ -38,10 +38,10 @@ public:
 	TSpriteSheet* GetTileSet(int TileSetID);
 	int CreateTextureFromImage(const char* Filename,int* TexWidth, int* TexHeight, bool UsePOT);
 	CSprite* loadSprite(char* Filename);
-	CTexFont* loadFont(char* Filename);
-	CTexFont* LoadSysFont();
-	CTexFont* LoadSmallSysFont();
-	CTexFont* loadFontFromStream(std::istream &input);
+	//CTexFont* loadFont(char* Filename);
+	//CTexFont* LoadSysFont();
+	//CTexFont* LoadSmallSysFont();
+	//CTexFont* loadFontFromStream(std::istream &input);
 
 	TRect* GetTileData(TSpriteSheet* TileSet, int TileNo);
 	unsigned int MakeDefaultTexture(int* TexW, int* TexH);
@@ -50,7 +50,7 @@ public:
 
 	TSpriteSheetList TileSetList;
 	CSpriteList SpriteList;
-	CFontList FontList;
+	//CFontList FontList;
 	std::vector<CTexture*> textureList;
 	int TileSetID; ///<Next free SpriteSheet ID number
 	int SpriteID; ///<Next free billboard ID number.

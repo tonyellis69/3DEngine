@@ -42,15 +42,15 @@ public:
 	void drawTile(int TileNo, float x, float y);
 	CSprite* loadSprite(char* Filename);
 	void drawSprite(const CSprite& Sprite);
-	unsigned int loadFont(const std::string& filename);
-	void drawString(char* Str, float x, float y, int w);
-	void drawString(float x, float y, int w, const char* format, ...);
-	void drawString(float x, float y, const char* format, ...);
-	void drawString( char* text,float x, float y );
-	int drawCharacter(char letter, float x, float y);
-	int findTextWidth(const char* Str);
-	void drawCursor(float x, float y, char* Text);
-	void drawStringWithCursor(int x, int y, int c, char* Text);
+	//unsigned int loadFont(const std::string& filename);
+	//void drawString(char* Str, float x, float y, int w);
+	//void drawString(float x, float y, int w, const char* format, ...);
+	//void drawString(float x, float y, const char* format, ...);
+	//void drawString( char* text,float x, float y );
+	//int drawCharacter(char letter, float x, float y);
+	//int findTextWidth(const char* Str);
+	//void drawCursor(float x, float y, char* Text);
+	//void drawStringWithCursor(int x, int y, int c, char* Text);
 	int loadTexture( const string& Filename);
 	void makeFit(int PixW, int PixH, bool Centre);
 	void registerSprite(const CSprite& Sprite);
@@ -64,7 +64,7 @@ public:
 	void drawRegisteredSprites();
 	void updateRegisteredSprites(const double& dT);
 	void clearRegisteredSpriteList();
-	void setFont(int FontNo);
+	//void setFont(int FontNo);
 	//void CreateTileLayer(char* TileData, TSpriteSheet& Sheet, int Width, int Height);
 	//void drawSceneLayers();
 	//C2DVector ScrollBackdrop(float x, float y);
@@ -159,8 +159,8 @@ public:
 
 	CCamera* defaultCamera; ///<Initially available camera.
 
-	CTexFont* sysFont;  ///<Points to the default system font.
-	CTexFont* CurrentFont; ///<Points to the last-used font.
+//	CTexFont* sysFont;  ///<Points to the default system font.
+//	CTexFont* CurrentFont; ///<Points to the last-used font.
 
 	bool BackdropOn; ///<Flags whether to draw backdrop.
 	bool MakingFit;///<True if we want to scale drawing to fit desired dimensions.

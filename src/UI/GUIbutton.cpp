@@ -14,7 +14,7 @@ CGUIbutton::CGUIbutton(int x, int y, int w, int h) {
 
 
 void CGUIbutton::DrawSelf( ) {
-	pDrawFuncs->setFont(TextFont);
+///////////////	pDrawFuncs->setFont(TextFont);
 	if (MouseDown == this)
 		pDrawFuncs->setDrawColours(backColour2, backColour1);
 	else 
@@ -30,7 +30,7 @@ void CGUIbutton::DrawSelf( ) {
 
 	//Write button label
 	pDrawFuncs->setDrawColoursConditional(txtColour, txtColour,enabled);
-	pDrawFuncs->drawText(screenPos.x,screenPos.y + (height/2),width,(char*)Text.c_str());
+////////////////	pDrawFuncs->drawText(screenPos.x,screenPos.y + (height/2),width,(char*)Text.c_str());
 }
 
 
