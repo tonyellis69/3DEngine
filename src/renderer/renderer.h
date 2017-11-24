@@ -30,13 +30,8 @@ extern int totalbufsize;
 extern int totalchunks;
 
 
-//class CRenderTerrain;
-
-
 /** The high-level renderer class. */
-//class CBaseTexture;
 class CBaseBuf;
-
 class CRenderer {
 public:
 	CRenderer();

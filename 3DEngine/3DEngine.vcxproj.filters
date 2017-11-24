@@ -18,6 +18,9 @@
     <Filter Include="plants">
       <UniqueIdentifier>{f8095697-a025-4e4c-a489-51c83798dc72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="vm">
+      <UniqueIdentifier>{0182bb3e-e9c5-4d69-aa75-cd0204fe3489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -255,6 +258,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUInumeric2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\daemon.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\stack.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\var.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\vm.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\vmConsole.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\vmApp.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIconsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -521,6 +545,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUInumeric2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\daemon.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\stack.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\var.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\vm.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\vmConsole.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\vmApp.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIconsole.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

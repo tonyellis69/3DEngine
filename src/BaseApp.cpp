@@ -49,6 +49,8 @@ CBaseApp::CBaseApp(void)  {
 	
 	quitOnEsc = true;
 	initWatches();
+
+	vm.setApp(this);
 }
 
 
@@ -186,7 +188,8 @@ void CBaseApp::AppTasks() {
 
 	Engine.clearFrame();
 
-	//Time = Engine.Time.milliseconds();
+	vm.execute();
+
 	Time = Engine.Time.seconds();
 	dT = Time - LastTime;
 	Engine.dT = dT;

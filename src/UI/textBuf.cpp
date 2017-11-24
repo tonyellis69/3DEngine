@@ -12,12 +12,14 @@ CTextBuffer::CTextBuffer() {
 	TextAlign = tleft;
 	font = NULL;
 	cursorTextPos = 0;
-	borderWidth = 5;
+	drawBorder = glm::i32vec2(5,0);
 }
 
+/** Set the absolute dimensions, in pixels, of the buffer texture.*/
 void CTextBuffer::setSize(int w, int h) {
 	size = glm::i32vec2(w, h);
 	textTexture.resize(w, h);
+	drawSpace = size - drawBorder * 2;
 }
 
 void CTextBuffer::setText(std::string & str) {
@@ -46,29 +48,28 @@ void CTextBuffer::renderText() {
 	vector<unsigned int> index;
 	chars.resize(text.size() * 4);
 
-	float baseLine = 0;
-
 	glm::vec2 blCorner = glm::vec2(-1.0f, 0.0f);
 
 	int v = 0; float lineWidth = 0; int nextBreak = text.size();
 	if (multiLine)
 		nextBreak = nextLineBreak(0);
-	
+	glyph* glyph;
 	for (int c = 0; c < text.size(); c++) {
-		glyph* glyph = font->table[text[c]];
-		//construct quads
-		chars[v].v = blCorner; //A
-		chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
-		chars[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->height); //C
-		chars[v + 3].v = blCorner + glm::vec2(glyph->width, -glyph->height); //D
-		chars[v].tex = glm::vec2(glyph->u, glyph->v);
-		chars[v + 1].tex = glm::vec2(glyph->s, glyph->v);
-		chars[v + 2].tex = glm::vec2(glyph->u, glyph->t);
-		chars[v + 3].tex = glm::vec2(glyph->s, glyph->t);
+		if (text[c] != '\n') {
+			glyph = font->table[text[c]];
+			//construct quads
+			chars[v].v = blCorner; //A
+			chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
+			chars[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->height); //C
+			chars[v + 3].v = blCorner + glm::vec2(glyph->width, -glyph->height); //D
+			chars[v].tex = glm::vec2(glyph->u, glyph->v);
+			chars[v + 1].tex = glm::vec2(glyph->s, glyph->v);
+			chars[v + 2].tex = glm::vec2(glyph->u, glyph->t);
+			chars[v + 3].tex = glm::vec2(glyph->s, glyph->t);
 
-		index.push_back(v + 2); index.push_back(v + 3); index.push_back(v);
-		index.push_back(v); index.push_back(v + 3); index.push_back(v + 1);
-
+			index.push_back(v + 2); index.push_back(v + 3); index.push_back(v);
+			index.push_back(v); index.push_back(v + 3); index.push_back(v + 1);
+		}
 		if (c == nextBreak) {
 			lineWidth = 0;
 			blCorner = glm::vec2(0, blCorner.y + glyphHeight);
@@ -94,14 +95,23 @@ void CTextBuffer::renderText() {
 
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */
 int CTextBuffer::nextLineBreak(int lineStart) {
-	int breakDist = text.size(); float dist = 0;
+	int breakDist = text.size(); float dist =  drawBorder.x;
 	//while there are characters, when we reach a word break record it, until we go over the allotted width;
 	int c = lineStart;
-	while (c < text.size() && dist < size.x) {
+	while (  dist < drawSpace.x) {
+		if (text[c] == '\n') {
+			//text.erase(c, 1);
+			return c;
+		}
+
 		if (isspace(text[c]))
 			breakDist = c;
 		dist += font->table[text[c]]->width;
 		c++;
+		//if (c == 83)
+		//	int j = 0;
+		if (c >= text.size())
+			return c;
 	}
 	return breakDist;
 }
@@ -119,7 +129,7 @@ TTextAlign CTextBuffer::getJustification() {
 }
 
 float CTextBuffer::getTextWidth() {
-	float dist = 0;
+	float dist = drawBorder.x;
 	for (int c=0; c < text.size(); c++) {
 		dist += font->table[text[c]]->width;
 	}
@@ -133,12 +143,11 @@ CBuf * CTextBuffer::getCursorPos() {
 
 void CTextBuffer::calcCursorPosition() {
 	//lazily assuming single line text for now
-	float dist = 0;
+	float dist = drawBorder.x;
 	for (int c = 0; c < cursorTextPos; c++) {
 		dist += font->table[text[c]]->width;
 	}
-	dist += borderWidth;
-	float halfHeight = size.y / 2.0f;
+	float halfHeight = drawSpace.y / 2.0f;
 	float yOffset = int(0 - (glyphHeight / 2.0f) + halfHeight);
 	vBuf::T2DtexVert cursorVert[2];
 	cursorVert[0].v = glm::vec2(dist, yOffset);
@@ -177,24 +186,30 @@ std::string CTextBuffer::getText() {
 	return text;
 }
 
+/** Append newText to the currently rendered text. */
+void CTextBuffer::appendText(std::string newText) {
+	text += newText;
+	renderText();
+}
+
 
 /** Write the given series of text-quads to the storage texture. */
 void CTextBuffer::writeToTexture(CBuf& glyphQuads, float lineWidth) {
-	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
+	glm::vec2 halfSize = glm::vec2(drawSpace) / 2.0f;
 	float xOffset = 0; float yOffset = 0 - (glyphHeight/2.0f);
 	if (TextAlign == tcentred) {
-		xOffset = (size.x - lineWidth) / 2.0f;
+		xOffset = (drawSpace.x - lineWidth) / 2.0f;
 	}
 	if (TextAlign == tright) {
-		xOffset = size.x - lineWidth;
+		xOffset = drawSpace.x - lineWidth;
 	}
 
 	if (multiLine) {
 		yOffset = halfSize.y - glyphHeight;
 	}
 
-	yOffset = int(yOffset); //Because drawing on a fractional pixel causes blurred text
-	xOffset = int(xOffset) + borderWidth;
+	yOffset = int(yOffset) - drawBorder.y; //Because drawing on a fractional pixel causes blurred text
+	xOffset = int(xOffset) + drawBorder.x;
 
 	glm::mat4 orthoMatrix = glm::ortho<float>(-xOffset, size.x-xOffset, -halfSize.y + yOffset, halfSize.y + yOffset);
 	

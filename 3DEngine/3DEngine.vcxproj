@@ -87,6 +87,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\VMtest\src\daemon.cpp" />
+    <ClCompile Include="..\..\VMtest\src\stack.cpp" />
+    <ClCompile Include="..\..\VMtest\src\var.cpp" />
+    <ClCompile Include="..\..\VMtest\src\vm.cpp" />
+    <ClCompile Include="..\..\VMtest\src\vmConsole.cpp" />
+    <ClCompile Include="..\..\VMtest\src\vmApp.cpp" />
     <ClCompile Include="..\Src\BaseApp.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
@@ -144,6 +150,7 @@
     <ClCompile Include="..\src\UI\GUIbutton.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
+    <ClCompile Include="..\src\UI\GUIconsole.cpp" />
     <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
     <ClCompile Include="..\src\UI\GUIdlg.cpp" />
     <ClCompile Include="..\src\UI\GUIgroup.cpp" />
@@ -168,6 +175,12 @@
     <ClCompile Include="..\Src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\VMtest\src\daemon.h" />
+    <ClInclude Include="..\..\VMtest\src\stack.h" />
+    <ClInclude Include="..\..\VMtest\src\var.h" />
+    <ClInclude Include="..\..\VMtest\src\vm.h" />
+    <ClInclude Include="..\..\VMtest\src\vmConsole.h" />
+    <ClInclude Include="..\..\VMtest\src\vmApp.h" />
     <ClInclude Include="..\Src\BaseApp.h" />
     <ClInclude Include="..\src\chunk.h" />
     <ClInclude Include="..\src\cnode.h" />
@@ -231,6 +244,7 @@
     <ClInclude Include="..\src\UI\GUIbutton.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
+    <ClInclude Include="..\src\UI\GUIconsole.h" />
     <ClInclude Include="..\src\UI\GUIcontainer.h" />
     <ClInclude Include="..\src\UI\GUIdlg.h" />
     <ClInclude Include="..\src\UI\GUIgroup.h" />

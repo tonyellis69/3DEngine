@@ -25,12 +25,13 @@
 #include "SysFnt.h"
 #include "smallsysf.h"
 
+#include "..\VMtest\src\vmApp.h"
 
 #include <iostream> //for cerr
 using namespace std;
 
 
-
+//class CVMapp;
 class CBaseApp
 {
 public:
@@ -68,6 +69,8 @@ public:
 	
 	void initWatches();
 	void updateWatches();
+
+	virtual void vmMessage(TVMmsg) {};
 
 
 	CEngine Engine;
@@ -129,6 +132,10 @@ public:
 
 	CFont sysFont; ///<Default font
 	CFont smallSysFont; ///<Default font for GUI
+
+
+	CVMapp vm; ///<The Tig virtual machine.
+
 
 	};
 

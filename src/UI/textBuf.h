@@ -31,6 +31,7 @@ public:
 	void backSpace();
 	void insert(std::string inText);
 	std::string getText();
+	void appendText(std::string newText);
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	
@@ -48,5 +49,7 @@ private:
 	float glyphHeight;
 	int cursorTextPos; ///<String index of character cursor precedes.
 	CBuf cursor; ///<Holds verts for the cursor position and size.
-	int borderWidth;
+	
+	glm::i32vec2 drawBorder;
+	glm::i32vec2 drawSpace;
 };
