@@ -10,6 +10,8 @@
 
 #include <iostream> //for cerr
 
+//#include <GLFW\glfw3.h>
+
 using namespace std;
 
 /** Simple message struct. */
@@ -273,32 +275,18 @@ enum Messagetypes {change,userDraw,uiMsgDrop,uiMsgLMdown,uiMsgRMdown,uiMsgMouseM
 #define WM_MOUSEHWHEEL                  0x020E
 #endif
 
-#define	VK_BACK			  0x08
-#define VK_RETURN         0x0D
-#define VK_LEFT           0x25
-#define VK_UP             0x26
-#define VK_RIGHT          0x27
-#define VK_DOWN           0x28
-#define VK_SELECT         0x29
-#define VK_PRINT          0x2A
-#define VK_EXECUTE        0x2B
-#define VK_SNAPSHOT       0x2C
-#define VK_INSERT         0x2D
-#define VK_DELETE         0x2E
 
-#ifndef NOKEYSTATES
 
-/*
- * Key State Masks for Mouse Messages
- */
-#define MK_LBUTTON          0x0001
-#define MK_RBUTTON          0x0002
-#define MK_SHIFT            0x0004
-#define MK_CONTROL          0x0008
-#define MK_MBUTTON          0x0010
-#if(_WIN32_WINNT >= 0x0500)
-#define MK_XBUTTON1         0x0020
-#define MK_XBUTTON2         0x0040
-#endif /* _WIN32_WINNT >= 0x0500 */
 
-#endif /* !NOKEYSTATES */
+
+//A few GLFW codes we use internally
+#define GLFW_KEY_ESCAPE             256
+#define GLFW_KEY_ENTER              257
+#define GLFW_KEY_TAB                258
+#define GLFW_KEY_BACKSPACE          259
+#define GLFW_KEY_INSERT             260
+#define GLFW_KEY_DELETE             261
+#define GLFW_KEY_RIGHT              262
+#define GLFW_KEY_LEFT               263
+#define GLFW_KEY_DOWN               264
+#define GLFW_KEY_UP                 265

@@ -1,7 +1,6 @@
 
 #include "BaseApp.h"
 #include <iostream> //for cerr
-#include <Windowsx.h> //for get_mouse_x etc
 
 #include <glm/glm.hpp>
 
@@ -14,7 +13,7 @@ using namespace watch;
 CBaseApp::CBaseApp(void)  {
 	
 
-	homeDir = Window.getExePath();
+	homeDir = getExePath();
 #ifdef _DEBUG
 	homeDir += "..\\";
 #endif
@@ -29,7 +28,7 @@ CBaseApp::CBaseApp(void)  {
 	Engine.Renderer.dataPath = homeDir + "Data\\";
 	
 	//Set up our handlers for window events
-	RegisterHandlers();
+	//RegisterHandlers();
 	EatKeys();
 
 	UIeng.pEngine = &Engine;
@@ -41,16 +40,25 @@ CBaseApp::CBaseApp(void)  {
 	Paused = false;
 	
 	//Set up engine for rendering
-	Engine.init(Window.hWnd);
+	win.setApp(this);
+
+	win.createWindowHidden(800, 600, "Base window");
+	win.setCallbacks();
+	
+	Engine.init();
+	
+
 	loadSystemFonts();
 	GUIroot.setDefaultFont(smallSysFont);
 
 	RegisterUIfunctors();
+
 	
 	quitOnEsc = true;
 	initWatches();
 
 	vm.setApp(this);
+
 }
 
 
@@ -69,61 +77,25 @@ void CBaseApp::loadSystemFonts() {
 	smallSysFont.loadFromStream(ss);
 }
 
-void CBaseApp::RegisterHandlers() {
-	KeyDownFunc.Set(this, &CBaseApp::OnKeyPress); //set the  functor to point to CBaseApp's keypress handler...
-	Window.RegisterKeypressHandler(&KeyDownFunc); //...then pass the functor to the window to use when it detects a keypress.
-
-	KeyUpFunc.Set(this, &CBaseApp::OnKeyRelease);
-	Window.RegisterKeyreleaseHandler(&KeyUpFunc);
-
-	
-	CharEntryFunc.Set(this, &CBaseApp::OnCharEntry);
-	Window.RegisterCharEntryHandler(&CharEntryFunc);
-
-	MouseMsgFunc.Set(this, &CBaseApp::OnMouseMsg);
-	Window.RegisterMouseMsgHandler(&MouseMsgFunc);
-
-	MouseWheelMsgFunc.Set(this, &CBaseApp::OnMouseWheelMsg);
-	Window.RegisterMouseWheelMsgHandler(&MouseWheelMsgFunc);
-
-	//OnWinResizeFunc.Set(this, &CBaseApp::onWinResize);
-	//Window.RegisterSizeHandler(&OnWinResizeFunc);
-	Window.resizeHandler.Set(this,&CBaseApp::onWinResize); 
-
-	AppTasksFunc.Set(this, &CBaseApp::AppTasks);
-	Window.RegisterAppTasksHandler(&AppTasksFunc);
-}
 
 /** Starts the application loop. This will not return until the app is shut down. */
 void CBaseApp::start() {
 	//LastTime = Engine.Time.milliseconds();
 	LastTime = Engine.Time.seconds();
 	onStart();
-	Window.WinLoop();
+	//Window.WinLoop();
+	win.hideWindow(false);
+	while (!win.windowClosing()) {
+		AppTasks();
+	}
 }
 
-/** Sets the application window to the given dimensions. */
-void CBaseApp::SetWindow( int width, int height) {
-	Window.SetWindow(-1,-1,width,height, "", 0);
-	sizeViewToWindow();
-}
 
-void CBaseApp::SetWindow( int width, int height, const std::string& Title, int Style) {
-	Window.SetWindow(-1,-1,width,height,Title, Style);
-	sizeViewToWindow();
-}
 
-void CBaseApp::SetWindow(const std::string& Title) {
-	Window.SetWindow(0,0,0,0, Title, WIN_NORMAL);
-	sizeViewToWindow();
-}
-
-/** Directly sets the width and height of the renderer drawing area to our window dimensions.
-	Useful because a Windows WinResize message may not arrive in time for the user. */
-void CBaseApp::sizeViewToWindow() {
-	int w,h; Window.getDrawingArea(w,h);
-	onWinResize(w,h);
-	
+void CBaseApp::SetWindow( int width, int height, std::string title) {
+	win.setWindowSize(width, height);
+	win.setTitle(title);
+	onWinResize(width, height);
 }
 
 /** Handler for when our window is rezized. */
@@ -137,13 +109,17 @@ void CBaseApp::onWinResize( int w, int h) {
 
 /** Event handler for when the OS messages that a key is pressed down. */
 void CBaseApp::OnKeyPress(unsigned int Key, long Mod) {
-	KeyDown[Key] = true; //NB some lag with this.
-	if ((Key == VK_TAB) && (BuiltInFullScrn)) {
-		Window.bFullscreen ? Window.UnFullScreen() : Window.FullScreen();
+	KeyDown[Key] = true; //TO DO 'some lag with this' - really? Check.
+	if (Key == GLFW_KEY_TAB && BuiltInFullScrn) {
+		if (!win.fullScreenOn)
+			 win.fullScreen();
+		else
+			 win.unFullScreen();
 		return;
 	}
-	if ((Key == VK_ESCAPE) && (quitOnEsc)){
-		Window.quitWindow();
+	if (Key == GLFW_KEY_ESCAPE && quitOnEsc){
+		//win.quitWindow();
+		PostQuitMessage(0);
 		return;
 	}	
 	//send the key to the UI
@@ -161,24 +137,51 @@ void CBaseApp::OnCharEntry(unsigned int Key, long Mod) {
 	GUIroot.CharEntryMsg(Key, Mod);
 }
 
-/** Event handler for mouse messages such as mouse movement. */
-void CBaseApp::OnMouseMsg(unsigned int Msg, unsigned int wParam, long lParam) {
-	
-	GUIroot.MouseMsg(Msg,GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam),wParam);
-	if (Msg == WM_MOUSEMOVE) {
-		mouseKey = wParam;
-	}
 
+
+void CBaseApp::onMouseMove(int x, int y) {
+	unsigned int msg = WM_MOUSEMOVE;
+	int key = 0;
+	if (win.leftMouseDown())
+		key += MK_LBUTTON;
+	if (win.rightMouseDown())
+		key += MK_RBUTTON;
+	if (win.middleMouseDown())
+		key += MK_MBUTTON;
+	mouseKey = key;
+	GUIroot.MouseMsg(msg, x, y, key);
+}
+
+void CBaseApp::onMouseButton(int button, int action, int mods) {
+	unsigned int msg = 0; int x, y;
+	getMousePos(x, y);
+
+	if (action == GLFW_RELEASE) {
+		if (button == GLFW_MOUSE_BUTTON_LEFT) 
+			msg = WM_LBUTTONUP;
+		if (button == GLFW_MOUSE_BUTTON_RIGHT)
+			msg = WM_RBUTTONUP;
+	}
+	else {
+		if (button == GLFW_MOUSE_BUTTON_LEFT)
+			msg = WM_LBUTTONDOWN;
+		if (button == GLFW_MOUSE_BUTTON_RIGHT)
+			msg = WM_RBUTTONDOWN;
+	}
+	GUIroot.MouseMsg(msg, x, y, 0);
 }
 
 /** Event handler for mouse wheel messages. */
 void CBaseApp::OnMouseWheelMsg(unsigned int wParam, long lParam) {
-	POINT Mouse;
-	GetCursorPos(&Mouse);
-	ScreenToClient(Window.hWnd,&Mouse);
-	int delta = GET_WHEEL_DELTA_WPARAM(wParam) / 120;
-	if (GUIroot.IsOnControl(GUIroot,Mouse.x, Mouse.y))
-		GUIroot.MouseWheelMsg(Mouse.x,Mouse.y,delta,GET_KEYSTATE_WPARAM(wParam));
+
+	//GetCursorPos(&Mouse);
+	//ScreenToClient(Window.hWnd,&Mouse);
+	int x, y;
+	win.getMousePos(x, y);
+	int delta;// = GET_WHEEL_DELTA_WPARAM(wParam) / 120;
+	delta = wParam;
+	if (GUIroot.IsOnControl(GUIroot,x, y))
+		GUIroot.MouseWheelMsg(x,y,delta,GET_KEYSTATE_WPARAM(wParam));
 }
 
 
@@ -194,8 +197,9 @@ void CBaseApp::AppTasks() {
 	dT = Time - LastTime;
 	Engine.dT = dT;
 	LastTime = Time;
-	getMousePos(mouseX, mouseY);
-	keyCheck();
+	//getMousePos(mouseX, mouseY);
+	win.getMousePos(mouseX, mouseY);
+	keyCheck(); //happens every frame, therefore responsive
 
 	//TO DO: mouseCheck, which calls user with last reported mouse position.
 	if (!Paused) {
@@ -228,18 +232,12 @@ void CBaseApp::AppTasks() {
 
 
 
-	Engine.showFrame();
-
+	//Engine.showFrame();
+	win.swapBuffers();
+	win.pollEvents();
 
 }
 
-void CBaseApp::FullScreen() {
-	Window.FullScreen();
-}
-
-void CBaseApp::UnFullScreen() {
-	Window.UnFullScreen();
-}
 
 void CBaseApp::EatKeys() {
 	for (int x=0;x<0x100;x++) 
@@ -323,38 +321,41 @@ void CBaseApp::drawSkyDome() {
 
 
 void CBaseApp::mouseCaptured(bool capture) {
-	Window.mouseCaptured(capture);
+	//Window.mouseCaptured(capture);
+	if (capture)
+		SetCapture(win.getWindowsHandle());
+	else
+		ReleaseCapture();
 }
 
-string CBaseApp::getFilenameDlg(const std::string& title, const char* path) {
-	return Window.getFilenameDlg(title,path);
-}
-
-string CBaseApp::saveFilenameDlg(const std::string& title, const char* path) {
-		return Window.saveFilenameDlg(title,path);
-}
 
 /** Turns mouse pointer on or off.*/
-void CBaseApp::showMouse(bool on) {
-	Window.showMouse(on);
+void CBaseApp::showMouse(bool onOff) {
+	//Window.showMouse(on);
+	win.showMouse(onOff);
 }
 
 void CBaseApp::setMousePos(int x, int y) {
-	Window.setMousePos(x,y);
+	//Window.setMousePos(x,y);
+	win.setMousePos(x, y);
 }
 
 void CBaseApp::getMousePos(int& x, int& y) {
-	Window.getMousePos(x,y);
+	//Window.getMousePos(x,y);
+	win.getMousePos(x, y);
 }
 
 bool CBaseApp::keyNow(int vKey) {
-	return Window.keyNow(vKey);
+	//return KeyDown[vKey];
+	//return Window.keyNow(vKey);
+	return GetAsyncKeyState(vKey) && 0x4000;
 }
 
 
 /** Shut down the entire app and exit. */
 void CBaseApp::exit() {
-	Window.quitWindow();
+	//Window.quitWindow();
+	PostQuitMessage(0);
 }
 
 
@@ -401,6 +402,43 @@ void CBaseApp::updateWatches() {
 	//show the last h lines of text. Maybe the control keeps track of how many lines it 
 	//can fit at its current font and height, and also how many lines are in its buffer.
 	//May well need to create a more sophisticated control for that, with a more sophisticated buffer.
+}
+
+/** Returns the file path of the current program. */
+string CBaseApp::getExePath() {
+	char path[512];
+	GetModuleFileName(NULL,(char*)path,512);
+	string tmp(path);
+	int n  = tmp.find_last_of(('\\'));
+	tmp = tmp.substr( 0, n+1 );
+	return tmp;
+}
+
+/** Use the Windows Common Dialog to get a filename. */
+string CBaseApp::getFilenameDlg(const std::string&  title, const char* path) {
+	const int BUFSIZE = 1024;
+	CHAR buffer[BUFSIZE] = { 0 };
+	OPENFILENAME ofns = { 0 };
+	ofns.lStructSize = sizeof(ofns);
+	ofns.lpstrFile = buffer;
+	ofns.nMaxFile = BUFSIZE;
+	ofns.lpstrTitle = (title.c_str());
+	ofns.lpstrInitialDir = path;
+	GetOpenFileName(&ofns);
+	return buffer;
+}
+
+string CBaseApp::saveFilenameDlg(const std::string&  title, const char* path) {
+	const int BUFSIZE = 1024;
+	CHAR buffer[BUFSIZE] = { 0 };
+	OPENFILENAME ofns = { 0 };
+	ofns.lStructSize = sizeof(ofns);
+	ofns.lpstrFile = buffer;
+	ofns.nMaxFile = BUFSIZE;
+	ofns.lpstrTitle = (title.c_str());
+	ofns.lpstrInitialDir = path;
+	GetSaveFileName(&ofns);
+	return buffer;
 }
 
 

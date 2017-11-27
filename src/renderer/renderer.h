@@ -1,7 +1,7 @@
 #pragma once
 
 #include "2d.h"
-#include <windows.h> 
+//#include <windows.h> 
 #include <string>
 #include <vector>
 
@@ -16,6 +16,10 @@
 #include "..\terrain.h"
 
 #include "renderShader.h"
+
+
+
+
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, 
@@ -41,11 +45,8 @@ public:
 		static CRenderer *instance = new CRenderer();
 		return *instance;
 	}
-	void attachWindow(HWND& hWnd);
 	void getGLinfo();
-	void detachWindow();
 	void clearFrame();
-	void showFrame();
 	void setBackColour(const rgba& colour);
 	void set2DView(int x, int y,int width,int height);
 	void init();
@@ -114,9 +115,6 @@ public:
 
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
-
-	HDC myhDC; ///<Handle for the window device context we're using.
-	HGLRC myhRC; ///<Handle for the window rendering context we're using.
 
 	TMatrix DisplayMatrix; ///<A matrix storing whatever global translations, scaling, etc, we use every frame.
 

@@ -77,13 +77,13 @@ void CGUItextbox2::OnClick(const  int mouseX, const  int mouseY) {
 /**User has pressed a key, and we have focus. Use this to catch cursor keys, backspace,etc*/
 void CGUItextbox2::OnKeyPress(unsigned int Key, long Mod) {
 	switch (Key) {
-	case VK_LEFT:	textBuf.moveCursor(-1, 0);
+	case GLFW_KEY_LEFT:	textBuf.moveCursor(-1, 0);
 					break;
-	case VK_RIGHT:	textBuf.moveCursor(1, 0);
+	case GLFW_KEY_RIGHT:	textBuf.moveCursor(1, 0);
 					break;
-	case  VK_BACK:	textBuf.backSpace();
+	case  GLFW_KEY_BACKSPACE:	textBuf.backSpace();
 					break;
-	case VK_RETURN:	dataEnteredAlert();
+	case GLFW_KEY_ENTER:	dataEnteredAlert();
 		break;
 	};
 }

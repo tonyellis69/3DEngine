@@ -6,6 +6,8 @@ using namespace std;
 
 /** Create and display a Windows window for use as a drawing surface. */
 CWindow::CWindow(): WinStyle (WS_CAPTION|WS_SYSMENU){
+	return;
+
 
 	bFullscreen = false; 
     WNDCLASSEX wc;
@@ -93,7 +95,7 @@ LRESULT CWindow::WndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 			}
 		case WM_SIZE:	{
 			//SizeHandler->Call(LOWORD(lParam),HIWORD(lParam));
-			resizeHandler(LOWORD(lParam),HIWORD(lParam));
+			////////////////////resizeHandler(LOWORD(lParam),HIWORD(lParam));
 			break;
 			}
 		case WM_KEYDOWN: {
@@ -101,15 +103,15 @@ LRESULT CWindow::WndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 				 PostQuitMessage(0);
 				 return 0;}	*/
 
-			KeypressHandler->Call(wParam,lParam);
+			//KeypressHandler->Call(wParam,lParam);
 			break;
 			}
 		case WM_KEYUP: {
-			KeyreleaseHandler->Call(wParam,lParam);
+			//KeyreleaseHandler->Call(wParam,lParam);
 			break;
 			}
 		case WM_CHAR: {
-			CharEntryHandler->Call(wParam,lParam);
+			//CharEntryHandler->Call(wParam,lParam);
 			break;
 			}
 		case WM_MOUSEMOVE: 
@@ -170,6 +172,7 @@ void CWindow::RegisterAppTasksHandler(TFunctor* Func) {
 
 /** Start running the window message pump, don't return until we quit the window. */
 void CWindow::WinLoop()	{ 
+	
 	ShowWindow(hWnd, SW_SHOW); //we don't need to show the window until we're ready.
 
 	//TO DO: get actual window size with a windows function!
@@ -429,6 +432,7 @@ void CWindow::showMouse(bool on) {
 
 /** Set mouse pointer to the given window position. Minus values are centred.*/
 void CWindow::setMousePos(int x, int y) {
+
 	int width, height;
 	getDrawingArea(width,height);
 
@@ -445,6 +449,7 @@ void CWindow::setMousePos(int x, int y) {
 
 //get current mouse position
 void CWindow::getMousePos(int& x, int& y) {
+	return;
 	POINT pt;
 	GetCursorPos(&pt);
 	ScreenToClient(hWnd, &pt);

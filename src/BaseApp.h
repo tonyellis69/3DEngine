@@ -1,8 +1,8 @@
 #pragma once
 
-
-
-#include "Window.h"
+#include <windows.h>  //for file dialogues
+#include <glew.h>
+//#include "Window.h"
 #include "Engine.h"
 #include "UI\GUIbase.h"
 #include "UI\GUIroot.h"
@@ -27,6 +27,8 @@
 
 #include "..\VMtest\src\vmApp.h"
 
+#include "win\win.h"
+
 #include <iostream> //for cerr
 using namespace std;
 
@@ -39,12 +41,8 @@ public:
 	~CBaseApp(void);
 
 	void loadSystemFonts();
-	void RegisterHandlers();
 	void start();
-	void SetWindow(int width, int height);
-	void SetWindow(const std::string& Title);
-	void SetWindow( int width, int height, const std::string& Title, int Style);
-	void sizeViewToWindow();
+	void SetWindow( int width, int height, const std::string Title);
 	virtual void OnKeyDown(unsigned int wParam, long lParam) {};
 	virtual void draw() {};
 	virtual void Update() {};
@@ -55,12 +53,11 @@ public:
 	void OnKeyPress(unsigned int Key, long Mod);
 	void OnKeyRelease(unsigned int Key, long Mod);
 	void OnCharEntry(unsigned int Key, long Mod);
-	void OnMouseMsg(unsigned int Msg, unsigned int wParam, long lParam);
+	void onMouseMove(int x, int y);
+	void onMouseButton(int button, int action, int mods);
 	void OnMouseWheelMsg(unsigned int wParam, long lParam);
 	virtual void OnEvent() {};
 	void AppTasks();
-	void FullScreen();
-	void UnFullScreen();
 	void EatKeys();
 	void DrawUI();
 	void RegisterUIfunctors();
@@ -70,27 +67,30 @@ public:
 	void initWatches();
 	void updateWatches();
 
+	string getExePath();
+
 	virtual void vmMessage(TVMmsg) {};
 
 
 	CEngine Engine;
-	CWindow Window;
+	//CWindow Window;
 	CGUIengine UIeng;
 	CSoundLib snd;
 	CGUIroot GUIroot;
+	CWin win;
 
 	FILE* ErrStream;	///<Filestream error messages are written to.
 
 	CRenderDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
 
 
-	TSpecificFunctor<CBaseApp> KeyDownFunc;
-	TSpecificFunctor<CBaseApp> KeyUpFunc;
-	TSpecificFunctor<CBaseApp> CharEntryFunc;
-	TMouseMsgFunctor<CBaseApp> MouseMsgFunc;
-	TSpecificFunctor<CBaseApp> MouseWheelMsgFunc;
-	TSpecificFunctor<CBaseApp> OnWinResizeFunc;
-	TPlainFunctor<CBaseApp>	AppTasksFunc;
+//	TSpecificFunctor<CBaseApp> KeyDownFunc;
+//	TSpecificFunctor<CBaseApp> KeyUpFunc;
+//	TSpecificFunctor<CBaseApp> CharEntryFunc;
+//	TMouseMsgFunctor<CBaseApp> MouseMsgFunc;
+//	TSpecificFunctor<CBaseApp> MouseWheelMsgFunc;
+//	TSpecificFunctor<CBaseApp> OnWinResizeFunc;
+//	TPlainFunctor<CBaseApp>	AppTasksFunc;
 
 
 	bool KeyDown[0x100]; 

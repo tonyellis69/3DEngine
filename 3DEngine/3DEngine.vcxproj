@@ -54,7 +54,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\SFML-1.6\include;$(SolutionDir)..\glew\include\GL;$(SolutionDir)..\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\SFML-1.6\include;$(SolutionDir)..\glew\include\GL;$(SolutionDir)..\glm;D:\projects\glfw32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -65,7 +65,7 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>OpenGL32.lib;soil.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;soil.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-d.lib</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -172,7 +172,7 @@
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
-    <ClCompile Include="..\Src\Window.cpp" />
+    <ClCompile Include="..\src\win\win.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\VMtest\src\daemon.h" />
@@ -269,7 +269,7 @@
     <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
-    <ClInclude Include="..\Src\Window.h" />
+    <ClInclude Include="..\src\win\win.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

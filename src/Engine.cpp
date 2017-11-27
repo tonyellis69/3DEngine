@@ -32,8 +32,8 @@ CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 }
 
 /** Low level initialisation. */
-void CEngine::init(HWND& hWnd) {
-	Renderer.attachWindow(hWnd);
+void CEngine::init() {
+	//Renderer.attachWindow(hWnd);
 	Renderer.getGLinfo();
 	//CurrentFont = sysFont = ImageLib.LoadSysFont();
 	//ImageLib.LoadSmallSysFont();
@@ -286,11 +286,6 @@ void CEngine::applyGlobalScale() {
 /** Erase the contents of the frame buffer to the current background colour, ready for drawing to.*/
 void CEngine::clearFrame() {
 	Renderer.clearFrame();
-}
-
-/** Display the current contents of the framebuffer. */
-void CEngine::showFrame() {
-	Renderer.showFrame();
 }
 
 void CEngine::enableLineMode(bool enabled) {
@@ -806,5 +801,5 @@ CEngine::~CEngine(void) {
 	for (size_t s = 0; s<Renderer.shaderList.size(); s++)
 		delete Renderer.shaderList[s];
 
-	Renderer.detachWindow();
+	//Renderer.detachWindow();
 }

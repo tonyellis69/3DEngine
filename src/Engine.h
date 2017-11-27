@@ -31,7 +31,7 @@ class CEngine
 {
 public:
 	CEngine();
-	void init(HWND& hWnd);
+	void init();
 	void resizeView(int x, int y, int width, int height);
 	void setCurrentTexture( int textureNo);
 	int getTextureHandle(int textureNo);

@@ -57,18 +57,18 @@ void CGUIsysTextbox::OnKeyPress(unsigned int Key, long Mod) {
 
 
 	switch (Key) {
-	case VK_LEFT :	if (CursorPos > 0) 
+	case GLFW_KEY_LEFT :	if (CursorPos > 0) 
 						CursorPos--; 
 		break;
-	case VK_RIGHT :	if (CursorPos < (int)Text.length())
+	case GLFW_KEY_RIGHT :	if (CursorPos < (int)Text.length())
 						CursorPos++; 
 		break;
-	case  VK_BACK   :	if (CursorPos > 0) {
+	case  GLFW_KEY_BACKSPACE   :	if (CursorPos > 0) {
 							Text.erase(CursorPos-1,1); 
 							CursorPos--;
 						}
 						break;
-	case VK_RETURN  :	dataEnteredAlert();
+	case GLFW_KEY_ENTER:	dataEnteredAlert();
 						break;
 	};
 }

@@ -21,6 +21,9 @@
     <Filter Include="vm">
       <UniqueIdentifier>{0182bb3e-e9c5-4d69-aa75-cd0204fe3489}</UniqueIdentifier>
     </Filter>
+    <Filter Include="win">
+      <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -117,9 +120,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\watch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\2d.cpp">
@@ -281,11 +281,11 @@
     <ClCompile Include="..\src\UI\GUIconsole.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\win\win.cpp">
+      <Filter>win</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Src\Window.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\BaseApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -567,6 +567,9 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIconsole.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\win\win.h">
+      <Filter>win</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,5 @@
 #include "renderer.h"
-#include <windows.h> 
-//#include <gl/gl.h>
+//#include <windows.h> 
 #include <glew.h>
 #include <wglew.h>
 #include "..\Macros.h"
@@ -20,7 +19,7 @@ using namespace std;
 
 /** Initialise the high-level renderer. */
 CRenderer::CRenderer() {
-	myhRC = NULL;
+	//myhRC = NULL;
 	
 	
 
@@ -32,43 +31,6 @@ CRenderer::~CRenderer() {
 	_CrtDumpMemoryLeaks();
 }
 
-
-
-/** Attach the given window to the renderer, so it can be drawn to. */
-void CRenderer::attachWindow(HWND& hWnd){
-	//Windows-OpenGL setup stuff:
-	//Set the Windows device context pixel format for the given window
-	int nPixelFormat;
-
-	static PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR),	//size of this structure
-		1,								//version
-		PFD_DRAW_TO_WINDOW |			//draw to window (not bitmap)
-		PFD_SUPPORT_OPENGL |			//support OpenGL calls
-		PFD_DOUBLEBUFFER,				//double-buffered mode
-		PFD_TYPE_RGBA,					//RGBA colour mode
-		32,								//32 bit colour
-		0,0,0,0,0,						//not used
-		0,0,0,0,0,0,0,					//not used
-		32,								//size of depth buffer
-		0,0,							//not used
-		PFD_MAIN_PLANE,					//draw in main plane
-		0,0,0,0							//not used
-	};
-
-	myhDC = ::GetDC(hWnd); //get the window's device context 
-
-	//choose pixel format that best matches the one described:
-	nPixelFormat = ChoosePixelFormat(myhDC, &pfd);
-	SetPixelFormat(myhDC, nPixelFormat, &pfd);
-
-	ASSERT_ALWAYS(nPixelFormat, "Can't Find A Suitable PixelFormat.");
-	ASSERT_ALWAYS(SetPixelFormat(myhDC,nPixelFormat,&pfd),"Can't Set The PixelFormat.");
-   
-	 myhRC = wglCreateContext(myhDC); //create rendering context for OpenGL
-	ASSERT_ALWAYS(myhRC,"Can't Create A GL Rendering Context.");
-	ASSERT_ALWAYS(wglMakeCurrent(myhDC, myhRC),"Can't activate GL Rendering Context.");
-}
 
 
 
@@ -93,21 +55,12 @@ void CRenderer::getGLinfo() {
 }
 
 
-/** Detach the connected window from our renderer, if any. */
-void CRenderer::detachWindow(){
-	ASSERT_ALWAYS(wglMakeCurrent(myhDC, NULL),"Can't deactivate GL Rendering Context.");
-	wglDeleteContext(myhRC);
-}
-
 /** Clear the frame using the current background colour. */
 void CRenderer::clearFrame(){
 	glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 }
 
-/** Display the current frame. */
-void CRenderer::showFrame() {
-	SwapBuffers(myhDC);	
-}
+
 
 /** Set the background colour. */
 void CRenderer::setBackColour(const rgba& colour){
