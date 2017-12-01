@@ -113,7 +113,7 @@ public:
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
-			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric};
+			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu};
 
 
 
@@ -135,7 +135,7 @@ public:
 	virtual void OnLMouseUp(const  int mouseX, const  int mouseY)  ;
 	virtual void onRMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void OnClick(const  int mouseX, const  int mouseY) {};
-	virtual void OnKeyPress(unsigned int Key, long Mod) {};
+	virtual void onKeyPress(unsigned int Key, long Mod) {};
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void SetPos(int x, int y, int w, int h);
@@ -156,12 +156,12 @@ public:
 	virtual void uncaptureKeyboard();
 	virtual void setVisible(bool onOff);
 	virtual bool getVisible();
-
+	unsigned int getID();
 
 	void GenName(char* NameStr, int Count);
 	void SetName(char* NameStr);
 
-	void setDefaultFont(CFont& font);
+	void setDefaultFont(CFont* font);
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -218,9 +218,10 @@ public:
 
 	bool mousePassthru;
 
+	unsigned int uniqueID; ///<Unique identifier for each control; TO DO: make private
 protected:
 	bool enabled; ///<False if this control has been deactivated.
-	static CFont defaultFont;
+	static CFont* defaultFont;
 public:
 	//static DelegateP<void,int> setFont;
 };

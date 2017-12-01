@@ -129,8 +129,8 @@ void CGUInumericTextbox2::OnCharEntry(unsigned int Key, long Mod) {
 	((CGUInumeric2*)parent)->value = (float)atof(str.c_str());
 }
 
-void CGUInumericTextbox2::OnKeyPress(unsigned int Key, long Mod) {
-	CGUItextbox2::OnKeyPress(Key, Mod);
+void CGUInumericTextbox2::onKeyPress(unsigned int Key, long Mod) {
+	CGUItextbox2::onKeyPress(Key, Mod);
 	std::string str = textBuf.getText();
 	((CGUInumeric2*)parent)->value = (float)atof(str.c_str());
 }

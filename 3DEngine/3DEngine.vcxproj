@@ -159,6 +159,7 @@
     <ClCompile Include="..\src\UI\GUIimageGrid.cpp" />
     <ClCompile Include="..\src\UI\GUIlabel.cpp" />
     <ClCompile Include="..\src\UI\GUIlabel2.cpp" />
+    <ClCompile Include="..\src\UI\GUImenu.cpp" />
     <ClCompile Include="..\src\UI\GUInumeric.cpp" />
     <ClCompile Include="..\src\UI\GUInumeric2.cpp" />
     <ClCompile Include="..\src\UI\GUIpanel.cpp" />
@@ -254,6 +255,7 @@
     <ClInclude Include="..\src\UI\GUIimageGrid.h" />
     <ClInclude Include="..\src\UI\GUIlabel.h" />
     <ClInclude Include="..\src\UI\GUIlabel2.h" />
+    <ClInclude Include="..\src\UI\GUImenu.h" />
     <ClInclude Include="..\src\UI\GUImouse.h" />
     <ClInclude Include="..\src\UI\GUInumeric.h" />
     <ClInclude Include="..\src\UI\GUInumeric2.h" />

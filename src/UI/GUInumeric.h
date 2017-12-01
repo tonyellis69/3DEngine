@@ -49,6 +49,6 @@ public:
 	CGUInumericTextbox() {};
 	CGUInumericTextbox(int x, int y, int w, int h);
 	void OnCharEntry(unsigned int Key, long Mod);
-	void OnKeyPress(unsigned int Key, long Mod);
+	void onKeyPress(unsigned int Key, long Mod);
 	void dataEnteredAlert();
 };

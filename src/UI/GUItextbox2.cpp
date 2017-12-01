@@ -18,7 +18,7 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 
 }
 
-void CGUItextbox2::setFont(CFont& font) {
+void CGUItextbox2::setFont(CFont* font) {
 	textBuf.setFont(font);
 	textBuf.renderText();
 }
@@ -75,7 +75,7 @@ void CGUItextbox2::OnClick(const  int mouseX, const  int mouseY) {
 }
 
 /**User has pressed a key, and we have focus. Use this to catch cursor keys, backspace,etc*/
-void CGUItextbox2::OnKeyPress(unsigned int Key, long Mod) {
+void CGUItextbox2::onKeyPress(unsigned int Key, long Mod) {
 	switch (Key) {
 	case GLFW_KEY_LEFT:	textBuf.moveCursor(-1, 0);
 					break;

@@ -284,6 +284,9 @@
     <ClCompile Include="..\src\win\win.cpp">
       <Filter>win</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUImenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -570,6 +573,9 @@
     </ClInclude>
     <ClInclude Include="..\src\win\win.h">
       <Filter>win</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUImenu.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -57,7 +57,7 @@ CDrawFuncs* CGUIbase::pDrawFuncs;
 CGUImouse* CGUIbase::mouse;
 CGUIbaseEngine* CGUIbase::pGUIeng;
 
-CFont CGUIbase::defaultFont;
+CFont* CGUIbase::defaultFont;
 
 /** Returns true if the given point is inside this control's area. */
 bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY) {
@@ -269,7 +269,7 @@ void CGUIbase::SetName(char* NameStr) {
 	strcpy(Name,NameStr);
 }
 
-void CGUIbase::setDefaultFont(CFont & font) {
+void CGUIbase::setDefaultFont(CFont* font) {
 	defaultFont = font;
 }
 
@@ -400,5 +400,9 @@ void CGUIbase::setVisible(bool onOff) {
 
 bool CGUIbase::getVisible() {
 	return visible;
+}
+
+unsigned int CGUIbase::getID() {
+	return uniqueID;
 }
 

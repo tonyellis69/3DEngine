@@ -53,7 +53,7 @@ void CGUIsysTextbox::OnClick(const  int mouseX, const  int mouseY) {
 }
 
 /**User has pressed a key, and we have focus. Use this to catch cursor keys, backspace,etc*/
-void CGUIsysTextbox::OnKeyPress(unsigned int Key, long Mod) {
+void CGUIsysTextbox::onKeyPress(unsigned int Key, long Mod) {
 
 
 	switch (Key) {

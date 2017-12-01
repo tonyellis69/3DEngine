@@ -43,14 +43,14 @@ public:
 	void loadSystemFonts();
 	void start();
 	void SetWindow( int width, int height, const std::string Title);
-	virtual void OnKeyDown(unsigned int wParam, long lParam) {};
+	virtual void onKeyDown( int key, long mod) {};
 	virtual void draw() {};
 	virtual void Update() {};
 	virtual void onResize(int width, int height) {};
 	virtual void keyCheck() {};
 	virtual void mouseMove(int x, int y, int key) {};
 	void onWinResize( int w, int h);
-	void OnKeyPress(unsigned int Key, long Mod);
+	void onKeyPress(int key, long Mod);
 	void OnKeyRelease(unsigned int Key, long Mod);
 	void OnCharEntry(unsigned int Key, long Mod);
 	void onMouseMove(int x, int y);
@@ -58,7 +58,6 @@ public:
 	void OnMouseWheelMsg(unsigned int wParam, long lParam);
 	virtual void OnEvent() {};
 	void AppTasks();
-	void EatKeys();
 	void DrawUI();
 	void RegisterUIfunctors();
 	virtual void onStart() {};
@@ -93,7 +92,7 @@ public:
 //	TPlainFunctor<CBaseApp>	AppTasksFunc;
 
 
-	bool KeyDown[0x100]; 
+	//bool KeyDown[0x100]; 
 	bool BuiltInFullScrn; ///<If true, Tab toggles fullscreen.
 
 	double Time;

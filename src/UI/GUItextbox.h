@@ -9,7 +9,7 @@ public:
 	CGUIsysTextbox(void);
 	void DrawSelf( );
 	void OnClick(const  int mouseX, const  int mouseY);
-	void OnKeyPress(unsigned int Key, long Mod);
+	void onKeyPress(unsigned int Key, long Mod);
 	void OnCharEntry(unsigned int Key, long Mod);
 	virtual void dataEnteredAlert();
 	virtual void message(CGUIbase& sender, CMessage& msg);

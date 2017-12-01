@@ -106,8 +106,8 @@ void CGUInumericTextbox::OnCharEntry(unsigned int Key, long Mod) {
 	((CGUInumeric*)parent)->value = (float)atof(Text.c_str());
 }
 
-void CGUInumericTextbox::OnKeyPress(unsigned int Key, long Mod) {
-	CGUItextbox::OnKeyPress(Key,Mod);
+void CGUInumericTextbox::onKeyPress(unsigned int Key, long Mod) {
+	CGUItextbox::onKeyPress(Key,Mod);
 	((CGUInumeric*)parent)->value = (float)atof(Text.c_str());
 }
 

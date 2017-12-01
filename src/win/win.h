@@ -33,6 +33,7 @@ public:
 	void hideWindow(bool onOff);
 	void setTitle(std::string & title);
 	void showMouse(bool onOff);
+	bool keyPressed(int key);
 
 
 	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);

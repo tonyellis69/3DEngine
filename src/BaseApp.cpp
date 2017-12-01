@@ -29,7 +29,6 @@ CBaseApp::CBaseApp(void)  {
 	
 	//Set up our handlers for window events
 	//RegisterHandlers();
-	EatKeys();
 
 	UIeng.pEngine = &Engine;
 
@@ -49,7 +48,7 @@ CBaseApp::CBaseApp(void)  {
 	
 
 	loadSystemFonts();
-	GUIroot.setDefaultFont(smallSysFont);
+	GUIroot.setDefaultFont(&smallSysFont);
 
 	RegisterUIfunctors();
 
@@ -107,29 +106,29 @@ void CBaseApp::onWinResize( int w, int h) {
 	onResize(w,h); //Call the user's resize handler, in case they want to do something;
 }
 
-/** Event handler for when the OS messages that a key is pressed down. */
-void CBaseApp::OnKeyPress(unsigned int Key, long Mod) {
-	KeyDown[Key] = true; //TO DO 'some lag with this' - really? Check.
-	if (Key == GLFW_KEY_TAB && BuiltInFullScrn) {
+/** Event handler for when the OS messages that a key has been pressed down. */
+void CBaseApp::onKeyPress(int key, long mod) {
+	//KeyDown[key] = true; //TO DO 'some lag with this' - really? Check.
+	if (key == GLFW_KEY_TAB && BuiltInFullScrn) {
 		if (!win.fullScreenOn)
 			 win.fullScreen();
 		else
 			 win.unFullScreen();
 		return;
 	}
-	if (Key == GLFW_KEY_ESCAPE && quitOnEsc){
+	if (key == GLFW_KEY_ESCAPE && quitOnEsc){
 		//win.quitWindow();
 		PostQuitMessage(0);
 		return;
 	}	
 	//send the key to the UI
-	GUIroot.KeyboardMsg(Key, Mod);
-	OnKeyDown(Key,Mod); //Call the user's key handler - useful when we don't want feedback every frame
+	GUIroot.KeyboardMsg(key, mod);
+	onKeyDown(key,mod); //Call the user's key handler - useful when we don't want feedback every frame
 }
 
 /** Event handler for when a key is released. */
 void CBaseApp::OnKeyRelease(unsigned int Key, long Mod) {
-	KeyDown[Key] = false;
+	//KeyDown[Key] = false;
 }
 
 /** Event handler for when a key is pressed and we want to handle it as a character. Eg, textbox entry. */
@@ -173,14 +172,11 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 
 /** Event handler for mouse wheel messages. */
 void CBaseApp::OnMouseWheelMsg(unsigned int wParam, long lParam) {
-
-	//GetCursorPos(&Mouse);
-	//ScreenToClient(Window.hWnd,&Mouse);
 	int x, y;
 	win.getMousePos(x, y);
 	int delta;// = GET_WHEEL_DELTA_WPARAM(wParam) / 120;
 	delta = wParam;
-	if (GUIroot.IsOnControl(GUIroot,x, y))
+	if (GUIroot.IsOnControl(GUIroot,x, y)) //checks that the mouse isn't outside our app altogether
 		GUIroot.MouseWheelMsg(x,y,delta,GET_KEYSTATE_WPARAM(wParam));
 }
 
@@ -238,11 +234,6 @@ void CBaseApp::AppTasks() {
 
 }
 
-
-void CBaseApp::EatKeys() {
-	for (int x=0;x<0x100;x++) 
-		KeyDown[x] = false;
-}
 
 /** Draw the UI system. */
 void CBaseApp::DrawUI() {
@@ -346,37 +337,35 @@ void CBaseApp::getMousePos(int& x, int& y) {
 }
 
 bool CBaseApp::keyNow(int vKey) {
-	//return KeyDown[vKey];
-	//return Window.keyNow(vKey);
-	return GetAsyncKeyState(vKey) && 0x4000;
+	return win.keyPressed( vKey);
+	//return GetAsyncKeyState(vKey) && 0x4000;
 }
 
 
 /** Shut down the entire app and exit. */
 void CBaseApp::exit() {
-	//Window.quitWindow();
 	PostQuitMessage(0);
 }
 
 
 void CBaseApp::initWatches() {
 	wLabel1 = new CGUIlabel2(800,100,400,50);
-	wLabel1->setFont(sysFont);
+	wLabel1->setFont(&sysFont);
 	wLabel1->setTextColour(UIwhite);
 	GUIroot.Add(wLabel1);
 
 	wLabel2 = new CGUIlabel2(800,150,400,50);
-	wLabel2->setFont(sysFont);
+	wLabel2->setFont(&sysFont);
 	wLabel2->setTextColour(UIwhite);
 	GUIroot.Add(wLabel2);
 
 	wLabel3 = new CGUIlabel2(800,200,400,50);
-	wLabel3->setFont(sysFont);
+	wLabel3->setFont(&sysFont);
 	wLabel3->setTextColour(UIwhite);
 	GUIroot.Add(wLabel3);
 
 	consoleLbl = new CGUIlabel2(10,10,100,100);	
-	consoleLbl->setFont(sysFont);
+	consoleLbl->setFont(&sysFont);
 	consoleLbl->setTextColour(UIwhite);
 	consoleLbl->anchorBottom = 10;
 	consoleLbl->anchorRight = 10;

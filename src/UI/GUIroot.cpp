@@ -11,9 +11,10 @@ CGUIroot::CGUIroot() {
 	id = uiRootID;
 	modalControl = NULL;
 	killModal = false;
+	focusControl = NULL;
 }
 
-/** We overload this method so that we can send messages direct to any control that has trapped the
+/** Root overloads this method so it can send messages direct to any control that has trapped the
 	mouse, keyboard, etc. */
 void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
@@ -33,11 +34,14 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		OnMouseMove(mouseX,mouseY,key);
 	}
 
+	if (focusControl)
+		return focusControl->MouseMsg(Msg, mouseX, mouseY,key);
+
 
 	CGUIbase::MouseMsg(Msg,mouseX,mouseY,key);
 }
 
-/** We overload this method so that we can send messages direct to any control that has trapped the
+/** Root overloads this method so it can send messages direct to any control that has trapped the
 	mouse, keyboard, etc. */
 bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
 	if ((!visible) || (!enabled))
@@ -47,8 +51,13 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 		return modalControl->MouseWheelMsg(mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,wheelDelta,key);
 	}
 
+	if (focusControl)
+		return focusControl->MouseWheelMsg(mouseX, mouseY, wheelDelta, key);
+
 	if (CGUIbase::MouseWheelMsg(mouseX,mouseY,wheelDelta,key))
 		return true;
+
+	
 
 	//still here? mousewheel was on this control
 	CMessage msg;
@@ -76,7 +85,7 @@ void CGUIroot::CalculateClipbox() {
 /** Receives a keystroke message, and passes it on to whichever control has captured the keyboard, if any. */
 void CGUIroot::KeyboardMsg(unsigned int Key, long Mod) {
 	if (KeyCapture != NULL)
-		KeyCapture->OnKeyPress(Key,Mod);
+		KeyCapture->onKeyPress(Key,Mod);
 }
 
 /** Receives a character entry message, and passes it on to whichever control has captured the keyboard, if any. */
@@ -169,6 +178,12 @@ void CGUIroot::addModal(CGUIbase* control) {
 void CGUIroot::removeModal() {
 	killModal = true;
 	updateAppearance();
+}
+
+/** Set the given control as the control with focus, to which input can be sent even if the mouse pointer
+isn't over it. */
+void CGUIroot::setFocus(CGUIbase * control) {
+	focusControl = control;
 }
 
 

@@ -136,6 +136,10 @@ void CWin::showMouse(bool onOff) {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
+bool CWin::keyPressed(int key) {
+	return glfwGetKey(window, key);
+}
+
 
 void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
 	pApp->onMouseMove(xpos, ypos);
@@ -151,7 +155,7 @@ void CWin::windowSizeCallback(GLFWwindow* window, int width, int height) {
 
 void CWin::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS)
-		pApp->OnKeyPress(key, mods);
+		pApp->onKeyPress(key, mods);
 	else
 		pApp->OnKeyRelease(key, mods);
 }

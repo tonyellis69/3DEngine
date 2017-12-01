@@ -23,7 +23,9 @@ public:
 	void SetPos(int x, int y, int w, int h);
 	void setPos(int x, int y);
 
-	unsigned int uniqueID; ///<Unique identifier for each control;
+	
+
+
 	guiRect drawBox; ///<Defines the dimensions of the control for drawing (replaces screenPos).
 	guiRect clipBox; ///<Defines the drawable area of this control for child controls.
 
