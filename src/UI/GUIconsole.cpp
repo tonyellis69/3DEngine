@@ -24,17 +24,18 @@ void CGUIconsole::DrawSelf() {
 }
 
 void CGUIconsole::setText(std::string newText) {
-	textObj = newText;
+	text = newText;
 	topLineStart = 0;
 	textBuf.setText(newText);
 }
 
 /** Append newText to the currently displayed text. */
 void CGUIconsole::appendText(std::string newText) {
-	textObj += newText;
-	textBuf.appendText(newText);
-	//if (textBuf.getOverrun() > 0)
-	while (textBuf.getOverrun() > 0)
+	text += newText;
+	//textBuf.appendText(newText);
+	renderText();
+
+	while (overrun > 0)
 	{
 		scroll(-1);
 	}
@@ -43,9 +44,37 @@ void CGUIconsole::appendText(std::string newText) {
 /** Change the first line that we display. */
 void CGUIconsole::scroll(int direction) {
 	if (direction < 0) { //scrolling down through text
-		//find next line break 
-		topLineStart += textBuf.nextLineBreak(0) ;
-		textBuf.setText(textObj.substr(topLineStart, string::npos));
+		topLineStart = getNextLineStart(topLineStart) ;
+		renderText();
 	}
+}
 
+/** Render the text according to current settings. */
+void CGUIconsole::renderText() {
+	if (!text.size())
+		return;
+	textBuf.clearBuffer();
+	calcLineRenderedWidth();
+	calcLineOffset();
+	overrun = 0;
+	int lineStart = topLineStart; int lineYpos = lineOffset.y;
+	int nextLineStart;
+	std::string renderLine;
+	do {
+		
+		nextLineStart = getNextLineStart(lineStart);
+		renderLine = text.substr(lineStart, nextLineStart - lineStart);
+		textBuf.renderTextAt(lineOffset.x, lineYpos, renderLine);
+		if ((lineYpos + font->lineHeight) > height) {
+			overrun = (lineYpos + font->lineHeight) - height;
+			return;
+		}
+
+
+		lineYpos += font->lineHeight;
+		lineStart = nextLineStart;
+		
+
+	} while (nextLineStart < text.size());
+	
 }

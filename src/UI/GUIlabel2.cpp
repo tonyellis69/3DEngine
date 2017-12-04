@@ -6,6 +6,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	xPos = x; yPos = y; width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 	textBuf.setFont(defaultFont);
+	font = defaultFont;
 	textBuf.setSize(w, h);
 
 	type = uiLabel;
@@ -31,7 +32,7 @@ void CGUIlabel2::setText(std::string newText) {
 void CGUIlabel2::setTextColour(float r, float g, float b, float a) {
 	textColour.r = r; textColour.g = g; textColour.b = b; textColour.a = a;
 	textBuf.setTextColour(textColour);
-	//textBuf.renderText();
+	renderText();
 }
 
 void CGUIlabel2::setTextColour(UIcolour  colour) {
@@ -39,19 +40,18 @@ void CGUIlabel2::setTextColour(UIcolour  colour) {
 }
 
 void CGUIlabel2::setMultiLine(bool onOff) {
-	textBuf.setMultiLine(onOff);
 	multiLine = onOff;
 	renderText();
 }
 
 void CGUIlabel2::setHorizontalAlignment(TTextAlign align) {
 	textAlign = align;
-	textBuf.setHorizontalAlignment(align);
+	
 	
 }
 
 TTextAlign CGUIlabel2::getJustification() {
-	return textBuf.getJustification();
+	return textAlign;
 }
 
 
@@ -81,15 +81,15 @@ void CGUIlabel2::SetPos(int x, int y, int w, int h) {
 }
 
 float CGUIlabel2::getTextWidth() {
-	return textBuf.getTextWidth();
+	return lineRenderedWidth;
 }
 
 /** Determine offset due to centering, etc. */
 void CGUIlabel2::calcLineOffset() {
-	if (multiLine) 
-		lineOffset.y = (-height / 2.0) + font->lineHeight;
+	if (multiLine)
+		lineOffset.y = 0;
 	else
-		lineOffset.y = font->lineHeight/2.0;
+		lineOffset.y = (height - font->lineHeight) / 2.0f;
 
 	if (textAlign == tcentred) {
 		lineOffset.x = (width - lineRenderedWidth) / 2.0f;

@@ -9,7 +9,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	textColour = UIblack;
 	selectedColour = UIblue;
 	type = uiMenu;
-	vPad = 4;
+	vPad =  4;
 	itemWidth = width;
 	itemHeight = itemFont->lineHeight + vPad;
 	clear();
@@ -41,8 +41,9 @@ void CGUImenu::DrawSelf() {
 
 void CGUImenu::addItem(std::string  itemText) {
 	CGUIlabel2* item = new CGUIlabel2(0, nextItemPos, itemWidth, itemHeight);
+	item->setMultiLine(false);
 	item->setFont(itemFont);
-	//item->borderOn(true);
+	item->borderOn(false);
 	if (selected == nItems)
 		item->setTextColour(selectedColour);
 	else

@@ -12,6 +12,9 @@ public:
 	void appendText(std::string newText);
 	void scroll(int direction);
 
-	std::string textObj;
+	void renderText();
+	int overrun;
+
+	//std::string textObj;
 	int topLineStart; ///<Position in text of the first character to display.
 };
