@@ -38,7 +38,7 @@ void CGUIengine::DrawBorder(int x, int y, int width, int height) {
 }
 
 void CGUIengine::setClip(UIrect& clipbox) {
-	;//	pEngine->setClip(clipbox.x, clipbox.y, clipbox.width, clipbox.height);
+		pEngine->setClip(clipbox.x, clipbox.y, clipbox.width, clipbox.height);
 }
 
 

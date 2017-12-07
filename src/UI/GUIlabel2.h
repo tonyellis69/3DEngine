@@ -1,11 +1,11 @@
 #pragma once
 
-#include "GUIbetterBase.h"
+#include "GUIbase.h"
 #include "font.h"
 #include "textBuf.h"
 
 /** A class to render text to the screen. */
-class CGUIlabel2 : public CGUIbetterBase {
+class CGUIlabel2 : public CGUIbase {
 public:
 	CGUIlabel2(int x, int y, int w, int h);
 	void setFont(CFont* font);
@@ -26,6 +26,8 @@ public:
 	void renderText();
 	int getNextLineStart(int lineStart);
 
+
+
 	CTextBuffer textBuf;
 	glm::vec4 textColour;
 	CFont* font;
@@ -34,4 +36,4 @@ public:
 	int lineRenderedWidth;
 	TTextAlign textAlign; ///<Records whether the text is centred, etc, in its area.
 	bool multiLine;
-};
+	};

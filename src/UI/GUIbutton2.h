@@ -2,9 +2,9 @@
 
 #include "GUIlabel2.h"
 #include "GUIlabel.h"
-#include "GUIbetterBase.h"
+#include "GUIbase.h"
 
-class CGUIbutton2 : public CGUIbetterBase {
+class CGUIbutton2 : public CGUIbase {
 public:
 	CGUIbutton2(int x, int y, int w, int h);
 	void DrawSelf();

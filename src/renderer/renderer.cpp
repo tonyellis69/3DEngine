@@ -19,10 +19,6 @@ using namespace std;
 
 /** Initialise the high-level renderer. */
 CRenderer::CRenderer() {
-	//myhRC = NULL;
-	
-	
-
 }
 
 CRenderer::~CRenderer() {
@@ -30,9 +26,6 @@ CRenderer::~CRenderer() {
 		delete bufferList[b];
 	_CrtDumpMemoryLeaks();
 }
-
-
-
 
 void CRenderer::getGLinfo() {
 	cerr << endl;

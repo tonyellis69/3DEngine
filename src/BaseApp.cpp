@@ -240,7 +240,7 @@ void CBaseApp::DrawUI() {
 	Engine.setCurrentShader(0);
 	Engine.setDrawColour(engineWhite);
 	GUIroot.Draw();
-	Engine.setClip(0,0,GUIroot.width,GUIroot.height);
+	Engine.setClip(0,0,GUIroot.drawBox.size.x, GUIroot.drawBox.size.y);
 }
 
 /** Assign engine functions to the UI so it can draw itself, etc. */

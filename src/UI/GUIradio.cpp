@@ -3,7 +3,8 @@
 
 int CGUIradio::Count = 1;
 CGUIradio::CGUIradio(int x , int y, int w, int h) {
-	xPos = x;yPos = y;width = w;height = h;
+	localPos = glm::i32vec2(x, y);
+	width = w;height = h;
 	GenName("Radio",Count++);
 	SetText(Name);
 	Orientation = lblFirst;

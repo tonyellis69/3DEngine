@@ -2,6 +2,7 @@
 #include "GUIbase.h"
 
 
+
 /** The class defining GUIroot, the parent UI control to which all other controls are attached. */
 class CGUIroot : public CGUIbase {
 public:

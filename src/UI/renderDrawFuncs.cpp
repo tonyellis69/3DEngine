@@ -35,15 +35,14 @@ void CRenderDrawFuncs::loadShaders() {
 
 
 /** Register this control with the uiEngine, storing its details for drawing. */
-void CRenderDrawFuncs::registerControl(CGUIbetterBase & control) {
-
+void CRenderDrawFuncs::registerControl(CGUIbase & control) {
 	quadBufs[control.uniqueID].border = (CBuf*)pRenderer->createBuffer();
 	quadBufs[control.uniqueID].rect = (CBuf*)pRenderer->createBuffer();
 
 	setScreenDimensions(control);
 }
 
-void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
+void CRenderDrawFuncs::setScreenDimensions(CGUIbase & control) {
 
 	//A B
 	//C D
@@ -62,6 +61,9 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
 	quadBufs[control.uniqueID].rect->storeIndex(index,  4);
 	quadBufs[control.uniqueID].rect->storeLayout(2, 2, 0, 0);
 
+	corners[0].v += vec2(0.5f); ///A little bodge, because rounding errors can put the border coords
+	corners[1].v += vec2(0,0.5f); ///outside of the clipping area. The trouble is that a vertical line starting at
+	corners[2].v += vec2(0.5f,0); // 0,0 is halfway into -1,0, and the clipping area is described in integers.
 	unsigned int index2 [4] = { 1,0,2,3 };
 	quadBufs[control.uniqueID].border->storeVertexes(corners, sizeof(corners), 4);
 	quadBufs[control.uniqueID].border->storeIndex(index2,  4);
@@ -71,7 +73,7 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbetterBase & control) {
 }
 
 /** Draw the drawBox rectangle of this control. */
-void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
+void CRenderDrawFuncs::drawCtrlRect(CGUIbase & control) {
 	CBuf* buf = quadBufs[control.uniqueID].rect;
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1,(vec4&)control.backColour1);
@@ -81,7 +83,7 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbetterBase & control) {
 	pRenderer->setShader(0);
 }
 
-void CRenderDrawFuncs::drawCtrlBorder(CGUIbetterBase & control) {
+void CRenderDrawFuncs::drawCtrlBorder(CGUIbase & control) {
 	CBuf* buf = quadBufs[control.uniqueID].border;
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1, (vec4&)control.borderColour);
@@ -96,7 +98,7 @@ void CRenderDrawFuncs::setScreenSize(int width, int height) {
 	mat4 flip;
 	flip[1].y = -1;
 	flip[2].y = float(height);
-	orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height) ;
+	//orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height) ;
 	orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height);
 
 	screenWidth = width; screenHeight = height;
@@ -107,7 +109,7 @@ unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName)
 	return renTex->handle;
 }
 
-void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {
+void CRenderDrawFuncs::drawTexture(CGUIbase & control, CBaseTexture& texture) {
 	CBuf* buf = quadBufs[control.uniqueID].rect;
 	//set shader
 	pRenderer->setShader(uiTexShader);
@@ -132,13 +134,13 @@ void CRenderDrawFuncs::drawTexture(CGUIbetterBase & control, CBaseTexture& textu
 }
 
 /** Update the vertexes defining the dimensions of this control. */
-void CRenderDrawFuncs::updateScreenDimensions(CGUIbetterBase & control) {
+void CRenderDrawFuncs::updateScreenDimensions(CGUIbase & control) {
 	setScreenDimensions(control);
 	//TO DO: more elegant and efficient to update matrix, not all the verts!
 }
 
 /** Assuming this is an interactive text control, draw its cursor. */
-void CRenderDrawFuncs::drawCursor(CGUIbetterBase& control,CBuf& cursorPos) {
+void CRenderDrawFuncs::drawCursor(CGUIbase& control,CBuf& cursorPos) {
 	chrono::system_clock::time_point currentTime = chrono::system_clock::now();
 	chrono::duration<float> time_span = chrono::duration_cast<chrono::duration<float>>(currentTime - lastCursorFlash);
 	if (time_span.count() > cursorFlashDelay) {

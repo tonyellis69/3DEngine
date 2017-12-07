@@ -1,18 +1,17 @@
-#include "GUIconsole.h"
+#include "GUIrichText.h"
 
 #include "glm\glm.hpp"
 
 using namespace glm;
 
-CGUIconsole::CGUIconsole(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
+CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	UIcolour tint = { 0,0,0,0.2f };
 	setBackColour1(tint);
 	setBackColour2(tint);
-	textBuf.setDrawBorder(10, 10);
 	topLineStart = 0;
 }
 
-void CGUIconsole::DrawSelf() {
+void CGUIrichText::DrawSelf() {
 
 	pDrawFuncs->drawCtrlRect(*this);
 
@@ -23,14 +22,14 @@ void CGUIconsole::DrawSelf() {
 	}
 }
 
-void CGUIconsole::setText(std::string newText) {
+void CGUIrichText::setText(std::string newText) {
 	text = newText;
 	topLineStart = 0;
-	textBuf.setText(newText);
+	//textBuf.setText(newText);
 }
 
 /** Append newText to the currently displayed text. */
-void CGUIconsole::appendText(std::string newText) {
+void CGUIrichText::appendText(std::string newText) {
 	text += newText;
 	//textBuf.appendText(newText);
 	renderText();
@@ -42,7 +41,7 @@ void CGUIconsole::appendText(std::string newText) {
 }
 
 /** Change the first line that we display. */
-void CGUIconsole::scroll(int direction) {
+void CGUIrichText::scroll(int direction) {
 	if (direction < 0) { //scrolling down through text
 		topLineStart = getNextLineStart(topLineStart) ;
 		renderText();
@@ -50,7 +49,7 @@ void CGUIconsole::scroll(int direction) {
 }
 
 /** Render the text according to current settings. */
-void CGUIconsole::renderText() {
+void CGUIrichText::renderText() {
 	if (!text.size())
 		return;
 	textBuf.clearBuffer();

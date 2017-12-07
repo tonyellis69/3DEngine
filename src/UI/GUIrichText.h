@@ -4,9 +4,9 @@
 
 
 /** A more versatile multiline text display class. */
-class CGUIconsole : public CGUIlabel2 {
+class CGUIrichText : public CGUIlabel2 {
 public:
-	CGUIconsole(int x, int y, int w, int h);
+	CGUIrichText(int x, int y, int w, int h);
 	void DrawSelf();
 	void setText(std::string newText);
 	void appendText(std::string newText);

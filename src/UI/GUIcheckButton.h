@@ -7,11 +7,13 @@
 
 /** Simple check button control. */
 
-class CGUIcheckButton :  public CGUIbase, public CGUIbaseLbl {
+class CGUIcheckButton :  public CGUIbase {
 public:
 	CGUIcheckButton(int x, int y, int w, int h);
 	void DrawSelf();
 	void OnClick(const  int mouseX, const  int mouseY);
+
+	void setText(std::string newText);
 
 	static int Count;
 	RadioOrientationType Orientation; ///<Which way around the label and icon go.

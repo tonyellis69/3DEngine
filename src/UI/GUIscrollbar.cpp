@@ -6,7 +6,7 @@ using namespace std;
 CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y, int length) {
 	orientation = axis; 
 	type = scrollbar;
-	xPos = x; yPos = y;
+	localPos = glm::i32vec2(x,y);
 	if (orientation == horizontal) {
 		width = length; height = barWidth; }
 	else {

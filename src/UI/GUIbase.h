@@ -10,9 +10,15 @@
 
 #include <iostream> //for cerr
 
-//#include <GLFW\glfw3.h>
+#include "glm\glm.hpp"
 
 using namespace std;
+
+class guiRect {
+public:
+	glm::i32vec2 pos;
+	glm::i32vec2 size;
+};
 
 /** Simple message struct. */
 class CMessage {
@@ -75,7 +81,7 @@ class CGUIbase;
 //TO DO: remove test
 extern DelegateP<void,int> setFont; 
 
-class CGUIbetterBase;
+/////////////////////class CGUIbetterBase;
 /** Contains member function pointers to the various drawing function the GUI needs. It is the user's responsibility
 	to create an instance of this, initialise it and pass it to GUIroot. */
 class CDrawFuncs {
@@ -100,20 +106,20 @@ public:
 	DelegatePPPP<void,int,int,int,int> drawDottedRect;
 	DelegatePP<void,float,float> setScale;
 
-	virtual void registerControl(CGUIbetterBase& control) {};
-	virtual void drawCtrlRect(CGUIbetterBase& control) {};
-	virtual void drawCtrlBorder(CGUIbetterBase& control) {};
+	virtual void registerControl(CGUIbase& control) {};
+	virtual void drawCtrlRect(CGUIbase& control) {};
+	virtual void drawCtrlBorder(CGUIbase& control) {};
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
-	virtual void drawTexture(CGUIbetterBase & control, CBaseTexture& texture) {};
-	virtual void updateScreenDimensions(CGUIbetterBase& control) {};
-	virtual void drawCursor(CGUIbetterBase& control, CBuf& cursorPos) {};
+	virtual void drawTexture(CGUIbase & control, CBaseTexture& texture) {};
+	virtual void updateScreenDimensions(CGUIbase& control) {};
+	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
 };
 
 
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
-			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu};
+			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel};
 
 
 
@@ -139,6 +145,7 @@ public:
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void SetPos(int x, int y, int w, int h);
+	void setPos(int x, int y);
 	virtual void Add(CGUIbase* child);
 	virtual void updateAppearance();
 	virtual void Draw();
@@ -158,6 +165,12 @@ public:
 	virtual bool getVisible();
 	unsigned int getID();
 
+	void setBackColour1(const UIcolour & colour);
+
+	void setBackColour2(const UIcolour & colour);
+
+	void setBorderColour(const UIcolour & colour);
+
 	void GenName(char* NameStr, int Count);
 	void SetName(char* NameStr);
 
@@ -165,8 +178,8 @@ public:
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
-	int xPos; ///<Top left corner x coordinate.
-	int yPos; ///<Top left corner y coordinate.
+	
+	glm::i32vec2 localPos; ///<Top left corner position relative to parent;
 	
 	int width; ///<Width of control.
 	int height; ///<Height of control.
@@ -190,6 +203,7 @@ public:
 	UIrect Clipbox; ///<A clipping rectangle defining the drawable area of this control.
 	
 	CGUIbase* parent; ///<Points to the parent control of this control.
+	//CGUIbetterBase* parent; ///<Points to the parent control of this control.
 
 	char* Name; ///<Points to the string identifying this control.
 
@@ -219,6 +233,12 @@ public:
 	bool mousePassthru;
 
 	unsigned int uniqueID; ///<Unique identifier for each control; TO DO: make private
+
+	guiRect drawBox; ///<Defines the dimensions of the control for drawing (replaces screenPos).
+	guiRect clipBox; ///<Defines the drawable area of this control for child controls.
+
+	UIcolour borderColour; ///<Colour for the border of this control.
+	bool drawBorder; ///<true if we draw this control's border.
 protected:
 	bool enabled; ///<False if this control has been deactivated.
 	static CFont* defaultFont;

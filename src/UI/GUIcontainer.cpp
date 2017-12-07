@@ -7,7 +7,8 @@ const int defaultSpaceAroundControls = 20;
 CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 	type = container;
 	borderWidth = 1;
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y);
+	width = w; height = h;
 	horizontalBarActive = false;
 	createScrollbars();
 	verticalBar->visible = false;
@@ -56,10 +57,10 @@ void CGUIsysContainer::Add(CGUIbase* child) {
 /** Handles a scroll message from the container's scrollbars. */
 void CGUIsysContainer::message(CGUIbase& sender, CMessage& msg) {
 	if (sender.id == uiContainerVbarID) 
-		surface->yPos =  0 - (verticalBar->Max - msg.value);
+		surface->localPos.y =  0 - (verticalBar->Max - msg.value);
 
 	if (sender.id == uiContainerHbarID) 
-		surface->xPos = 0 - msg.value;
+		surface->localPos.x = 0 - msg.value;
 	needsUpdate = true;
 }
 
@@ -117,13 +118,13 @@ bool CGUIsysContainer::verticalBarCheck() {
 		verticalBar->setSliderSize((float) surface->viewBox.height / surface->height);  
 		verticalBar->updateSliderAppearance();
 		//adust scrolling of surface accordingly:
-		surface->yPos =  surface->viewBox.y - (verticalBar->Max - verticalBar->Value) ;
+		surface->localPos.y =  surface->viewBox.y - (verticalBar->Max - verticalBar->Value) ;
 		return newBar;
 
 	}
 	else {
 		verticalBar->visible = false;
-		surface->yPos = surface->viewBox.y;
+		surface->localPos.y = surface->viewBox.y;
 		return false;
 	}
 }
@@ -150,12 +151,12 @@ bool CGUIsysContainer::horizontalBarCheck() {
 		horizontalBar->setMax(surface->width - surface->viewBox.width);
 		horizontalBar->setSliderSize((float) surface->viewBox.width / surface->width);  
 		horizontalBar->updateSliderAppearance();
-		surface->xPos = surface->viewBox.x - horizontalBar->Value;
+		surface->localPos.x = surface->viewBox.x - horizontalBar->Value;
 		return newBar;
 	}
 	else {
 		horizontalBar->visible = false;
-		surface->xPos = surface->viewBox.x;
+		surface->localPos.x = surface->viewBox.x;
 		return false;
 	}
 }
@@ -275,10 +276,10 @@ void CGUIbaseSurface::encompassChildControls() {
 
 	for (size_t i=0;i<Control.size();i++) {
 		child =Control[i];
-		if ((child->yPos + child->height + spaceAroundControls ) > newHeight)
-			newHeight = child->yPos + child->height + spaceAroundControls;
-		if ((child->xPos +child->width + spaceAroundControls) > newWidth)
-			newWidth = child->xPos + child->width + spaceAroundControls;
+		if ((child->localPos.y + child->height + spaceAroundControls ) > newHeight)
+			newHeight = child->localPos.y + child->height + spaceAroundControls;
+		if ((child->localPos.x +child->width + spaceAroundControls) > newWidth)
+			newWidth = child->localPos.x + child->width + spaceAroundControls;
 	}
 
 	if ((height != newHeight) || (width != newWidth))

@@ -11,7 +11,8 @@ CGUIpanelContainer::CGUIpanelContainer(int x, int y, int w, int h) {
 	borderWidth = 1;
 	horizontalBarActive = false;
 	type = panelContainer;
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y);
+	width = w; height = h;
 	
 	createScrollbars();
 	verticalBar->visible = false;

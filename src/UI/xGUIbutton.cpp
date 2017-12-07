@@ -4,7 +4,8 @@
 int CGUIbutton::Count = 1;
 
 CGUIbutton::CGUIbutton(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y); 
+	width = w; height = h;
 	backColour1 = oldbackColour1;
 	backColour2 = oldbackColour2;
 	GenName("Button",Count++);

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GUIbetterBase.h"
+#include "GUIbase.h"
 #include "textBuf.h"
 
 /** Simple textbox control using shader and render-to-texture. */
-class CGUItextbox2 : public CGUIbetterBase {
+class CGUItextbox2 : public CGUIbase {
 public:
 	CGUItextbox2(int x, int y, int w, int h);
 

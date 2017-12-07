@@ -3,11 +3,13 @@
 using namespace glm;
 
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
-	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	localPos = glm::i32vec2(x, y);
+	width = w; height = h;
+	drawBox.pos = i32vec2(x, y); 
+	drawBox.size = i32vec2(w, h);
 	textBuf.setFont(defaultFont);
 	font = defaultFont;
-	textBuf.setSize(w, h);
+	textBuf.setSize(w,h);
 
 	type = uiLabel;
 	setTextColour(0, 0, 0, 1);
@@ -72,12 +74,13 @@ void CGUIlabel2::borderOn(bool onOff) {
 
 /** Set the dimensions and relative position of the control. */
 void CGUIlabel2::SetPos(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y); 
+	width = w; height = h;
 	drawBox.pos = glm::i32vec2(x, y);
 	drawBox.size = glm::i32vec2(w, h);
-	textBuf.setSize(w, h);
-	//textBuf.renderText();
+	textBuf.setSize(w,h);
 	updateAppearance();
+	renderText();
 }
 
 float CGUIlabel2::getTextWidth() {
@@ -151,3 +154,5 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 	}
 	return breakDist;
 }
+
+

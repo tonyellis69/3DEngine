@@ -3,7 +3,7 @@
 
 CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	type = dlgCtrl;
-	xPos = 0; yPos = 0; width = w; height = h;
+	localPos = glm::i32vec2(x, y); width = w; height = h;
 	hFormat = hCentre; vFormat = vCentre;
 	header = new CGUIlabel2(0,10,width,30);
 	header->setText("Header");
@@ -67,14 +67,14 @@ CGUIokDlg::CGUIokDlg(int w, int h)  : CGUIsysDlg()  {
 	ok = new CGUIdlgButton(10,20,100,30);
 	ok->setText("OK");
 	ok->hFormat = hCentre;
-	ok->yPos = parent->height - 50;
+	ok->localPos.y = parent->height - 50;
 	ok->id = dlgOKID;
 	Add(ok);
 
 
 	body->width = w - 40;
 	body->height = h-110;
-	body->yPos = 60;
+	body->localPos.y = 60;
 }
 
 

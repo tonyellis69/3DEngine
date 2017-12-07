@@ -146,11 +146,9 @@
     <ClCompile Include="..\src\UIengine.cpp" />
     <ClCompile Include="..\src\UI\font.cpp" />
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
-    <ClCompile Include="..\src\UI\GUIbetterBase.cpp" />
-    <ClCompile Include="..\src\UI\GUIbutton.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
-    <ClCompile Include="..\src\UI\GUIconsole.cpp" />
+    <ClCompile Include="..\src\UI\GUIrichText.cpp" />
     <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
     <ClCompile Include="..\src\UI\GUIdlg.cpp" />
     <ClCompile Include="..\src\UI\GUIgroup.cpp" />
@@ -241,11 +239,9 @@
     <ClInclude Include="..\src\UIengine.h" />
     <ClInclude Include="..\src\UI\font.h" />
     <ClInclude Include="..\src\UI\GUIbase.h" />
-    <ClInclude Include="..\src\UI\GUIbetterBase.h" />
-    <ClInclude Include="..\src\UI\GUIbutton.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
-    <ClInclude Include="..\src\UI\GUIconsole.h" />
+    <ClInclude Include="..\src\UI\GUIrichText.h" />
     <ClInclude Include="..\src\UI\GUIcontainer.h" />
     <ClInclude Include="..\src\UI\GUIdlg.h" />
     <ClInclude Include="..\src\UI\GUIgroup.h" />

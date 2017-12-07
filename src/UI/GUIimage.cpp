@@ -3,7 +3,8 @@
 using namespace glm;
 
 CGUIimage::CGUIimage(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y);
+	width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 
 	type = uiImage;

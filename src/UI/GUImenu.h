@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GUIbetterBase.h"
+#include "GUIbase.h"
 #include "GUIlabel2.h"
 
 /** A graphical control for presenting a simple menu. */
-class CGUImenu : public CGUIbetterBase {
+class CGUImenu : public CGUIbase {
 public:
 	CGUImenu(int x, int y, int w, int h);
 	void setFont(CFont* newFont);

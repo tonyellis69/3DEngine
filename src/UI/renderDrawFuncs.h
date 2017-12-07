@@ -3,7 +3,7 @@
 #include <chrono>
 
 #include "GUIbase.h"
-#include "GUIbetterBase.h"
+
 
 
 #include "..\renderer\renderer.h"
@@ -25,15 +25,15 @@ public:
 	~CRenderDrawFuncs();
 	void setRenderer(CRenderer* renderer);
 	void loadShaders();
-	void registerControl(CGUIbetterBase& control);
-	void drawCtrlRect(CGUIbetterBase& control);
-	void drawCtrlBorder(CGUIbetterBase& control);
+	void registerControl(CGUIbase& control);
+	void drawCtrlRect(CGUIbase& control);
+	void drawCtrlBorder(CGUIbase& control);
 	void setScreenSize(int width, int height);
 	unsigned int getTextureHandle(const std::string& textureName);
-	void drawTexture(CGUIbetterBase & control, CBaseTexture& texture);
-	void setScreenDimensions(CGUIbetterBase & control);
-	void updateScreenDimensions(CGUIbetterBase& control);
-	void drawCursor(CGUIbetterBase& control,CBuf& cursorPos);
+	void drawTexture(CGUIbase & control, CBaseTexture& texture);
+	void setScreenDimensions(CGUIbase & control);
+	void updateScreenDimensions(CGUIbase& control);
+	void drawCursor(CGUIbase& control,CBuf& cursorPos);
 	float getTime();
 
 //private:

@@ -10,7 +10,7 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	if (!h)
 		h = defaultNumericHeight;
 
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y); width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 
 	pDrawFuncs->registerControl(*this);

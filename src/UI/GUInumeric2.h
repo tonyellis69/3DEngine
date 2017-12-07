@@ -9,7 +9,7 @@ class CGUIiconButton;
 class CGUItextbox2;
 class CGUInumericIconButton;
 class CGUInumericTextbox2;
-class CGUInumeric2 : public CGUIbetterBase {
+class CGUInumeric2 : public CGUIbase {
 public:
 	CGUInumeric2(int x, int y, int w, int h);
 	void setValue(float newValue);

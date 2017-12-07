@@ -1,24 +1,26 @@
 #include "GUIpanel.h"
 
-
-int CGUIpanel::Count = 1;
-
 CGUIpanel::CGUIpanel(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
-	borderColour = UIdarkGrey;
-	GenName("Panel",Count++);
-	type = panel;
+	localPos = glm::i32vec2(x, y); 
+	//width = w; height = h;
+
 	drawBorder = true;
+
+	drawBox.pos = glm::i32vec2(x, y); 
+	drawBox.size = glm::i32vec2(w, h);
+
+	type = uiPanel;
+
+	pDrawFuncs->registerControl(*this);
+
+	setBackColour1(oldbackColour1);
+	setBackColour2(oldbackColour2);
 }
 
 
 void CGUIpanel::DrawSelf() {
-	//just a boring rectangle to draw.
-	pDrawFuncs->setDrawColours(backColour1, backColour2);
-	pDrawFuncs->drawRect(screenPos,width,height);
-	if (drawBorder) {
-		pDrawFuncs->setDrawColours(borderColour, borderColour);
-		pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
-	}
+	pDrawFuncs->drawCtrlRect(*this);
 
+	setBorderColour(UIdarkGrey);
+	pDrawFuncs->drawCtrlBorder(*this);
 }

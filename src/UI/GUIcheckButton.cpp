@@ -7,9 +7,8 @@ const int unChecked = 0;
 
 int CGUIcheckButton::Count = 1;
 CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
+	pDrawFuncs->registerControl(*this);
 	SetPos(x,y,w,h);
-	GenName("checkButton",Count++);
-	SetText(Name);
 	Orientation = lblFirst;
 	Set = false;
 	type = checkButton;
@@ -25,9 +24,9 @@ CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
 
 void CGUIcheckButton::DrawSelf( ) {
 ////////////	pDrawFuncs->setFont(TextFont);
-	pDrawFuncs->setDrawColours(txtColour, txtColour);
+	//pDrawFuncs->setDrawColours(txtColour, txtColour);
 
-	int w = 0; int reducedWidth = width - iconOffset;
+	int w = 0; int reducedWidth = drawBox.size.x - iconOffset;
 
 	if (label->getJustification() == tcentred)
 		w = reducedWidth;
@@ -36,12 +35,12 @@ void CGUIcheckButton::DrawSelf( ) {
 
 	int lblPos, iconPos;
 	if (Orientation == lblFirst) {
-		iconPos =  screenPos.x + reducedWidth + (iconOffset >> 1) ;
-		lblPos = screenPos.x;
+		iconPos = drawBox.pos.x + reducedWidth + (iconOffset >> 1) ;
+		lblPos = drawBox.pos.x;
 		label->setPos(5,5);
 	} else {
-		lblPos =  screenPos.x + iconOffset;
-		iconPos = screenPos.x + (iconOffset >> 1);
+		lblPos = drawBox.pos.x + iconOffset;
+		iconPos = drawBox.pos.x + (iconOffset >> 1);
 		label->setPos(10 + iconOffset, 5);
 	}
  
@@ -51,11 +50,15 @@ void CGUIcheckButton::DrawSelf( ) {
 	pDrawFuncs->setIconset(iconset);
 	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
 	if (Set)
-		pDrawFuncs->drawIcon(checked, iconPos,screenPos.y + (height >> 1));
+		pDrawFuncs->drawIcon(checked, iconPos,drawBox.pos.y + (drawBox.size.y >> 1));
 	else
-		pDrawFuncs->drawIcon(unChecked, iconPos,screenPos.y + (height >> 1));
+		pDrawFuncs->drawIcon(unChecked, iconPos, drawBox.pos.y + (drawBox.size.y >> 1));
 	
-	pDrawFuncs->drawBorder(screenPos.x, screenPos.y, width, height);
+	if (MouseOver == this)
+		setBorderColour(UIdarkGrey);
+	else
+		setBorderColour(UIlightGrey);
+	pDrawFuncs->drawCtrlBorder(*this);
 }
 
 void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
@@ -65,6 +68,12 @@ void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
 	msg.Msg = uiClick;
 	msg.value = Set;
 	pDrawFuncs->handleUImsg(*this,msg);
+}
+
+void CGUIcheckButton::setText(std::string newText) {
+	//text = newText;
+	//renderText();
+	label->setText(newText);
 }
 
 

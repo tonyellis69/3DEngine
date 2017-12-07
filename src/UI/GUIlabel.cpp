@@ -33,7 +33,8 @@ void CGUIsysLbl::DrawSelf( ) {
 int CGUIlabel::Count = 1;
 
 CGUIlabel::CGUIlabel(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y); 
+	width = w; height = h;
 	GenName("Label",Count++);
 	SetText(Name);
 	type = label;

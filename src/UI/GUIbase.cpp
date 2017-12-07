@@ -9,6 +9,8 @@
 
 // TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
 
+unsigned int UIuniqueIDgen = 0;
+
 CGUIbase::CGUIbase()  {
 	backColour1 = UItransparent;
 	backColour2 = UItransparent;
@@ -25,7 +27,6 @@ CGUIbase::CGUIbase()  {
 	scrollbarHasMouse = NULL;
 	id = 0;
 	type = base;
-	visible = true;
 	borderWidth = 0;
 	needsUpdate = false;
 
@@ -33,11 +34,20 @@ CGUIbase::CGUIbase()  {
 	anchorRight = NONE;	
 
 
-	xPos = 0; yPos = 0; width = 30; height = 20;
+	localPos = glm::i32vec2(0); 
+	width = 30; height = 20;
 
 	enabled = true;
 
 	mousePassthru = false;
+
+	//BetterBase stuff, may overrule some of the above:
+	backColour1 = UIlightGrey;
+	backColour2 = UIdarkGrey;
+	borderColour = UIdarkGrey;
+	drawBorder = true;
+	uniqueID = UIuniqueIDgen++;
+	visible = true;
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
@@ -63,8 +73,12 @@ CFont* CGUIbase::defaultFont;
 bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY) {
 	if (!Control.visible || !Control.enabled || Control.mousePassthru)
 		return false;
-	return ( (Control.xPos < mouseX) && ((Control.xPos + Control.width) > mouseX)
-		&& (Control.yPos < mouseY) && ((Control.yPos + Control.height) > mouseY));
+	//return ( (Control.localPos.x < mouseX) && ((Control.localPos.x + Control.width) > mouseX)
+	//	&& (Control.localPos.y < mouseY) && ((Control.localPos.y + Control.height) > mouseY));
+	return glm::all(glm::lessThan(Control.localPos, glm::i32vec2(mouseX, mouseY))) &&
+		glm::all(glm::greaterThan(Control.localPos + Control.drawBox.size,
+			glm::i32vec2(mouseX, mouseY)));
+
 }
 
 
@@ -76,7 +90,7 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	//otherwise, recursively test message against this control's child controls
 	for (size_t i = 0; i < Control.size(); i++) {
 		if (IsOnControl(*Control[i], mouseX, mouseY)) {
-			Control[i]->MouseMsg(Msg, mouseX - Control[i]->xPos, mouseY - Control[i]->yPos, key);
+			Control[i]->MouseMsg(Msg, mouseX - Control[i]->localPos.x, mouseY - Control[i]->localPos.y, key);
 			return;
 		}
 	}
@@ -131,7 +145,7 @@ bool CGUIbase::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 
 	for (size_t i=0;i < Control.size();i++)
 		if ( IsOnControl( *Control[i],mouseX, mouseY) ) {
-			if (Control[i]->MouseWheelMsg(mouseX - Control[i]->xPos, mouseY - Control[i]->yPos,wheelDelta,key))
+			if (Control[i]->MouseWheelMsg(mouseX - Control[i]->localPos.x, mouseY - Control[i]->localPos.y,wheelDelta,key))
 				return true;
 		}
 	return false;
@@ -139,10 +153,28 @@ bool CGUIbase::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 
 
 /** Set the dimensions and relative position of the control. */
+/*
 void CGUIbase::SetPos(int x, int y, int w, int h) {
 	xPos = x; yPos = y; width = w; height = h;
 	updateAppearance();
 }
+*/
+void CGUIbase::SetPos(int x, int y, int w, int h) {
+	localPos = glm::i32vec2(x, y);
+	width = w; height = h;
+	drawBox.pos = glm::i32vec2(x, y);
+	drawBox.size = glm::i32vec2(w, h);
+	updateAppearance();
+}
+
+void CGUIbase::setPos(int x, int y) {
+	localPos = glm::i32vec2(x, y);
+	drawBox.pos = glm::i32vec2(x, y);
+	updateAppearance();
+}
+
+
+
 
 
 /** Add a child UI element to this UI element. */
@@ -153,6 +185,7 @@ void CGUIbase::Add(CGUIbase* child) {
 }
 
 /** Recursively update this control's position, dimensions and clipping, and those of its children. */
+/*
 void CGUIbase::updateAppearance() {
 
 	needsUpdate = false;
@@ -199,6 +232,61 @@ void CGUIbase::updateAppearance() {
 	for (size_t i=0;i < Control.size();i++)
 		Control[i]->updateAppearance();
 }
+*/
+
+/** Recursively update this control's position, dimensions and clipping, and those of its children. */
+void CGUIbase::updateAppearance() {
+	needsUpdate = false;
+	//1. Recalculate x,y,w,h if necessary due to justification or spanning
+	if (anchorRight != NONE)
+		drawBox.size.x = parent->drawBox.size.x - localPos.x - anchorRight;
+	else {
+		switch (hFormat) {
+		case hCentre: {
+			localPos.x = (parent->drawBox.size.x - drawBox.size.x) / 2; break; }
+		case hRight: {
+			localPos.x = parent->drawBox.size.x - (drawBox.size.x + parent->borderWidth); break; }
+		case hLeft: {
+			localPos.x = parent->borderWidth; break; }
+		case hSpan: {
+			localPos.x = 0; drawBox.size.x = parent->drawBox.size.x; break; }
+		}
+	}
+
+	if (anchorBottom != NONE)
+		drawBox.size.y = parent->drawBox.size.y - localPos.y - anchorBottom;
+	else {
+		switch (vFormat) {
+		case vCentre: {
+			localPos.y = (parent->drawBox.size.y - drawBox.size.y) / 2; break; }
+		case vTop: {
+			localPos.y = parent->borderWidth; break; }
+		case vBottom: {
+			localPos.y = parent->drawBox.size.y - drawBox.size.y - parent->borderWidth; break; }
+		case vSpan: {
+			localPos.y = 0; drawBox.size.y = parent->drawBox.size.y; break; }
+		}
+	}
+
+
+
+	//2. Recalculate clipping
+	CalculateClipbox();
+	//3. Recalculate screen position
+	screenPos.x = parent->screenPos.x + drawBox.pos.x; screenPos.y = parent->screenPos.y + drawBox.pos.y;
+	//screenPos.x = parent->screenPos.x + xPos; screenPos.y = parent->screenPos.y + yPos;
+	//TO DO: above is legacy, to be replaced with:
+	//drawBox.pos = glm::i32vec2(parent->screenPos.x, parent->screenPos.y) + drawBox.pos;
+	drawBox.pos = parent->drawBox.pos + localPos;
+	//...but screenPos becomes drawBox
+	pDrawFuncs->updateScreenDimensions(*this);
+
+	//repeat through children
+	for (size_t i = 0; i < Control.size(); i++)
+		Control[i]->updateAppearance();
+}
+
+
 
 /** Draw this UI element. In practice this means recursively drawing all its child items too.*/
 void CGUIbase::Draw() {
@@ -222,6 +310,7 @@ void CGUIbase::DrawSelf() {
 
 
 /** Calculate the drawable area of this control, and clip it to the drawable area of its parent conntrol. */
+/*
 void CGUIbase::CalculateClipbox() {
 
 
@@ -250,6 +339,40 @@ void CGUIbase::CalculateClipbox() {
 		Clipbox.width -= (Clipbox.x + Clipbox.width) - (parentClipbox.x + parentClipbox.width);
 
 	if ((Clipbox.y + Clipbox.height) > (parentClipbox.y + parentClipbox.height))
+		Clipbox.height -= (Clipbox.y + Clipbox.height) - (parentClipbox.y + parentClipbox.height);
+}
+
+*/
+
+/** Calculate the drawable area of this control, and clip it to the drawable area of its parent conntrol. */
+void CGUIbase::CalculateClipbox() {
+
+
+	UIrect parentClipbox = parent->Clipbox;
+	parentClipbox.x += parent->borderWidth;	parentClipbox.y += parent->borderWidth;
+	parentClipbox.width -= parent->borderWidth * 2; parentClipbox.height -= parent->borderWidth * 2;
+
+	Clipbox.width = drawBox.size.x;
+	Clipbox.x = parent->drawBox.pos.x + localPos.x;
+	if (Clipbox.x <parentClipbox.x) {
+		Clipbox.width -= (parentClipbox.x - Clipbox.x);
+		Clipbox.x = parentClipbox.x;
+	}
+
+
+	Clipbox.height = drawBox.size.y;
+	Clipbox.y = parent->drawBox.pos.y + localPos.y;
+	if (Clipbox.y < parentClipbox.y) {
+		Clipbox.height -= (parentClipbox.y - Clipbox.y);
+		if (Clipbox.height < 0)
+			Clipbox.height = 0;
+		Clipbox.y = parentClipbox.y;
+	}
+
+	if ((Clipbox.x + Clipbox.width) >(parentClipbox.x + parentClipbox.width))
+		Clipbox.width -= (Clipbox.x + Clipbox.width) - (parentClipbox.x + parentClipbox.width);
+
+	if ((Clipbox.y + Clipbox.height) >(parentClipbox.y + parentClipbox.height))
 		Clipbox.height -= (Clipbox.y + Clipbox.height) - (parentClipbox.y + parentClipbox.height);
 }
 
@@ -405,4 +528,17 @@ bool CGUIbase::getVisible() {
 unsigned int CGUIbase::getID() {
 	return uniqueID;
 }
+
+void CGUIbase::setBackColour1(const UIcolour & colour) {
+	backColour1 = colour;
+}
+
+void CGUIbase::setBackColour2(const UIcolour & colour) {
+	backColour2 = colour;
+}
+
+void CGUIbase::setBorderColour(const UIcolour& colour) {
+	borderColour = colour;
+}
+
 

@@ -70,7 +70,11 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 
 
 void CGUIroot::SetPos(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h; screenPos.x = x; screenPos.y = y;
+	localPos = glm::i32vec2(x, y); 
+	width = w; height = h; 
+	//screenPos.x = x; screenPos.y = y;
+	drawBox.pos = glm::i32vec2(x, y);
+	drawBox.size = glm::i32vec2(w, h);
 	Clipbox.x =x;Clipbox.y =y; Clipbox.width = w; Clipbox.height = h;
 	for (size_t i=0;i < Control.size();i++)
 		Control[i]->updateAppearance();
@@ -79,7 +83,7 @@ void CGUIroot::SetPos(int x, int y, int w, int h) {
 
 /** Override the normal clipping method, as GUIroot has no parent to clip against. */
 void CGUIroot::CalculateClipbox() {
-	Clipbox.x = xPos; Clipbox.y = yPos; Clipbox.width = width; Clipbox.height = height;
+	Clipbox.x = localPos.x; Clipbox.y = localPos.y; Clipbox.width = drawBox.size.x; Clipbox.height = drawBox.size.y;
 }
 
 /** Receives a keystroke message, and passes it on to whichever control has captured the keyboard, if any. */

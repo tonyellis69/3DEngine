@@ -130,7 +130,7 @@ void CGUIimageGrid::setCellSize(int size) {
 void CGUIimageGrid::resizeGrid() {
 	cellCount = rows * cols;
 	cell.resize(cellCount,-1);
-	SetPos(xPos,yPos,cols*cellSize,rows*cellSize);
+	SetPos(localPos.x, localPos.y,cols*cellSize,rows*cellSize);
 }
 
 /** Return the cell number of the first empty cell, if any.*/

@@ -41,9 +41,6 @@
     <ClCompile Include="..\src\UI\GUIbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIbutton.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -209,9 +206,6 @@
     <ClCompile Include="..\src\playerObj.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIbetterBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -278,13 +272,13 @@
     <ClCompile Include="..\..\VMtest\src\vmApp.cpp">
       <Filter>vm</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIconsole.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\win\win.cpp">
       <Filter>win</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUImenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIrichText.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -308,9 +302,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIbase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\GUIbutton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIcheckButton.h">
@@ -496,9 +487,6 @@
     <ClInclude Include="..\src\playerObj.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\GUIbetterBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\renderDrawFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -568,13 +556,13 @@
     <ClInclude Include="..\..\VMtest\src\vmApp.h">
       <Filter>vm</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\GUIconsole.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\win\win.h">
       <Filter>win</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUImenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIrichText.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

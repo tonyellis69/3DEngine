@@ -9,7 +9,8 @@ int CGUIgroup::Count = 1;
 CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 	GenName("Group",Count++);
 	type = group;
-	xPos = x; yPos = y; width = w; height = h;
+	localPos = glm::i32vec2(x, y); 
+	width = w; height = h;
 
 	isDrawn = true;
 	headerHeight = defaultHeaderHeight;
