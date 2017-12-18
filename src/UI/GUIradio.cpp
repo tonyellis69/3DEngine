@@ -6,7 +6,7 @@ CGUIradio::CGUIradio(int x , int y, int w, int h) {
 	localPos = glm::i32vec2(x, y);
 	width = w;height = h;
 	GenName("Radio",Count++);
-	SetText(Name);
+	//SetText(Name);
 	Orientation = lblFirst;
 	Set = false;
 	type = radioButton;
@@ -21,7 +21,7 @@ CGUIradio::CGUIradio(int x , int y, int w, int h) {
 
 void CGUIradio::DrawSelf( ) {
 ///////////	pDrawFuncs->setFont(TextFont);
-	pDrawFuncs->setDrawColours(txtColour, txtColour);
+//	pDrawFuncs->setDrawColours(txtColour, txtColour);
 
 	int w = 0; int reducedWidth = width - iconOffset;
 

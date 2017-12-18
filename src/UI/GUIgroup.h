@@ -1,6 +1,5 @@
 #pragma once
 #include "GUIbase.h"
-#include "GUIlabel.h"
 #include "GUIlabel2.h"
 
 

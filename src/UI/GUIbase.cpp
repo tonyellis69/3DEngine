@@ -541,4 +541,8 @@ void CGUIbase::setBorderColour(const UIcolour& colour) {
 	borderColour = colour;
 }
 
+void CGUIbase::borderOn(bool onOff) {
+	drawBorder = onOff;
+}
+
 

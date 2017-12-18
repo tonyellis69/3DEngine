@@ -5,7 +5,7 @@ CGUIpanel::CGUIpanel(int x, int y, int w, int h) {
 	//width = w; height = h;
 
 	drawBorder = true;
-
+	setBorderColour(UIdarkGrey);
 	drawBox.pos = glm::i32vec2(x, y); 
 	drawBox.size = glm::i32vec2(w, h);
 
@@ -21,6 +21,8 @@ CGUIpanel::CGUIpanel(int x, int y, int w, int h) {
 void CGUIpanel::DrawSelf() {
 	pDrawFuncs->drawCtrlRect(*this);
 
-	setBorderColour(UIdarkGrey);
-	pDrawFuncs->drawCtrlBorder(*this);
+	if (drawBorder) {
+		pDrawFuncs->drawCtrlBorder(*this);
+	}
+
 }

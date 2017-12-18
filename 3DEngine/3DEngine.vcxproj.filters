@@ -59,12 +59,6 @@
     <ClCompile Include="..\src\UI\GUIimageGrid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIlabel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\GUInumeric.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIpanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,9 +72,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\GUItextbox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\ImageLib.cpp">
@@ -331,9 +322,6 @@
     <ClInclude Include="..\src\UI\GUImouse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\GUInumeric.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\GUIpanel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -347,9 +335,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIscrollbar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\GUItextbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\ImageLib.h">

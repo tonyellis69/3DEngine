@@ -5,7 +5,7 @@ using namespace glm;
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x,y); width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
-	lineOffset = i32vec2(0);
+	renderOffset = i32vec2(0);
 	textBuf.setFont(defaultFont);
 	font = defaultFont;
 	cursorTextPos = 0;
@@ -92,7 +92,7 @@ void CGUItextbox2::calcCursorPosition() {
 
 /** Determine offset due to centering, etc. */
 void CGUItextbox2::calcLineOffset() {
-	lineOffset.y = font->lineHeight / 2.0;
+	renderOffset.y = font->lineHeight / 2.0;
 }
 
 
@@ -168,6 +168,6 @@ void CGUItextbox2::renderText() {
 	textBuf.clearBuffer();
 	//calcLineRenderedWidth();
 	calcLineOffset();
-	textBuf.renderTextAt(lineOffset.x, lineOffset.y, text);
+	textBuf.renderTextAt(renderOffset.x, renderOffset.y, text);
 	calcCursorPosition();
 }

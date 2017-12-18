@@ -2,7 +2,7 @@
 
 #include "GUItextbox2.h"
 #include "GUIiconButton.h"
-#include "GUItextbox.h"
+
 
 /** New class for a numeric control. */
 class CGUIiconButton;

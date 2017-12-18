@@ -155,10 +155,8 @@
     <ClCompile Include="..\src\UI\GUIiconButton.cpp" />
     <ClCompile Include="..\src\UI\GUIimage.cpp" />
     <ClCompile Include="..\src\UI\GUIimageGrid.cpp" />
-    <ClCompile Include="..\src\UI\GUIlabel.cpp" />
     <ClCompile Include="..\src\UI\GUIlabel2.cpp" />
     <ClCompile Include="..\src\UI\GUImenu.cpp" />
-    <ClCompile Include="..\src\UI\GUInumeric.cpp" />
     <ClCompile Include="..\src\UI\GUInumeric2.cpp" />
     <ClCompile Include="..\src\UI\GUIpanel.cpp" />
     <ClCompile Include="..\src\UI\GUIpanelContainer.cpp" />
@@ -167,7 +165,6 @@
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
-    <ClCompile Include="..\src\UI\GUItextbox.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
@@ -253,7 +250,6 @@
     <ClInclude Include="..\src\UI\GUIlabel2.h" />
     <ClInclude Include="..\src\UI\GUImenu.h" />
     <ClInclude Include="..\src\UI\GUImouse.h" />
-    <ClInclude Include="..\src\UI\GUInumeric.h" />
     <ClInclude Include="..\src\UI\GUInumeric2.h" />
     <ClInclude Include="..\src\UI\GUIpanel.h" />
     <ClInclude Include="..\src\UI\GUIpanelContainer.h" />
@@ -262,7 +258,6 @@
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />
-    <ClInclude Include="..\src\UI\GUItextbox.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\vertBufs.h" />

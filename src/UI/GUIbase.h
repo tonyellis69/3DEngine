@@ -171,6 +171,8 @@ public:
 
 	void setBorderColour(const UIcolour & colour);
 
+	void borderOn(bool onOff);
+
 	void GenName(char* NameStr, int Count);
 	void SetName(char* NameStr);
 

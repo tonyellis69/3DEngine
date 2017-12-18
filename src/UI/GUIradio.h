@@ -1,14 +1,13 @@
 #pragma once
 #include "GUIbase.h"
 #include "GUIicons.h"
-#include "GUIlabel.h"
 #include "GUIlabel2.h"
 
 
 
 /** Simple radio button control. */
 
-class CGUIradio :  public CGUIbase, public CGUIbaseLbl {
+class CGUIradio :  public CGUIbase {
 public:
 	CGUIradio(int x , int y, int w, int h);
 	void DrawSelf( );

@@ -1,7 +1,6 @@
 #pragma once
 #include "GUIbase.h"
 #include "GUIicons.h"
-#include "GUIlabel.h"
 
 #include "GUIlabel2.h"
 

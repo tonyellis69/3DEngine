@@ -7,7 +7,6 @@
 #include "UI\GUIbase.h"
 #include "UI\GUIroot.h"
 #include "UI\GUIradio.h"
-#include "UI\GUItextbox.h"
 #include "UI\GUIscrollbar.h"
 #include "UI\GUIgroup.h"
 #include "UI\GUIcontainer.h"

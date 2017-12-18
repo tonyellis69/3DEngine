@@ -16,7 +16,7 @@ public:
 	void setHorizontalAlignment(TTextAlign align);
 	TTextAlign getJustification();
 	void DrawSelf();
-	void borderOn(bool onOff);
+	//void borderOn(bool onOff);
 	void SetPos(int x, int y, int w, int h);
 	float getTextWidth();
 	void calcLineOffset();
@@ -29,11 +29,11 @@ public:
 
 
 	CTextBuffer textBuf;
-	glm::vec4 textColour;
-	CFont* font;
-	std::string text;
-	glm::i32vec2 lineOffset;///<Due to centering, multiline, etc.
+	//std::string text;
+	glm::i32vec2 renderOffset;///<Due to centering, multiline, etc.
 	int lineRenderedWidth;
 	TTextAlign textAlign; ///<Records whether the text is centred, etc, in its area.
 	bool multiLine;
+
+	textRec textData;
 	};

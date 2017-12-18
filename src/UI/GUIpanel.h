@@ -9,6 +9,5 @@ public:
 	void DrawSelf();
 
 
-	UIcolour borderColour; ///<Colour for the border of this control.
-	bool drawBorder; ///<true if we draw this control's border.
+	
 };

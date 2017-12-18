@@ -7,8 +7,8 @@
 
 CTextBuffer::CTextBuffer() {
 	pRenderer = &CRenderer::getInstance();
-	textColour = glm::vec4(1, 1, 1, 1);
-	font = NULL;
+	textData.textColour = glm::vec4(1, 1, 1, 1);
+	textData.font = NULL;
 	
 }
 
@@ -20,20 +20,20 @@ void CTextBuffer::setSize(int w, int h) {
 }
 
 void CTextBuffer::setFont(CFont* newFont) {
-	font = newFont;
+	textData.font = newFont;
 }
 
 void CTextBuffer::setTextColour(glm::vec4 & newColour) {
-	textColour = newColour;
+	textData.textColour = newColour;
 }
 
 
 
 
 /** Draw textLine at the offset x,y on the text buffer. */
-void CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
+glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	if (!textLine.size())
-		return;
+		return glm::i32vec2(0);
 
 	vector<vBuf::T2DtexVert> chars;
 	vector<unsigned int> index;
@@ -45,7 +45,7 @@ void CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	glyph* glyph;
 	for (int c = 0; c < textLine.size(); c++) {
 		if (textLine[c] != '\n') {
-			glyph = font->table[textLine[c]];
+			glyph = textData.font->table[textLine[c]];
 			//construct quads
 			chars[v].v = blCorner; //A
 			chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
@@ -71,6 +71,7 @@ void CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	buf.storeLayout(2, 2, 0, 0);
 
 	writeToTexture2(buf);
+	return blCorner;
 }
 
 void CTextBuffer::clearBuffer() {
@@ -80,18 +81,18 @@ void CTextBuffer::clearBuffer() {
 
 void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
-	float xOffset = 0; float yOffset = 0 - (font->lineHeight / 2.0f);
+	float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
 	
 	glm::mat4 orthoMatrix = glm::ortho<float>(0, size.x, -halfSize.y, halfSize.y);
 
-	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + font->lineHeight, 0));
+	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
 
 //	glm::vec4 test = orthoMatrix * glm::vec4(50, 18, 0, 0);
 
 	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, font->texture); //attach texture to textureUnit (0)
+	pRenderer->attachTexture(0, textData.font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
+	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textData.textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
 
 	pRenderer->renderToTextureTris(glyphQuads, textTexture);

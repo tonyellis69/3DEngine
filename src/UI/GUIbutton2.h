@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GUIlabel2.h"
-#include "GUIlabel.h"
 #include "GUIbase.h"
 
 class CGUIbutton2 : public CGUIbase {

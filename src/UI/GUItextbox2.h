@@ -35,7 +35,7 @@ private:
 
 	CFont* font;
 	
-	glm::i32vec2 lineOffset;///<Due to centering, multiline, etc.
+	glm::i32vec2 renderOffset;///<Due to centering, multiline, etc.
 
 	int cursorTextPos; ///<String index of character cursor precedes.
 	CBuf cursor; ///<Holds verts for the cursor position and size.
