@@ -2,6 +2,20 @@
 
 #include "GUIlabel2.h"
 
+struct TTextPos {
+	int textObj;
+	int textStart;
+	int renderStartX;
+
+};
+
+struct TTextChunk {
+	int textLength;
+	bool causesNewLine; 
+
+	TTextPos nextTextPos;
+};
+
 
 /** A more versatile multiline text display class. */
 class CGUIrichText : public CGUIlabel2 {
@@ -18,6 +32,8 @@ public:
 	int getNextLineStart(int lineStart, int& textPos);
 
 	void renderText();
+//	void renderText2();
+	TTextChunk getNextTextChunk(TTextPos & textPos);
 	int overrun;
 
 	
