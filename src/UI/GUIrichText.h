@@ -28,12 +28,10 @@ public:
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	void scroll(int direction);
-
 	int getNextLineStart(int lineStart, int& textPos);
-
 	void renderText();
-//	void renderText2();
 	TTextChunk getNextTextChunk(TTextPos & textPos);
+
 	int overrun;
 
 	

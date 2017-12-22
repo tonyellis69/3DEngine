@@ -73,26 +73,29 @@ void CGUIrichText::appendText(std::string newText) {
 void CGUIrichText::scroll(int direction) {
 	if (direction < 0) { //scrolling down through text
 		textData = textObjs[firstVisibleObject];
-		int textPos = 0;
-		int nextLineStart = getNextLineStart(firstVisibleText, textPos) ;
-		while (nextLineStart == 0) {
-			firstVisibleObject++;
-			textData = textObjs[firstVisibleObject];
-			nextLineStart = getNextLineStart(0, textPos);
-		}
-		firstVisibleText = nextLineStart;
+		TTextChunk textChunk;
+		TTextPos positionInText = { firstVisibleObject, firstVisibleText, 0 };
+		do {
+			textChunk = getNextTextChunk(positionInText);
+			positionInText = textChunk.nextTextPos;
+		} while (positionInText.textObj < textObjs.size() && !textChunk.causesNewLine);
+		firstVisibleText = textChunk.nextTextPos.textStart;
+		firstVisibleObject = textChunk.nextTextPos.textObj;
 		renderText();
 	}
 }
 
-/** Returns the point at which whitespace lets us wrap the text onto the next line. */
+/** Returns the point at which whitespace or \n lets us wrap the text onto the next line. */
 int CGUIrichText::getNextLineStart(int lineStart, int& textPos) {
-	int breakDist = 0;// textData.text.size();
+	int breakDist = 0;
 	//while there are characters, when we reach a word break record it, until we go over the allotted width;
 	int c = lineStart;
 	while (textPos < width) { //TO DO: put c >= text.size() check here?
 		if (textData.text[c] == '\n') {
-			return c +1;
+			if (c + 1 >= textData.text.size())
+				return 0;
+			else
+				return c +1;  //this is the line. we've come to the end of the string but we're not telling
 		}
 
 		if (isspace(textData.text[c]))
@@ -110,22 +113,22 @@ int CGUIrichText::getNextLineStart(int lineStart, int& textPos) {
 void CGUIrichText::renderText() {
 	overrun = 0;
 	textBuf.clearBuffer();
-	i32vec2 renderOffset(0);
+	i32vec2 offset(0);
 	int currentObjNo = firstVisibleObject;
-	TTextPos positionInText = { firstVisibleObject, firstVisibleText, renderOffset.x };
+	TTextPos positionInText = { firstVisibleObject, firstVisibleText, offset.x };
 	do {
 		TTextChunk textChunk = getNextTextChunk(positionInText);
 		textRec currentObj = textObjs[currentObjNo];
 		std::string renderLine = currentObj.text.substr(positionInText.textStart, textChunk.textLength);
 		textBuf.setTextColour(currentObj.textColour);
-		renderOffset = textBuf.renderTextAt(renderOffset.x, renderOffset.y, renderLine);
+		offset = textBuf.renderTextAt(offset.x, offset.y, renderLine);
 		if (textChunk.causesNewLine) {
-			renderOffset = glm::i32vec2(0, renderOffset.y + currentObj.font->lineHeight);
+			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight);
 		}
 		positionInText = textChunk.nextTextPos;
-		positionInText.renderStartX = renderOffset.x;
-		if (renderOffset.y + currentObj.font->lineHeight > height) {
-			overrun = renderOffset.y + currentObj.font->lineHeight - height;
+		positionInText.renderStartX = offset.x;
+		if (offset.y + currentObj.font->lineHeight > height) {
+			overrun = offset.y + currentObj.font->lineHeight - height;
 			return;
 		}
 		currentObjNo = textChunk.nextTextPos.textObj;
@@ -142,10 +145,13 @@ TTextChunk CGUIrichText::getNextTextChunk(TTextPos& textPos) {
 
 	int glyphStartX = textPos.renderStartX;
 	int nextTextStart = getNextLineStart(textPos.textStart, glyphStartX);
-	if (nextTextStart == 0) { //we've outstripped this object but we're still on the same line
+	if (nextTextStart == 0) { //we've outstripped this object but may still be on the same line
 		nextTextPos.textObj = textPos.textObj + 1;
 		nextTextPos.textStart = 0;
-		textChunk.causesNewLine = false;
+		if (textData.text.back() == '\n') //slightly messy test for \n at end of text
+			textChunk.causesNewLine = true;
+		else
+			textChunk.causesNewLine = false;
 		textChunk.textLength = textSize - textPos.textStart;
 	}
 	else {
@@ -154,7 +160,7 @@ TTextChunk CGUIrichText::getNextTextChunk(TTextPos& textPos) {
 		textChunk.causesNewLine = true;
 		textChunk.textLength = nextTextStart - textPos.textStart;
 	}
-	
+	nextTextPos.renderStartX = glyphStartX;
 	textChunk.nextTextPos = nextTextPos;
 	return textChunk;
 }
