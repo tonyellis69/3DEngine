@@ -43,7 +43,7 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 
 	int v = 0; 
 	glyph* glyph;
-	for (int c = 0; c < textLine.size(); c++) {
+	for (unsigned int c = 0; c < textLine.size(); c++) {
 		if (textLine[c] != '\n') {
 			glyph = textData.font->table[textLine[c]];
 			//construct quads
@@ -83,7 +83,7 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
 	float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
 	
-	glm::mat4 orthoMatrix = glm::ortho<float>(0, size.x, -halfSize.y, halfSize.y);
+	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, -halfSize.y, halfSize.y);
 
 	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
 

@@ -17,6 +17,23 @@ struct TTextChunk {
 };
 
 
+struct TRichTextRec : textRec {
+	void findNewlines();
+	std::vector<int> newLines;
+};
+
+/** A partial or complete line of text, with its rendered (x) dimensions. */
+struct TLineFragment {
+	int textObj;
+	int textPos;
+	int textLength;
+	int renderStartX;
+	int renderEndX;
+	bool causesNewLine;
+	bool finalFrag;
+};
+
+
 /** A more versatile multiline text display class. */
 class CGUIrichText : public CGUIlabel2 {
 public:
@@ -31,12 +48,13 @@ public:
 	int getNextLineStart(int lineStart, int& textPos);
 	void renderText();
 	TTextChunk getNextTextChunk(TTextPos & textPos);
+	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 
 	int overrun;
 
 	
 
-	std::vector<textRec> textObjs; ///<The complete text of this control.
+	std::vector<TRichTextRec> textObjs; ///<The complete text of this control.
 	int currentTextObj;
 	int firstVisibleObject; ///<Index of the first object we need to draw.
 	int firstVisibleText; ///<Position in the top visible object of the first text to display.

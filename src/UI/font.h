@@ -8,8 +8,8 @@
 
 struct glyph {
 	float u,v, s,t;
-	float width;
-	float height;
+	int width;
+	int height;
 	size_t advance;
 };
 
