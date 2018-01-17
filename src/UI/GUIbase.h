@@ -144,6 +144,7 @@ public:
 	virtual void onKeyPress(unsigned int Key, long Mod) {};
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
+	virtual void onMouseOff(const  int mouseX, const  int mouseY, int key) {};
 	void SetPos(int x, int y, int w, int h);
 	void setPos(int x, int y);
 	virtual void Add(CGUIbase* child);
@@ -268,7 +269,8 @@ const int uiContainerHbarID = 1005;
 
 //message types
 enum Messagetypes {change,userDraw,uiMsgDrop,uiMsgLMdown,uiMsgRMdown,uiMsgMouseMove,
- uiMsgLMouseUp,uiMsgRMouseUp,uiMouseWheel,uiClick,uiDataEntered,uiSpin,uiLostKeyboard};
+ uiMsgLMouseUp,uiMsgRMouseUp,uiMouseWheel,uiClick,uiDataEntered,uiSpin,uiLostKeyboard,
+	uiMsgHotTextClick};
 
 #define NONE -1
 

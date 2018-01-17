@@ -12,6 +12,8 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	textObjs.push_back(defaultStyle);
 	currentTextObj = 0;
 	firstVisibleObject = 0;
+	mousePassthru = false;
+	selectedHotObj = -1;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -40,6 +42,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	if (textObjs[currentTextObj].text.size() > 0) {
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
+		newObj.hotTextId = 0; //assume we don't want to add to any preceeding hot text.
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -68,61 +71,45 @@ void CGUIrichText::appendText(std::string newText) {
 	}
 }
 
-/** Change the first line that we display. */
+/** Advance the first line that we display. */
 void CGUIrichText::scroll(int direction) {
 	if (direction < 0) { //scrolling down through text
 		textData = textObjs[firstVisibleObject];
-		TTextChunk textChunk;
-		TTextPos positionInText = { firstVisibleObject, firstVisibleText, 0 };
+		TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
 		do {
-			textChunk = getNextTextChunk(positionInText);
-			positionInText = textChunk.nextTextPos;
-		} while (positionInText.textObj < textObjs.size() && !textChunk.causesNewLine);
-		firstVisibleText = textChunk.nextTextPos.textStart;
-		firstVisibleObject = textChunk.nextTextPos.textObj;
+			lineFragment = getNextLineFragment(lineFragment);
+		} while (!lineFragment.finalFrag && !lineFragment.causesNewLine);
+		firstVisibleObject = lineFragment.textObj;
+		firstVisibleText = lineFragment.textPos + lineFragment.textLength;
 		renderText();
 	}
-}
-
-/** Returns the point at which whitespace or \n lets us wrap the text onto the next line. */
-int CGUIrichText::getNextLineStart(int lineStart, int& textPos) {
-	int breakDist = 0;
-	//while there are characters, when we reach a word break record it, until we go over the allotted width;
-	int c = lineStart;
-	while (textPos < width) { //TO DO: put c >= text.size() check here?
-		if (textData.text[c] == '\n') {
-			if (c + 1 >= textData.text.size())
-				return 0;
-			else
-				return c +1;  
-		}
-
-		if (isspace(textData.text[c]))
-			breakDist = c + 1;
-		textPos += textData.font->table[textData.text[c]]->width;
-		c++;
-		if (c >= textData.text.size())
-			return 0;// c;
-	}
-	return breakDist;
 }
 
 
 /** Starting with the top visible object, work through the list, rendering each, until we overrun the
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
+	hotTextFrags.clear();
 	overrun = 0;
 	textBuf.clearBuffer();
 	i32vec2 offset(0);
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
 	do {
 		lineFragment = getNextLineFragment(lineFragment);
-		textRec currentObj = textObjs[lineFragment.textObj];
+		TRichTextRec currentObj = textObjs[lineFragment.textObj];
 
 		std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 		textBuf.setTextColour(currentObj.textColour);
 
-		offset = textBuf.renderTextAt(lineFragment.renderStartX, offset.y, renderLine);
+		int renderStartY = offset.y;
+		offset = textBuf.renderTextAt(lineFragment.renderStartX, renderStartY, renderLine);
+
+		if (currentObj.hotTextId && renderLine[0] != '\n') {
+			THotTextFragment hotFrag = { lineFragment.renderStartX, renderStartY, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
+			hotFrag.text = renderLine;
+			hotTextFrags.push_back(hotFrag);
+		}
+
 		if (lineFragment.causesNewLine) {
 			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight);
 		}
@@ -131,46 +118,9 @@ void CGUIrichText::renderText() {
 			return;
 		}
 	}  while(!lineFragment.finalFrag);
+
 }
 
-/** Returns the next block of drawable text for this position. */
-TTextChunk CGUIrichText::getNextTextChunk(TTextPos& textPos) {
-	TTextChunk textChunk;
-	TTextPos nextTextPos;
-
-	textData = textObjs[textPos.textObj]; //TO DO, retire/replace with richTextData
-	TRichTextRec richTextData = textObjs[textPos.textObj];
-
-	int textSize = textData.text.size();
-
-	int glyphStartX = textPos.renderStartX;
-	int nextTextStart = getNextLineStart(textPos.textStart, glyphStartX);
-
-	//we either reached the end of the text object, a linebreak or a word-wrap.
-
-	//did we hit a newline character along the way?
-
-
-
-	if (nextTextStart == 0) { //we've outstripped this object but may still be on the same line
-		nextTextPos.textObj = textPos.textObj + 1;
-		nextTextPos.textStart = 0;
-		if (textData.text.back() == '\n') //slightly messy test for \n at end of text
-			textChunk.causesNewLine = true;
-		else
-			textChunk.causesNewLine = false;
-		textChunk.textLength = textSize - textPos.textStart;
-	}
-	else {
-		nextTextPos.textObj = textPos.textObj;
-		nextTextPos.textStart = nextTextStart;
-		textChunk.causesNewLine = true;
-		textChunk.textLength = nextTextStart - textPos.textStart;
-	}
-	nextTextPos.renderStartX = glyphStartX;
-	textChunk.nextTextPos = nextTextPos;
-	return textChunk;
-}
 
 /** Return the text fragment following the given one. */
 TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLineFrag) {
@@ -219,6 +169,93 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	return nextLineFrag;
 }
 
+/** Add clickable text to the end of the existing body copy. */
+void CGUIrichText::appendHotText(std::string newText, int idNo) {
+	//create a new text object with the hypertext style
+	//set it to the given text
+	//append it to the list of text objects
+	TRichTextRec newObj = textObjs[currentTextObj]; //clone existing style for now
+	newObj.text.clear();
+	newObj.hotTextId = idNo;
+	textObjs.push_back(newObj);
+	currentTextObj++;
+
+	textObjs[currentTextObj].text += newText;
+	textObjs[currentTextObj].findNewlines();
+	renderText();
+
+	while (overrun > 0) {
+		scroll(-1);
+	}
+
+}
+
+
+
+/** Check for mouse over hot text. */
+void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+	int oldSelectedHotObj = selectedHotObj;
+	selectedHotObj = -1;
+	for (auto hotTextFrag : hotTextFrags) {
+		if (mouseY > hotTextFrag.renderStartY &&  mouseY < hotTextFrag.renderEndY
+			&& mouseX > hotTextFrag.renderStartX && mouseX < hotTextFrag.renderEndX) {
+			selectedHotObj = hotTextFrag.textObj;
+			if (oldSelectedHotObj != selectedHotObj) {
+				highlight(selectedHotObj);
+			}
+			break;
+		}
+	}
+	
+	if (oldSelectedHotObj > 0 && oldSelectedHotObj != selectedHotObj) 
+		unhighlight(oldSelectedHotObj);
+}
+
+/** Highlight the given text object.*/
+void CGUIrichText::highlight(int textObj) {
+	textBuf.setTextColour(vec4(0,0,1,1));
+	for (auto hotTextFrag : hotTextFrags) {
+		if (hotTextFrag.textObj == textObj) {
+			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, hotTextFrag.text);
+		}
+	}
+}
+
+/** Detect clicks on any menu items. */
+void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
+	if (selectedHotObj > -1) {
+		CMessage msg;
+		msg.Msg = uiMsgHotTextClick;
+		msg.value = textObjs[selectedHotObj].hotTextId;
+		pDrawFuncs->handleUImsg(*this, msg);
+	}
+}
+
+/** Check for losing mouse while hot text selected. */
+void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
+	if (selectedHotObj > 0) {
+		unhighlight(selectedHotObj);
+		selectedHotObj = -1;
+	}
+}
+
+/** Unhighlight the given text object.*/
+void CGUIrichText::unhighlight(int textObj) {
+	glm::vec4 defaultColour = textObjs[textObj].textColour;
+	textBuf.setTextColour(defaultColour);
+	for (auto hotTextFrag : hotTextFrags) {
+		if (hotTextFrag.textObj == textObj) {
+			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, hotTextFrag.text);
+		}
+	}
+}
+
+
+
+
+TRichTextRec::TRichTextRec() {
+	hotTextId = 0;
+}
 
 /** Find all the linebreaks in this text object and record their positions. */
 void TRichTextRec::findNewlines() {

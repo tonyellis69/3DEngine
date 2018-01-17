@@ -89,7 +89,10 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 
 	//otherwise, recursively test message against this control's child controls
 	for (size_t i = 0; i < Control.size(); i++) {
+		if (Control[i]->id == 66)
+			int b = 0;
 		if (IsOnControl(*Control[i], mouseX, mouseY)) {
+			
 			Control[i]->MouseMsg(Msg, mouseX - Control[i]->localPos.x, mouseY - Control[i]->localPos.y, key);
 			return;
 		}
@@ -99,6 +102,8 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	case WM_MOUSEMOVE : {
 		if (MouseOver != this){ //mouse has just entered this control 
 			MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
+			if (MouseOver)
+				MouseOver->onMouseOff(mouseX, mouseY, key);
 		}
 		MouseOver = this; 
 		OnMouseMove(mouseX, mouseY,key); return; }
