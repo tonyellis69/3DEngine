@@ -50,8 +50,8 @@ public:
 	void highlight(int textObj);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
-
 	void unhighlight(int textObj);
+	void removeHotText(int tagNo);
 
 	int overrun;
 

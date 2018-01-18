@@ -18,8 +18,6 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 
 void CGUIrichText::DrawSelf() {
 
-	//pDrawFuncs->drawCtrlRect(*this);
-
 	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
 
 	if (drawBorder) {
@@ -62,8 +60,8 @@ void CGUIrichText::setText(std::string newText) {
 
 /** Append newText to the current body of text. */
 void CGUIrichText::appendText(std::string newText) {
-	textObjs[currentTextObj].text += newText;
-	textObjs[currentTextObj].findNewlines();
+	textObjs.back().text += newText;
+	textObjs.back().findNewlines();
 	renderText();
 
 	while (overrun > 0) {
@@ -171,17 +169,14 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 /** Add clickable text to the end of the existing body copy. */
 void CGUIrichText::appendHotText(std::string newText, int idNo) {
-	//create a new text object with the hypertext style
-	//set it to the given text
-	//append it to the list of text objects
-	TRichTextRec newObj = textObjs[currentTextObj]; //clone existing style for now
+	TRichTextRec newObj = textObjs.back(); //clone existing style for now
 	newObj.text.clear();
 	newObj.hotTextId = idNo;
 	textObjs.push_back(newObj);
 	currentTextObj++;
 
-	textObjs[currentTextObj].text += newText;
-	textObjs[currentTextObj].findNewlines();
+	textObjs.back().text += newText;
+	textObjs.back().findNewlines();
 	renderText();
 
 	while (overrun > 0) {
@@ -250,6 +245,18 @@ void CGUIrichText::unhighlight(int textObj) {
 	}
 }
 
+/** Remove any hot text objects with this tag. */
+void CGUIrichText::removeHotText(int tagNo) {
+	for (auto it = textObjs.begin(); it != textObjs.end(); ) {
+		if ((*it).hotTextId & tagNo) {
+			it = textObjs.erase(it);
+		}
+		else
+			++it;
+	}
+	currentTextObj = textObjs.size() - 1;
+	renderText();
+}
 
 
 
@@ -264,4 +271,5 @@ void TRichTextRec::findNewlines() {
 		if (text[c] == '\n')
 			newLines.push_back(c);
 	}
+
 }
