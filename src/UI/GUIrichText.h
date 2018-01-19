@@ -52,6 +52,8 @@ public:
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void unhighlight(int textObj);
 	void removeHotText(int tagNo);
+	void scrollUp();
+	int getPrevCharacter(int & textObj, int & pos);
 
 	int overrun;
 

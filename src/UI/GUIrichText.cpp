@@ -226,6 +226,7 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 	}
 }
 
+
 /** Check for losing mouse while hot text selected. */
 void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 	if (selectedHotObj > 0) {
@@ -256,6 +257,74 @@ void CGUIrichText::removeHotText(int tagNo) {
 	}
 	currentTextObj = textObjs.size() - 1;
 	renderText();
+}
+
+/** Scroll up by one line. */
+void CGUIrichText::scrollUp() {
+	int textObj = firstVisibleObject;
+	int endPos = firstVisibleText;
+	int origFirstVisibleText = firstVisibleText;
+	int origFirstVisibleObject = firstVisibleObject;
+
+	//find previous character
+	//if it's a newline, skip it: that's the reason we're on the current line
+	//find the previous character
+	//track spaces
+	//if the combined character width takes us over linewidth, last space marks our line start
+	//if character = newline, that newline marks our line start
+
+	int prevCharacter = getPrevCharacter(textObj, endPos);
+
+	if (prevCharacter == '\n') { //discard, this is the newline that made this line
+		prevCharacter = getPrevCharacter(textObj, endPos);
+	}
+
+	int textWidth = 0; std::vector<int> spaces; 
+	while (prevCharacter != -1) {
+
+		TRichTextRec* obj = &textObjs[textObj];
+
+		if (prevCharacter == '\n') {
+			firstVisibleText = endPos +1;
+			firstVisibleObject = textObj;
+			break;
+		}
+		prevCharacter = getPrevCharacter(textObj, endPos);
+
+	}
+
+	if (prevCharacter == -1) { //ugh
+		firstVisibleText = 0;
+		firstVisibleObject = 0;
+	}
+
+	//any word wraps between here and where we started?
+	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
+	do {
+		lineFragment = getNextLineFragment(lineFragment);
+		//if causes new line, get details
+		if (lineFragment.causesNewLine) {
+			firstVisibleText = lineFragment.textPos;
+			firstVisibleObject = lineFragment.textObj;
+		}
+	} while (lineFragment.textObj <= origFirstVisibleObject && (lineFragment.textPos + lineFragment.textLength) < origFirstVisibleText-1);
+
+
+
+	renderText();
+}
+
+/** Return character at position previous to that given, winding back textObj if needed. */
+int CGUIrichText::getPrevCharacter(int& textObj, int& pos) {
+	if (pos == 0) {
+		if (textObj == 0)
+			return -1;
+		textObj--;
+		pos = textObjs[textObj].text.size() - 1;
+	}
+	else
+		pos--;
+	return textObjs[textObj].text[pos];
 }
 
 

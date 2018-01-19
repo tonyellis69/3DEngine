@@ -44,7 +44,8 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	int v = 0; 
 	glyph* glyph;
 	for (unsigned int c = 0; c < textLine.size(); c++) {
-		if (textLine[c] != '\n') {
+		//if (textLine[c] != '\n') 
+		{
 			glyph = textData.font->table[textLine[c]];
 			//construct quads
 			chars[v].v = blCorner; //A
