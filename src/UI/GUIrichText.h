@@ -2,6 +2,11 @@
 
 #include "GUIlabel2.h"
 
+struct TCharacterPos {
+	int textObj;
+	int pos;
+};
+
 
 struct TRichTextRec : textRec {
 	TRichTextRec();
@@ -42,7 +47,7 @@ public:
 	void setTextColour(UIcolour colour);
 	void setText(std::string newText);
 	void appendText(std::string newText);
-	void scroll(int direction);
+	void scrollDown();
 	void renderText();
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void appendHotText(std::string newText, int idNo);
@@ -54,8 +59,10 @@ public:
 	void removeHotText(int tagNo);
 	void scrollUp();
 	int getPrevCharacter(int & textObj, int & pos);
+	TCharacterPos getPrevNewline(int textObj, int pos);
+	void update(float dT);
 
-	int overrun;
+	bool overrun;
 
 	std::vector<TRichTextRec> textObjs; ///<The complete text of this control.
 	int currentTextObj;
@@ -64,4 +71,8 @@ public:
 
 	std::vector<THotTextFragment> hotTextFrags; ///<Currently visible hot text fragments
 	int selectedHotObj; ///<Currently selected hot text oject, if any.
+	float updateDt; ///<Elapsed seconds since last call to update().
+
+	float correctOverrunDelay; ///<Delay before we next scroll
+	bool overrunCorrect; ///<If true, scrolldown to correct overrun
 };

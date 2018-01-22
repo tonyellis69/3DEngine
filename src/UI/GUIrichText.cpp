@@ -14,6 +14,9 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	firstVisibleObject = 0;
 	mousePassthru = false;
 	selectedHotObj = -1;
+	updateDt = 0;
+	correctOverrunDelay = 0.001f;
+	overrunCorrect = false;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -63,15 +66,11 @@ void CGUIrichText::appendText(std::string newText) {
 	textObjs.back().text += newText;
 	textObjs.back().findNewlines();
 	renderText();
-
-	while (overrun > 0) {
-		scroll(-1);
-	}
+	overrunCorrect = true;
 }
 
 /** Advance the first line that we display. */
-void CGUIrichText::scroll(int direction) {
-	if (direction < 0) { //scrolling down through text
+void CGUIrichText::scrollDown() {
 		textData = textObjs[firstVisibleObject];
 		TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
 		do {
@@ -80,7 +79,6 @@ void CGUIrichText::scroll(int direction) {
 		firstVisibleObject = lineFragment.textObj;
 		firstVisibleText = lineFragment.textPos + lineFragment.textLength;
 		renderText();
-	}
 }
 
 
@@ -88,7 +86,7 @@ void CGUIrichText::scroll(int direction) {
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
-	overrun = 0;
+	overrun = false;
 	textBuf.clearBuffer();
 	i32vec2 offset(0);
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
@@ -112,7 +110,8 @@ void CGUIrichText::renderText() {
 			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight);
 		}
 		if (offset.y + currentObj.font->lineHeight > height) {
-			overrun = offset.y + currentObj.font->lineHeight - height;
+			//overrun = offset.y + currentObj.font->lineHeight - height;
+			overrun = true;
 			return;
 		}
 	}  while(!lineFragment.finalFrag);
@@ -178,11 +177,7 @@ void CGUIrichText::appendHotText(std::string newText, int idNo) {
 	textObjs.back().text += newText;
 	textObjs.back().findNewlines();
 	renderText();
-
-	while (overrun > 0) {
-		scroll(-1);
-	}
-
+	overrunCorrect = true;
 }
 
 
@@ -261,42 +256,12 @@ void CGUIrichText::removeHotText(int tagNo) {
 
 /** Scroll up by one line. */
 void CGUIrichText::scrollUp() {
-	int textObj = firstVisibleObject;
-	int endPos = firstVisibleText;
 	int origFirstVisibleText = firstVisibleText;
 	int origFirstVisibleObject = firstVisibleObject;
 
-	//find previous character
-	//if it's a newline, skip it: that's the reason we're on the current line
-	//find the previous character
-	//track spaces
-	//if the combined character width takes us over linewidth, last space marks our line start
-	//if character = newline, that newline marks our line start
-
-	int prevCharacter = getPrevCharacter(textObj, endPos);
-
-	if (prevCharacter == '\n') { //discard, this is the newline that made this line
-		prevCharacter = getPrevCharacter(textObj, endPos);
-	}
-
-	int textWidth = 0; std::vector<int> spaces; 
-	while (prevCharacter != -1) {
-
-		TRichTextRec* obj = &textObjs[textObj];
-
-		if (prevCharacter == '\n') {
-			firstVisibleText = endPos +1;
-			firstVisibleObject = textObj;
-			break;
-		}
-		prevCharacter = getPrevCharacter(textObj, endPos);
-
-	}
-
-	if (prevCharacter == -1) { //ugh
-		firstVisibleText = 0;
-		firstVisibleObject = 0;
-	}
+	TCharacterPos prevNewline = getPrevNewline(firstVisibleObject, firstVisibleText -1);//-1 ensures we skip a newline that caused this line
+	firstVisibleText = prevNewline.pos;
+	firstVisibleObject = prevNewline.textObj;
 
 	//any word wraps between here and where we started?
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
@@ -308,8 +273,6 @@ void CGUIrichText::scrollUp() {
 			firstVisibleObject = lineFragment.textObj;
 		}
 	} while (lineFragment.textObj <= origFirstVisibleObject && (lineFragment.textPos + lineFragment.textLength) < origFirstVisibleText-1);
-
-
 
 	renderText();
 }
@@ -327,12 +290,40 @@ int CGUIrichText::getPrevCharacter(int& textObj, int& pos) {
 	return textObjs[textObj].text[pos];
 }
 
+TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
+	do {
+		if (pos <= 0) {
+			if (textObj == 0)
+				return TCharacterPos{ 0 };
+			textObj--;
+			pos = textObjs[textObj].text.size() - 1 + pos;
+		}
+		else
+			pos--;
+	} while (textObjs[textObj].text[pos] != '\n');
+	return TCharacterPos{textObj, pos+1};
+}
+
+
+void CGUIrichText::update(float dT) {
+	updateDt += dT;
+	if (updateDt > correctOverrunDelay) {
+		updateDt = 0;
+		if (overrun && overrunCorrect) {
+			scrollDown();
+			overrunCorrect = overrun;
+		}
+
+	}
+}
+
 
 
 TRichTextRec::TRichTextRec() {
 	hotTextId = 0;
 }
 
+//TO DO: scrap this 
 /** Find all the linebreaks in this text object and record their positions. */
 void TRichTextRec::findNewlines() {
 	newLines.clear();
