@@ -27,15 +27,25 @@ public:
 	void setTextColour(glm::vec4& newColour);
 	glm::i32vec2 renderTextAt(int x, int y, std::string textLine);
 	void clearBuffer();
+	void init(bool clearBuffer);
+	glm::i32vec2 addFragment(int x, int y, std::string textLine);
+	void render();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	
+	CRenderer* pRenderer;
+
+
 private:
 	void writeToTexture2(CBuf & glyphQuads);
 
+
+
 	glm::i32vec2 size;
-	CRenderer* pRenderer;
+
 	textRec textData;
 
-
+	//CBuf buf2;
+	vector<vBuf::T2DtexVert> textQuads;
+	vector<unsigned int> textQuadsIndex;
 };

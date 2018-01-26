@@ -84,6 +84,7 @@ public:
 	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
 	void beginRenderToTexture(CBaseTexture & texture);
 	void endRenderToTexture();
+	void rendertToTextureClear(CBaseTexture& texture, glm::vec4 & colour);
 	unsigned int getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode);
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploadDataTexture(int hShader, int hTexture);
@@ -91,6 +92,8 @@ public:
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	void initQuery();
 	unsigned int query();
+	void initTimerQuery();
+	unsigned long getTimerQuery();
 	void drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
 	void drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
 	void setDepthTest(bool on);
@@ -180,6 +183,10 @@ public:
 	GLuint hPhongInstAmbientLight;
 	GLuint hPhongInstColour;
 	GLuint hPhongInstMVP;
+
+	GLuint hTimeQuery;
+
+	rgba clearColour;
 
 private:
 

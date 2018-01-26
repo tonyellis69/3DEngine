@@ -20,6 +20,7 @@ void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
 	if (hBuffer == 0) {
 		glGenBuffers(1, &hBuffer);
 	}
+	//NB any pre-existing data is freed
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 	glBufferData(GL_ARRAY_BUFFER, size, (void*)verts, GL_STATIC_DRAW); //was static
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

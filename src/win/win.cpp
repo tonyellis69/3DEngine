@@ -165,5 +165,5 @@ void CWin::characterCallback(GLFWwindow* window, unsigned int codepoint) {
 }
 
 void CWin::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-	pApp->OnMouseWheelMsg(yoffset,0);
+	pApp->OnMouseWheelMsg(xoffset,yoffset);
 }

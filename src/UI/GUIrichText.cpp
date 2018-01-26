@@ -15,12 +15,15 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	mousePassthru = false;
 	selectedHotObj = -1;
 	updateDt = 0;
-	correctOverrunDelay = 0.001f;
+	correctOverrunDelay = 0.01f;
 	overrunCorrect = false;
+	yPixelOffset = 0;
+	smoothScrollStep = 4;
 }
 
 void CGUIrichText::DrawSelf() {
-
+	//cerr << "\ndraw texture";
+	//if (!overrunCorrect)
 	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
 
 	if (drawBorder) {
@@ -69,16 +72,21 @@ void CGUIrichText::appendText(std::string newText) {
 	overrunCorrect = true;
 }
 
-/** Advance the first line that we display. */
-void CGUIrichText::scrollDown() {
+/** Make the line after the current top line the new top line. */
+bool CGUIrichText::scrollDown() {
 		textData = textObjs[firstVisibleObject];
 		TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
 		do {
 			lineFragment = getNextLineFragment(lineFragment);
 		} while (!lineFragment.finalFrag && !lineFragment.causesNewLine);
+
 		firstVisibleObject = lineFragment.textObj;
 		firstVisibleText = lineFragment.textPos + lineFragment.textLength;
+		if (lineFragment.finalFrag)
+			return false;
+
 		renderText();
+		return true;
 }
 
 
@@ -87,35 +95,48 @@ void CGUIrichText::scrollDown() {
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
 	overrun = false;
-	textBuf.clearBuffer();
-	i32vec2 offset(0);
+	textBuf.init(true);
+	i32vec2 offset(0, yPixelOffset);
+	int currObjNo = firstVisibleObject;
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
 	do {
 		lineFragment = getNextLineFragment(lineFragment);
+		if (currObjNo != lineFragment.textObj) {
+			textBuf.render();
+			textBuf.init(false);
+			currObjNo = lineFragment.textObj;
+		}
 		TRichTextRec currentObj = textObjs[lineFragment.textObj];
+		scrollHeight = currentObj.font->lineHeight;
 
 		std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 		textBuf.setTextColour(currentObj.textColour);
 
-		int renderStartY = offset.y;
-		offset = textBuf.renderTextAt(lineFragment.renderStartX, renderStartY, renderLine);
-
+		//offset = textBuf.renderTextAt(lineFragment.renderStartX, offset.y, renderLine);
+		offset = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
+		
 		if (currentObj.hotTextId && renderLine[0] != '\n') {
-			THotTextFragment hotFrag = { lineFragment.renderStartX, renderStartY, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
+			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
 			hotTextFrags.push_back(hotFrag);
 		}
 
 		if (lineFragment.causesNewLine) {
-			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight);
+			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight );
 		}
 		if (offset.y + currentObj.font->lineHeight > height) {
-			//overrun = offset.y + currentObj.font->lineHeight - height;
 			overrun = true;
-			return;
+			if (offset.y > height) {
+				textBuf.render();
+				return;
+			}
 		}
+
+
+
 	}  while(!lineFragment.finalFrag);
 
+	textBuf.render();
 }
 
 
@@ -254,27 +275,37 @@ void CGUIrichText::removeHotText(int tagNo) {
 	renderText();
 }
 
-/** Scroll up by one line. */
-void CGUIrichText::scrollUp() {
+/** Make the line previous to the current top line the new top line. */
+bool CGUIrichText::scrollUp() {
 	int origFirstVisibleText = firstVisibleText;
 	int origFirstVisibleObject = firstVisibleObject;
 
-	TCharacterPos prevNewline = getPrevNewline(firstVisibleObject, firstVisibleText -1);//-1 ensures we skip a newline that caused this line
+	TCharacterPos prevNewline = getPrevNewline(firstVisibleObject, firstVisibleText - 1);//-1 ensures we skip a newline that caused this line
 	firstVisibleText = prevNewline.pos;
 	firstVisibleObject = prevNewline.textObj;
 
 	//any word wraps between here and where we started?
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0 };
-	do {
-		lineFragment = getNextLineFragment(lineFragment);
-		//if causes new line, get details
-		if (lineFragment.causesNewLine) {
-			firstVisibleText = lineFragment.textPos;
-			firstVisibleObject = lineFragment.textObj;
+		
+	//while current position < original position   //current pos = linefrag
+		//final position = current position			// final pos = first*
+		//current position = next wordwrap
+		while (lineFragment.textObj < origFirstVisibleObject ||
+			(lineFragment.textObj == origFirstVisibleObject && lineFragment.textPos < (origFirstVisibleText-1))) {
+
+			if (lineFragment.causesNewLine) {
+				firstVisibleText = lineFragment.textPos;
+				firstVisibleObject = lineFragment.textObj;
+			}
+
+			lineFragment = getNextLineFragment(lineFragment); //TO DO should always be next wordwrap
 		}
-	} while (lineFragment.textObj <= origFirstVisibleObject && (lineFragment.textPos + lineFragment.textLength) < origFirstVisibleText-1);
+
+	if (firstVisibleObject == origFirstVisibleObject &&  firstVisibleText == origFirstVisibleText)
+		return false;
 
 	renderText();
+	return true;
 }
 
 /** Return character at position previous to that given, winding back textObj if needed. */
@@ -306,17 +337,58 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 
 
 void CGUIrichText::update(float dT) {
+	
 	updateDt += dT;
-	if (updateDt > correctOverrunDelay) {
+	if (updateDt > correctOverrunDelay) 
+	{
 		updateDt = 0;
 		if (overrun && overrunCorrect) {
-			scrollDown();
+			smoothScroll(-smoothScrollStep);
 			overrunCorrect = overrun;
 		}
-
 	}
+	
 }
 
+
+bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
+	if (wheelDelta < 0)
+		smoothScroll(-scrollHeight);
+	else
+		smoothScroll(scrollHeight);
+	return true;
+}
+
+void CGUIrichText::smoothScroll(int pixels) { 
+	if (pixels < 0) { //we're scrolling down to the bottom of the text
+		if (!overrun) //no more text to expose
+			return;
+		yPixelOffset += pixels;
+		int lines = yPixelOffset / -scrollHeight;
+		for (int line = 0; line < lines; line++) {
+			if (overrun) {
+				yPixelOffset += scrollHeight;
+				scrollDown();
+				
+			}
+		}
+
+
+	}
+	else //we're scrolling up
+	{
+		yPixelOffset += pixels;
+		if (yPixelOffset >= 0) {  //have we dropped below top of screen?	
+			yPixelOffset -= scrollHeight;  //attempt to add a new line to fill the space
+			if (scrollUp()) {
+				return; 
+			}
+			else
+				yPixelOffset = 0;
+		}
+	}
+	renderText();
+}
 
 
 TRichTextRec::TRichTextRec() {

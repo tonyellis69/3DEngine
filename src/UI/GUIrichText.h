@@ -5,6 +5,7 @@
 struct TCharacterPos {
 	int textObj;
 	int pos;
+//	bool greaterThan(int )
 };
 
 
@@ -47,7 +48,7 @@ public:
 	void setTextColour(UIcolour colour);
 	void setText(std::string newText);
 	void appendText(std::string newText);
-	void scrollDown();
+	bool scrollDown();
 	void renderText();
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void appendHotText(std::string newText, int idNo);
@@ -57,10 +58,14 @@ public:
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void unhighlight(int textObj);
 	void removeHotText(int tagNo);
-	void scrollUp();
+	bool scrollUp();
 	int getPrevCharacter(int & textObj, int & pos);
 	TCharacterPos getPrevNewline(int textObj, int pos);
 	void update(float dT);
+
+	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
+
+	void smoothScroll(int pixels);
 
 	bool overrun;
 
@@ -75,4 +80,7 @@ public:
 
 	float correctOverrunDelay; ///<Delay before we next scroll
 	bool overrunCorrect; ///<If true, scrolldown to correct overrun
+	int yPixelOffset; ///<Used for scrolling by pixel.
+	int scrollHeight; ///<Pixels to smoothscroll before actually scrolling the text one line.
+	int smoothScrollStep;
 };

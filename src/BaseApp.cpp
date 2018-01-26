@@ -171,13 +171,13 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 }
 
 /** Event handler for mouse wheel messages. */
-void CBaseApp::OnMouseWheelMsg(unsigned int wParam, long lParam) {
+void CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
 	int x, y;
 	win.getMousePos(x, y);
-	int delta;// = GET_WHEEL_DELTA_WPARAM(wParam) / 120;
-	delta = wParam;
+	int delta = yoffset;
+	int keyState = 0; //can get key state if ever needed
 	if (GUIroot.IsOnControl(GUIroot,x, y)) //checks that the mouse isn't outside our app altogether
-		GUIroot.MouseWheelMsg(x,y,delta,GET_KEYSTATE_WPARAM(wParam));
+		GUIroot.MouseWheelMsg(x,y,delta,keyState);
 }
 
 
@@ -199,7 +199,7 @@ void CBaseApp::AppTasks() {
 
 	//TO DO: mouseCheck, which calls user with last reported mouse position.
 	if (!Paused) {
-		Engine.updateRegisteredSprites(dT);
+		//Engine.updateRegisteredSprites(dT);
 		Update();
 	}
 
@@ -216,7 +216,7 @@ void CBaseApp::AppTasks() {
 	Engine.drawModels();
 	
 //	Engine.drawSceneLayers();
-	Engine.drawRegisteredSprites();
+	//Engine.drawRegisteredSprites();
 	draw(); //Do user drawing
 
 	

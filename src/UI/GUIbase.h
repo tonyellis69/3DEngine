@@ -86,16 +86,13 @@ extern DelegateP<void,int> setFont;
 	to create an instance of this, initialise it and pass it to GUIroot. */
 class CDrawFuncs {
 public:
-	//DelegateP<void,int> setFont;
+
 	DelegatePP<void,const UIcolour&,const UIcolour&> setDrawColours;
-	//DelegateP<int,char*> getTextWidth;
 	DelegatePPP<void,int,int,int> drawIcon;
 	DelegatePP<void,CGUIbase&, CMessage&> handleUImsg;
 	DelegatePPP<void,UIcoord&,int,int> drawRect;
 	DelegatePPPP<void,int,int,int,int> drawBorder;
 	DelegateP<void,UIrect&> setClip;
-	//DelegatePPPP<void,int,int,int,char*> drawText;
-	//DelegatePPPP<void,int,int,int,char*> drawTextMultiLine;
 	DelegatePPPP<void,int,int,int,int> drawLine;
 	DelegateP<void,int> setIconset;
 	DelegatePP<void,int,UIrect&> drawTile;

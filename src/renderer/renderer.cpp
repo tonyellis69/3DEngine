@@ -472,6 +472,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 		return;
 	}
 	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
+
 }
 
 /**	Clean up after rendering to a texture. */
@@ -481,6 +482,15 @@ void CRenderer::endRenderToTexture() {
 	glDeleteFramebuffers(1, &hFrameBuffer);
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_BLEND);
+}
+
+void CRenderer::rendertToTextureClear(CBaseTexture& texture,glm::vec4& colour) {
+	beginRenderToTexture(texture);
+	rgba clr = { colour.r,colour.g, colour.b, colour.a };
+	setBackColour((rgba&)colour);
+	glClear(GL_COLOR_BUFFER_BIT);
+	endRenderToTexture();
+	setBackColour(clearColour);
 }
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
@@ -604,6 +614,27 @@ unsigned int CRenderer::query() {
 	return primitives;
 }
 
+
+void CRenderer::initTimerQuery() {
+	//glFinish();
+	cerr << "\ncache glFinished.";
+	glGenQueries(1, &hTimeQuery);
+	glBeginQuery(GL_TIME_ELAPSED, hTimeQuery);
+}
+
+unsigned long CRenderer::getTimerQuery() {
+	glEndQuery(GL_TIME_ELAPSED);
+	GLuint64 timeElapsed;
+	int done = 0;
+	while (!done) {
+	//	cerr << "*";
+		glGetQueryObjectiv(hTimeQuery,
+			GL_QUERY_RESULT_AVAILABLE,
+			&done);
+	}
+	glGetQueryObjectui64v(hTimeQuery, GL_QUERY_RESULT, &timeElapsed);
+	return timeElapsed; 
+}
 
 
 

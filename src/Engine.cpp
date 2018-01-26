@@ -41,7 +41,8 @@ void CEngine::init() {
 	UIicons = loadSpritesheet(dataPath+ "icons.png",32,32);
 
 	Renderer.init();
-	Renderer.setBackColour(engineTurquiose);
+	Renderer.clearColour = engineTurquiose;
+	Renderer.setBackColour(Renderer.clearColour);
 
 	defaultCamera = createCamera(glm::vec3(0,2,4));
 	setCurrentCamera(defaultCamera);
