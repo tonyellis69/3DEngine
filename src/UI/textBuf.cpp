@@ -47,7 +47,7 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	glyph* glyph;
 	unsigned int numChars = textLine.size();
 	for (unsigned int c = 0; c < numChars; c++) { //1 iterations takes it way down
-		//if (textLine[c] != '\n') 
+		if (textLine[c] != '\n') 
 		{
 			glyph = textData.font->table[textLine[c]];
 			//construct quads
@@ -118,7 +118,7 @@ glm::i32vec2 CTextBuffer::addFragment(int x, int y, std::string textLine) {
 	unsigned int numChars = textLine.size();
 	textQuads.resize(v + numChars * 4);
 	for (unsigned int c = 0; c < numChars; c++) { 
-		//if (textLine[c] != '\n') 
+		if (textLine[c] != '\n') 
 		{
 			glyph = textData.font->table[textLine[c]];
 			//construct quads

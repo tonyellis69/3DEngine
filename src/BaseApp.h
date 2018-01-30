@@ -53,7 +53,7 @@ public:
 	void OnCharEntry(unsigned int Key, long Mod);
 	void onMouseMove(int x, int y);
 	void onMouseButton(int button, int action, int mods);
-	void OnMouseWheelMsg(float xoffset, float yoffset);
+	virtual void OnMouseWheelMsg(float xoffset, float yoffset);
 	virtual void OnEvent() {};
 	void AppTasks();
 	void DrawUI();

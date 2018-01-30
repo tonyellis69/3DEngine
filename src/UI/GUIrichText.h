@@ -2,10 +2,11 @@
 
 #include "GUIlabel2.h"
 
+enum TMouseWheelMode {scroll,hotText};
+
 struct TCharacterPos {
 	int textObj;
 	int pos;
-//	bool greaterThan(int )
 };
 
 
@@ -16,6 +17,8 @@ struct TRichTextRec : textRec {
 	int hotTextId;
 };
 
+enum TNewLine {no, wordwrap, newline};
+
 /** A partial or complete line of text, with its rendered (x) dimensions. */
 struct TLineFragment {
 	int textObj;
@@ -23,7 +26,7 @@ struct TLineFragment {
 	int textLength;
 	int renderStartX;
 	int renderEndX;
-	bool causesNewLine;
+	TNewLine causesNewLine;
 	bool finalFrag;
 };
 
@@ -46,6 +49,8 @@ public:
 	void setFont(CFont* newFont);
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
+	void setHotTextColour(float r, float g, float b, float a);
+	void setHotTextHighlightColour(float r, float g, float b, float a);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	bool scrollDown();
@@ -64,8 +69,14 @@ public:
 	void update(float dT);
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
-
+	bool attemptHotTextScroll(int direction);
 	void smoothScroll(int pixels);
+	void updateText();
+	void setMouseWheelMode(TMouseWheelMode mode);
+	void updateHotTextSelection();
+	void hotTextScroll(int direction);
+
+	void selectTopHotText();
 
 	bool overrun;
 
@@ -76,6 +87,8 @@ public:
 
 	std::vector<THotTextFragment> hotTextFrags; ///<Currently visible hot text fragments
 	int selectedHotObj; ///<Currently selected hot text oject, if any.
+	std::vector<int> hotTextObjs; ///<Currently visible hot text object
+
 	float updateDt; ///<Elapsed seconds since last call to update().
 
 	float correctOverrunDelay; ///<Delay before we next scroll
@@ -83,4 +96,10 @@ public:
 	int yPixelOffset; ///<Used for scrolling by pixel.
 	int scrollHeight; ///<Pixels to smoothscroll before actually scrolling the text one line.
 	int smoothScrollStep;
+	TMouseWheelMode mouseWheelMode; ///<Either scrolling or hot text selecting.
+	int hotTextEscapeDirection; ///<Scroll direction 
+
+	glm::vec4 hotTextColour; ///<colour for unselected hot text.
+	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
+
 };
