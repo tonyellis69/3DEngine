@@ -106,7 +106,7 @@ bool CGUIrichText::scrollDown() {
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
-	overrun = false;
+	overrun = false; overrunHotTextObj = -1;
 	textBuf.init(true);
 	i32vec2 offset(0, yPixelOffset);
 	int currObjNo = firstVisibleObject;
@@ -129,6 +129,10 @@ void CGUIrichText::renderText() {
 		if (currentObj.hotTextId && renderLine[0] != '\n') {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
+			if (offset.y + currentObj.font->lineHeight > height)
+				hotFrag.overrun = true;
+			else
+				hotFrag.overrun = false;
 			hotTextFrags.push_back(hotFrag);
 		}
 
@@ -137,6 +141,8 @@ void CGUIrichText::renderText() {
 		}
 		if (offset.y + currentObj.font->lineHeight > height) {
 			overrun = true;
+			if (currentObj.hotTextId &&  overrunHotTextObj == -1)
+				overrunHotTextObj = currObjNo;
 			if (offset.y > height) {
 				textBuf.render();
 				return;
@@ -209,7 +215,7 @@ void CGUIrichText::appendHotText(std::string newText, int idNo) {
 	TRichTextRec newObj = textObjs.back(); //clone existing style for now
 	newObj.text.clear();
 	newObj.textColour = hotTextColour;
-	newObj.firstLineIndent = 20;
+	newObj.firstLineIndent = 15;
 	newObj.hotTextId = idNo;
 	textObjs.push_back(newObj);
 	currentTextObj++;
@@ -360,15 +366,21 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 
 void CGUIrichText::update(float dT) {
 
-updateDt += dT;
-if (updateDt > correctOverrunDelay)
-{
-	updateDt = 0;
-	if (overrun && overrunCorrect) {
-		smoothScroll(-smoothScrollStep);
-		overrunCorrect = overrun;
+	updateDt += dT;
+	if (updateDt > correctOverrunDelay)
+	{
+		updateDt = 0;
+		if (overrun && overrunCorrect) {
+			smoothScroll(-smoothScrollStep);
+			overrunCorrect = overrun;
+		} 
+		/*else
+		if (overrun && (overrunHotTextObj == selectedHotObj != -1) ) {
+			overrunHotTextObj = -1;
+			smoothScroll(-scrollHeight);
+			
+		}*/
 	}
-}
 
 }
 
@@ -440,12 +452,12 @@ void CGUIrichText::setMouseWheelMode(TMouseWheelMode mode) {
 	}
 }
 
-/** Ensure hot text is selected, if it's onscreen. */
+/** Ensure hot text is selected, if it's onscreen, and that we enter hot text scroll mode. */
 void CGUIrichText::updateHotTextSelection() {
 	if (hotTextFrags.size() == 0) { //no hot text
+		selectedHotObj = -1;
 		if (mouseWheelMode == hotText) {
 			mouseWheelMode = scroll;
-			selectedHotObj = -1;
 		}
 	}
 	else { //visible hot text
@@ -454,9 +466,8 @@ void CGUIrichText::updateHotTextSelection() {
 		else {
 			selectedHotObj = hotTextFrags[0].textObj;
 			highlight(selectedHotObj);
-			mouseWheelMode = hotText;
 		}
-
+		mouseWheelMode = hotText;
 	}
 }
 
@@ -489,6 +500,12 @@ void CGUIrichText::hotTextScroll(int direction) {
 	unhighlight(selectedHotObj);
 	selectedHotObj = nextHotOb;
 	highlight(selectedHotObj);
+	/////////////////////////////////////////
+	//check here if the hot text we've selected is overruning
+	if (overrunHotTextObj == selectedHotObj) {
+		overrunHotTextObj = -1;
+		smoothScroll(-scrollHeight);
+	}
 }
 
 /** Select the topmost visible hot text. */

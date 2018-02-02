@@ -38,6 +38,7 @@ struct THotTextFragment {
 	int renderEndY;
 	int textObj;
 	std::string text;
+	bool overrun;
 };
 
 
@@ -92,12 +93,12 @@ public:
 	float updateDt; ///<Elapsed seconds since last call to update().
 
 	float correctOverrunDelay; ///<Delay before we next scroll
-	bool overrunCorrect; ///<If true, scrolldown to correct overrun
+	bool overrunCorrect; ///<If true, scroll down to correct overrun
+	int overrunHotTextObj;
 	int yPixelOffset; ///<Used for scrolling by pixel.
 	int scrollHeight; ///<Pixels to smoothscroll before actually scrolling the text one line.
 	int smoothScrollStep;
 	TMouseWheelMode mouseWheelMode; ///<Either scrolling or hot text selecting.
-	int hotTextEscapeDirection; ///<Scroll direction 
 
 	glm::vec4 hotTextColour; ///<colour for unselected hot text.
 	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
