@@ -12,11 +12,12 @@
 /** Stores the style details of a homogenous piece of text, ie, one with the same
 font, colour, etc, together with the text itself. */
 struct textRec {
-	textRec() { firstLineIndent = 0; }
+	textRec() { firstLineIndent = 0; bold = false; }
 	std::string text;
 	CFont* font;
 	glm::vec4 textColour;
 	int firstLineIndent;
+	bool bold;
 	//others to follow
 };
 

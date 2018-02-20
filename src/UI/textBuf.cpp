@@ -92,10 +92,13 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 
 	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
 
+	glm::vec4 textColour = textData.textColour;
+	//textColour.a = 0.5;
+
 	pRenderer->setShader(pRenderer->textShader);
 	pRenderer->attachTexture(0, textData.font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textData.textColour);
+	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
 	
 	pRenderer->renderToTextureTris(glyphQuads, textTexture);

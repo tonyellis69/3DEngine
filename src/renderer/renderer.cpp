@@ -83,6 +83,7 @@ void CRenderer::resetMatrix() {
 void CRenderer::init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//	glBlendFunc(GL_SRC_ALPHA, GL_ONE);;
 
 	glClampColor(GL_CLAMP_VERTEX_COLOR, GL_FALSE);
 
@@ -97,7 +98,8 @@ void CRenderer::init() {
 	glDepthFunc(GL_LEQUAL);
 	glDepthRange(0.0f, 1.0f);
 
-	initRenderToTextureBufs();
+//	initRenderToTextureBufs();
+
 
 	glPrimitiveRestartIndex(65535);
 
@@ -393,6 +395,8 @@ float g_vertex_buffer_data[] = {
 	1.0f,  1.0f,
 };
 
+//TO DO: check if we can scrap this
+/*
 void CRenderer::initRenderToTextureBufs() {
 	
     glGenBuffers(1, &r2texQuadBuffer);
@@ -416,6 +420,7 @@ void CRenderer::initRenderToTextureBufs() {
 	glBindFramebuffer(GL_FRAMEBUFFER,0); //do this for legacy compatibility
 	glDisableVertexAttribArray(0);	//do this for legacy compatibility
 }
+*/
 
 /** Create an internal frameBuffer so  we can render to a texture when needed. */
 void CRenderer::createFrameBuffer() {
@@ -454,11 +459,15 @@ void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
 
 
 /**	Prepare to render to the given texture, leaving the actual drawing to the user. */
+//TO DO: see if there's any overhead in deleting/regenerating FBO
+//and maybe only calling drawbuffers once
+//ANSWER: no overhead, drivers seem to check for this stuff.
 void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
-
+	
 	
 	CRenderTexture* glTex = (CRenderTexture*)&texture;
 	glDisable(GL_BLEND); //Otherwise this messes up text texture alpha
+	
 	glGenFramebuffers(1, &hFrameBuffer);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
@@ -477,9 +486,9 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 
 /**	Clean up after rendering to a texture. */
 void CRenderer::endRenderToTexture() {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+//	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDeleteFramebuffers(1, &hFrameBuffer);
+//	glDeleteFramebuffers(1, &hFrameBuffer);
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_BLEND);
 }
@@ -617,7 +626,6 @@ unsigned int CRenderer::query() {
 
 void CRenderer::initTimerQuery() {
 	//glFinish();
-	cerr << "\ncache glFinished.";
 	glGenQueries(1, &hTimeQuery);
 	glBeginQuery(GL_TIME_ELAPSED, hTimeQuery);
 }

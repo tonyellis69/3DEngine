@@ -12,7 +12,7 @@ struct TCharacterPos {
 
 struct TRichTextRec : textRec {
 	TRichTextRec();
-	void findNewlines();
+	void findNewlines(); //TO DO: am I keeping this?
 	std::vector<int> newLines;
 	int hotTextId;
 };
@@ -49,6 +49,8 @@ public:
 	void DrawSelf();
 	void setFont(CFont* newFont);
 	void setTextColour(float r, float g, float b, float a);
+	void setAppendStyleBold(bool isOn);
+	void setAppendStyleHot(bool isOn, int tagId);
 	void setTextColour(UIcolour colour);
 	void setHotTextColour(float r, float g, float b, float a);
 	void setHotTextHighlightColour(float r, float g, float b, float a);

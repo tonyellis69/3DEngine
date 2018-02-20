@@ -77,7 +77,7 @@ public:
 	void setShader(int program);
 	void setShader(CShader* shader);
 	void drawModel(CRenderModel& model);
-	void initRenderToTextureBufs();
+	//void initRenderToTextureBufs();
 	void createFrameBuffer();
 	void createScreenQuad();
 	void renderToTextureQuad(CBaseTexture & texture);
@@ -190,13 +190,13 @@ public:
 
 private:
 
-	
+	GLenum DrawBuffers[1];
 
 
 	std::vector<GLuint> tmpShaderList; ///<Stores recently compiled shaders.
 
 	//render to texture stuff:
-	unsigned int r2texQuadBuffer;
+	//unsigned int r2texQuadBuffer;
 	unsigned int r2texFrameBuf;
 	unsigned int  r2texTex;
 

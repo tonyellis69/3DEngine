@@ -46,7 +46,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	if (textObjs[currentTextObj].textColour == newTextColour)
 		return;
 
-	if (textObjs[currentTextObj].text.size() > 0) {
+	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
 		newObj.hotTextId = 0; //assume we don't want to add to any preceeding hot text.
@@ -55,6 +55,42 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	}
 	textObjs[currentTextObj].textColour = vec4(r, g, b, a);
 }
+
+/** Set the bold style for appending text, ie, on or off. */
+void CGUIrichText::setAppendStyleBold(bool isOn) {
+	if (textObjs[currentTextObj].bold == isOn)
+		return;
+
+	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text
+		//replace with addTextlessEndObj
+		TRichTextRec newObj = textObjs[currentTextObj];
+		newObj.text.clear();
+		textObjs.push_back(newObj);
+		currentTextObj++;
+	}
+	textObjs[currentTextObj].bold = isOn;
+	if (isOn)
+		textObjs[currentTextObj].textColour = vec4(0, 0, 1, 1); ///FAKE!!! DO NOT KEEP
+	else
+		textObjs[currentTextObj].textColour = vec4(1, 1, 1, 1);
+}
+
+
+/** Set hot text style for appending text on or off. */
+void CGUIrichText::setAppendStyleHot(bool isOn, int tagId) {
+	if (textObjs[currentTextObj].hotTextId == tagId)
+		return;
+
+	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text
+													 //replace with addTextlessEndObj
+		TRichTextRec newObj = textObjs[currentTextObj];
+		newObj.text.clear();
+		textObjs.push_back(newObj);
+		currentTextObj++;
+	}
+	textObjs[currentTextObj].hotTextId = tagId;
+}
+
 
 void CGUIrichText::setTextColour(UIcolour  colour) {
 	setTextColour(colour.r, colour.g, colour.b, colour.a);

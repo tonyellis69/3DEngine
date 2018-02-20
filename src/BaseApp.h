@@ -66,7 +66,7 @@ public:
 
 	string getExePath();
 
-	virtual void vmMessage(TVMmsg) {};
+	virtual void vmMessage(TvmAppMsg) {};
 
 
 	CEngine Engine;
