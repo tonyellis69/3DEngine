@@ -23,7 +23,7 @@ public:
 /** Simple message struct. */
 class CMessage {
 public:
-	char* Name;
+	//char* Name;
 	int Msg;
 	int value;
 	float fValue;

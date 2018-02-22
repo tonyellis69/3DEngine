@@ -42,8 +42,8 @@ void CGUIrichText::setFont(CFont* newFont) {
 
 /** Set the current text drawing colour. */
 void CGUIrichText::setTextColour(float r, float g, float b, float a) {
-	vec4 newTextColour = glm::vec4(r, g, b, a);
-	if (textObjs[currentTextObj].textColour == newTextColour)
+	defaultTextColour = glm::vec4(r, g, b, a);
+	if (textObjs[currentTextObj].textColour == defaultTextColour)
 		return;
 
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
@@ -89,6 +89,10 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int tagId) {
 		currentTextObj++;
 	}
 	textObjs[currentTextObj].hotTextId = tagId;
+	if (tagId)
+		textObjs[currentTextObj].textColour = hotTextColour;
+	else
+		textObjs[currentTextObj].textColour = defaultTextColour;
 }
 
 
