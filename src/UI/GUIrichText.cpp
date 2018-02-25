@@ -348,29 +348,34 @@ bool CGUIrichText::scrollUp() {
 	int origFirstVisibleText = firstVisibleText;
 	int origFirstVisibleObject = firstVisibleObject;
 
+
 	TCharacterPos prevNewline = getPrevNewline(firstVisibleObject, firstVisibleText - 1);//-1 ensures we skip a newline that caused this line
 	firstVisibleText = prevNewline.pos;
 	firstVisibleObject = prevNewline.textObj;
 
+	int lastNewLineObj = firstVisibleObject;
+	int lastNewLinePos = firstVisibleText;
+
 	//any word wraps between here and where we started?
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,no,0 };
-		
-	//while current position < original position   //current pos = linefrag
-		//final position = current position			// final pos = first*
-		//current position = next wordwrap
-		while (lineFragment.textObj < origFirstVisibleObject ||
-			(lineFragment.textObj == origFirstVisibleObject && lineFragment.textPos < (origFirstVisibleText-1))) {
-
-			if (lineFragment.causesNewLine != no) {
-				firstVisibleText = lineFragment.textPos;
-				firstVisibleObject = lineFragment.textObj;
-			}
-
-			lineFragment = getNextLineFragment(lineFragment); //TO DO should always be next wordwrap
+	do {	
+		if (lineFragment.causesNewLine == wordwrap) {
+			lastNewLinePos = lineFragment.textPos + lineFragment.textLength;
+			lastNewLineObj = lineFragment.textObj;
 		}
+
+		lineFragment = getNextLineFragment(lineFragment); //TO DO should always be next wordwrap
+
+	} while (lineFragment.textObj < origFirstVisibleObject ||
+		//(lineFragment.textObj == origFirstVisibleObject && lineFragment.textPos < (origFirstVisibleText - 1)));
+	  (lineFragment.textObj == origFirstVisibleObject && (lineFragment.textPos + lineFragment.textLength) < (origFirstVisibleText - 1)));
+
 
 	if (firstVisibleObject == origFirstVisibleObject &&  firstVisibleText == origFirstVisibleText)
 		return false;
+
+	firstVisibleObject = lastNewLineObj;
+	firstVisibleText = lastNewLinePos;
 
 	updateText();
 	return true;
@@ -555,7 +560,16 @@ void CGUIrichText::selectTopHotText() {
 		highlight(selectedHotObj);
 		mouseWheelMode = hotText;
 	}
+}
 
+/** Convert all existing hot text objects to standard style. */
+void CGUIrichText::purgeHotText() {
+	for (auto &textObj : textObjs) {
+		if (textObj.hotTextId > 0) {
+			textObj.hotTextId = 0;
+			textObj.textColour = defaultTextColour;
+		}
+	}
 }
 
 
@@ -571,5 +585,4 @@ void TRichTextRec::findNewlines() {
 		if (text[c] == '\n')
 			newLines.push_back(c);
 	}
-
 }

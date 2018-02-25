@@ -78,8 +78,8 @@ public:
 	void setMouseWheelMode(TMouseWheelMode mode);
 	void updateHotTextSelection();
 	void hotTextScroll(int direction);
-
 	void selectTopHotText();
+	void purgeHotText();
 
 	bool overrun;
 
