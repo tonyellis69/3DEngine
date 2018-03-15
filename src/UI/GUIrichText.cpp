@@ -572,6 +572,15 @@ void CGUIrichText::purgeHotText() {
 	}
 }
 
+/** Convert hot text with the given id to standard style. */
+void CGUIrichText::purgeHotText(int id) {
+	for (auto &textObj : textObjs) {
+		if (textObj.hotTextId == id) {
+			textObj.hotTextId = 0;
+			textObj.textColour = defaultTextColour;
+		}
+	}
+}
 
 TRichTextRec::TRichTextRec() {
 	hotTextId = 0;

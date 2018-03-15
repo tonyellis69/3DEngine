@@ -80,6 +80,7 @@ public:
 	void hotTextScroll(int direction);
 	void selectTopHotText();
 	void purgeHotText();
+	void purgeHotText(int id);
 
 	bool overrun;
 
