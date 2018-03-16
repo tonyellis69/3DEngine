@@ -81,6 +81,7 @@ public:
 	void selectTopHotText();
 	void purgeHotText();
 	void purgeHotText(int id);
+	void clear();
 
 	bool overrun;
 
@@ -106,4 +107,5 @@ public:
 	glm::vec4 hotTextColour; ///<colour for unselected hot text.
 	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
 	glm::vec4 defaultTextColour;
+	CFont* currentSetFont;
 };

@@ -7,10 +7,10 @@ using namespace glm;
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	firstVisibleText = 0;
 	TRichTextRec defaultStyle;
-	defaultStyle.font = defaultFont;
 	defaultStyle.textColour = vec4(0,0,0,1);
 	textObjs.push_back(defaultStyle);
 	currentTextObj = 0;
+	setFont(defaultFont);
 	firstVisibleObject = 0;
 	mousePassthru = false;
 	selectedHotObj = -1;
@@ -38,6 +38,7 @@ void CGUIrichText::setFont(CFont* newFont) {
 	textBuf.setFont(newFont);
 	textData.font = newFont;
 	textObjs[currentTextObj].font = newFont;
+	currentSetFont = newFont;
 }
 
 /** Set the current text drawing colour. */
@@ -204,6 +205,10 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	
 	unsigned int textStartPos = currentLineFrag.textPos + currentLineFrag.textLength;
 	if (textStartPos >= textObjs[textObj].text.size()) {
+		if (textObj + 1 == textObjs.size()) {
+			nextLineFrag.finalFrag = true;
+			return nextLineFrag;
+		}
 		textObj++;
 		textStartPos = 0;
 	}
@@ -582,6 +587,21 @@ void CGUIrichText::purgeHotText(int id) {
 	}
 }
 
+/** Remove all text from the control. */
+void CGUIrichText::clear() {
+	textObjs.clear();
+	firstVisibleText = 0;
+	TRichTextRec defaultStyle;
+	defaultStyle.font = currentSetFont;
+	defaultStyle.textColour = defaultTextColour;
+	textObjs.push_back(defaultStyle);
+	currentTextObj = 0;
+	firstVisibleObject = 0;
+	selectedHotObj = -1;
+	updateText();
+}
+
+
 TRichTextRec::TRichTextRec() {
 	hotTextId = 0;
 }
@@ -595,3 +615,5 @@ void TRichTextRec::findNewlines() {
 			newLines.push_back(c);
 	}
 }
+
+
