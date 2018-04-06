@@ -131,11 +131,11 @@ public:
 	//CGUIbase(int x, int y, int w, int h);
 	virtual ~CGUIbase(void);
 	bool IsOnControl(const CGUIbase& Control,const  int mouseX, const  int mouseY);
-	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
+	virtual void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	virtual void OnMouseMove(const  int mouseX, const  int mouseY, int key) {};
 	virtual void OnLMouseDown(const  int mouseX, const  int mouseY, int key) {};
 	virtual void OnRMouseDown(const  int mouseX, const  int mouseY) {};
-	virtual void OnLMouseUp(const  int mouseX, const  int mouseY)  ;
+	virtual void OnLMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void onRMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void OnClick(const  int mouseX, const  int mouseY) {};
 	virtual void onKeyPress(unsigned int Key, long Mod) {};
@@ -162,6 +162,7 @@ public:
 	virtual void setVisible(bool onOff);
 	virtual bool getVisible();
 	unsigned int getID();
+	void makeModal(CGUIbase * control);
 
 	void setBackColour1(const UIcolour & colour);
 
@@ -175,6 +176,8 @@ public:
 	void SetName(char* NameStr);
 
 	void setDefaultFont(CFont* font);
+
+	glm::i32vec2 getScreenCoords(int x, int y);
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -244,6 +247,7 @@ protected:
 	static CFont* defaultFont;
 public:
 	//static DelegateP<void,int> setFont;
+	static CGUIbase* modalControl; ///<Pointer to the current modal control, if any.
 };
 
 

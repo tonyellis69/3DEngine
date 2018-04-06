@@ -27,7 +27,7 @@ public:
 	void removeModal();
 	void setFocus(CGUIbase* control);
 
-	CGUIbase* modalControl; ///<Pointer to the current modal control, if any.
+	//CGUIbase* modalControl; ///<Pointer to the current modal control, if any.
 	bool killModal; ///<Set to true to schedule the deletion of the current modal control.
 
 	CGUIbase* focusControl; ///<The current control with focus, if any.

@@ -11,6 +11,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	type = uiMenu;
 	vPad =  4;
 	itemWidth = width;
+	maxItemWidth = 0;// itemWidth;
 	itemHeight = itemFont->lineHeight + vPad;
 	clear();
 	
@@ -21,6 +22,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 /** Set the font used by the menu items. */
 void CGUImenu::setFont(CFont * newFont) {
 	itemFont = newFont;
+	itemHeight = itemFont->lineHeight + vPad;
 }
 
 /** Set colour of menu items. */
@@ -51,8 +53,21 @@ void CGUImenu::addItem(std::string  itemText) {
 	item->setText(itemText);
 	nextItemPos += itemHeight + vPad;
 	item->id = nItems++;
+	if (maxItemWidth < item->getTextWidth())
+		maxItemWidth = item->getTextWidth();
 	Add(item);
 	items.push_back(item);
+
+	resizeToFit();
+}
+
+/** Resize to fit current items. */
+void CGUImenu::resizeToFit() {
+	itemWidth = maxItemWidth + 2 * vPad;
+	width = itemWidth;
+	height = (itemHeight + vPad) * items.size();
+	drawBox.size = i32vec2(width, height);
+	updateAppearance();
 }
 
 /** User rolling the mouse wheel, so scroll the selection. */
@@ -88,4 +103,5 @@ void CGUImenu::clear() {
 		delete Control[i];
 	Control.clear();
 }
+
 

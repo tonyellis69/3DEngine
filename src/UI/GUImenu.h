@@ -12,15 +12,16 @@ public:
 	void setSelectedColour(UIcolour colour);
 	void DrawSelf();
 	void addItem(std::string itemText);
+	void resizeToFit();
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void clear();
-
-
+	
 	std::vector<CGUIlabel2*> items;
 	int nItems;
 	CFont* itemFont;
 	int itemWidth;
+	int maxItemWidth;
 	int itemHeight;
 	int nextItemPos;
 	int vPad;

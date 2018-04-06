@@ -307,6 +307,7 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 	if (selectedHotObj > -1) {
 		CMessage msg;
 		msg.Msg = uiMsgHotTextClick;
+		msg.x = mouseX; msg.y = mouseY;
 		msg.value = textObjs[selectedHotObj].hotTextId;
 		pDrawFuncs->handleUImsg(*this, msg);
 	}

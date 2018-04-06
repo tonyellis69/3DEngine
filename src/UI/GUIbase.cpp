@@ -69,6 +69,8 @@ CGUIbaseEngine* CGUIbase::pGUIeng;
 
 CFont* CGUIbase::defaultFont;
 
+CGUIbase* CGUIbase::modalControl;
+
 /** Returns true if the given point is inside this control's area. */
 bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY) {
 	if (!Control.visible || !Control.enabled || Control.mousePassthru)
@@ -401,6 +403,11 @@ void CGUIbase::setDefaultFont(CFont* font) {
 	defaultFont = font;
 }
 
+/** Convert these local coordinate to absolute screen coordinates. */
+glm::i32vec2 CGUIbase::getScreenCoords(int x, int y) {
+	return glm::i32vec2(drawBox.pos.x + x, drawBox.pos.y + y);
+}
+
 
 
 /** Return a pointer to the child control of this control with the given id number. */
@@ -441,24 +448,7 @@ CGUIbase* CGUIbase::findControl(CGUIbase* child) {
 
 void CGUIbase::OnLMouseUp(const int mouseX, const int mouseY) {
 	//do the default action for mouse up:
-/*	CMessage msg;
-	if (mouse->dragging) { //we're dragging something, so drop it.
-	
-		//Some code here to handle being dropped on
 
-		msg.Msg = uiMsgDrop;
-		msg.x = mouse->screenPos.x; msg.y = mouse->screenPos.y;
-	//	Message.value = image;
-		//then kill the mouse object
-		pDrawFuncs->handleUImsg(*this,msg);
-		//delete mouse;
-	//mouse = new CGUImouse();
-	
-	}*/
-	//TO DO: pretty sure we're not using the above any more.
-	//also it's bad policy - dragging/dropping should be handled at a higher level,
-	//not by the base class. By default, all we should do is alert user this event
-	//has happened:
 	CMessage msg2;
 	msg2.Msg = uiMsgLMouseUp;
 	msg2.x = mouse->screenPos.x; msg2.y = mouse->screenPos.y;
@@ -550,4 +540,7 @@ void CGUIbase::borderOn(bool onOff) {
 	drawBorder = onOff;
 }
 
+void CGUIbase::makeModal(CGUIbase * control) {
+	modalControl = control;
+}
 

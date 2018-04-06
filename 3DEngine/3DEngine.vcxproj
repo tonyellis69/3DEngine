@@ -148,6 +148,7 @@
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
+    <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIrichText.cpp" />
     <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
     <ClCompile Include="..\src\UI\GUIdlg.cpp" />
@@ -238,6 +239,7 @@
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
+    <ClInclude Include="..\src\UI\GUIpopMenu.h" />
     <ClInclude Include="..\src\UI\GUIrichText.h" />
     <ClInclude Include="..\src\UI\GUIcontainer.h" />
     <ClInclude Include="..\src\UI\GUIdlg.h" />
