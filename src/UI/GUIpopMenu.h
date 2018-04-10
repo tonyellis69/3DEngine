@@ -9,5 +9,11 @@ public:
 	void DrawSelf();
 	//void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	void OnLMouseUp(const  int mouseX, const  int mouseY);
+	void OnMouseMove(const  int mouseX, const  int mouseY, int key);
 
+	void setVisible(bool onOff);
+
+
+	int lastY;
+	int yDisplacement;
 };
