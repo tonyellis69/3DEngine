@@ -55,6 +55,7 @@ void CGUImenu::addItem(std::string  itemText) {
 	item->id = nItems++;
 	if (maxItemWidth < item->getTextWidth())
 		maxItemWidth = item->getTextWidth();
+	item->mousePassthru =  true;
 	Add(item);
 	items.push_back(item);
 
@@ -85,10 +86,31 @@ bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta,
 	return true;
 }
 
+/** If the mouse moves over a menu item, select it. */
+void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+	items[selected]->setTextColour(textColour);
+	selected = 0;
+	if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
+		selected = mouseY / itemHeight;
+		if (selected > nItems - 1)
+			selected = nItems - 1;
+		items[selected]->setTextColour(selectedColour);
+	}
+		
+}
+
 /** User pressed left-mouse, affirming the currently selected item. */
 void CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgLMdown;
+	msg.value = selected;
+	pDrawFuncs->handleUImsg(*this, msg);
+}
+
+/** User pressed left-mouse, affirming the currently selected item. */
+void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
+	CMessage msg;
+	msg.Msg = uiClick;
 	msg.value = selected;
 	pDrawFuncs->handleUImsg(*this, msg);
 }

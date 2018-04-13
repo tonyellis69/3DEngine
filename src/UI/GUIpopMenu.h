@@ -12,8 +12,10 @@ public:
 	void OnMouseMove(const  int mouseX, const  int mouseY, int key);
 
 	void setVisible(bool onOff);
-
+	//void setPos(int x, int y);
 
 	int lastY;
 	int yDisplacement;
+
+	bool releaseMode; ///<If true, menu disappears on LMB up
 };

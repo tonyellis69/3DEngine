@@ -22,6 +22,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	setMouseWheelMode(scroll);
 	setHotTextColour(1, 1, 1, 1);
 	setHotTextHighlightColour(0, 0, 1, 1);
+	mouseMode = true;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -39,6 +40,10 @@ void CGUIrichText::setFont(CFont* newFont) {
 	textData.font = newFont;
 	textObjs[currentTextObj].font = newFont;
 	currentSetFont = newFont;
+}
+
+CFont * CGUIrichText::getFont() {
+	return currentSetFont;
 }
 
 /** Set the current text drawing colour. */
@@ -276,7 +281,8 @@ void CGUIrichText::appendHotText(std::string newText, int idNo) {
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	int oldSelectedHotObj = selectedHotObj;
-//	selectedHotObj = -1;
+	if (mouseMode)
+		selectedHotObj = -1;
 	for (auto hotTextFrag : hotTextFrags) {
 		if (mouseY > hotTextFrag.renderStartY &&  mouseY < hotTextFrag.renderEndY
 			&& mouseX > hotTextFrag.renderStartX && mouseX < hotTextFrag.renderEndX) {
@@ -310,14 +316,15 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 		msg.x = mouseX; msg.y = mouseY;
 		msg.value = textObjs[selectedHotObj].hotTextId;
 		pDrawFuncs->handleUImsg(*this, msg);
+		
 	}
 }
 
 
 /** Check for losing mouse while hot text selected. */
 void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
-
-	return;
+	if (!mouseMode)
+		return;
 
 	if (selectedHotObj > 0) {
 		unhighlight(selectedHotObj);
@@ -492,7 +499,8 @@ void CGUIrichText::smoothScroll(int pixels) {
 
 void CGUIrichText::updateText() {
 	renderText();
-	updateHotTextSelection();
+	if (!mouseMode)
+		updateHotTextSelection();
 }
 
 /** Change between scrolling mode and hot text selection mode. */
@@ -600,6 +608,14 @@ void CGUIrichText::clear() {
 	firstVisibleObject = 0;
 	selectedHotObj = -1;
 	updateText();
+}
+
+/** Unselect any selected hot text. */
+void CGUIrichText::clearSelection() {
+	if (selectedHotObj == -1)
+		return;
+	unhighlight(selectedHotObj);
+	selectedHotObj = -1;
 }
 
 

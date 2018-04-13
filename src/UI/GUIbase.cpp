@@ -91,10 +91,7 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 
 	//otherwise, recursively test message against this control's child controls
 	for (size_t i = 0; i < Control.size(); i++) {
-		if (Control[i]->id == 66)
-			int b = 0;
-		if (IsOnControl(*Control[i], mouseX, mouseY)) {
-			
+		if (IsOnControl(*Control[i], mouseX, mouseY)) {		
 			Control[i]->MouseMsg(Msg, mouseX - Control[i]->localPos.x, mouseY - Control[i]->localPos.y, key);
 			return;
 		}
@@ -246,7 +243,8 @@ void CGUIbase::updateAppearance() {
 	needsUpdate = false;
 	//1. Recalculate x,y,w,h if necessary due to justification or spanning
 	if (anchorRight != NONE)
-		drawBox.size.x = parent->drawBox.size.x - localPos.x - anchorRight;
+		//drawBox.size.x = parent->drawBox.size.x - localPos.x - anchorRight;
+		localPos.x = parent->drawBox.size.x - drawBox.size.x - anchorRight;
 	else {
 		switch (hFormat) {
 		case hCentre: {
@@ -261,7 +259,8 @@ void CGUIbase::updateAppearance() {
 	}
 
 	if (anchorBottom != NONE)
-		drawBox.size.y = parent->drawBox.size.y - localPos.y - anchorBottom;
+		//drawBox.size.y = parent->drawBox.size.y - localPos.y - anchorBottom;
+		localPos.y = parent->drawBox.size.y - drawBox.size.y - anchorBottom;
 	else {
 		switch (vFormat) {
 		case vCentre: {

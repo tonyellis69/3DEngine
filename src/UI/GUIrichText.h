@@ -48,6 +48,7 @@ public:
 	CGUIrichText(int x, int y, int w, int h);
 	void DrawSelf();
 	void setFont(CFont* newFont);
+	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setAppendStyleBold(bool isOn);
 	void setAppendStyleHot(bool isOn, int tagId);
@@ -82,6 +83,7 @@ public:
 	void purgeHotText();
 	void purgeHotText(int id);
 	void clear();
+	void clearSelection();
 
 	bool overrun;
 
@@ -108,4 +110,6 @@ public:
 	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
 	glm::vec4 defaultTextColour;
 	CFont* currentSetFont;
+
+	bool mouseMode; ///<True for selection hot text with mouse pointer.
 };

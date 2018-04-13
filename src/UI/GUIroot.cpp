@@ -12,6 +12,8 @@ CGUIroot::CGUIroot() {
 	modalControl = NULL;
 	killModal = false;
 	focusControl = NULL;
+	borderWidth = 0;
+
 }
 
 /** Root overloads this method so it can send messages direct to any control that has trapped the
@@ -21,9 +23,10 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		return;
 
 	if (modalControl != NULL) {
-		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
+		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
 		//TO DO: why did I ever do the above?
-		modalControl->MouseMsg(Msg, mouseX , mouseY, key);
+		modalControl->MouseMsg(Msg, mouseX - modalControl->drawBox.pos.x, mouseY - modalControl->drawBox.pos.y, key); 
+		//modalControl->MouseMsg(Msg, mouseX , mouseY, key);
 		if (killModal) 
 			deleteModal();
 		return;
@@ -108,7 +111,6 @@ void CGUIroot::setDrawFuncs(CDrawFuncs* drawFunc) {
 /** Overload function to draw the mouse after drawing everything else, so it's on top. */
 void CGUIroot::Draw() {
 	CGUIbase::Draw(); //draw every other child control of root first
-	
 	//draw mouse control if any
 	pDrawFuncs->setClip(Clipbox);
 	mouse->DrawSelf();

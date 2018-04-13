@@ -143,7 +143,7 @@ public:
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	virtual void onMouseOff(const  int mouseX, const  int mouseY, int key) {};
 	void SetPos(int x, int y, int w, int h);
-	void setPos(int x, int y);
+	virtual void setPos(int x, int y);
 	virtual void Add(CGUIbase* child);
 	virtual void updateAppearance();
 	virtual void Draw();

@@ -14,7 +14,9 @@ public:
 	void addItem(std::string itemText);
 	void resizeToFit();
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
+	void OnMouseMove(const int mouseX, const int mouseY, int key);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	void OnClick(const int mouseX, const int mouseY);
 	void clear();
 	
 	std::vector<CGUIlabel2*> items;
