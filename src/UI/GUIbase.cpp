@@ -407,6 +407,14 @@ glm::i32vec2 CGUIbase::getScreenCoords(int x, int y) {
 	return glm::i32vec2(drawBox.pos.x + x, drawBox.pos.y + y);
 }
 
+int CGUIbase::getWidth() {
+	return drawBox.size.x;
+}
+
+int CGUIbase::getHeight() {
+	return drawBox.size.y;
+}
+
 
 
 /** Return a pointer to the child control of this control with the given id number. */

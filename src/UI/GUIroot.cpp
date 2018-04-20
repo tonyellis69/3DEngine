@@ -25,6 +25,8 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if (modalControl != NULL) {
 		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
 		//TO DO: why did I ever do the above?
+		if (modalControl->id == 88)
+			int b = 0;
 		modalControl->MouseMsg(Msg, mouseX - modalControl->drawBox.pos.x, mouseY - modalControl->drawBox.pos.y, key); 
 		//modalControl->MouseMsg(Msg, mouseX , mouseY, key);
 		if (killModal) 

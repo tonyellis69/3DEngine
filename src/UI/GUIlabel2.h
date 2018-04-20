@@ -18,6 +18,7 @@ public:
 	void DrawSelf();
 	//void borderOn(bool onOff);
 	void SetPos(int x, int y, int w, int h);
+	void updateAppearance();
 	float getTextWidth();
 	void calcLineOffset();
 
@@ -36,4 +37,7 @@ public:
 	bool multiLine;
 
 	textRec textData;
+
+	int textureHeight; ///<Height of the texture being drawn to.
+	int textureWidth; ///<Guess.
 	};

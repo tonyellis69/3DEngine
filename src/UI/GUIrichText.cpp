@@ -175,7 +175,7 @@ void CGUIrichText::renderText() {
 		if (currentObj.hotTextId && renderLine[0] != '\n') {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
-			if (offset.y + currentObj.font->lineHeight > height)
+			if (offset.y + currentObj.font->lineHeight > textureHeight)
 				hotFrag.overrun = true;
 			else
 				hotFrag.overrun = false;
@@ -185,11 +185,11 @@ void CGUIrichText::renderText() {
 		if (lineFragment.causesNewLine != no) {
 			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight );
 		}
-		if (offset.y + currentObj.font->lineHeight > height) {
+		if (offset.y + currentObj.font->lineHeight > textureHeight) {
 			overrun = true;
 			if (currentObj.hotTextId &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo;
-			if (offset.y > height) {
+			if (offset.y > textureHeight) {
 				textBuf.render();
 				return;
 			}
@@ -240,7 +240,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			nextLineFrag.causesNewLine = newline;
 			break;
 		}
-		if (renderX > width) {
+		if (renderX > textureWidth) {
 			c = breakPoint ;
 			renderX = breakPointX;
 			nextLineFrag.causesNewLine = wordwrap;
@@ -294,7 +294,7 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 		}
 	}
 	
-	if (oldSelectedHotObj > 0 && oldSelectedHotObj != selectedHotObj) 
+	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) 
 		unhighlight(oldSelectedHotObj);
 }
 
@@ -616,6 +616,59 @@ void CGUIrichText::clearSelection() {
 		return;
 	unhighlight(selectedHotObj);
 	selectedHotObj = -1;
+}
+
+
+
+void CGUIrichText::appendMarkedUpText(string text) {
+	bool bold = false; bool hot = false;
+	enum TStyleChange { styleNone, styleBold, styleHot };
+
+	std::string writeTxt = text;
+	std::string remainingTxt = text;
+	TStyleChange styleChange;
+	while (remainingTxt.size()) {
+		styleChange = styleNone;
+		int cut = 0; int tagId = 0;
+		size_t found = remainingTxt.find('\\');
+		if (found != std::string::npos) {
+			cut = 1;
+			if (remainingTxt[found + 1] == 'b') {
+				styleChange = styleBold;
+				bold = !bold;
+				cut = 2;
+			}
+
+			if (remainingTxt[found + 1] == 'h') {
+				hot = !hot;
+				styleChange = styleHot;
+				if (remainingTxt[found + 2] == '{') {
+					size_t end = remainingTxt.find("}", found);
+					std::string id = remainingTxt.substr(found + 3, end - (found + 3));
+					tagId = std::stoi(id);
+					cut = 4 + id.size();
+				}
+				else {
+					cut = 2;
+				}
+			}
+			//other markup checks here
+
+
+
+		}
+
+		writeTxt = remainingTxt.substr(0, found);
+		remainingTxt = remainingTxt.substr(writeTxt.size() + cut, std::string::npos);
+
+		appendText(writeTxt);
+
+		if (styleChange == styleBold)
+			setAppendStyleBold(bold);
+		if (styleChange == styleHot)
+			setAppendStyleHot(hot, tagId);
+
+	}
 }
 
 

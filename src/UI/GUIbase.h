@@ -116,7 +116,8 @@ public:
 enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
-			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel};
+			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel,
+			uiRichTextPanel };
 
 
 
@@ -178,6 +179,8 @@ public:
 	void setDefaultFont(CFont* font);
 
 	glm::i32vec2 getScreenCoords(int x, int y);
+	int getWidth();
+	int getHeight();
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 

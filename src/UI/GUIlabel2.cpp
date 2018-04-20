@@ -7,10 +7,12 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	width = w; height = h;
 	drawBox.pos = i32vec2(x, y); 
 	drawBox.size = i32vec2(w, h);
+	textureHeight = h;
+	textureWidth = w;
 	
 	textData.font = defaultFont;
 	textBuf.setFont(defaultFont);
-	textBuf.setSize(w,h);
+	textBuf.setSize(textureWidth, textureHeight);
 
 	type = uiLabel;
 	setTextColour(0, 0, 0, 1);
@@ -69,11 +71,22 @@ void CGUIlabel2::DrawSelf() {
 void CGUIlabel2::SetPos(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y); 
 	width = w; height = h;
+
 	drawBox.pos = glm::i32vec2(x, y);
 	drawBox.size = glm::i32vec2(w, h);
-	textBuf.setSize(w,h);
+	
 	updateAppearance();
+	//textureWidth = drawBox.size.x; //TO DO, any offset adjustment goes here
+	//textureHeight = drawBox.size.y;
+
+	textBuf.setSize(textureWidth, textureHeight);
 	renderText();
+}
+
+void CGUIlabel2::updateAppearance() {
+	CGUIbase::updateAppearance();
+	textureWidth = drawBox.size.x; //TO DO, any offset adjustment goes here
+	textureHeight = drawBox.size.y;
 }
 
 float CGUIlabel2::getTextWidth() {
@@ -86,12 +99,12 @@ void CGUIlabel2::calcLineOffset() {
 	if (multiLine)
 		renderOffset.y = 0;
 	else
-		renderOffset.y = (height - textData.font->lineHeight) / 2.0f;
+		renderOffset.y = (textureHeight - textData.font->lineHeight) / 2.0f;
 
 	if (textAlign == tcentred) {
-		renderOffset.x = (width - lineRenderedWidth) / 2.0f;
+		renderOffset.x = (textureWidth - lineRenderedWidth) / 2.0f;
 	} else if (textAlign == tright) {
-		renderOffset.x = width - lineRenderedWidth;
+		renderOffset.x = textureWidth - lineRenderedWidth;
 	}
 
 
@@ -133,7 +146,7 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 	int breakDist = textData.text.size(); int dist = 0;
 	//while there are characters, when we reach a word break record it, until we go over the allotted width;
 	int c = lineStart;
-	while (dist < width) { //TO DO: put c >= text.size() check here?
+	while (dist < textureWidth) { //TO DO: put c >= text.size() check here?
 		if (textData.text[c] == '\n') {
 			return c + 1;
 		}

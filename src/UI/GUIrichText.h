@@ -84,6 +84,7 @@ public:
 	void purgeHotText(int id);
 	void clear();
 	void clearSelection();
+	void appendMarkedUpText(string text);
 
 	bool overrun;
 
@@ -112,4 +113,6 @@ public:
 	CFont* currentSetFont;
 
 	bool mouseMode; ///<True for selection hot text with mouse pointer.
+
+
 };
