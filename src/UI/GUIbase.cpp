@@ -415,6 +415,12 @@ int CGUIbase::getHeight() {
 	return drawBox.size.y;
 }
 
+void CGUIbase::resize(int w, int h) {
+	width = w; height = h;
+	drawBox.size = glm::i32vec2(w, h);
+	updateAppearance();
+}
+
 
 
 /** Return a pointer to the child control of this control with the given id number. */

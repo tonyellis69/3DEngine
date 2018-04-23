@@ -16,6 +16,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	selectedHotObj = -1;
 	updateDt = 0;
 	correctOverrunDelay = 0.01f;
+	overrunMode = scrollMode; //TO DO: temporary only, make scroll
 	overrunCorrect = false;
 	yPixelOffset = 0;
 	smoothScrollStep = 4;
@@ -127,7 +128,10 @@ void CGUIrichText::appendText(std::string newText) {
 	textObjs.back().text += newText;
 	textObjs.back().findNewlines();
 	updateText();
-	overrunCorrect = true;
+	overrunCorrect = true; //TO DO: why do this here?
+	if (overrunCorrect && overrun && overrunMode == resizeMode)
+		resizeToFit();
+		
 }
 
 /** Make the line after the current top line the new top line. */
@@ -176,7 +180,7 @@ void CGUIrichText::renderText() {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
 			if (offset.y + currentObj.font->lineHeight > textureHeight)
-				hotFrag.overrun = true;
+				hotFrag.overrun = offset.y + currentObj.font->lineHeight - textureHeight; //was true;
 			else
 				hotFrag.overrun = false;
 			hotTextFrags.push_back(hotFrag);
@@ -186,7 +190,7 @@ void CGUIrichText::renderText() {
 			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight );
 		}
 		if (offset.y + currentObj.font->lineHeight > textureHeight) {
-			overrun = true;
+			overrun = offset.y + currentObj.font->lineHeight - textureHeight; //was true;
 			if (currentObj.hotTextId &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo;
 			if (offset.y > textureHeight) {
@@ -280,6 +284,8 @@ void CGUIrichText::appendHotText(std::string newText, int idNo) {
 
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+	if (getID() == 12)
+		int b = 0;
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
 		selectedHotObj = -1;
@@ -429,15 +435,12 @@ void CGUIrichText::update(float dT) {
 	{
 		updateDt = 0;
 		if (overrun && overrunCorrect) {
-			smoothScroll(-smoothScrollStep);
+			if (overrunMode == scrollMode)
+				smoothScroll(-smoothScrollStep);
+			else
+				resizeToFit();
 			overrunCorrect = overrun;
 		} 
-		/*else
-		if (overrun && (overrunHotTextObj == selectedHotObj != -1) ) {
-			overrunHotTextObj = -1;
-			smoothScroll(-scrollHeight);
-			
-		}*/
 	}
 
 }
@@ -669,6 +672,32 @@ void CGUIrichText::appendMarkedUpText(string text) {
 			setAppendStyleHot(hot, tagId);
 
 	}
+}
+
+void CGUIrichText::updateAppearance() {
+	CGUIbase::updateAppearance();
+	//assume dimensions may have changed, eg, if this control was set to span
+	textureWidth = drawBox.size.x; 
+	textureHeight = drawBox.size.y;
+	textBuf.setSize(textureWidth, textureHeight);
+	renderText();
+}
+
+void CGUIrichText::setResizeMode(bool onOff) {
+	if (onOff) 
+		overrunMode = resizeMode;
+	else
+		overrunMode = scrollMode;
+}
+
+/** Resize the control vertically if text is overrunning. */
+void CGUIrichText::resizeToFit() {
+	//if (overrun > 14)
+	//	return;
+	if (parent) //bit of a kludge. Ideal would be to just broadcast resize event message
+		parent->resize(parent->drawBox.size.x, parent->drawBox.size.y + overrun);
+	else
+		resize(drawBox.size.x, drawBox.size.y + overrun);
 }
 
 

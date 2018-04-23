@@ -54,6 +54,10 @@ void CGUIrichTextPanel::clear() {
 	richText->clear();
 }
 
+void CGUIrichTextPanel::setResizeMode(bool onOff) {
+	richText->setResizeMode(onOff);
+}
+
 void CGUIrichTextPanel::appendMarkedUpText(string text) {
 	richText->appendMarkedUpText(text);
 }
@@ -61,3 +65,12 @@ void CGUIrichTextPanel::appendMarkedUpText(string text) {
 unsigned int CGUIrichTextPanel::getRichTextID() {
 	return richText->getID();
 }
+
+/** Hacking this because I want the panel to keep its rich text control central.*/
+void CGUIrichTextPanel::updateAppearance() {
+	CGUIbase::updateAppearance();
+	richText->setPos(inset, inset);
+	richText->resize(drawBox.size.x - (2*inset), drawBox.size.y - (2*inset));
+	richText->updateAppearance();
+}
+

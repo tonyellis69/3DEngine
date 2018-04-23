@@ -18,6 +18,7 @@ struct TRichTextRec : textRec {
 };
 
 enum TNewLine {no, wordwrap, newline};
+enum TOverrunMode {scrollMode, resizeMode};
 
 /** A partial or complete line of text, with its rendered (x) dimensions. */
 struct TLineFragment {
@@ -86,7 +87,11 @@ public:
 	void clearSelection();
 	void appendMarkedUpText(string text);
 
-	bool overrun;
+	void updateAppearance();
+	void setResizeMode(bool onOff);
+	void resizeToFit();
+
+	int overrun;
 
 	std::vector<TRichTextRec> textObjs; ///<The complete text of this control.
 	int currentTextObj;
@@ -114,5 +119,5 @@ public:
 
 	bool mouseMode; ///<True for selection hot text with mouse pointer.
 
-
+	TOverrunMode overrunMode;
 };

@@ -27,6 +27,8 @@ public:
 	void renderText();
 	int getNextLineStart(int lineStart);
 
+	void resize(int w, int h);
+
 
 
 	CTextBuffer textBuf;

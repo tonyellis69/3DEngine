@@ -181,6 +181,7 @@ public:
 	glm::i32vec2 getScreenCoords(int x, int y);
 	int getWidth();
 	int getHeight();
+	virtual void resize(int w, int h);
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 

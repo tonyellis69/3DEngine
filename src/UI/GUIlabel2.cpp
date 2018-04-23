@@ -85,8 +85,11 @@ void CGUIlabel2::SetPos(int x, int y, int w, int h) {
 
 void CGUIlabel2::updateAppearance() {
 	CGUIbase::updateAppearance();
+	//assume dimensions may have changed, eg, if this label was set to span
 	textureWidth = drawBox.size.x; //TO DO, any offset adjustment goes here
 	textureHeight = drawBox.size.y;
+	textBuf.setSize(textureWidth, textureHeight);
+	renderText();
 }
 
 float CGUIlabel2::getTextWidth() {
@@ -159,6 +162,14 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 			return c;
 	}
 	return breakDist;
+}
+
+
+void CGUIlabel2::resize(int w, int h) {
+	width = w; height = h;
+	drawBox.size = glm::i32vec2(w, h);
+	updateAppearance();
+	renderText();
 }
 
 

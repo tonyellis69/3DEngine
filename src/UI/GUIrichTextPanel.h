@@ -18,9 +18,12 @@ public:
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	void clear();
+	void setResizeMode(bool onOff);
 
 	void appendMarkedUpText(string text);
 	unsigned int getRichTextID();
+
+	void updateAppearance();
 
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
