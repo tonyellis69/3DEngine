@@ -24,11 +24,10 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	setHotTextColour(1, 1, 1, 1);
 	setHotTextHighlightColour(0, 0, 1, 1);
 	mouseMode = true;
+	maxHeight = 1000;
 }
 
 void CGUIrichText::DrawSelf() {
-	//cerr << "\ndraw texture";
-	//if (!overrunCorrect)
 	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
 
 	if (drawBorder) {
@@ -129,7 +128,7 @@ void CGUIrichText::appendText(std::string newText) {
 	textObjs.back().findNewlines();
 	updateText();
 	overrunCorrect = true; //TO DO: why do this here?
-	if (overrunCorrect && overrun && overrunMode == resizeMode)
+	if (overrunCorrect && (overrun || underrun) && overrunMode == resizeMode)
 		resizeToFit();
 		
 }
@@ -156,7 +155,7 @@ bool CGUIrichText::scrollDown() {
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
-	overrun = false; overrunHotTextObj = -1;
+	overrun = 0; overrunHotTextObj = -1; underrun = 0;
 	textBuf.init(true);
 	i32vec2 offset(0, yPixelOffset);
 	int currObjNo = firstVisibleObject;
@@ -180,7 +179,7 @@ void CGUIrichText::renderText() {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
 			if (offset.y + currentObj.font->lineHeight > textureHeight)
-				hotFrag.overrun = offset.y + currentObj.font->lineHeight - textureHeight; //was true;
+				hotFrag.overrun =  true;
 			else
 				hotFrag.overrun = false;
 			hotTextFrags.push_back(hotFrag);
@@ -192,15 +191,15 @@ void CGUIrichText::renderText() {
 		if (offset.y + currentObj.font->lineHeight > textureHeight) {
 			overrun = offset.y + currentObj.font->lineHeight - textureHeight; //was true;
 			if (currentObj.hotTextId &&  overrunHotTextObj == -1)
-				overrunHotTextObj = currObjNo;
-			if (offset.y > textureHeight) {
+				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
+			if (offset.y > textureHeight) { //overrun texture, so no sense writing any more
 				textBuf.render();
 				return;
 			}
 		}
 
 
-
+		underrun = textureHeight - (offset.y + currentObj.font->lineHeight);
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
@@ -250,7 +249,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			nextLineFrag.causesNewLine = wordwrap;
 			break;
 		}
-		if (isspace(richTextData->text[c])) {
+		if (isspace(richTextData->text[c]) || richTextData->text[c] == '-') {
 			breakPoint = c+1;
 			breakPointX = renderX;
 		}
@@ -690,14 +689,29 @@ void CGUIrichText::setResizeMode(bool onOff) {
 		overrunMode = scrollMode;
 }
 
-/** Resize the control vertically if text is overrunning. */
+/** Resize the control vertically if text is overrunning or underrunning. */
 void CGUIrichText::resizeToFit() {
-	//if (overrun > 14)
-	//	return;
-	if (parent) //bit of a kludge. Ideal would be to just broadcast resize event message
-		parent->resize(parent->drawBox.size.x, parent->drawBox.size.y + overrun);
-	else
-		resize(drawBox.size.x, drawBox.size.y + overrun);
+	int resizeGuess = overrun;
+	while (overrun) {
+		if (drawBox.size.y + resizeGuess > maxHeight) {
+			setResizeMode(false);
+			return;
+		}
+		if (parent) //bit of a kludge. Ideal would be to just broadcast resize event message
+			parent->resize(parent->drawBox.size.x, parent->drawBox.size.y + resizeGuess);
+		else
+			resize(drawBox.size.x, drawBox.size.y + resizeGuess);
+		renderText();
+		resizeGuess *= 2;
+	}
+
+	if (underrun) {
+		if (parent) //bit of a kludge. Ideal would be to just broadcast resize event message
+			parent->resize(parent->drawBox.size.x, parent->drawBox.size.y - underrun);
+		else
+			resize(drawBox.size.x, drawBox.size.y - underrun);
+		renderText();
+	}
 }
 
 

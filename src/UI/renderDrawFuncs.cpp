@@ -47,10 +47,16 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbase & control) {
 	//A B
 	//C D
 	vBuf::T2DtexVert corners[4];
-	corners[0].v = vec2(control.drawBox.pos); //A
-	corners[1].v = vec2(control.drawBox.pos + i32vec2(control.drawBox.size.x, 0)); //B
-	corners[2].v = vec2(control.drawBox.pos + i32vec2(0, control.drawBox.size.y)); //C
-	corners[3].v = vec2(control.drawBox.pos + control.drawBox.size); //D
+	//corners[0].v = vec2(control.drawBox.pos); //A
+	//corners[1].v = vec2(control.drawBox.pos + i32vec2(control.drawBox.size.x, 0)); //B
+	//corners[2].v = vec2(control.drawBox.pos + i32vec2(0, control.drawBox.size.y)); //C
+	//corners[3].v = vec2(control.drawBox.pos + control.drawBox.size); //D
+
+	corners[0].v = vec2(0); //A
+	corners[1].v = vec2( i32vec2(control.drawBox.size.x, 0)); //B
+	corners[2].v = vec2( i32vec2(0, control.drawBox.size.y)); //C
+	corners[3].v = vec2(control.drawBox.size); //D
+
 	corners[0].tex = vec2(0);
 	corners[1].tex = vec2(1,0);
 	corners[2].tex = vec2(0,1);
@@ -78,7 +84,7 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbase & control) {
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1,(vec4&)control.backColour1);
 	uiRectShader->setShaderValue(hColour2,(vec4&)control.backColour2);
-	uiRectShader->setShaderValue(hOrtho,orthoView);
+	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
 	pRenderer->drawBuf(*buf, drawTriStrip);
 	pRenderer->setShader(0);
 }
@@ -88,7 +94,7 @@ void CRenderDrawFuncs::drawCtrlBorder(CGUIbase & control) {
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1, (vec4&)control.borderColour);
 	uiRectShader->setShaderValue(hColour2, (vec4&)control.borderColour);
-	uiRectShader->setShaderValue(hOrtho,orthoView);
+	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
 	pRenderer->drawBuf(*buf, drawLineLoop);
 	pRenderer->setShader(0);
 
@@ -116,20 +122,18 @@ void CRenderDrawFuncs::drawTexture(CGUIbase & control, CBaseTexture& texture) {
 	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
 	pRenderer->attachTexture(0, rendTex->handle);
-	//pRenderer->attachTexture(0, 1);
-	//pRenderer->attachTexture(0, 16);
+	
+	glm::mat4 posm = quadBufs[control.uniqueID].posM;
+	//DO any scaling like this:
+	//glm::mat4 posm = glm::scale(quadBufs[control.uniqueID].posM, vec3(0.5f));
 
 	//uiTexShader->setShaderValue(hTextureUnit, rendTex);
 	uiTexShader->setTextureUnit(hTextureUnit, 0);
 	uiTexShader->setShaderValue(hTile,vec2(1,1));
 	uiTexShader->setShaderValue(hOffset,vec2(0));
-	uiTexShader->setShaderValue(hTexOrtho,orthoView);
+	uiTexShader->setShaderValue(hTexOrtho, posm);
 	pRenderer->drawBuf(*buf, drawTriStrip);
-	//pRenderer->attachTexture(0, 0);
 
-
-///	glm::vec4 tmp = glm::vec4(chars[0].v, 0, 1);
-//	tmp = tmp * glm::mat4(1);
 
 }
 

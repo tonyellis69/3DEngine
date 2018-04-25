@@ -1,5 +1,9 @@
 #include "font.h"
 
+#include <fstream>
+#include <string>
+#include <iostream>
+
 // Helper function to read a piece of data from a stream.
 template<class T, class S>
 void readObject(T& to_read, S& in) {
@@ -21,7 +25,7 @@ void CFont::loadFromStream(std::istream & input) {
 	readObject(lineHeight, input);
 	readObject(nChars, input);
 	texLineHeight = static_cast<float>(lineHeight) / height;
-
+	//lineHeight /= 2;
 
 	// Read every glyph, store it in the glyph array and set the right
 	// pointer in the table.
@@ -34,7 +38,7 @@ void CFont::loadFromStream(std::istream & input) {
 		glyphs[i].t = static_cast<float>(buffer.y) / height;
 		glyphs[i].v = glyphs[i].t + texLineHeight;
 
-		glyphs[i].width = buffer.width;
+		glyphs[i].width = buffer.width;// / 2;
 		glyphs[i].height = lineHeight;
 		//Font->Glyphs[i].Rect.originX = 0;
 		//Font->Glyphs[i].Rect.originY = (float)line_height;
@@ -69,4 +73,16 @@ void CFont::loadFromStream(std::istream & input) {
 	//turn it into an alpha texture
 	texture.create(RGBA, width, height);
 	delete[] RGBA;
+}
+
+void CFont::loadFromFile(std::string filename) {
+	std::ifstream fontFile(filename,  std::ios::binary);
+	
+	if (fontFile.fail() || fontFile.get() != 'F' || fontFile.get() != '0') {
+		std::cerr << "\nNot a proper font file: " << filename;
+		exit(EXIT_FAILURE);
+	}
+
+	loadFromStream(fontFile);
+	fontFile.close();
 }

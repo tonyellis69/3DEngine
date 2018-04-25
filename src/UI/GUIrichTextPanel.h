@@ -25,6 +25,10 @@ public:
 
 	void updateAppearance();
 
+	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
+
+	void OnLMouseDown(const int mouseX, const int mouseY, int key);
+
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
 };

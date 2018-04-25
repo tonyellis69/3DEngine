@@ -74,3 +74,22 @@ void CGUIrichTextPanel::updateAppearance() {
 	richText->updateAppearance();
 }
 
+
+bool CGUIrichTextPanel::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
+	return richText->MouseWheelMsg(mouseX, mouseY, wheelDelta, key);
+}
+
+void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key) {
+	if (!IsOnControl((CGUIbase&)*this,mouseX, mouseY)) {
+		CMessage msg;
+		msg.Msg = uiMsgHotTextClick;
+		msg.x = mouseX; msg.y = mouseY;
+		msg.value = -1;
+		pDrawFuncs->handleUImsg(*this, msg);
+
+	}
+}
+
+
+
+

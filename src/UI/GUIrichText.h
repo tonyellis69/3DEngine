@@ -92,6 +92,8 @@ public:
 	void resizeToFit();
 
 	int overrun;
+	int underrun;
+	int maxHeight;
 
 	std::vector<TRichTextRec> textObjs; ///<The complete text of this control.
 	int currentTextObj;

@@ -24,6 +24,7 @@ class CFont {
 public:
 	CFont();
 	void loadFromStream(std::istream &input);
+	void loadFromFile(std::string filename);
 	
 	int lineHeight;
 	std::vector<glyph> glyphs;
