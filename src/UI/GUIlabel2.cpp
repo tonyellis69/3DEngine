@@ -167,6 +167,10 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 
 void CGUIlabel2::resize(int w, int h) {
 	width = w; height = h;
+	if (w < 1) //because bad things happen if we make the texture 0 in height or width
+		w = 1;
+	if (h < 1)
+		h = 1;
 	drawBox.size = glm::i32vec2(w, h);
 	updateAppearance();
 	renderText();

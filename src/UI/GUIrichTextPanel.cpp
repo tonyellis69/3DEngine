@@ -90,6 +90,19 @@ void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key
 	}
 }
 
+void CGUIrichTextPanel::resizeToFit() {
+	richText->resizeToFit();
+}
+
+void CGUIrichTextPanel::message(CGUIbase& sender, CMessage& msg) {
+	if (msg.Msg == uiMsgChildResize) {
+		drawBox.size.x = richText->drawBox.size.x + (2 * inset);
+		drawBox.size.y = richText->drawBox.size.y + (2 * inset);
+		updateAppearance();
+	}
+
+}
+
 
 
 

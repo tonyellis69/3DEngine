@@ -4,16 +4,27 @@
 #include "renderer.h"
 #include "renderTexture.h"
 
+#include <iostream> //for cerr
+
 /** Constructor for user-created default textures. Creating via Renderer hereby deprecated. */
-CRenderTexture::CRenderTexture() {
+CRenderTexture::CRenderTexture()  {
 	pRenderer = &CRenderer::getInstance();
+	handle = 0;
 	//create a simple 2x2 texture with a default pattern.
 	//DON'T register with textureManager, which is starting to look redundant.
-	int channels = 4; //lazily assume rgba
-	int width = 2;
-	int height = 2;
+
+	//TO DO: the below will NOT work with textures declared as members of CBaseApp
+	//because engine hasn't initialised renderer yet!
+
+	if (!pRenderer->initialised)
+		return;
+
+	 channels = 4; //lazily assume rgba
+	width = 2;
+	 height = 2;
 	float pixels[] = {	0.0f, 0.0f, 0.0f, 1.0f,   1.0f, 1.0f, 1.0f,1.0f,
 						1.0f, 1.0f, 1.0f,1.0f,   0.0f, 0.0f, 0.0f,1.0f };
+
 	glGenTextures(1, &handle);
 	glBindTexture(GL_TEXTURE_2D, handle);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -66,11 +77,19 @@ glm::uvec4  CRenderTexture::getPixel(int x, int y) {
 }
 
 /** Create an RGBA texture from data. */
-void CRenderTexture::create(unsigned char * data, int w, int h) {
-	handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_RGBA, SOIL_CREATE_NEW_ID, 0);
+void CRenderTexture::createRGBA(unsigned char * data, int w, int h) {
+	handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_RGBA, handle, 0);
 	width = w;
 	height = h;
 	channels = 4;
+}
+
+/** Create a single channel texture from data. */
+void CRenderTexture::createGreyscale(unsigned char * data, int w, int h) {
+	handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_L, handle, 0);
+	width = w;
+	height = h;
+	channels = 1;
 }
 
 void CRenderTexture::clear() {

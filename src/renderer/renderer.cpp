@@ -19,6 +19,7 @@ using namespace std;
 
 /** Initialise the high-level renderer. */
 CRenderer::CRenderer() {
+	initialised = false;
 }
 
 CRenderer::~CRenderer() {
@@ -32,6 +33,7 @@ void CRenderer::getGLinfo() {
 	GLenum err = glewInit();
 	if (GLEW_OK != err)	{
 		cerr << "\nglewInit failed, error: %s\n" << glewGetErrorString(err);
+		return;
 	}
 	cerr << "\nUsing GLEW " << glewGetString(GLEW_VERSION);
 	cerr << "\nOpenGL version: " << glGetString(GL_VERSION);
@@ -113,6 +115,7 @@ void CRenderer::init() {
 	createStandardMultiTexShader();
 	createInstancedPhongShader();
 	createTextShader();
+	initialised = true;
 }
 
 

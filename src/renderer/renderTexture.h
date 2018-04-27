@@ -14,7 +14,8 @@ public:
 	~CRenderTexture();
 	void resize(int w, int h);
 	glm::uvec4 getPixel(int x, int y);
-	void create(unsigned char* data, int w, int h);
+	void createRGBA(unsigned char* data, int w, int h);
+	void createGreyscale(unsigned char * data, int w, int h);
 	void clear();
 
 	unsigned int handle;

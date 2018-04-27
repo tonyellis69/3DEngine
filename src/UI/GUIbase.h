@@ -273,9 +273,11 @@ const int uiContainerHbarID = 1005;
 
 
 //message types
-enum Messagetypes {change,userDraw,uiMsgDrop,uiMsgLMdown,uiMsgRMdown,uiMsgMouseMove,
- uiMsgLMouseUp,uiMsgRMouseUp,uiMouseWheel,uiClick,uiDataEntered,uiSpin,uiLostKeyboard,
-	uiMsgHotTextClick};
+enum Messagetypes {
+	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
+	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiDataEntered, uiSpin, uiLostKeyboard,
+	uiMsgHotTextClick, uiMsgChildResize
+};
 
 #define NONE -1
 

@@ -29,6 +29,10 @@ public:
 
 	void OnLMouseDown(const int mouseX, const int mouseY, int key);
 
+	void resizeToFit();
+
+	void message(CGUIbase & sender, CMessage & msg);
+
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
 };

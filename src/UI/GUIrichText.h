@@ -94,6 +94,7 @@ public:
 	int overrun;
 	int underrun;
 	int maxHeight;
+	int longestLine;
 
 	std::vector<TRichTextRec> textObjs; ///<The complete text of this control.
 	int currentTextObj;

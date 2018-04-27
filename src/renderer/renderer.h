@@ -188,6 +188,8 @@ public:
 
 	rgba clearColour;
 
+	bool initialised;
+
 private:
 
 	GLenum DrawBuffers[1];

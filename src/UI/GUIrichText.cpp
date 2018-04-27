@@ -25,6 +25,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	setHotTextHighlightColour(0, 0, 1, 1);
 	mouseMode = true;
 	maxHeight = 1000;
+	longestLine = 0;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -127,10 +128,7 @@ void CGUIrichText::appendText(std::string newText) {
 	textObjs.back().text += newText;
 	textObjs.back().findNewlines();
 	updateText();
-	overrunCorrect = true; //TO DO: why do this here?
-	if (overrunCorrect && (overrun || underrun) && overrunMode == resizeMode)
-		resizeToFit();
-		
+	overrunCorrect = true; //TO DO: why do this here?		
 }
 
 /** Make the line after the current top line the new top line. */
@@ -155,7 +153,7 @@ bool CGUIrichText::scrollDown() {
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
-	overrun = 0; overrunHotTextObj = -1; underrun = 0;
+	overrun = 0; overrunHotTextObj = -1; underrun = 0; longestLine = 0;
 	textBuf.init(true);
 	i32vec2 offset(0, yPixelOffset);
 	int currObjNo = firstVisibleObject;
@@ -169,6 +167,8 @@ void CGUIrichText::renderText() {
 		}
 		TRichTextRec currentObj = textObjs[lineFragment.textObj];
 		scrollHeight = currentObj.font->lineHeight;
+		if (longestLine < lineFragment.renderEndX)
+			longestLine = lineFragment.renderEndX;
 
 		std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 		textBuf.setTextColour(currentObj.textColour);
@@ -691,27 +691,33 @@ void CGUIrichText::setResizeMode(bool onOff) {
 
 /** Resize the control vertically if text is overrunning or underrunning. */
 void CGUIrichText::resizeToFit() {
+	int resizeX = drawBox.size.x;
+	if (drawBox.size.x > longestLine) {
+		resizeX = longestLine;
+	}
+	resize(resizeX, drawBox.size.y);
+
 	int resizeGuess = overrun;
-	while (overrun) {
+	while (overrun && overrunMode == resizeMode) {
 		if (drawBox.size.y + resizeGuess > maxHeight) {
 			setResizeMode(false);
-			return;
 		}
-		if (parent) //bit of a kludge. Ideal would be to just broadcast resize event message
-			parent->resize(parent->drawBox.size.x, parent->drawBox.size.y + resizeGuess);
 		else
 			resize(drawBox.size.x, drawBox.size.y + resizeGuess);
-		renderText();
+		//renderText();
 		resizeGuess *= 2;
 	}
 
-	if (underrun) {
-		if (parent) //bit of a kludge. Ideal would be to just broadcast resize event message
-			parent->resize(parent->drawBox.size.x, parent->drawBox.size.y - underrun);
-		else
-			resize(drawBox.size.x, drawBox.size.y - underrun);
-		renderText();
+	if (underrun > 0) {
+		resize(drawBox.size.x, drawBox.size.y - underrun);
+		//renderText();
 	}
+
+	if (parent) {
+		CMessage msg = { uiMsgChildResize,0,0,0,0 };
+		parent->message(*this, msg);
+	}
+		
 }
 
 

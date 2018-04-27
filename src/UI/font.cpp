@@ -59,7 +59,7 @@ void CFont::loadFromStream(std::istream & input) {
 	}
 
 	//read font texture
-	unsigned char* RGBA = new unsigned char[width * height * 4];
+	/*unsigned char* RGBA = new unsigned char[width * height * 4];
 	char c; int t;
 	for (int h = 0; h<height; h++) {
 		for (int w = 0; w<width; w++) {
@@ -71,8 +71,23 @@ void CFont::loadFromStream(std::istream & input) {
 	}
 
 	//turn it into an alpha texture
-	texture.create(RGBA, width, height);
-	delete[] RGBA;
+	texture.createRGBA(RGBA, width, height);
+	delete[] RGBA;*/
+
+	unsigned char* data = new unsigned char[width * height];
+	char c; int t;
+	for (int h = 0; h<height; h++) {
+		for (int w = 0; w<width; w++) {
+			input.read(&c, 1);
+			t = ((h*width) + w);
+			data[t] = c;
+		}
+	}
+
+	//turn it into an alpha texture
+	texture.createGreyscale(data, width, height);
+	delete[] data; 
+
 }
 
 void CFont::loadFromFile(std::string filename) {
