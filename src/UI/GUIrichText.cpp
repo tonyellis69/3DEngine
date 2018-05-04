@@ -7,7 +7,7 @@ using namespace glm;
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	firstVisibleText = 0;
 	TRichTextRec defaultStyle;
-	defaultStyle.textColour = vec4(0,0,0,1);
+	defaultStyle.style.colour = vec4(0,0,0,1);
 	textObjs.push_back(defaultStyle);
 	currentTextObj = 0;
 	setFont(defaultFont);
@@ -26,6 +26,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
+	
 }
 
 void CGUIrichText::DrawSelf() {
@@ -37,9 +38,18 @@ void CGUIrichText::DrawSelf() {
 }
 
 void CGUIrichText::setFont(CFont* newFont) {
-	textBuf.setFont(newFont);
-	textData.font = newFont;
-	textObjs[currentTextObj].font = newFont;
+	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
+		TRichTextRec newObj = textObjs[currentTextObj];
+		newObj.text.clear();
+		newObj.hotTextId = 0; //assume we don't want to add to any preceeding hot text.
+		textObjs.push_back(newObj);
+		currentTextObj++;
+	}
+	textObjs[currentTextObj].style.font = newFont;
+
+	//textBuf.setFont(newFont);
+	//textData.font = newFont;
+	//textObjs[currentTextObj].font = newFont;
 	currentSetFont = newFont;
 }
 
@@ -50,7 +60,7 @@ CFont * CGUIrichText::getFont() {
 /** Set the current text drawing colour. */
 void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	defaultTextColour = glm::vec4(r, g, b, a);
-	if (textObjs[currentTextObj].textColour == defaultTextColour)
+	if (textObjs[currentTextObj].style.colour == defaultTextColour)
 		return;
 
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
@@ -60,7 +70,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
-	textObjs[currentTextObj].textColour = vec4(r, g, b, a);
+	textObjs[currentTextObj].style.colour = vec4(r, g, b, a);
 }
 
 /** Set the bold style for appending text, ie, on or off. */
@@ -77,9 +87,9 @@ void CGUIrichText::setAppendStyleBold(bool isOn) {
 	}
 	textObjs[currentTextObj].bold = isOn;
 	if (isOn)
-		textObjs[currentTextObj].textColour = vec4(0, 0, 1, 1); ///FAKE!!! DO NOT KEEP
+		textObjs[currentTextObj].style.colour = vec4(0, 0, 1, 1); ///FAKE!!! DO NOT KEEP
 	else
-		textObjs[currentTextObj].textColour = vec4(1, 1, 1, 1);
+		textObjs[currentTextObj].style.colour = vec4(1, 1, 1, 1);
 }
 
 
@@ -97,9 +107,9 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int tagId) {
 	}
 	textObjs[currentTextObj].hotTextId = tagId;
 	if (tagId)
-		textObjs[currentTextObj].textColour = hotTextColour;
+		textObjs[currentTextObj].style.colour = hotTextColour;
 	else
-		textObjs[currentTextObj].textColour = defaultTextColour;
+		textObjs[currentTextObj].style.colour = normalTextStyle.colour;
 }
 
 
@@ -114,6 +124,21 @@ void CGUIrichText::setHotTextColour(float r, float g, float b, float a) {
 
 void CGUIrichText::setHotTextHighlightColour(float r, float g, float b, float a) {
 	hotTextHighlightColour = glm::vec4(r, g, b, a);
+}
+
+/** Set the style for any text appended after this. */
+void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
+	normalTextStyle = newStyle;
+	if (textObjs[currentTextObj].style == newStyle)
+		return;
+
+	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
+		TRichTextRec newObj = textObjs[currentTextObj];
+		newObj.text.clear();
+		textObjs.push_back(newObj);
+		currentTextObj++;
+	}
+	textObjs[currentTextObj].style = newStyle;
 }
 
 /** Set the text of the current text object.*/
@@ -166,19 +191,20 @@ void CGUIrichText::renderText() {
 			currObjNo = lineFragment.textObj;
 		}
 		TRichTextRec currentObj = textObjs[lineFragment.textObj];
-		scrollHeight = currentObj.font->lineHeight;
+		scrollHeight = currentObj.style.font->lineHeight;
 		if (longestLine < lineFragment.renderEndX)
 			longestLine = lineFragment.renderEndX;
 
 		std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
-		textBuf.setTextColour(currentObj.textColour);
+		textBuf.setTextColour(currentObj.style.colour);
+		textBuf.setFont(currentObj.style.font);
 
 		offset = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
 		
 		if (currentObj.hotTextId && renderLine[0] != '\n') {
-			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.font->lineHeight, lineFragment.textObj };
+			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.style.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
-			if (offset.y + currentObj.font->lineHeight > textureHeight)
+			if (offset.y + currentObj.style.font->lineHeight > textureHeight)
 				hotFrag.overrun =  true;
 			else
 				hotFrag.overrun = false;
@@ -186,10 +212,10 @@ void CGUIrichText::renderText() {
 		}
 
 		if (lineFragment.causesNewLine != no) {
-			offset = glm::i32vec2(0, offset.y + currentObj.font->lineHeight );
+			offset = glm::i32vec2(0, offset.y + currentObj.style.font->lineHeight );
 		}
-		if (offset.y + currentObj.font->lineHeight > textureHeight) {
-			overrun = offset.y + currentObj.font->lineHeight - textureHeight; //was true;
+		if (offset.y + currentObj.style.font->lineHeight > textureHeight) {
+			overrun = offset.y + currentObj.style.font->lineHeight - textureHeight; //was true;
 			if (currentObj.hotTextId &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
 			if (offset.y > textureHeight) { //overrun texture, so no sense writing any more
@@ -199,7 +225,7 @@ void CGUIrichText::renderText() {
 		}
 
 
-		underrun = textureHeight - (offset.y + currentObj.font->lineHeight);
+		underrun = textureHeight - (offset.y + currentObj.style.font->lineHeight);
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
@@ -237,11 +263,18 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
 	for (c = textStartPos; c < richTextData->text.size(); c++) {
-		renderX += richTextData->font->table[richTextData->text[c]]->width;
+	//	if (richTextData->text[c] == 'x')
+	//		int b = 0;
+		renderX += richTextData->style.font->table[richTextData->text[c]]->width;
 		if (richTextData->text[c] == '\n') {
 			c++;
 			nextLineFrag.causesNewLine = newline;
 			break;
+		}
+		if (isspace(richTextData->text[c]) || richTextData->text[c] == '-') {
+			breakPoint = c + 1;
+			breakPointX = renderX;
+			//break; //pretty sure this works without break as long as we go to next clause
 		}
 		if (renderX > textureWidth) {
 			c = breakPoint ;
@@ -249,10 +282,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			nextLineFrag.causesNewLine = wordwrap;
 			break;
 		}
-		if (isspace(richTextData->text[c]) || richTextData->text[c] == '-') {
-			breakPoint = c+1;
-			breakPointX = renderX;
-		}
+
 
 	}
 
@@ -267,7 +297,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 void CGUIrichText::appendHotText(std::string newText, int idNo) {
 	TRichTextRec newObj = textObjs.back(); //clone existing style for now
 	newObj.text.clear();
-	newObj.textColour = hotTextColour;
+	newObj.style.colour = hotTextColour;
 	newObj.firstLineIndent = 15;
 	newObj.hotTextId = idNo;
 	textObjs.push_back(newObj);
@@ -428,7 +458,6 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 
 
 void CGUIrichText::update(float dT) {
-
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)
 	{
@@ -583,7 +612,7 @@ void CGUIrichText::purgeHotText() {
 	for (auto &textObj : textObjs) {
 		if (textObj.hotTextId > 0) {
 			textObj.hotTextId = 0;
-			textObj.textColour = defaultTextColour;
+			textObj.style.colour = normalTextStyle.colour;
 		}
 	}
 }
@@ -593,7 +622,7 @@ void CGUIrichText::purgeHotText(int id) {
 	for (auto &textObj : textObjs) {
 		if (textObj.hotTextId == id) {
 			textObj.hotTextId = 0;
-			textObj.textColour = defaultTextColour;
+			textObj.style.colour = normalTextStyle.colour;
 		}
 	}
 }
@@ -603,8 +632,7 @@ void CGUIrichText::clear() {
 	textObjs.clear();
 	firstVisibleText = 0;
 	TRichTextRec defaultStyle;
-	defaultStyle.font = currentSetFont;
-	defaultStyle.textColour = defaultTextColour;
+	defaultStyle.style = normalTextStyle;
 	textObjs.push_back(defaultStyle);
 	currentTextObj = 0;
 	firstVisibleObject = 0;
@@ -669,6 +697,8 @@ void CGUIrichText::appendMarkedUpText(string text) {
 			setAppendStyleBold(bold);
 		if (styleChange == styleHot)
 			setAppendStyleHot(hot, tagId);
+		if (styleChange == styleNone)
+			setTextStyle(normalTextStyle);
 
 	}
 }

@@ -63,6 +63,7 @@ const UIcolour UIblack = {0,0,0,1};
 const UIcolour UIdarkGrey = {0.49f,0.49f,0.49f,1};
 const UIcolour UIvLightGrey = {0.95f,0.95f,0.95f,1}; //too white
 const UIcolour UIblue = {0,0,0.7f,1};
+const UIcolour UIfullblue = { 0,0,1,1 };
 const UIcolour UIyellow = {1,1,0.4f,1};
 const UIcolour UIred = {1,0,0,1};
 const UIcolour UItransparent = {0,0,0,0};

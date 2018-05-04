@@ -9,13 +9,23 @@
 
 #include "renderDrawFuncs.h"
 
+struct TtextStyle {
+	CFont* font;
+	glm::vec4 colour;
+	bool operator == (const TtextStyle &style) const {
+		/* your logic for comparision between "*this" and "rhs" */
+		return this->font == style.font && this->colour == style.colour;
+	};
+};
+
 /** Stores the style details of a homogenous piece of text, ie, one with the same
 font, colour, etc, together with the text itself. */
 struct textRec {
 	textRec() { firstLineIndent = 0; bold = false; }
 	std::string text;
-	CFont* font;
-	glm::vec4 textColour;
+	//CFont* font;
+	//glm::vec4 textColour;
+	TtextStyle style;
 	int firstLineIndent;
 	bool bold;
 	//others to follow

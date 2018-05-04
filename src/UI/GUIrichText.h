@@ -56,6 +56,7 @@ public:
 	void setTextColour(UIcolour colour);
 	void setHotTextColour(float r, float g, float b, float a);
 	void setHotTextHighlightColour(float r, float g, float b, float a);
+	void setTextStyle(TtextStyle& style);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	bool scrollDown();
@@ -119,8 +120,10 @@ public:
 	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
 	glm::vec4 defaultTextColour;
 	CFont* currentSetFont;
+	TtextStyle normalTextStyle;
 
 	bool mouseMode; ///<True for selection hot text with mouse pointer.
 
 	TOverrunMode overrunMode;
+
 };

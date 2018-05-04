@@ -19,6 +19,7 @@ public:
 	void appendText(std::string newText);
 	void clear();
 	void setResizeMode(bool onOff);
+	void setTextStyle(TtextStyle & newStyle);
 
 	void appendMarkedUpText(string text);
 	unsigned int getRichTextID();

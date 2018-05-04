@@ -58,6 +58,10 @@ void CGUIrichTextPanel::setResizeMode(bool onOff) {
 	richText->setResizeMode(onOff);
 }
 
+void CGUIrichTextPanel::setTextStyle(TtextStyle & newStyle) {
+	richText->setTextStyle(newStyle);
+}
+
 void CGUIrichTextPanel::appendMarkedUpText(string text) {
 	richText->appendMarkedUpText(text);
 }
