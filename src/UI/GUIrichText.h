@@ -54,8 +54,8 @@ public:
 	void setAppendStyleBold(bool isOn);
 	void setAppendStyleHot(bool isOn, int tagId);
 	void setTextColour(UIcolour colour);
-	void setHotTextColour(float r, float g, float b, float a);
-	void setHotTextHighlightColour(float r, float g, float b, float a);
+	void setHotTextColour(const glm::vec4& colour);
+	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
 	void setText(std::string newText);
 	void appendText(std::string newText);

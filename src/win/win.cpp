@@ -36,6 +36,12 @@ void CWin::createWindowHidden(int w, int h, std::string title) {
 	createWindow(w, h, title);
 }
 
+void CWin::centreWindow() {
+	glfwGetWindowSize(window, &lastWindowWidth, &lastWindowHeight);
+	lastMode = glfwGetVideoMode(primaryMonitor);
+	glfwSetWindowPos(window, (lastMode->width - lastWindowWidth) / 2, (lastMode->height - lastWindowHeight) / 2);
+}
+
 HWND CWin::getWindowsHandle() {
 	return glfwGetWin32Window(window);
 	

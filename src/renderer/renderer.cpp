@@ -491,7 +491,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 void CRenderer::endRenderToTexture() {
 //	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//	glDeleteFramebuffers(1, &hFrameBuffer);
+	glDeleteFramebuffers(1, &hFrameBuffer);
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_BLEND);
 }

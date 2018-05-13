@@ -57,6 +57,7 @@ public:
 
 	GLuint indexType; ///<unsigned short or unsigned int
 
+
 private:
 	CRenderer* pRenderer;
 };

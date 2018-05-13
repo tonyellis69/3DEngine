@@ -15,6 +15,7 @@ public:
 	~CWin();
 	void createWindow(int w, int h, std::string title);
 	void createWindowHidden(int w, int h, std::string title);
+	void centreWindow();
 	HWND getWindowsHandle();
 	void swapBuffers();
 	void setWindowSize(int w, int h);

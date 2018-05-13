@@ -64,7 +64,7 @@ void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	noIndices = nIndices;
 	if (shortBuf)
-		delete shortBuf;
+		delete[] shortBuf;
 }
 
 void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {

@@ -21,8 +21,8 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	yPixelOffset = 0;
 	smoothScrollStep = 4;
 	setMouseWheelMode(scroll);
-	setHotTextColour(1, 1, 1, 1);
-	setHotTextHighlightColour(0, 0, 1, 1);
+	setHotTextColour(uiWhite);
+	setHotTextHighlightColour(uiBlue);
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
@@ -118,12 +118,12 @@ void CGUIrichText::setTextColour(UIcolour  colour) {
 }
 
 /** Normal colour for unselected hot text. */
-void CGUIrichText::setHotTextColour(float r, float g, float b, float a) {
-	hotTextColour = glm::vec4(r, g, b, a);
+void CGUIrichText::setHotTextColour(const glm::vec4& colour) {
+	hotTextColour = colour;
 }
 
-void CGUIrichText::setHotTextHighlightColour(float r, float g, float b, float a) {
-	hotTextHighlightColour = glm::vec4(r, g, b, a);
+void CGUIrichText::setHotTextHighlightColour(const glm::vec4& colour) {
+	hotTextHighlightColour = colour;
 }
 
 /** Set the style for any text appended after this. */
@@ -150,6 +150,7 @@ void CGUIrichText::setText(std::string newText) {
 
 /** Append newText to the current body of text. */
 void CGUIrichText::appendText(std::string newText) {
+
 	textObjs.back().text += newText;
 	textObjs.back().findNewlines();
 	updateText();
@@ -250,10 +251,16 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	nextLineFrag.textPos = textStartPos;
 
 	TRichTextRec* richTextData = &textObjs[textObj];
-	//if (currentLineFrag.causesNewLine != no)
-	//	nextLineFrag.renderStartX = 0;
-	//else
-//		nextLineFrag.renderStartX = currentLineFrag.renderEndX;
+
+	//catch full stops, etc, in the next object that should wrap this fragment onto the next line
+	int lookAheadCharWidth = 0;
+	if (textObj + 1 < textObjs.size()) {
+		char lookAheadChar = textObjs[textObj + 1].text[0];
+		if (ispunct(lookAheadChar))
+			lookAheadCharWidth = richTextData->style.font->table[lookAheadChar]->width;
+	}
+
+
 	switch(currentLineFrag.causesNewLine) {
 		case(wordwrap): nextLineFrag.renderStartX = 0; break;
 		case(newline): nextLineFrag.renderStartX = richTextData->firstLineIndent; break;
@@ -263,8 +270,6 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
 	for (c = textStartPos; c < richTextData->text.size(); c++) {
-	//	if (richTextData->text[c] == 'x')
-	//		int b = 0;
 		renderX += richTextData->style.font->table[richTextData->text[c]]->width;
 		if (richTextData->text[c] == '\n') {
 			c++;
@@ -276,7 +281,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			breakPointX = renderX;
 			//break; //pretty sure this works without break as long as we go to next clause
 		}
-		if (renderX > textureWidth) {
+		if (renderX > textureWidth || renderX + lookAheadCharWidth > textureWidth) {
 			c = breakPoint ;
 			renderX = breakPointX;
 			nextLineFrag.causesNewLine = wordwrap;
@@ -313,8 +318,6 @@ void CGUIrichText::appendHotText(std::string newText, int idNo) {
 
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
-	if (getID() == 12)
-		int b = 0;
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
 		selectedHotObj = -1;
@@ -699,6 +702,11 @@ void CGUIrichText::appendMarkedUpText(string text) {
 			setAppendStyleHot(hot, tagId);
 		if (styleChange == styleNone)
 			setTextStyle(normalTextStyle);
+
+		if (textObjs.size() > 30) {
+		//	textObjs.erase(textObjs.begin());
+		//	currentTextObj--;
+		}
 
 	}
 }

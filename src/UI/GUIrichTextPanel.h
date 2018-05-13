@@ -13,8 +13,8 @@ public:
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
-	void setHotTextColour(float r, float g, float b, float a);
-	void setHotTextHighlightColour(float r, float g, float b, float a);
+	void setHotTextColour(const glm::vec4& colour);
+	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	void clear();

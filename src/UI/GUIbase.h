@@ -76,6 +76,10 @@ const UIcolour UIlightGrey = {0.75f,0.75f,0.75f,1};// {0.86f,0.87f,0.87f,1};
 const UIcolour oldbackColour1 = {0.99f,0.99f, 0.99f,1.0f};
 const UIcolour oldbackColour2 = {0.75f, 0.75f, 0.75f,1.0f};
 
+//NEW colours (abandon the above)
+const glm::vec4 uiWhite = { 1,1,1,1 };
+const glm::vec4 uiBlue = { 0,0,0.7f,1 };
+const glm::vec4 uiBlack = { 0,0,0.0,1 };
 
 class CGUIbase;
 

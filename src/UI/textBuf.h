@@ -48,7 +48,7 @@ public:
 	
 	CRenderer* pRenderer;
 
-
+	CBuf buf;
 private:
 	void writeToTexture2(CBuf & glyphQuads);
 

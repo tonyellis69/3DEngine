@@ -34,12 +34,12 @@ void CGUIrichTextPanel::setTextColour(UIcolour colour) {
 	richText->setTextColour(colour);
 }
 
-void CGUIrichTextPanel::setHotTextColour(float r, float g, float b, float a) {
-	richText->setHotTextColour(r, g, b, a);
+void CGUIrichTextPanel::setHotTextColour(const glm::vec4& colour) {
+	richText->setHotTextColour(colour);
 }
 
-void CGUIrichTextPanel::setHotTextHighlightColour(float r, float g, float b, float a) {
-	richText->setHotTextHighlightColour(r, g, b, a);
+void CGUIrichTextPanel::setHotTextHighlightColour(const glm::vec4& colour) {
+	richText->setHotTextHighlightColour(colour);
 }
 
 void CGUIrichTextPanel::setText(std::string newText) {

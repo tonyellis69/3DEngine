@@ -145,7 +145,7 @@ glm::i32vec2 CTextBuffer::addFragment(int x, int y, std::string textLine) {
 
 /** Render the currently accumulated text quads to our buffer. */
 void CTextBuffer::render() {
-	CBuf buf;
+	//CBuf buf;
 	buf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
 	buf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
 	buf.storeLayout(2, 2, 0, 0);

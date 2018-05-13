@@ -90,10 +90,10 @@ void CBaseApp::start() {
 }
 
 
-
 void CBaseApp::SetWindow( int width, int height, std::string title) {
 	win.setWindowSize(width, height);
 	win.setTitle(title);
+	win.centreWindow();
 	onWinResize(width, height);
 }
 
