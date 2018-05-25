@@ -758,6 +758,15 @@ void CGUIrichText::resizeToFit() {
 		
 }
 
+/** Return true if the given id is an active hot text.*/
+bool CGUIrichText::isActiveHotText(int hotId) {
+	for (auto obj : textObjs) {
+		if (obj.hotTextId == hotId)
+			return true;
+	}
+	return false;
+}
+
 
 TRichTextRec::TRichTextRec() {
 	hotTextId = 0;

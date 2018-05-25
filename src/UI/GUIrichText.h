@@ -92,6 +92,8 @@ public:
 	void setResizeMode(bool onOff);
 	void resizeToFit();
 
+	bool isActiveHotText(int hotId);
+
 	int overrun;
 	int underrun;
 	int maxHeight;
@@ -104,7 +106,7 @@ public:
 
 	std::vector<THotTextFragment> hotTextFrags; ///<Currently visible hot text fragments
 	int selectedHotObj; ///<Currently selected hot text oject, if any.
-	std::vector<int> hotTextObjs; ///<Currently visible hot text object
+	//std::vector<int> hotTextObjs; ///<Currently visible hot text object
 
 	float updateDt; ///<Elapsed seconds since last call to update().
 
