@@ -364,7 +364,8 @@ void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 	if (!mouseMode)
 		return;
 
-	if (selectedHotObj > 0) {
+	//if (selectedHotObj > 0) {
+	if (selectedHotObj >= 0) {
 		unhighlight(selectedHotObj);
 		selectedHotObj = -1;
 	}

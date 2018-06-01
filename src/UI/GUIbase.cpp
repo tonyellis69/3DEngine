@@ -545,6 +545,14 @@ void CGUIbase::setBackColour2(const UIcolour & colour) {
 	backColour2 = colour;
 }
 
+void CGUIbase::setBackColour1(const glm::vec4 & colour) {
+	backColour1 = (UIcolour&)colour;
+}
+
+void CGUIbase::setBackColour2(const glm::vec4 & colour) {
+	backColour2 = (UIcolour&)colour;
+}
+
 void CGUIbase::setBorderColour(const UIcolour& colour) {
 	borderColour = colour;
 }

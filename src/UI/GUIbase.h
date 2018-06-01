@@ -80,6 +80,7 @@ const UIcolour oldbackColour2 = {0.75f, 0.75f, 0.75f,1.0f};
 const glm::vec4 uiWhite = { 1,1,1,1 };
 const glm::vec4 uiBlue = { 0,0,0.7f,1 };
 const glm::vec4 uiBlack = { 0,0,0.0,1 };
+const glm::vec4 uialmostBlack = { 0.1,0.1,0.1,1 };
 
 class CGUIbase;
 
@@ -171,8 +172,9 @@ public:
 	void makeModal(CGUIbase * control);
 
 	void setBackColour1(const UIcolour & colour);
-
+	void setBackColour1(const glm::vec4 & colour);
 	void setBackColour2(const UIcolour & colour);
+	void setBackColour2(const glm::vec4 & colour);
 
 	void setBorderColour(const UIcolour & colour);
 
