@@ -12,9 +12,9 @@ struct TCharacterPos {
 
 struct TRichTextRec : textRec {
 	TRichTextRec();
-	void findNewlines(); //TO DO: am I keeping this?
 	std::vector<int> newLines;
-	int hotTextId;
+	int hotMsgId;
+	int hotObjId;
 };
 
 enum TNewLine {no, wordwrap, newline};
@@ -52,7 +52,7 @@ public:
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setAppendStyleBold(bool isOn);
-	void setAppendStyleHot(bool isOn, int tagId);
+	void setAppendStyleHot(bool isOn, int msgId, int objId);
 	void setTextColour(UIcolour colour);
 	void setHotTextColour(const glm::vec4& colour);
 	void setHotTextHighlightColour(const glm::vec4& colour);
@@ -62,13 +62,13 @@ public:
 	bool scrollDown();
 	void renderText();
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
-	void appendHotText(std::string newText, int idNo);
+	void appendHotText(std::string newText, int msgId, int objId);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
 	void highlight(int textObj);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void unhighlight(int textObj);
-	void removeHotText(int tagNo);
+	void removeHotText(int hotMsgId);
 	bool scrollUp();
 	int getPrevCharacter(int & textObj, int & pos);
 	TCharacterPos getPrevNewline(int textObj, int pos);

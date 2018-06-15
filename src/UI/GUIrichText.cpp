@@ -41,7 +41,7 @@ void CGUIrichText::setFont(CFont* newFont) {
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
-		newObj.hotTextId = 0; //assume we don't want to add to any preceeding hot text.
+		newObj.hotMsgId = 0; //assume we don't want to add to any preceeding hot text.
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -66,7 +66,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
-		newObj.hotTextId = 0; //assume we don't want to add to any preceeding hot text.
+		newObj.hotMsgId = 0; //assume we don't want to add to any preceeding hot text.
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -94,8 +94,8 @@ void CGUIrichText::setAppendStyleBold(bool isOn) {
 
 
 /** Set hot text style for appending text on or off. */
-void CGUIrichText::setAppendStyleHot(bool isOn, int tagId) {
-	if (textObjs[currentTextObj].hotTextId == tagId)
+void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId) {
+	if (textObjs[currentTextObj].hotMsgId == msgId && textObjs[currentTextObj].hotObjId == objId)
 		return;
 
 	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text
@@ -105,8 +105,10 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int tagId) {
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
-	textObjs[currentTextObj].hotTextId = tagId;
-	if (tagId)
+	textObjs[currentTextObj].hotMsgId = msgId;
+	textObjs[currentTextObj].hotObjId = objId;
+
+	if (msgId)
 		textObjs[currentTextObj].style.colour = hotTextColour;
 	else
 		textObjs[currentTextObj].style.colour = normalTextStyle.colour;
@@ -152,7 +154,6 @@ void CGUIrichText::setText(std::string newText) {
 void CGUIrichText::appendText(std::string newText) {
 
 	textObjs.back().text += newText;
-	textObjs.back().findNewlines();
 	updateText();
 	overrunCorrect = true; //TO DO: why do this here?		
 }
@@ -202,7 +203,7 @@ void CGUIrichText::renderText() {
 
 		offset = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
 		
-		if (currentObj.hotTextId && renderLine[0] != '\n') {
+		if (currentObj.hotMsgId && renderLine[0] != '\n') {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.style.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
 			if (offset.y + currentObj.style.font->lineHeight > textureHeight)
@@ -217,7 +218,7 @@ void CGUIrichText::renderText() {
 		}
 		if (offset.y + currentObj.style.font->lineHeight > textureHeight) {
 			overrun = offset.y + currentObj.style.font->lineHeight - textureHeight; //was true;
-			if (currentObj.hotTextId &&  overrunHotTextObj == -1)
+			if (currentObj.hotMsgId &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
 			if (offset.y > textureHeight) { //overrun texture, so no sense writing any more
 				textBuf.render();
@@ -299,17 +300,17 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 }
 
 /** Add clickable text to the end of the existing body copy. */
-void CGUIrichText::appendHotText(std::string newText, int idNo) {
+void CGUIrichText::appendHotText(std::string newText, int msgId, int objId) {
 	TRichTextRec newObj = textObjs.back(); //clone existing style for now
 	newObj.text.clear();
 	newObj.style.colour = hotTextColour;
-	newObj.firstLineIndent = 15;
-	newObj.hotTextId = idNo;
+	newObj.firstLineIndent = 15; //TO DO wtf?
+	newObj.hotMsgId = msgId;
+	newObj.hotObjId = objId;
 	textObjs.push_back(newObj);
 	currentTextObj++;
 
 	textObjs.back().text += newText;
-	textObjs.back().findNewlines();
 	updateText();
 	overrunCorrect = true;
 }
@@ -352,9 +353,9 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 		CMessage msg;
 		msg.Msg = uiMsgHotTextClick;
 		msg.x = mouseX; msg.y = mouseY;
-		msg.value = textObjs[selectedHotObj].hotTextId;
+		msg.value = textObjs[selectedHotObj].hotMsgId;
+		msg.value2 = textObjs[selectedHotObj].hotObjId;
 		pDrawFuncs->handleUImsg(*this, msg);
-		
 	}
 }
 
@@ -364,7 +365,6 @@ void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 	if (!mouseMode)
 		return;
 
-	//if (selectedHotObj > 0) {
 	if (selectedHotObj >= 0) {
 		unhighlight(selectedHotObj);
 		selectedHotObj = -1;
@@ -383,9 +383,9 @@ void CGUIrichText::unhighlight(int textObj) {
 }
 
 /** Remove any hot text objects with this tag. */
-void CGUIrichText::removeHotText(int tagNo) {
+void CGUIrichText::removeHotText(int hotMsgId) {
 	for (auto it = textObjs.begin(); it != textObjs.end(); ) {
-		if ((*it).hotTextId & tagNo) {
+		if ((*it).hotMsgId == hotMsgId) {
 			it = textObjs.erase(it);
 		}
 		else
@@ -419,9 +419,7 @@ bool CGUIrichText::scrollUp() {
 		lineFragment = getNextLineFragment(lineFragment); //TO DO should always be next wordwrap
 
 	} while (lineFragment.textObj < origFirstVisibleObject ||
-		//(lineFragment.textObj == origFirstVisibleObject && lineFragment.textPos < (origFirstVisibleText - 1)));
 	  (lineFragment.textObj == origFirstVisibleObject && (lineFragment.textPos + lineFragment.textLength) < (origFirstVisibleText - 1)));
-
 
 	if (firstVisibleObject == origFirstVisibleObject &&  firstVisibleText == origFirstVisibleText)
 		return false;
@@ -474,7 +472,6 @@ void CGUIrichText::update(float dT) {
 			overrunCorrect = overrun;
 		} 
 	}
-
 }
 
 
@@ -584,8 +581,7 @@ void CGUIrichText::hotTextScroll(int direction) {
 			}
 	}
 
-	if (nextHotOb == -1) { //escape from hot text selection mode.
-	
+	if (nextHotOb == -1) { //escape from hot text selection mode.	
 		mouseWheelMode = scroll;
 		return;
 	}
@@ -614,18 +610,20 @@ void CGUIrichText::selectTopHotText() {
 /** Convert all existing hot text objects to standard style. */
 void CGUIrichText::purgeHotText() {
 	for (auto &textObj : textObjs) {
-		if (textObj.hotTextId > 0) {
-			textObj.hotTextId = 0;
+		if (textObj.hotMsgId > 0) {
+			textObj.hotMsgId = 0;
+			textObj.hotObjId = 0;
 			textObj.style.colour = normalTextStyle.colour;
 		}
 	}
 }
 
 /** Convert hot text with the given id to standard style. */
-void CGUIrichText::purgeHotText(int id) {
+void CGUIrichText::purgeHotText(int msgId) {
 	for (auto &textObj : textObjs) {
-		if (textObj.hotTextId == id) {
-			textObj.hotTextId = 0;
+		if (textObj.hotMsgId == msgId) {
+			textObj.hotMsgId = 0;
+			textObj.hotObjId = 0;
 			textObj.style.colour = normalTextStyle.colour;
 		}
 	}
@@ -663,7 +661,7 @@ void CGUIrichText::appendMarkedUpText(string text) {
 	TStyleChange styleChange;
 	while (remainingTxt.size()) {
 		styleChange = styleNone;
-		int cut = 0; int tagId = 0;
+		int cut = 0; int msgId = 0; int objId = 0;
 		size_t found = remainingTxt.find('\\');
 		if (found != std::string::npos) {
 			cut = 1;
@@ -679,7 +677,9 @@ void CGUIrichText::appendMarkedUpText(string text) {
 				if (remainingTxt[found + 2] == '{') {
 					size_t end = remainingTxt.find("}", found);
 					std::string id = remainingTxt.substr(found + 3, end - (found + 3));
-					tagId = std::stoi(id);
+					size_t sz;
+					msgId = std::stoi(id,&sz);
+					objId = std::stoi(id.substr(sz+1,std::string::npos));
 					cut = 4 + id.size();
 				}
 				else {
@@ -700,7 +700,7 @@ void CGUIrichText::appendMarkedUpText(string text) {
 		if (styleChange == styleBold)
 			setAppendStyleBold(bold);
 		if (styleChange == styleHot)
-			setAppendStyleHot(hot, tagId);
+			setAppendStyleHot(hot, msgId, objId);
 		if (styleChange == styleNone)
 			setTextStyle(normalTextStyle);
 
@@ -762,7 +762,7 @@ void CGUIrichText::resizeToFit() {
 /** Return true if the given id is an active hot text.*/
 bool CGUIrichText::isActiveHotText(int hotId) {
 	for (auto obj : textObjs) {
-		if (obj.hotTextId == hotId)
+		if (obj.hotMsgId == hotId)
 			return true;
 	}
 	return false;
@@ -770,17 +770,9 @@ bool CGUIrichText::isActiveHotText(int hotId) {
 
 
 TRichTextRec::TRichTextRec() {
-	hotTextId = 0;
+	hotMsgId = 0;
+	hotObjId = 0;
 }
 
-//TO DO: scrap this 
-/** Find all the linebreaks in this text object and record their positions. */
-void TRichTextRec::findNewlines() {
-	newLines.clear();
-	for (int c = 0; c < text.size(); c++) {
-		if (text[c] == '\n')
-			newLines.push_back(c);
-	}
-}
 
 

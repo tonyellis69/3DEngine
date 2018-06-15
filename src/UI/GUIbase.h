@@ -26,6 +26,7 @@ public:
 	//char* Name;
 	int Msg;
 	int value;
+	int value2;
 	float fValue;
 	int x;
 	int y;
