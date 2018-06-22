@@ -42,114 +42,67 @@ void CTerrain::reserveBuf(unsigned int elementsUsed) {
 
 /** Set the dimensions and building block sizes of this terrain. */
 void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize) {
-	float superChunkSize = _cubeSize * _cubesPerChunkEdge * _chunksPerSChunkEdge ;
 	chunksPerSChunkEdge = _chunksPerSChunkEdge;
 	LoD1cubeSize = _cubeSize;
 	cubesPerChunkEdge = _cubesPerChunkEdge;
-	totalTris = 0;
 }
 
-/** Create each nested layer of superchunks. */
-void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
-	//calculate dimensions of the innermost layer:
-	float LoDscale = 1.0f;
-	float layerExtent = LoD1extent;
-	float layerCubeSize = LoD1cubeSize;
-	float LoD1SCsize = layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge;
-	deque<float> layerSize = { layerExtent * 2 };
-	deque<int> superChunksPerLayerEdge = {int(layerSize.front() / LoD1SCsize) };
-	int noLayers = 1;
-	float layerSuperchunkSize;
-	float layerGrowth = 2.0f; //4.0f
-	int currentStep = 0;
+/** Create a series of nested shells made of superchunks. */
+void CTerrain::createShells(float terrainSize, float LoD1extent, int steps) {
+	TShellCalcData calcData;
+	int numShells = calcTotalShells(terrainSize,LoD1extent, steps, calcData);
 
-	//make sure we have an even number of SCs along the edge:
-	while ( (superChunksPerLayerEdge[0] % 2 != 0) || (superChunksPerLayerEdge[0]/ 2) % 2 != 0) {
-		superChunksPerLayerEdge[0] += 1;
-		layerSize[0] = superChunksPerLayerEdge[0] * LoD1SCsize;
-		layerExtent = layerSize[0] / 2;
-	}
+	// we should now have enough info to create the SC shells
 
-	//Expanding, see how many more layers we can fit into the remaining terain space
-	while (layerSize.front() < terrainSize ) {
-		LoDscale *= 2; //halve the level of detail by doubling the size of the building blocks
-		layerCubeSize = LoD1cubeSize * LoDscale;
-		layerSuperchunkSize = LoD1SCsize * LoDscale;
-
-		layerExtent = layerExtent * layerGrowth;
-		float currentLayerSize = layerExtent * 2;
-		int SCsPerLayerEdge = int(currentLayerSize / layerSuperchunkSize);
-		if (SCsPerLayerEdge % 2 != 0) { //can't have an odd number of SCs on an edge
-			SCsPerLayerEdge += 1;
-			currentLayerSize = SCsPerLayerEdge * layerSuperchunkSize;
-			layerExtent = currentLayerSize / 2;
-		}
-
-		//If we have no more steps, expand this layer to fit the total terrain size
-		if (currentStep == steps) {
-			while (currentLayerSize < terrainSize) {
-				SCsPerLayerEdge += 2;
-				currentLayerSize = SCsPerLayerEdge * layerSuperchunkSize;
-				layerExtent = currentLayerSize / 2;
-			}
-
-		}
-
-		superChunksPerLayerEdge.push_front(SCsPerLayerEdge);
-		layerSize.push_front(currentLayerSize);
-		noLayers++;
-		currentStep++;
-	}
-
-	//assume we iterated out, we should now have enough info to create the SC layers
+	float LoD1SCsize = LoD1cubeSize * cubesPerChunkEdge * chunksPerSChunkEdge; 
 	T3dArray array3d1, array3d2;
 	T3dArray* outerArray = &array3d1;
 	T3dArray* innerArray = &array3d2;
 
-	layers.resize(noLayers);
+	shells.resize(numShells);
 	CTerrainLayer::LoD1chunkSize = LoD1cubeSize * cubesPerChunkEdge;
-	worldSize = vec3(layerSize.front());
+	worldSize = vec3(calcData.shellSize.front());
 
-	int currentLoD = noLayers;
+	int currentLoD = numShells;
 
-	//create layers, working in from the outside
-	vec3 nwLayerPos = vec3(layerSize.front()) * -0.5f;
+	//create shells, working in from the outside
+	vec3 nwLayerPos = vec3(calcData.shellSize.front()) * -0.5f;
 
-	float gapBetweenLayers = 0;
-	int SCsBetweenLayers = 0;
-	float prevLayerSize = layerSize.front();
-	float prevSCsize =  layerSuperchunkSize;
+	float shellThickness = 0;
+	int shellThicknessInSCs = 0;
+	float prevShellSize = calcData.shellSize.front();
+	float prevSCsize = calcData.shellSuperchunkSize;
 	float prevLoDscale = 0;
 	vec3 samplesPerPrevSC(0);
 
 
-	for (int layerNo = 0; layerNo < noLayers; layerNo++) {
-		resize3dArray(*outerArray, i32vec3(superChunksPerLayerEdge[layerNo]));
-		layers[layerNo].nwLayerPos = vec3(layerSize[layerNo]) * -0.5f;
-		layers[layerNo].cubeSize = LoD1cubeSize * LoDscale;;
-		layers[layerNo].LoD = currentLoD;
-		layers[layerNo].scSize = LoD1SCsize * LoDscale;
-		layers[layerNo].SCsampleStep = layers[layerNo].scSize / worldUnitsPerSampleUnit;
-		layers[layerNo].chunkSampleStep = (layers[layerNo].cubeSize * cubesPerChunkEdge) / worldUnitsPerSampleUnit;
-		gapBetweenLayers = (prevLayerSize - layerSize[layerNo]) / 2;
-		SCsBetweenLayers = int(gapBetweenLayers / prevSCsize);
+	for (int shellNo = 0; shellNo < numShells; shellNo++) {
+		resize3dArray(*outerArray, i32vec3(calcData.superChunksPerShellEdge[shellNo]));
+		shells[shellNo].nwLayerPos = vec3(calcData.shellSize[shellNo]) * -0.5f;
+		shells[shellNo].cubeSize = LoD1cubeSize * calcData.LoDscale;;
+		shells[shellNo].LoD = currentLoD;
+		shells[shellNo].scSize = LoD1SCsize * calcData.LoDscale;
+		shells[shellNo].SCsampleStep = shells[shellNo].scSize / worldUnitsPerSampleUnit;
+		shells[shellNo].chunkSampleStep = (shells[shellNo].cubeSize * cubesPerChunkEdge) / worldUnitsPerSampleUnit;
+		shellThickness = (prevShellSize - calcData.shellSize[shellNo]) / 2;
+		shellThicknessInSCs = int(shellThickness / prevSCsize);
 
 		
-		createSuperChunks(*outerArray, layers[layerNo].superChunks);
-		initSuperChunks(*outerArray, layerNo,  i32vec3(chunksPerSChunkEdge));
+		createSuperChunks(*outerArray, shells[shellNo].superChunks);
+		initSuperChunks(*outerArray, shellNo,  i32vec3(chunksPerSChunkEdge));
 		connectSuperChunks(*outerArray);
-		findLayerFaces(*outerArray, layerNo);
+		findLayerFaces(*outerArray, shellNo);
 
 		currentLoD = currentLoD - 1;
 
-		if (layerNo > 0) { //stitch this layer into previous, outer layer
-			gapBetweenLayers = abs(layers[layerNo - 1].nwLayerPos.x - layers[layerNo].nwLayerPos.x);
-			SCsBetweenLayers = int(gapBetweenLayers / prevSCsize);// layerSCsize[layerNo - 1];
+		if (shellNo > 0) { //stitch this layer into previous, outer layer
+			shellThickness = abs(shells[shellNo - 1].nwLayerPos.x - shells[shellNo].nwLayerPos.x);
+			shellThicknessInSCs = int(shellThickness / prevSCsize);// layerSCsize[shellNo - 1];
 		
-			insertLayer(*innerArray, *outerArray, SCsBetweenLayers);
+			insertLayer(*innerArray, *outerArray, shellThicknessInSCs);
 
 			//remove redundant superChunks from outer layer
-			hollowLayer(*innerArray, layerNo - 1, SCsBetweenLayers);
+			hollowLayer(*innerArray, shellNo - 1, shellThicknessInSCs);
 		}
 			
 		//maker this layer the next outer layer
@@ -159,22 +112,75 @@ void CTerrain::createLayers(float terrainSize, float LoD1extent, int steps) {
 			innerArray = &array3d1; outerArray = &array3d2;
 		}
 
-		prevLayerSize = layerSize[layerNo];
-		prevSCsize = LoD1SCsize * LoDscale;
-	    prevLoDscale = LoDscale;
+		prevShellSize = calcData.shellSize[shellNo];
+		prevSCsize = LoD1SCsize * calcData.LoDscale;
+	    prevLoDscale = calcData.LoDscale;
 
-		samplesPerPrevSC = vec3(layers[layerNo].scSize / worldUnitsPerSampleUnit);
-		LoDscale = LoDscale / 2;
+		samplesPerPrevSC = vec3(shells[shellNo].scSize / worldUnitsPerSampleUnit);
+		calcData.LoDscale = calcData.LoDscale / 2;
 	}
 }
 
+int CTerrain::calcTotalShells(int terrainSize, float LoD1extent, int numSteps, TShellCalcData& calcData) {
+	calcData.LoDscale = 1.0f; //s
+	float layerExtent = LoD1extent; 
+	float layerCubeSize = LoD1cubeSize; 
+	calcData.LoD1SCsize = layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge; //s
+	calcData.shellSize = { layerExtent * 2 }; //s
+	calcData.superChunksPerShellEdge = { int(calcData.shellSize.front() / calcData.LoD1SCsize) };  //s
+	calcData.shellSuperchunkSize;  //s
+
+	float layerGrowth = 2.0f; 
+	int currentStep = 0; 
+	int noLayers = 1;
+
+	//make sure we have an even number of SCs along the edge:
+	while ((calcData.superChunksPerShellEdge[0] % 2 != 0) || (calcData.superChunksPerShellEdge[0] / 2) % 2 != 0) {
+		calcData.superChunksPerShellEdge[0] += 1;
+		calcData.shellSize[0] = calcData.superChunksPerShellEdge[0] * calcData.LoD1SCsize;
+		layerExtent = calcData.shellSize[0] / 2;
+	}
+
+	//Expanding, see how many more shells we can fit into the remaining terain space
+	while (calcData.shellSize.front() < terrainSize) {
+		calcData.LoDscale *= 2; //halve the level of detail by doubling the size of the building blocks
+		layerCubeSize = LoD1cubeSize * calcData.LoDscale;
+		calcData.shellSuperchunkSize = calcData.LoD1SCsize * calcData.LoDscale;
+
+		layerExtent = layerExtent * layerGrowth;
+		float currentLayerSize = layerExtent * 2;
+		int SCsPerLayerEdge = int(currentLayerSize / calcData.shellSuperchunkSize);
+		if (SCsPerLayerEdge % 2 != 0) { //can't have an odd number of SCs on an edge
+			SCsPerLayerEdge += 1;
+			currentLayerSize = SCsPerLayerEdge * calcData.shellSuperchunkSize;
+			layerExtent = currentLayerSize / 2;
+		}
+
+		//If we have no more steps, expand this layer to fit the total terrain size
+		if (currentStep == numSteps) {
+			while (currentLayerSize < terrainSize) {
+				SCsPerLayerEdge += 2;
+				currentLayerSize = SCsPerLayerEdge * calcData.shellSuperchunkSize;
+				layerExtent = currentLayerSize / 2;
+			}
+
+		}
+
+		calcData.superChunksPerShellEdge.push_front(SCsPerLayerEdge);
+		calcData.shellSize.push_front(currentLayerSize);
+		noLayers++;
+		currentStep++;
+	}
+
+	return noLayers;
+}
 
 
-/** Create chunks where needed for all layers. */
+/** Create chunks where needed for all shells. */
 void CTerrain::createAllChunks() {
-	for (size_t l=0;l<layers.size();l++) {
-		for (size_t s = 0; s < layers[l].superChunks.size(); s++) {
-			layers[l].superChunks[s]->createAllChunks();
+	for (size_t l=0;l<shells.size();l++) {
+		for (size_t s = 0; s < shells[l].superChunks.size(); s++) {
+			shells[l].superChunks[s]->createAllChunks();
 		}
 	}
 	cerr << "\nTotal SCs " << totalScs;
@@ -210,18 +216,18 @@ extern CSuperChunk* dbgSC = NULL;
 
 /** Initialise the given 3d array of superchunks with the correct position, size, lod, etc. */
 void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, i32vec3& _sizeInChunks) {
-	float LoDscale = float(1 << (layers[layerNo].LoD-1));
+	float LoDscale = float(1 << (shells[layerNo].LoD-1));
 	int cubesPerSCedge =  chunksPerSChunkEdge * cubesPerChunkEdge;
 
 	for (size_t x=0; x<scArray.size(); ++x) {
 		for (size_t y=0; y<scArray[0].size(); ++y) {
 			for (size_t z=0;z<scArray[0][0].size(); ++z) {
 				CSuperChunk* sChunk = scArray[x][y][z];
-				sChunk->nwWorldPos = vec3(x, y, z) * layers[layerNo].scSize;
-				sChunk->setSizes(_sizeInChunks,cubesPerChunkEdge,layers[layerNo].cubeSize);		
-				sChunk->LoD = layers[layerNo].LoD;
+				sChunk->nwWorldPos = vec3(x, y, z) * shells[layerNo].scSize;
+				sChunk->setSizes(_sizeInChunks,cubesPerChunkEdge,shells[layerNo].cubeSize);		
+				sChunk->LoD = shells[layerNo].LoD;
 				sChunk->LoDscale = LoDscale;
-				sChunk->sampleStep = layers[layerNo].SCsampleStep;
+				sChunk->sampleStep = shells[layerNo].SCsampleStep;
 				sChunk->tmpIndex = i32vec3(x,y,z);
 				if (x == 3 && y == 1 && z == 0 && layerNo == 1)
 					dbgSC = sChunk;
@@ -242,17 +248,17 @@ void CTerrain::findLayerFaces(T3dArray &scArray, int layerNo) {
 		for (size_t y=0; y<ySize; ++y) {
 			for (size_t z=0;z<zSize; ++z) {
 				if (x == 0)
-					layers[layerNo].faceGroup[west].push_back(scArray[x][y][z]);
+					shells[layerNo].faceGroup[west].push_back(scArray[x][y][z]);
 				if (x == xSize-1)
-					layers[layerNo].faceGroup[east].push_back(scArray[x][y][z]);
+					shells[layerNo].faceGroup[east].push_back(scArray[x][y][z]);
 				if (y == 0)
-					layers[layerNo].faceGroup[down].push_back(scArray[x][y][z]);
+					shells[layerNo].faceGroup[down].push_back(scArray[x][y][z]);
 				if (y == ySize-1)
-					layers[layerNo].faceGroup[up].push_back(scArray[x][y][z]);
+					shells[layerNo].faceGroup[up].push_back(scArray[x][y][z]);
 				if (z == 0)
-					layers[layerNo].faceGroup[north].push_back(scArray[x][y][z]);
+					shells[layerNo].faceGroup[north].push_back(scArray[x][y][z]);
 				if (z == zSize-1) {
-					layers[layerNo].faceGroup[south].push_back(scArray[x][y][z]);
+					shells[layerNo].faceGroup[south].push_back(scArray[x][y][z]);
 				}
 			}
 		}
@@ -326,9 +332,9 @@ void CTerrain::hollowLayer(T3dArray &layerArray, int layerNo, int depth) {
 			for (int j=depth;j<=innerLayerEnd;j++) {
 				for (int k=depth;k<=innerLayerEnd;k++) {
 					sChunk = layerArray[i][j][k];
-					iter pos = std::find(layers[layerNo].superChunks.begin(), layers[layerNo].superChunks.end(),sChunk);
+					iter pos = std::find(shells[layerNo].superChunks.begin(), shells[layerNo].superChunks.end(),sChunk);
 					delete (*pos);
-					layers[layerNo].superChunks.erase(pos);
+					shells[layerNo].superChunks.erase(pos);
 				}
 			}
 		}
@@ -403,16 +409,16 @@ void CTerrain::update() {
 void CTerrain::advance(Tdirection dir) {
 	i32vec3 scrollVec = dirToVec(dir);
 
-	int inner = layers.size()-1;
+	int inner = shells.size()-1;
 	//for (int l=inner;l>=0;l--) {
 	for (int layerNo=0; layerNo <= inner; layerNo++) {  //from outer layer to inner
 			Tdirection outgoingDir = flipDir(dir);
 
 			//Move all chunks along by the size of LoD1, and maybe trigger the layer's scroll action.
-			bool layerScrolled = layers[layerNo].advance(scrollVec); 
+			bool layerScrolled = shells[layerNo].advance(scrollVec); 
 			
 			//Check if this layer has now scrolled twice and thus reset 
-			if (layerScrolled && layers[layerNo].resetCheck(scrollVec)) {
+			if (layerScrolled && shells[layerNo].resetCheck(scrollVec)) {
 				if (layerNo > 0) {
 					addTwoIncomingLayers(layerNo, dir);
 				}
@@ -463,8 +469,8 @@ void CTerrain::addTwoIncomingLayers(int layerNo, Tdirection face) {
 	yStart = getYstart(face); yEnd = flipDir(yStart);
 
 	CSuperChunk* sc;
-	for (size_t scNo=0;scNo<layers[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
-		sc = layers[layerNo].faceGroup[face][scNo];
+	for (size_t scNo=0;scNo<shells[layerNo].faceGroup[face].size();scNo++) { //for each face SC...
+		sc = shells[layerNo].faceGroup[face][scNo];
 		sc->addTwoIncomingLayers(face, xStart, yStart);
 	} 
 }
@@ -481,15 +487,15 @@ void CTerrain::freeChunk(Chunk & chunk) {
 /** Return the superchunk at the given position. */
 CSuperChunk * CTerrain::getSC(const glm::vec3 & pos) {
 	float LoD1chunkSize = cubesPerChunkEdge * LoD1cubeSize;
-	for (int layerNo = layers.size() - 1; layerNo >= 0; layerNo--) {
-		vec3 scrolledPos = pos - (vec3(layers[layerNo].scrollState) * LoD1chunkSize);
-		bvec3 inside = lessThanEqual(glm::abs(scrolledPos), abs(layers[layerNo].nwLayerPos));
+	for (int layerNo = shells.size() - 1; layerNo >= 0; layerNo--) {
+		vec3 scrolledPos = pos - (vec3(shells[layerNo].scrollState) * LoD1chunkSize);
+		bvec3 inside = lessThanEqual(glm::abs(scrolledPos), abs(shells[layerNo].nwLayerPos));
 		if ( all(inside) ) {
-			vec3 offset = scrolledPos + glm::abs( layers[layerNo].nwLayerPos);
-			i32vec3 index = offset / layers[layerNo].scSize;
-			for (size_t sc = 0; sc < layers[layerNo].superChunks.size(); sc++) {
-				if (layers[layerNo].superChunks[sc]->tmpIndex == index)
-					return layers[layerNo].superChunks[sc];
+			vec3 offset = scrolledPos + glm::abs( shells[layerNo].nwLayerPos);
+			i32vec3 index = offset / shells[layerNo].scSize;
+			for (size_t sc = 0; sc < shells[layerNo].superChunks.size(); sc++) {
+				if (shells[layerNo].superChunks[sc]->tmpIndex == index)
+					return shells[layerNo].superChunks[sc];
 			}
 		}
 	}
@@ -501,7 +507,7 @@ Chunk * CTerrain::getChunk(const glm::vec3 & pos) {
 	CSuperChunk* sc = getSC(pos);
 	if (!sc)
 		return NULL;
-	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos); //+ glm::abs( sc->nwWorldPos);
+	vec3 offset = pos + glm::abs(shells[sc->layerNo].nwLayerPos); //+ glm::abs( sc->nwWorldPos);
 	offset -= sc->nwWorldPos;
 	
 	i32vec3 index = offset / sc->chunkSize;
@@ -568,7 +574,7 @@ glm::vec3 CTerrain::getChunkPos(const glm::vec3 & pos) {
 	CSuperChunk* sc = getSC(pos);
 	if (!sc)
 		return vec3(0);
-	vec3 offset = pos + glm::abs(layers[sc->layerNo].nwLayerPos); 
+	vec3 offset = pos + glm::abs(shells[sc->layerNo].nwLayerPos); 
 	offset -= sc->nwWorldPos;
 
 	vec3 cornerPos =  (offset / sc->chunkSize) * sc->chunkSize;
@@ -579,9 +585,9 @@ glm::vec3 CTerrain::getChunkPos(const glm::vec3 & pos) {
 
 /** Remove all current terrain and free up the memory. */
 void CTerrain::clear() {
-	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
-		for (size_t scNo = 0; scNo < layers[layerNo].superChunks.size(); scNo++) {
-			CSuperChunk* sc = layers[layerNo].superChunks[scNo];
+	for (size_t layerNo = 0; layerNo < shells.size(); layerNo++) {
+		for (size_t scNo = 0; scNo < shells[layerNo].superChunks.size(); scNo++) {
+			CSuperChunk* sc = shells[layerNo].superChunks[scNo];
 			sc->removeAllChunks();
 		}
 	}	
@@ -590,12 +596,12 @@ void CTerrain::clear() {
 /** Set the point in sample-space that this terrain will centre on when created. */
 void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
 	sampleOffset = centrePos;
-	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
-		vec3 nwCorner = (layers[layerNo].nwLayerPos / worldUnitsPerSampleUnit)
+	for (size_t layerNo = 0; layerNo < shells.size(); layerNo++) {
+		vec3 nwCorner = (shells[layerNo].nwLayerPos / worldUnitsPerSampleUnit)
 			+ centrePos;
-		layers[layerNo].nwSampleCorner = nwCorner;
-		for (size_t scNo = 0; scNo < layers[layerNo].superChunks.size(); scNo++) {
-			CSuperChunk* sc = layers[layerNo].superChunks[scNo];
+		shells[layerNo].nwSampleCorner = nwCorner;
+		for (size_t scNo = 0; scNo < shells[layerNo].superChunks.size(); scNo++) {
+			CSuperChunk* sc = shells[layerNo].superChunks[scNo];
 			sc->setSamplePos(nwCorner + vec3(sc->tmpIndex) * sc->sampleStep);
 		}
 	}
@@ -605,10 +611,10 @@ void CTerrain::setSampleCentre(glm::vec3 & centrePos) {
 void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 	CSuperChunk* sc;
 	visibleSClist.clear();
-	for (size_t layerNo = 0; layerNo < layers.size(); layerNo++) {
-		int slSize = layers[layerNo].superChunks.size();
+	for (size_t layerNo = 0; layerNo < shells.size(); layerNo++) {
+		int slSize = shells[layerNo].superChunks.size();
 		for (int scNo = 0; scNo < slSize; scNo++) {
-			sc = layers[layerNo].superChunks[scNo];
+			sc = shells[layerNo].superChunks[scNo];
 			//if (!sc->isOutsideFustrum(camMatrix)) {
 				visibleSClist.push_back(sc);
 			//}
@@ -694,9 +700,9 @@ CTerrain::~CTerrain() {
 		delete spareChunks[c];
 	}
 	
-	for (size_t l=0;l<layers.size();l++) {
-		for (size_t s=0;s<layers[l].superChunks.size();s++) {
-			delete layers[l].superChunks[s];
+	for (size_t l=0;l<shells.size();l++) {
+		for (size_t s=0;s<shells[l].superChunks.size();s++) {
+			delete shells[l].superChunks[s];
 		}
 	}
 //	if (cachedChunkTris.buf)

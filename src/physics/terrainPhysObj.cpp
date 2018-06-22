@@ -151,7 +151,7 @@ float CTerrainPhysObj::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactDi
 	scrolledSegTop = scrolledSegBase + vec3(0, veryFarUp, 0);
 	vec3 scrolledSearchBase = scrolledSegBase;
 
-	//while (searchPos.y < abs(pTerrain->layers[0].nwLayerPos.y)) {
+	//while (searchPos.y < abs(pTerrain->shells[0].nwLayerPos.y)) {
 	while (sc = pTerrain->getSC(searchPos)) {
 		pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {

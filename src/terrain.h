@@ -15,7 +15,7 @@
 #include <set>
 
 //LOD counts down from the outmost layer towards the innermost, 1.
-//However, in the layers array 0 is the outermost
+//However, in the shells array 0 is the outermost
 //Maybe change this sometime?
 
 
@@ -44,13 +44,22 @@ public:
 
 const int chunkTriCacheSize = 6;
 
+struct TShellCalcData {
+	float LoDscale;
+	float LoD1SCsize;
+	std::deque<float> shellSize;
+	std::deque<int> superChunksPerShellEdge;
+	float shellSuperchunkSize;
+};
+
 
 class CTerrain : public CModel  {
 public:
 	CTerrain();
 	void reserveBuf(unsigned int elementsUsed);
 	void setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float _cubeSize);
-	void createLayers(float terrainSize, float LoD1extent, int steps);
+	void createShells(float terrainSize, float LoD1extent, int steps);
+	int calcTotalShells(int terrainSize, float LoD1extent, int numSteps, TShellCalcData& calcData);
 	void createAllChunks();
 	void resize3dArray(T3dArray &scArray, glm::i32vec3& size);
 	void createSuperChunks(T3dArray &scArray, std::vector<CSuperChunk*>& container);
@@ -110,7 +119,7 @@ public:
 
 	std::vector<Chunk*> allChunks; ///<Pointers to all the chunks of this terrain, in use or not. 
 
-	std::vector<CTerrainLayer> layers; ///<A simple list of all the layers of this terrain.
+	std::vector<CTerrainLayer> shells; ///<A simple list of all the shells of this terrain.
 
 	glm::mat4 chunkOrigin; ///<Chunks are drawn relative to this point.
 	glm::vec3 scrollTriggerPoint; ///<Tracks how close terrain is to scrolling in any direction.
@@ -145,7 +154,7 @@ public:
 
 
 
-/** Represents one of a terrain's concentric layers of superchunks. */
+/** Represents one of a terrain's concentric shells of superchunks. */
 class CTerrainLayer {
 public:
 	CTerrainLayer();

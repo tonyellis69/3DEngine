@@ -62,7 +62,7 @@ extern int uniTag = 0;
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition, Tdirection overlap) {
 	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (chunkSize / terrain->worldUnitsPerSampleUnit);
 	Chunk* newChunk = terrain->getFreeChunk();
-	vec3 layerPos = terrain->layers[layerNo].nwLayerPos;
+	vec3 layerPos = terrain->shells[layerNo].nwLayerPos;
 	newChunk->terrainPos = layerPos + nwWorldPos + (vec3(gridPosition)*chunkSize) - vec3(terrain->chunkOrigin[3]);
 	newChunk->cubeSize = cubeSize;
 	newChunk->setSamplePos(samplePos);
@@ -389,10 +389,10 @@ void CSuperChunk::overlapAlert(Tdirection overlap) {
 
 /**	Returns true if any part of the SC is in front of the given plane.*/
 bool CSuperChunk::inFrontOfPlane(glm::vec3& planePos, glm::vec3& planeNormal) {
-	vec3 corner = nwWorldPos + terrain->layers[layerNo].nwLayerPos;
+	vec3 corner = nwWorldPos + terrain->shells[layerNo].nwLayerPos;
 	if (glm::dot(corner - planePos, planeNormal) >= 0)
 		return true;
-	vec3 opCorner = corner + vec3(terrain->layers[layerNo].scSize);
+	vec3 opCorner = corner + vec3(terrain->shells[layerNo].scSize);
 	if (glm::dot(opCorner - planePos, planeNormal) >= 0)
 		return true;
 	return false;
@@ -401,7 +401,7 @@ bool CSuperChunk::inFrontOfPlane(glm::vec3& planePos, glm::vec3& planeNormal) {
 /** Returns true if the SC is entirely outside the fustrum extracted from the given matrix. */
 bool CSuperChunk::isOutsideFustrum(glm::mat4 & mvp) {
 	
-	float scSize = terrain->layers[layerNo].scSize;
+	float scSize = terrain->shells[layerNo].scSize;
 
 	vec3 cornerAdjust = vec3(0);// vec3(faceBoundary[west], faceBoundary[down], faceBoundary[north]);
 	vec3 opCornerAdjust = vec3(0); // vec3(faceBoundary[east] + 1, faceBoundary[up] + 1, faceBoundary[south] + 1);
@@ -414,7 +414,7 @@ bool CSuperChunk::isOutsideFustrum(glm::mat4 & mvp) {
 	//because normally all that terrain will be in view anyway.
 	
 	vec3 minMax[2];
-	minMax[0] = nwWorldPos + terrain->layers[layerNo].nwLayerPos;
+	minMax[0] = nwWorldPos + terrain->shells[layerNo].nwLayerPos;
 	minMax[1] = minMax[0] + scSize; // (opCornerAdjust * chunkSize);
 
 	minMax[0] += cornerAdjust * chunkSize;
