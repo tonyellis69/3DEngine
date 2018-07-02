@@ -69,7 +69,7 @@ CGUIbaseEngine* CGUIbase::pGUIeng;
 
 CFont* CGUIbase::defaultFont;
 
-CGUIbase* CGUIbase::modalControl;
+std::vector<CGUIbase*> CGUIbase::modalControls;
 
 /** Returns true if the given point is inside this control's area. */
 bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY) {
@@ -562,6 +562,22 @@ void CGUIbase::borderOn(bool onOff) {
 }
 
 void CGUIbase::makeModal(CGUIbase * control) {
-	modalControl = control;
+	modalControls.push_back(control);
+}
+
+void CGUIbase::destroy() {
+	auto it = parent->Control.begin();
+	for (; it != parent->Control.end(); it++) {
+		if (*it == this) {
+			for (auto control = modalControls.begin(); control != modalControls.end(); control++) {
+				if (*control == this) {
+					modalControls.erase(control);
+					break;
+				}
+			}
+			parent->Control.erase(it);
+			return;
+		}
+	}
 }
 

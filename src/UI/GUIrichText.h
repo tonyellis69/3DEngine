@@ -83,7 +83,7 @@ public:
 	void hotTextScroll(int direction);
 	void selectTopHotText();
 	void purgeHotText();
-	void purgeHotText(int id);
+	void purgeHotText(int msgId, int objId);
 	void clear();
 	void clearSelection();
 	void appendMarkedUpText(string text);

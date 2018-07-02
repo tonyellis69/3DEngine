@@ -67,6 +67,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
 		newObj.hotMsgId = 0; //assume we don't want to add to any preceeding hot text.
+		newObj.hotObjId = 0;
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -108,7 +109,7 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId) {
 	textObjs[currentTextObj].hotMsgId = msgId;
 	textObjs[currentTextObj].hotObjId = objId;
 
-	if (msgId)
+	if (msgId || objId)
 		textObjs[currentTextObj].style.colour = hotTextColour;
 	else
 		textObjs[currentTextObj].style.colour = normalTextStyle.colour;
@@ -203,7 +204,7 @@ void CGUIrichText::renderText() {
 
 		offset = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
 		
-		if (currentObj.hotMsgId && renderLine[0] != '\n') {
+		if ( (currentObj.hotMsgId || currentObj.hotObjId) && renderLine[0] != '\n') {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.style.font->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
 			if (offset.y + currentObj.style.font->lineHeight > textureHeight)
@@ -218,7 +219,7 @@ void CGUIrichText::renderText() {
 		}
 		if (offset.y + currentObj.style.font->lineHeight > textureHeight) {
 			overrun = offset.y + currentObj.style.font->lineHeight - textureHeight; //was true;
-			if (currentObj.hotMsgId &&  overrunHotTextObj == -1)
+			if ((currentObj.hotMsgId || currentObj.hotObjId) &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
 			if (offset.y > textureHeight) { //overrun texture, so no sense writing any more
 				textBuf.render();
@@ -610,7 +611,7 @@ void CGUIrichText::selectTopHotText() {
 /** Convert all existing hot text objects to standard style. */
 void CGUIrichText::purgeHotText() {
 	for (auto &textObj : textObjs) {
-		if (textObj.hotMsgId > 0) {
+		if (textObj.hotMsgId || textObj.hotObjId) {
 			textObj.hotMsgId = 0;
 			textObj.hotObjId = 0;
 			textObj.style.colour = normalTextStyle.colour;
@@ -619,9 +620,9 @@ void CGUIrichText::purgeHotText() {
 }
 
 /** Convert hot text with the given id to standard style. */
-void CGUIrichText::purgeHotText(int msgId) {
+void CGUIrichText::purgeHotText(int msgId, int objId) {
 	for (auto &textObj : textObjs) {
-		if (textObj.hotMsgId == msgId) {
+		if (textObj.hotMsgId == msgId && textObj.hotObjId == objId) {
 			textObj.hotMsgId = 0;
 			textObj.hotObjId = 0;
 			textObj.style.colour = normalTextStyle.colour;

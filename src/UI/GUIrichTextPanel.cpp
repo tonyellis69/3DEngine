@@ -89,7 +89,7 @@ void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key
 		msg.Msg = uiMsgHotTextClick;
 		msg.x = mouseX; msg.y = mouseY;
 		msg.value = -1;
-		pDrawFuncs->handleUImsg(*this, msg);
+		pDrawFuncs->handleUImsg(*this->richText, msg);
 
 	}
 }

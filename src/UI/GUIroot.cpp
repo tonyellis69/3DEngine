@@ -2,6 +2,7 @@
 #include "GUImouse.h"
 
 CGUIroot* CGUIbase::rootUI;
+
  
 CGUIroot::CGUIroot() {
 	SetName("Root");
@@ -9,7 +10,6 @@ CGUIroot::CGUIroot() {
 	rootUI = this;
 	mouse = new CGUImouse(); //create default mouse.
 	id = uiRootID;
-	modalControl = NULL;
 	killModal = false;
 	focusControl = NULL;
 	borderWidth = 0;
@@ -22,12 +22,10 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
 		return;
 
-	if (modalControl != NULL) {
+	if (modalControls.size() > 0) {
 		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
 		//TO DO: why did I ever do the above?
-		if (modalControl->id == 88)
-			int b = 0;
-		modalControl->MouseMsg(Msg, mouseX - modalControl->drawBox.pos.x, mouseY - modalControl->drawBox.pos.y, key); 
+		modalControls.back()->MouseMsg(Msg, mouseX - modalControls.back()->drawBox.pos.x, mouseY - modalControls.back()->drawBox.pos.y, key);
 		//modalControl->MouseMsg(Msg, mouseX , mouseY, key);
 		if (killModal) 
 			deleteModal();
@@ -54,8 +52,8 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 	if ((!visible) || (!enabled))
 		return false;
 
-	if (modalControl != NULL) {
-		return modalControl->MouseWheelMsg(mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,wheelDelta,key);
+	if (modalControls.size()) {
+		return modalControls.back()->MouseWheelMsg(mouseX - modalControls.back()->screenPos.x ,mouseY - modalControls.back()->screenPos.y,wheelDelta,key);
 	}
 
 	if (focusControl)
@@ -179,7 +177,7 @@ void CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
 /** Add this control as something that must be dismissed before the user can return to
 	the rest of the UI. Normally used for modal dialogue boxes.*/
 void CGUIroot::addModal(CGUIbase* control) {
-	modalControl = control;
+	modalControls.push_back(control);
 	Add(control);
 }
 
@@ -201,14 +199,9 @@ void CGUIroot::setFocus(CGUIbase * control) {
 //after modalControl has been deleted.
 /** Delete the current modal control, if any.*/
 void CGUIroot::deleteModal() {
-	if (modalControl != NULL) {
-		for (size_t c=0;c<Control.size();c++) {
-			if (Control[c] == modalControl)
-				Control.erase(Control.begin()+c);
-		}
-		delete modalControl;
+	if (modalControls.size() > 0 ) {
+		modalControls.pop_back();
 	}
-	modalControl = NULL;
 	killModal = false;
 }
 

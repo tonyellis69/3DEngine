@@ -45,8 +45,6 @@ public:
 const int chunkTriCacheSize = 6;
 
 struct TShellCalcData {
-	float LoDscale;
-	float LoD1SCsize;
 	std::deque<float> shellSize;
 	std::deque<int> superChunksPerShellEdge;
 	float shellSuperchunkSize;

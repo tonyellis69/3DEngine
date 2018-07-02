@@ -48,12 +48,11 @@ void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float 
 }
 
 /** Create a series of nested shells made of superchunks. */
-void CTerrain::createShells(float terrainSize, float LoD1extent, int steps) {
+void CTerrain::createShells(float terrainSize, float centreShellSize, int steps) {
 	TShellCalcData calcData;
-	int numShells = calcTotalShells(terrainSize,LoD1extent, steps, calcData);
+	int numShells = calcTotalShells(terrainSize,centreShellSize, steps, calcData);
 
 	// we should now have enough info to create the SC shells
-
 	float LoD1SCsize = LoD1cubeSize * cubesPerChunkEdge * chunksPerSChunkEdge; 
 	T3dArray array3d1, array3d2;
 	T3dArray* outerArray = &array3d1;
@@ -77,11 +76,12 @@ void CTerrain::createShells(float terrainSize, float LoD1extent, int steps) {
 
 
 	for (int shellNo = 0; shellNo < numShells; shellNo++) {
+		float LoDscale = pow(2, numShells - (shellNo + 1));
 		resize3dArray(*outerArray, i32vec3(calcData.superChunksPerShellEdge[shellNo]));
 		shells[shellNo].nwLayerPos = vec3(calcData.shellSize[shellNo]) * -0.5f;
-		shells[shellNo].cubeSize = LoD1cubeSize * calcData.LoDscale;;
+		shells[shellNo].cubeSize = LoD1cubeSize  *LoDscale;;
 		shells[shellNo].LoD = currentLoD;
-		shells[shellNo].scSize = LoD1SCsize * calcData.LoDscale;
+		shells[shellNo].scSize = LoD1SCsize * LoDscale;
 		shells[shellNo].SCsampleStep = shells[shellNo].scSize / worldUnitsPerSampleUnit;
 		shells[shellNo].chunkSampleStep = (shells[shellNo].cubeSize * cubesPerChunkEdge) / worldUnitsPerSampleUnit;
 		shellThickness = (prevShellSize - calcData.shellSize[shellNo]) / 2;
@@ -113,47 +113,47 @@ void CTerrain::createShells(float terrainSize, float LoD1extent, int steps) {
 		}
 
 		prevShellSize = calcData.shellSize[shellNo];
-		prevSCsize = LoD1SCsize * calcData.LoDscale;
-	    prevLoDscale = calcData.LoDscale;
+		prevSCsize = LoD1SCsize * LoDscale;
+	    prevLoDscale = LoDscale;
 
 		samplesPerPrevSC = vec3(shells[shellNo].scSize / worldUnitsPerSampleUnit);
-		calcData.LoDscale = calcData.LoDscale / 2;
 	}
 }
 
-int CTerrain::calcTotalShells(int terrainSize, float LoD1extent, int numSteps, TShellCalcData& calcData) {
-	calcData.LoDscale = 1.0f; //s
-	float layerExtent = LoD1extent; 
-	float layerCubeSize = LoD1cubeSize; 
-	calcData.LoD1SCsize = layerCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge; //s
-	calcData.shellSize = { layerExtent * 2 }; //s
-	calcData.superChunksPerShellEdge = { int(calcData.shellSize.front() / calcData.LoD1SCsize) };  //s
+int CTerrain::calcTotalShells(int terrainSize, float centreShellSize, int numSteps, TShellCalcData& calcData) {
+	float currentShellSize = centreShellSize; 
+	float currentShellCubeSize = LoD1cubeSize; 
+	float LoD1SCsize = currentShellCubeSize * cubesPerChunkEdge * chunksPerSChunkEdge; //s
+
+	calcData.shellSize = { currentShellSize * 2 }; //s
+	calcData.superChunksPerShellEdge = { int(calcData.shellSize.front() / LoD1SCsize) };  //s
 	calcData.shellSuperchunkSize;  //s
 
+	float LoDscale = 1.0f; //s
 	float layerGrowth = 2.0f; 
 	int currentStep = 0; 
-	int noLayers = 1;
+	int numShells = 1;
 
 	//make sure we have an even number of SCs along the edge:
 	while ((calcData.superChunksPerShellEdge[0] % 2 != 0) || (calcData.superChunksPerShellEdge[0] / 2) % 2 != 0) {
 		calcData.superChunksPerShellEdge[0] += 1;
-		calcData.shellSize[0] = calcData.superChunksPerShellEdge[0] * calcData.LoD1SCsize;
-		layerExtent = calcData.shellSize[0] / 2;
+		calcData.shellSize[0] = calcData.superChunksPerShellEdge[0] * LoD1SCsize;
+		currentShellSize = calcData.shellSize[0] / 2;
 	}
 
 	//Expanding, see how many more shells we can fit into the remaining terain space
 	while (calcData.shellSize.front() < terrainSize) {
-		calcData.LoDscale *= 2; //halve the level of detail by doubling the size of the building blocks
-		layerCubeSize = LoD1cubeSize * calcData.LoDscale;
-		calcData.shellSuperchunkSize = calcData.LoD1SCsize * calcData.LoDscale;
+		LoDscale *= 2; //halve the level of detail by doubling the size of the building blocks
+		currentShellCubeSize = LoD1cubeSize * LoDscale;
+		calcData.shellSuperchunkSize = LoD1SCsize * LoDscale;
 
-		layerExtent = layerExtent * layerGrowth;
-		float currentLayerSize = layerExtent * 2;
+		currentShellSize = currentShellSize * layerGrowth;
+		float currentLayerSize = currentShellSize * 2;
 		int SCsPerLayerEdge = int(currentLayerSize / calcData.shellSuperchunkSize);
 		if (SCsPerLayerEdge % 2 != 0) { //can't have an odd number of SCs on an edge
 			SCsPerLayerEdge += 1;
 			currentLayerSize = SCsPerLayerEdge * calcData.shellSuperchunkSize;
-			layerExtent = currentLayerSize / 2;
+			currentShellSize = currentLayerSize / 2;
 		}
 
 		//If we have no more steps, expand this layer to fit the total terrain size
@@ -161,18 +161,18 @@ int CTerrain::calcTotalShells(int terrainSize, float LoD1extent, int numSteps, T
 			while (currentLayerSize < terrainSize) {
 				SCsPerLayerEdge += 2;
 				currentLayerSize = SCsPerLayerEdge * calcData.shellSuperchunkSize;
-				layerExtent = currentLayerSize / 2;
+				currentShellSize = currentLayerSize / 2;
 			}
 
 		}
 
 		calcData.superChunksPerShellEdge.push_front(SCsPerLayerEdge);
 		calcData.shellSize.push_front(currentLayerSize);
-		noLayers++;
+		numShells++;
 		currentStep++;
 	}
 
-	return noLayers;
+	return numShells;
 }
 
 

@@ -171,6 +171,7 @@ public:
 	virtual bool getVisible();
 	unsigned int getID();
 	void makeModal(CGUIbase * control);
+	void destroy();
 
 	void setBackColour1(const UIcolour & colour);
 	void setBackColour1(const glm::vec4 & colour);
@@ -259,7 +260,7 @@ protected:
 	static CFont* defaultFont;
 public:
 	//static DelegateP<void,int> setFont;
-	static CGUIbase* modalControl; ///<Pointer to the current modal control, if any.
+	static std::vector<CGUIbase*> modalControls; ///<List of modal controls, if any.
 };
 
 
