@@ -20,6 +20,7 @@ public:
 	void clear();
 	void setResizeMode(bool onOff);
 	void setTextStyle(TtextStyle & newStyle);
+	void addStyle(TtextStyle & newStyle);
 
 	void appendMarkedUpText(string text);
 	unsigned int getRichTextID();

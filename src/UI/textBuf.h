@@ -10,11 +10,12 @@
 #include "renderDrawFuncs.h"
 
 struct TtextStyle {
+	std::string name;
 	CFont* font;
 	glm::vec4 colour;
 	bool operator == (const TtextStyle &style) const {
-		/* your logic for comparision between "*this" and "rhs" */
-		return this->font == style.font && this->colour == style.colour;
+		return this->font == style.font && this->colour == style.colour &&
+			this->name == style.name;
 	};
 };
 

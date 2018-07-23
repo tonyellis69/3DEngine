@@ -6,9 +6,11 @@ using namespace glm;
 
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	firstVisibleText = 0;
-	TRichTextRec defaultStyle;
-	defaultStyle.style.colour = vec4(0,0,0,1);
-	textObjs.push_back(defaultStyle);
+	TRichTextRec defaultStyleObj;
+	currentTextStyle = { "default",defaultFont,defaultTextColour };
+	styles.push_back(currentTextStyle);
+	defaultStyleObj.style = currentTextStyle;
+	textObjs.push_back(defaultStyleObj);
 	currentTextObj = 0;
 	setFont(defaultFont);
 	firstVisibleObject = 0;
@@ -23,6 +25,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	setMouseWheelMode(scroll);
 	setHotTextColour(uiWhite);
 	setHotTextHighlightColour(uiBlue);
+
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
@@ -45,7 +48,8 @@ void CGUIrichText::setFont(CFont* newFont) {
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
-	textObjs[currentTextObj].style.font = newFont;
+	currentTextStyle.font = newFont;
+	textObjs[currentTextObj].style = currentTextStyle;
 
 	//textBuf.setFont(newFont);
 	//textData.font = newFont;
@@ -112,7 +116,7 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId) {
 	if (msgId || objId)
 		textObjs[currentTextObj].style.colour = hotTextColour;
 	else
-		textObjs[currentTextObj].style.colour = normalTextStyle.colour;
+		textObjs[currentTextObj].style.colour = currentTextStyle.colour;
 }
 
 
@@ -131,7 +135,7 @@ void CGUIrichText::setHotTextHighlightColour(const glm::vec4& colour) {
 
 /** Set the style for any text appended after this. */
 void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
-	normalTextStyle = newStyle;
+	currentTextStyle = newStyle;
 	if (textObjs[currentTextObj].style == newStyle)
 		return;
 
@@ -142,6 +146,15 @@ void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
 		currentTextObj++;
 	}
 	textObjs[currentTextObj].style = newStyle;
+}
+
+void CGUIrichText::setTextStyle(std::string styleName) {
+	for (auto style : styles) {
+		if (style.name == styleName) {
+			setTextStyle(style);
+			return;
+		}
+	}
 }
 
 /** Set the text of the current text object.*/
@@ -614,7 +627,7 @@ void CGUIrichText::purgeHotText() {
 		if (textObj.hotMsgId || textObj.hotObjId) {
 			textObj.hotMsgId = 0;
 			textObj.hotObjId = 0;
-			textObj.style.colour = normalTextStyle.colour;
+			textObj.style.colour = currentTextStyle.colour;
 		}
 	}
 }
@@ -625,7 +638,7 @@ void CGUIrichText::purgeHotText(int msgId, int objId) {
 		if (textObj.hotMsgId == msgId && textObj.hotObjId == objId) {
 			textObj.hotMsgId = 0;
 			textObj.hotObjId = 0;
-			textObj.style.colour = normalTextStyle.colour;
+			textObj.style.colour = currentTextStyle.colour;
 		}
 	}
 }
@@ -635,7 +648,7 @@ void CGUIrichText::clear() {
 	textObjs.clear();
 	firstVisibleText = 0;
 	TRichTextRec defaultStyle;
-	defaultStyle.style = normalTextStyle;
+	defaultStyle.style = currentTextStyle;
 	textObjs.push_back(defaultStyle);
 	currentTextObj = 0;
 	firstVisibleObject = 0;
@@ -655,10 +668,11 @@ void CGUIrichText::clearSelection() {
 
 void CGUIrichText::appendMarkedUpText(string text) {
 	bool bold = false; bool hot = false;
-	enum TStyleChange { styleNone, styleBold, styleHot };
+	enum TStyleChange { styleNone, styleBold, styleHot, styleStyle };
 
 	std::string writeTxt = text;
 	std::string remainingTxt = text;
+	std::string styleName;
 	TStyleChange styleChange;
 	while (remainingTxt.size()) {
 		styleChange = styleNone;
@@ -688,7 +702,12 @@ void CGUIrichText::appendMarkedUpText(string text) {
 				}
 			}
 			//other markup checks here
-
+			if (remainingTxt.substr(found + 1, 6) == "style{") {
+				styleChange = styleStyle;
+				size_t end = remainingTxt.find("}", found);
+				styleName = remainingTxt.substr(found + 7, end - (found + 7));
+				cut = 8 + styleName.size();
+			}
 
 
 		}
@@ -703,7 +722,9 @@ void CGUIrichText::appendMarkedUpText(string text) {
 		if (styleChange == styleHot)
 			setAppendStyleHot(hot, msgId, objId);
 		if (styleChange == styleNone)
-			setTextStyle(normalTextStyle);
+			setTextStyle(currentTextStyle);
+		if (styleChange == styleStyle)
+			setTextStyle(styleName);
 
 		if (textObjs.size() > 30) {
 		//	textObjs.erase(textObjs.begin());
@@ -731,6 +752,7 @@ void CGUIrichText::setResizeMode(bool onOff) {
 
 /** Resize the control vertically if text is overrunning or underrunning. */
 void CGUIrichText::resizeToFit() {
+	//return;
 	int resizeX = drawBox.size.x;
 	if (drawBox.size.x > longestLine) {
 		resizeX = longestLine;

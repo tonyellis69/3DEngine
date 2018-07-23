@@ -62,6 +62,10 @@ void CGUIrichTextPanel::setTextStyle(TtextStyle & newStyle) {
 	richText->setTextStyle(newStyle);
 }
 
+void CGUIrichTextPanel::addStyle(TtextStyle & newStyle) {
+	richText->styles.push_back(newStyle);
+}
+
 void CGUIrichTextPanel::appendMarkedUpText(string text) {
 	richText->appendMarkedUpText(text);
 }

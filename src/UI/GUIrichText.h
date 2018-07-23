@@ -57,6 +57,7 @@ public:
 	void setHotTextColour(const glm::vec4& colour);
 	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
+	void setTextStyle(std::string styleName);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	bool scrollDown();
@@ -122,10 +123,10 @@ public:
 	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
 	glm::vec4 defaultTextColour;
 	CFont* currentSetFont;
-	TtextStyle normalTextStyle;
+	TtextStyle currentTextStyle;
 
 	bool mouseMode; ///<True for selection hot text with mouse pointer.
 
 	TOverrunMode overrunMode;
-
+	std::vector<TtextStyle> styles; ///<List of available styles
 };
