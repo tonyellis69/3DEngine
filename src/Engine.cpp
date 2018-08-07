@@ -55,8 +55,8 @@ void CEngine::init() {
 /** Resize the view - usually in response to the window being resized. */
 void CEngine::resizeView(int x, int y, int width, int height) {
 	Renderer.set2DView(x,y,width,height);
-	if (MakingFit) 
-		scaleToFit();
+//	if (MakingFit) 
+	//	scaleToFit();
 	//ensure any scene layers are up to date.
 	//Scene.Resize((float)Renderer.Width,(float) Renderer.Height);	
 	currentCamera->setAspectRatio((float)width,(float)height);

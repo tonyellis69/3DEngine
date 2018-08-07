@@ -18,7 +18,7 @@ public:
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	void clear();
-	void setResizeMode(bool onOff);
+	void setResizeMode(TResizeMode mode);
 	void setTextStyle(TtextStyle & newStyle);
 	void addStyle(TtextStyle & newStyle);
 

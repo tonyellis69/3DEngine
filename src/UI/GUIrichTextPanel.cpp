@@ -54,8 +54,10 @@ void CGUIrichTextPanel::clear() {
 	richText->clear();
 }
 
-void CGUIrichTextPanel::setResizeMode(bool onOff) {
-	richText->setResizeMode(onOff);
+
+
+void CGUIrichTextPanel::setResizeMode(TResizeMode mode){
+	richText->setResizeMode(mode);
 }
 
 void CGUIrichTextPanel::setTextStyle(TtextStyle & newStyle) {
@@ -75,6 +77,8 @@ unsigned int CGUIrichTextPanel::getRichTextID() {
 }
 
 /** Hacking this because I want the panel to keep its rich text control central.*/
+//TO DO: should be able to do this automatically with anchorRight and anchorBottom - investigate!
+//Doesn't appear to do anything! Is that because I always spawn a new richtext now rather than resize the old one?
 void CGUIrichTextPanel::updateAppearance() {
 	CGUIbase::updateAppearance();
 	richText->setPos(inset, inset);

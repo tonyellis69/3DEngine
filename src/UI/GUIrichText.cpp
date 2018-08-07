@@ -18,8 +18,8 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	selectedHotObj = -1;
 	updateDt = 0;
 	correctOverrunDelay = 0.01f;
-	overrunMode = scrollMode; //TO DO: temporary only, make scroll
 	overrunCorrect = false;
+	resizeMode = resizeByWidthMode;
 	yPixelOffset = 0;
 	smoothScrollStep = 4;
 	setMouseWheelMode(scroll);
@@ -479,10 +479,10 @@ void CGUIrichText::update(float dT) {
 	{
 		updateDt = 0;
 		if (overrun && overrunCorrect) {
-			if (overrunMode == scrollMode)
+			//if (overrunMode == overScrollMode)
 				smoothScroll(-smoothScrollStep);
-			else
-				resizeToFit();
+			//else
+			//	resizeToFit();
 			overrunCorrect = overrun;
 		} 
 	}
@@ -634,6 +634,10 @@ void CGUIrichText::purgeHotText() {
 
 /** Convert hot text with the given id to standard style. */
 void CGUIrichText::purgeHotText(int msgId, int objId) {
+	if (msgId == NULL && objId == NULL) {
+		purgeHotText();
+		return;
+	}
 	for (auto &textObj : textObjs) {
 		if (textObj.hotMsgId == msgId && textObj.hotObjId == objId) {
 			textObj.hotMsgId = 0;
@@ -737,22 +741,61 @@ void CGUIrichText::appendMarkedUpText(string text) {
 void CGUIrichText::updateAppearance() {
 	CGUIbase::updateAppearance();
 	//assume dimensions may have changed, eg, if this control was set to span
-	textureWidth = drawBox.size.x; 
-	textureHeight = drawBox.size.y;
-	textBuf.setSize(textureWidth, textureHeight);
-	renderText();
+	//TO DO: something's wrong, we come here way too many times
+	//cerr << "\nupdate appearance " << uniqueID;
+	if (textureWidth != drawBox.size.x || textureHeight != drawBox.size.y) {
+		textureWidth = drawBox.size.x;
+		textureHeight = drawBox.size.y;
+		textBuf.setSize(textureWidth, textureHeight);
+		renderText();
+	}
+
 }
 
-void CGUIrichText::setResizeMode(bool onOff) {
-	if (onOff) 
-		overrunMode = resizeMode;
-	else
-		overrunMode = scrollMode;
-}
+
 
 /** Resize the control vertically if text is overrunning or underrunning. */
 void CGUIrichText::resizeToFit() {
-	//return;
+	if (resizeMode == resizeByRatioMode) {
+		resizeByRatio();
+	}
+	else
+		resizeByWidth();
+
+	if (parent) {
+		CMessage msg = { uiMsgChildResize,0,0,0,0 };
+		parent->message(*this, msg);
+	}
+}
+
+void CGUIrichText::resizeByRatio() {
+	float ratio = 1.8;// 1.618;
+	int heightModifier = textObjs[currentTextObj].style.font->lineHeight;
+	int newHeight = drawBox.size.y; int newWidth = drawBox.size.x;
+	bool previouslyOverrun = false;
+
+	while (overrun || underrun) {
+		if (overrun) {
+			previouslyOverrun = true;
+			newHeight = drawBox.size.y + heightModifier;
+		}
+		else {
+			if (previouslyOverrun) {
+				break;
+			}
+			newHeight = drawBox.size.y - underrun;
+		}
+		newWidth = newHeight * ratio;
+
+		resize(newWidth, newHeight);
+	}
+
+	//tidy any remaining underrun
+	newHeight = drawBox.size.y - underrun;
+	resize(newWidth, newHeight);
+}
+
+void CGUIrichText::resizeByWidth() {
 	int resizeX = drawBox.size.x;
 	if (drawBox.size.x > longestLine) {
 		resizeX = longestLine;
@@ -760,26 +803,18 @@ void CGUIrichText::resizeToFit() {
 	resize(resizeX, drawBox.size.y);
 
 	int resizeGuess = overrun;
-	while (overrun && overrunMode == resizeMode) {
+	while (overrun) {
 		if (drawBox.size.y + resizeGuess > maxHeight) {
-			setResizeMode(false);
+			break;
 		}
 		else
 			resize(drawBox.size.x, drawBox.size.y + resizeGuess);
-		//renderText();
 		resizeGuess *= 2;
 	}
 
 	if (underrun > 0) {
 		resize(drawBox.size.x, drawBox.size.y - underrun);
-		//renderText();
 	}
-
-	if (parent) {
-		CMessage msg = { uiMsgChildResize,0,0,0,0 };
-		parent->message(*this, msg);
-	}
-		
 }
 
 /** Return true if the given id is an active hot text.*/
@@ -789,6 +824,10 @@ bool CGUIrichText::isActiveHotText(int hotId) {
 			return true;
 	}
 	return false;
+}
+
+void CGUIrichText::setResizeMode(TResizeMode mode) {
+	resizeMode = mode;
 }
 
 

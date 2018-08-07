@@ -18,7 +18,8 @@ struct TRichTextRec : textRec {
 };
 
 enum TNewLine {no, wordwrap, newline};
-enum TOverrunMode {scrollMode, resizeMode};
+enum TOverrunMode {overScrollMode, overResizeMode};
+enum TResizeMode {resizeByRatioMode, resizeByWidthMode };
 
 /** A partial or complete line of text, with its rendered (x) dimensions. */
 struct TLineFragment {
@@ -90,10 +91,14 @@ public:
 	void appendMarkedUpText(string text);
 
 	void updateAppearance();
-	void setResizeMode(bool onOff);
 	void resizeToFit();
 
+	void resizeByRatio();
+	void resizeByWidth();
+
 	bool isActiveHotText(int hotId);
+
+	void setResizeMode(TResizeMode mode);
 
 	int overrun;
 	int underrun;
@@ -127,6 +132,7 @@ public:
 
 	bool mouseMode; ///<True for selection hot text with mouse pointer.
 
-	TOverrunMode overrunMode;
+	TResizeMode resizeMode;
+
 	std::vector<TtextStyle> styles; ///<List of available styles
 };
