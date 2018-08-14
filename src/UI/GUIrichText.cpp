@@ -21,7 +21,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	overrunCorrect = false;
 	resizeMode = resizeByWidthMode;
 	yPixelOffset = 0;
-	smoothScrollStep = 4;
+	smoothScrollStep = 8;
 	setMouseWheelMode(scroll);
 	setHotTextColour(uiWhite);
 	setHotTextHighlightColour(uiBlue);
@@ -297,10 +297,14 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			//break; //pretty sure this works without break as long as we go to next clause
 		}
 		if (renderX > textureWidth || renderX + lookAheadCharWidth > textureWidth) {
-			c = breakPoint ;
-			renderX = breakPointX;
-			nextLineFrag.causesNewLine = wordwrap;
-			break;
+			
+			if (breakPointX > 0) {
+				c = breakPoint;
+				renderX = breakPointX;
+				nextLineFrag.causesNewLine = wordwrap;
+				break;
+			}
+
 		}
 
 
@@ -796,9 +800,10 @@ void CGUIrichText::resizeByRatio() {
 }
 
 void CGUIrichText::resizeByWidth() {
+	int rightBorder = 10;
 	int resizeX = drawBox.size.x;
-	if (drawBox.size.x > longestLine) {
-		resizeX = longestLine;
+	if (drawBox.size.x != longestLine) {
+		resizeX = longestLine + rightBorder;
 	}
 	resize(resizeX, drawBox.size.y);
 
