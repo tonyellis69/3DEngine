@@ -17,7 +17,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	mousePassthru = false;
 	selectedHotObj = -1;
 	updateDt = 0;
-	correctOverrunDelay = 0.01f;
+	correctOverrunDelay = 0.001f;
 	overrunCorrect = false;
 	resizeMode = resizeByWidthMode;
 	yPixelOffset = 0;
@@ -773,7 +773,7 @@ void CGUIrichText::resizeToFit() {
 }
 
 void CGUIrichText::resizeByRatio() {
-	float ratio = 1.8;// 1.618;
+	float ratio = 2;// 1.618;
 	int heightModifier = textObjs[currentTextObj].style.font->lineHeight;
 	int newHeight = drawBox.size.y; int newWidth = drawBox.size.x;
 	bool previouslyOverrun = false;
