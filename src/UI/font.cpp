@@ -38,7 +38,7 @@ void CFont::loadFromStream(std::istream & input) {
 		glyphs[i].t = static_cast<float>(buffer.y) / height;
 		glyphs[i].v = glyphs[i].t + texLineHeight;
 
-		glyphs[i].width = buffer.width;// / 2;
+		glyphs[i].width = buffer.width  ;// / 2;
 		glyphs[i].height = lineHeight;
 		//Font->Glyphs[i].Rect.originX = 0;
 		//Font->Glyphs[i].Rect.originY = (float)line_height;
@@ -46,6 +46,7 @@ void CFont::loadFromStream(std::istream & input) {
 		table[buffer.ascii] = &glyphs[i];
 		//TO DO use index rather than pointer to memory
 	};
+
 
 	//Point chars with no glyph to point to the default glyph.
 	glyph* defaultGlyph = table[(unsigned char)'\xFF'];

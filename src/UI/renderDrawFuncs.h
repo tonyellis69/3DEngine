@@ -35,6 +35,7 @@ public:
 	void updateScreenDimensions(CGUIbase& control);
 	void drawCursor(CGUIbase& control,CBuf& cursorPos);
 	float getTime();
+	CFont* getFont(std::string name);
 
 //private:
 	CRenderer* pRenderer;

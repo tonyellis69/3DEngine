@@ -9,6 +9,7 @@
 class CGUIrichTextPanel : public CGUIpanel {
 public:	
 	CGUIrichTextPanel(int x, int y, int w, int h);
+	void setInset(int newInset);
 	void setFont(CFont* newFont);
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
@@ -21,6 +22,8 @@ public:
 	void setResizeMode(TResizeMode mode);
 	void setTextStyle(TtextStyle & newStyle);
 	void addStyle(TtextStyle & newStyle);
+	void purgeHotText(int msgId, int objId);
+	void update(float dT);
 
 	void appendMarkedUpText(string text);
 	unsigned int getRichTextID();

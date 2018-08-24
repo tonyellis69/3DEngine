@@ -10,8 +10,8 @@ using namespace watch;
 
 
 
-CBaseApp::CBaseApp(void)  {
-	
+CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
+
 
 	homeDir = getExePath();
 #ifdef _DEBUG
@@ -48,7 +48,7 @@ CBaseApp::CBaseApp(void)  {
 	
 
 	loadSystemFonts();
-	GUIroot.setDefaultFont(&smallSysFont);
+	GUIroot.setDefaultFont(smallSysFont);
 
 	RegisterUIfunctors();
 
@@ -67,13 +67,14 @@ void CBaseApp::loadSystemFonts() {
 	std::istringstream ss;
 	std::string tmp((char*)SysFnt + 2, 33600);
 	ss.str(tmp);
-	sysFont.loadFromStream(ss);
+	sysFont = &renderer.fontManager.createFromStream("sysFont",ss);
 
 	ss.clear();
 	tmp.clear();
 	tmp = std::string((char*)SmallSysFnt + 2, 17728);
 	ss.str(tmp);
-	smallSysFont.loadFromStream(ss);
+	smallSysFont = &renderer.fontManager.createFromStream("smallSysFont",ss);
+
 }
 
 
@@ -99,6 +100,8 @@ void CBaseApp::SetWindow( int width, int height, std::string title) {
 
 /** Handler for when our window is rezized. */
 void CBaseApp::onWinResize( int w, int h) {
+	if (w == 0 || h == 0)
+		return; //panic!
 	viewWidth = w; viewHeight = h;
 	Engine.resizeView(0,0,w,h); //We need to change shape of view.
 	drawFuncs->setScreenSize(w, h);
@@ -350,22 +353,22 @@ void CBaseApp::exit() {
 
 void CBaseApp::initWatches() {
 	wLabel1 = new CGUIlabel2(800,100,400,50);
-	wLabel1->setFont(&sysFont);
+	wLabel1->setFont(sysFont);
 	wLabel1->setTextColour(UIwhite);
 	GUIroot.Add(wLabel1);
 
 	wLabel2 = new CGUIlabel2(800,150,400,50);
-	wLabel2->setFont(&sysFont);
+	wLabel2->setFont(sysFont);
 	wLabel2->setTextColour(UIwhite);
 	GUIroot.Add(wLabel2);
 
 	wLabel3 = new CGUIlabel2(800,200,400,50);
-	wLabel3->setFont(&sysFont);
+	wLabel3->setFont(sysFont);
 	wLabel3->setTextColour(UIwhite);
 	GUIroot.Add(wLabel3);
 
 	consoleLbl = new CGUIlabel2(10,10,100,100);	
-	consoleLbl->setFont(&sysFont);
+	consoleLbl->setFont(sysFont);
 	consoleLbl->setTextColour(UIwhite);
 	consoleLbl->anchorBottom = 10;
 	consoleLbl->anchorRight = 10;

@@ -127,12 +127,13 @@ public:
 	unsigned int hTexture;
 	unsigned int hTextureMVP;
 
-	CFont sysFont; ///<Default font
-	CFont smallSysFont; ///<Default font for GUI
+	CFont* sysFont; ///<Default font
+	CFont* smallSysFont; ///<Default font for GUI
 
 
 	CVMapp vm; ///<The Tig virtual machine.
 
+	CRenderer& renderer;
 
 	};
 

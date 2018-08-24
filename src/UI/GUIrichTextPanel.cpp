@@ -18,6 +18,11 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 
 }
 
+void CGUIrichTextPanel::setInset(int newInset) {
+	inset = newInset;
+	updateAppearance();
+}
+
 void CGUIrichTextPanel::setFont(CFont * newFont) {
 	richText->setFont(newFont);
 }
@@ -66,6 +71,14 @@ void CGUIrichTextPanel::setTextStyle(TtextStyle & newStyle) {
 
 void CGUIrichTextPanel::addStyle(TtextStyle & newStyle) {
 	richText->styles.push_back(newStyle);
+}
+
+void CGUIrichTextPanel::purgeHotText(int msgId, int objId){
+	richText->purgeHotText(msgId, objId);
+}
+
+void CGUIrichTextPanel::update(float dT) {
+	richText->update(dT);
 }
 
 void CGUIrichTextPanel::appendMarkedUpText(string text) {

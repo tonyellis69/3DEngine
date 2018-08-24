@@ -278,6 +278,9 @@
     <ClCompile Include="..\src\UI\GUIrichTextPanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\fontManager.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -561,6 +564,9 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIrichTextPanel.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\fontManager.h">
+      <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

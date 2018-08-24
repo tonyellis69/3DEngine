@@ -17,7 +17,7 @@
 
 #include "renderShader.h"
 
-
+#include "fontManager.h"
 
 
 
@@ -124,6 +124,8 @@ public:
 	C2dRenderer rend2d; ///<2D renderer.
 
 	CTextureManagerOGL textureManager;
+
+	CFontManager fontManager;
 
 	CCamera* currentCamera;
 

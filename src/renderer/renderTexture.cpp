@@ -44,6 +44,7 @@ CRenderTexture::~CRenderTexture() {
 }
 
 /** Resize this texture, freeing any previously used memory. */
+//TO DO: careful! We may not want to set mipmapping to GL_NEAREST.
 void CRenderTexture::resize(int w, int h) {
 	glDeleteTextures(1, &handle);
 	glGenTextures(1, &handle);
@@ -86,10 +87,22 @@ void CRenderTexture::createRGBA(unsigned char * data, int w, int h) {
 
 /** Create a single channel texture from data. */
 void CRenderTexture::createGreyscale(unsigned char * data, int w, int h) {
-	handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_L, handle, 0);
+	//handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_L, handle, 0);
 	width = w;
 	height = h;
 	channels = 1;
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_2D, handle);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width, height, 0, GL_LUMINANCE,
+		GL_UNSIGNED_BYTE, data);
+//	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 void CRenderTexture::clear() {

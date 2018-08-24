@@ -166,6 +166,10 @@ float CRenderDrawFuncs::getTime() {
 	return 0.0f;
 }
 
+CFont * CRenderDrawFuncs::getFont(std::string name) {
+	return &pRenderer->fontManager.getFont(name);
+}
+
 
 
 CRenderDrawFuncs::~CRenderDrawFuncs() {

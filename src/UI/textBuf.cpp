@@ -8,7 +8,7 @@
 CTextBuffer::CTextBuffer() {
 	pRenderer = &CRenderer::getInstance();
 	textData.style.colour = glm::vec4(1, 1, 1, 1);
-	textData.style.font = NULL;
+	textData.font = NULL;
 	
 }
 
@@ -20,7 +20,7 @@ void CTextBuffer::setSize(int w, int h) {
 }
 
 void CTextBuffer::setFont(CFont* newFont) {
-	textData.style.font = newFont;
+	textData.font = newFont;
 }
 
 void CTextBuffer::setTextColour(glm::vec4 & newColour) {
@@ -49,7 +49,7 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	for (unsigned int c = 0; c < numChars; c++) { //1 iterations takes it way down
 		if (textLine[c] != '\n') 
 		{
-			glyph = textData.style.font->table[textLine[c]];
+			glyph = textData.font->table[textLine[c]];
 			//construct quads
 			chars[v].v = blCorner; //A
 			chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
@@ -86,17 +86,17 @@ void CTextBuffer::clearBuffer() {
 
 void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
-	float xOffset = 0; float yOffset = 0 - (textData.style.font->lineHeight / 2.0f);
+	float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
 	
 	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, -halfSize.y, halfSize.y);
 
-	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.style.font->lineHeight, 0));
+	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
 
 	glm::vec4 textColour = textData.style.colour;
 	//textColour.a = 0.5;
 
 	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, textData.style.font->texture); //attach texture to textureUnit (0)
+	pRenderer->attachTexture(0, textData.font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
@@ -123,7 +123,7 @@ glm::i32vec2 CTextBuffer::addFragment(int x, int y, std::string textLine) {
 	for (unsigned int c = 0; c < numChars; c++) { 
 		if (textLine[c] != '\n') 
 		{
-			glyph = textData.style.font->table[textLine[c]];
+			glyph = textData.font->table[textLine[c]];
 			//construct quads
 			textQuads[v].v = blCorner; //A
 			textQuads[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B

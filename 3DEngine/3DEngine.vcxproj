@@ -120,6 +120,7 @@
     <ClCompile Include="..\src\renderer\billboard.cpp" />
     <ClCompile Include="..\src\renderer\buf.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
+    <ClCompile Include="..\src\renderer\fontManager.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
     <ClCompile Include="..\src\renderer\material.cpp" />
     <ClCompile Include="..\src\renderer\model.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="..\src\renderer\billboard.h" />
     <ClInclude Include="..\src\renderer\buf.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
+    <ClInclude Include="..\src\renderer\fontManager.h" />
     <ClInclude Include="..\src\renderer\light.h" />
     <ClInclude Include="..\src\renderer\material.h" />
     <ClInclude Include="..\src\renderer\model.h" />

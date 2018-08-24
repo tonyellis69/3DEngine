@@ -11,7 +11,8 @@
 
 struct TtextStyle {
 	std::string name;
-	CFont* font;
+	//CFont* font;
+	std::string font;
 	glm::vec4 colour;
 	bool operator == (const TtextStyle &style) const {
 		return this->font == style.font && this->colour == style.colour &&
@@ -24,7 +25,7 @@ font, colour, etc, together with the text itself. */
 struct textRec {
 	textRec() { firstLineIndent = 0; bold = false; }
 	std::string text;
-	//CFont* font;
+	CFont* font;
 	//glm::vec4 textColour;
 	TtextStyle style;
 	int firstLineIndent;

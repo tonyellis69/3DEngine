@@ -10,7 +10,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	textureHeight = h;
 	textureWidth = w;
 	
-	textData.style.font = defaultFont;
+	textData.font = defaultFont;
 	textBuf.setFont(defaultFont);
 	textBuf.setSize(textureWidth, textureHeight);
 
@@ -25,7 +25,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 
 void CGUIlabel2::setFont(CFont* newFont) {
 	textBuf.setFont(newFont);
-	textData.style.font = newFont;
+	textData.font = newFont;
 }
 
 void CGUIlabel2::setText(std::string newText) {
@@ -102,7 +102,7 @@ void CGUIlabel2::calcLineOffset() {
 	if (multiLine)
 		renderOffset.y = 0;
 	else
-		renderOffset.y = (textureHeight - textData.style.font->lineHeight) / 2.0f;
+		renderOffset.y = (textureHeight - textData.font->lineHeight) / 2.0f;
 
 	if (textAlign == tcentred) {
 		renderOffset.x = (textureWidth - lineRenderedWidth) / 2.0f;
@@ -117,7 +117,7 @@ void CGUIlabel2::calcLineOffset() {
 void CGUIlabel2::calcLineRenderedWidth() {
 	lineRenderedWidth = 0;
 	for (int c = 0; c < textData.text.size(); c++) {
-		lineRenderedWidth += textData.style.font->table[textData.text[c]]->width;
+		lineRenderedWidth += textData.font->table[textData.text[c]]->width;
 	}
 }
 
@@ -136,7 +136,7 @@ void CGUIlabel2::renderText() {
 			nextLineStart = getNextLineStart(lineStart);
 			renderLine = textData.text.substr(lineStart, nextLineStart - lineStart);
 			textBuf.renderTextAt(renderOffset.x, lineYpos, renderLine);
-			lineYpos += textData.style.font->lineHeight;
+			lineYpos += textData.font->lineHeight;
 			lineStart = nextLineStart;
 		} while (nextLineStart < textData.text.size());
 	}
@@ -156,7 +156,7 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 
 		if (isspace(textData.text[c]))
 			breakDist = c + 1;
-		dist += textData.style.font->table[textData.text[c]]->width;
+		dist += textData.font->table[textData.text[c]]->width;
 		c++;
 		if (c >= textData.text.size())
 			return c;

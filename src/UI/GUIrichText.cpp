@@ -7,7 +7,7 @@ using namespace glm;
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	firstVisibleText = 0;
 	TRichTextRec defaultStyleObj;
-	currentTextStyle = { "default",defaultFont,defaultTextColour };
+	currentTextStyle = { "default","defaultFont",defaultTextColour };
 	styles.push_back(currentTextStyle);
 	defaultStyleObj.style = currentTextStyle;
 	textObjs.push_back(defaultStyleObj);
@@ -48,7 +48,7 @@ void CGUIrichText::setFont(CFont* newFont) {
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
-	currentTextStyle.font = newFont;
+	currentTextStyle.font = newFont->name;
 	textObjs[currentTextObj].style = currentTextStyle;
 
 	//textBuf.setFont(newFont);
@@ -207,20 +207,21 @@ void CGUIrichText::renderText() {
 			currObjNo = lineFragment.textObj;
 		}
 		TRichTextRec currentObj = textObjs[lineFragment.textObj];
-		scrollHeight = currentObj.style.font->lineHeight;
+		CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
+		scrollHeight = currentFont->lineHeight;
 		if (longestLine < lineFragment.renderEndX)
 			longestLine = lineFragment.renderEndX;
 
 		std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 		textBuf.setTextColour(currentObj.style.colour);
-		textBuf.setFont(currentObj.style.font);
+		textBuf.setFont(currentFont);
 
 		offset = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
 		
 		if ( (currentObj.hotMsgId || currentObj.hotObjId) && renderLine[0] != '\n') {
-			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentObj.style.font->lineHeight, lineFragment.textObj };
+			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentFont->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
-			if (offset.y + currentObj.style.font->lineHeight > textureHeight)
+			if (offset.y + currentFont->lineHeight > textureHeight)
 				hotFrag.overrun =  true;
 			else
 				hotFrag.overrun = false;
@@ -228,10 +229,10 @@ void CGUIrichText::renderText() {
 		}
 
 		if (lineFragment.causesNewLine != no) {
-			offset = glm::i32vec2(0, offset.y + currentObj.style.font->lineHeight );
+			offset = glm::i32vec2(0, offset.y + currentFont->lineHeight );
 		}
-		if (offset.y + currentObj.style.font->lineHeight > textureHeight) {
-			overrun = offset.y + currentObj.style.font->lineHeight - textureHeight; //was true;
+		if (offset.y + currentFont->lineHeight > textureHeight) {
+			overrun = offset.y + currentFont->lineHeight - textureHeight; //was true;
 			if ((currentObj.hotMsgId || currentObj.hotObjId) &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
 			if (offset.y > textureHeight) { //overrun texture, so no sense writing any more
@@ -241,7 +242,7 @@ void CGUIrichText::renderText() {
 		}
 
 
-		underrun = textureHeight - (offset.y + currentObj.style.font->lineHeight);
+		underrun = textureHeight - (offset.y + currentFont->lineHeight);
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
@@ -266,13 +267,14 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	nextLineFrag.textPos = textStartPos;
 
 	TRichTextRec* richTextData = &textObjs[textObj];
+	CFont* currentFont = pDrawFuncs->getFont(richTextData->style.font);
 
 	//catch full stops, etc, in the next object that should wrap this fragment onto the next line
 	int lookAheadCharWidth = 0;
 	if (textObj + 1 < textObjs.size()) {
 		char lookAheadChar = textObjs[textObj + 1].text[0];
 		if (ispunct(lookAheadChar))
-			lookAheadCharWidth = richTextData->style.font->table[lookAheadChar]->width;
+			lookAheadCharWidth = currentFont->table[lookAheadChar]->width;
 	}
 
 
@@ -285,7 +287,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
 	for (c = textStartPos; c < richTextData->text.size(); c++) {
-		renderX += richTextData->style.font->table[richTextData->text[c]]->width;
+		renderX += currentFont->table[richTextData->text[c]]->width;
 		if (richTextData->text[c] == '\n') {
 			c++;
 			nextLineFrag.causesNewLine = newline;
@@ -722,7 +724,7 @@ void CGUIrichText::appendMarkedUpText(string text) {
 
 		writeTxt = remainingTxt.substr(0, found);
 		remainingTxt = remainingTxt.substr(writeTxt.size() + cut, std::string::npos);
-
+		//TO DO: writeTxt can be empty, in which case don't append
 		appendText(writeTxt);
 
 		if (styleChange == styleBold)
@@ -774,7 +776,7 @@ void CGUIrichText::resizeToFit() {
 
 void CGUIrichText::resizeByRatio() {
 	float ratio = 2;// 1.618;
-	int heightModifier = textObjs[currentTextObj].style.font->lineHeight;
+	int heightModifier = pDrawFuncs->getFont(textObjs[currentTextObj].style.font)->lineHeight;
 	int newHeight = drawBox.size.y; int newWidth = drawBox.size.x;
 	bool previouslyOverrun = false;
 

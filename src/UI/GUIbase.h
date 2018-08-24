@@ -82,6 +82,7 @@ const glm::vec4 uiWhite = { 1,1,1,1 };
 const glm::vec4 uiBlue = { 0,0,0.7f,1 };
 const glm::vec4 uiBlack = { 0,0,0.0,1 };
 const glm::vec4 uialmostBlack = { 0.1,0.1,0.1,1 };
+const glm::vec4 uiDarkGrey = { 0.25,0.25,0.25,1 };
 
 class CGUIbase;
 
@@ -117,6 +118,7 @@ public:
 	virtual void drawTexture(CGUIbase & control, CBaseTexture& texture) {};
 	virtual void updateScreenDimensions(CGUIbase& control) {};
 	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
+	virtual CFont* getFont(std::string name) { return NULL; };
 };
 
 

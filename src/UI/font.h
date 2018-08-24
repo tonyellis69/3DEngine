@@ -30,4 +30,6 @@ public:
 	std::vector<glyph> glyphs;
 	glyph* table[256];
 	CRenderTexture texture;
+
+	std::string name;
 };
