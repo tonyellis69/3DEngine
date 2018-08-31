@@ -39,6 +39,7 @@ void CGUIrichTextPanel::setTextColour(UIcolour colour) {
 	richText->setTextColour(colour);
 }
 
+/*
 void CGUIrichTextPanel::setHotTextColour(const glm::vec4& colour) {
 	richText->setHotTextColour(colour);
 }
@@ -46,6 +47,7 @@ void CGUIrichTextPanel::setHotTextColour(const glm::vec4& colour) {
 void CGUIrichTextPanel::setHotTextHighlightColour(const glm::vec4& colour) {
 	richText->setHotTextHighlightColour(colour);
 }
+*/
 
 void CGUIrichTextPanel::setText(std::string newText) {
 	richText->setText(newText);
@@ -65,12 +67,14 @@ void CGUIrichTextPanel::setResizeMode(TResizeMode mode){
 	richText->setResizeMode(mode);
 }
 
-void CGUIrichTextPanel::setTextStyle(TtextStyle & newStyle) {
-	richText->setTextStyle(newStyle);
+
+
+void CGUIrichTextPanel::setTextStyles(std::vector<TtextStyle>* styles) {
+	richText->setTextStyles(styles);
 }
 
-void CGUIrichTextPanel::addStyle(TtextStyle & newStyle) {
-	richText->styles.push_back(newStyle);
+void CGUIrichTextPanel::setTextStyle(std::string styleName) {
+	richText->setTextStyle(styleName);
 }
 
 void CGUIrichTextPanel::purgeHotText(int msgId, int objId){

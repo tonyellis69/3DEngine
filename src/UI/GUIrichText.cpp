@@ -5,14 +5,18 @@
 using namespace glm;
 
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
-	firstVisibleText = 0;
+
+	styles = NULL;
+	defaultTextStyle = { "default","defaultFont",glm::vec4(0,0,0,1) };
+
+
 	TRichTextRec defaultStyleObj;
-	currentTextStyle = { "default","defaultFont",defaultTextColour };
-	styles.push_back(currentTextStyle);
 	defaultStyleObj.style = currentTextStyle;
 	textObjs.push_back(defaultStyleObj);
 	currentTextObj = 0;
-	setFont(defaultFont);
+	setTextStyle(defaultTextStyle);
+
+	firstVisibleText = 0;
 	firstVisibleObject = 0;
 	mousePassthru = false;
 	selectedHotObj = -1;
@@ -23,13 +27,14 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	yPixelOffset = 0;
 	smoothScrollStep = 8;
 	setMouseWheelMode(scroll);
-	setHotTextColour(uiWhite);
-	setHotTextHighlightColour(uiBlue);
+//	setHotTextColour(uiWhite);
+//	setHotTextHighlightColour(uiBlue);
+	hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
+	selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
 
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
-	
 }
 
 void CGUIrichText::DrawSelf() {
@@ -50,21 +55,16 @@ void CGUIrichText::setFont(CFont* newFont) {
 	}
 	currentTextStyle.font = newFont->name;
 	textObjs[currentTextObj].style = currentTextStyle;
-
-	//textBuf.setFont(newFont);
-	//textData.font = newFont;
-	//textObjs[currentTextObj].font = newFont;
-	currentSetFont = newFont;
 }
 
+
 CFont * CGUIrichText::getFont() {
-	return currentSetFont;
+	return pDrawFuncs->getFont(currentTextStyle.font);
 }
 
 /** Set the current text drawing colour. */
 void CGUIrichText::setTextColour(float r, float g, float b, float a) {
-	defaultTextColour = glm::vec4(r, g, b, a);
-	if (textObjs[currentTextObj].style.colour == defaultTextColour)
+	if (textObjs[currentTextObj].style.colour == vec4(r, g, b, a))
 		return;
 
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
@@ -114,9 +114,11 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId) {
 	textObjs[currentTextObj].hotObjId = objId;
 
 	if (msgId || objId)
-		textObjs[currentTextObj].style.colour = hotTextColour;
+		//textObjs[currentTextObj].style.colour = hotTextColour;
+		textObjs[currentTextObj].style = hotTextStyle;
 	else
-		textObjs[currentTextObj].style.colour = currentTextStyle.colour;
+		//textObjs[currentTextObj].style.colour = currentTextStyle.colour;
+		textObjs[currentTextObj].style = currentTextStyle;
 }
 
 
@@ -125,13 +127,15 @@ void CGUIrichText::setTextColour(UIcolour  colour) {
 }
 
 /** Normal colour for unselected hot text. */
+/*
 void CGUIrichText::setHotTextColour(const glm::vec4& colour) {
-	hotTextColour = colour;
+//	hotTextColour = colour;
 }
 
 void CGUIrichText::setHotTextHighlightColour(const glm::vec4& colour) {
-	hotTextHighlightColour = colour;
+	//hotTextHighlightColour = colour;
 }
+*/
 
 /** Set the style for any text appended after this. */
 void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
@@ -149,7 +153,9 @@ void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
 }
 
 void CGUIrichText::setTextStyle(std::string styleName) {
-	for (auto style : styles) {
+	if (styles == NULL)
+		return;
+	for (auto style : *styles) {
 		if (style.name == styleName) {
 			setTextStyle(style);
 			return;
@@ -157,9 +163,22 @@ void CGUIrichText::setTextStyle(std::string styleName) {
 	}
 }
 
+/** Provide a pointer to a set of text styles to use */
+void CGUIrichText::setTextStyles(std::vector<TtextStyle>* styleList) {
+	styles = styleList;
+
+	///////////////////
+	//cache hot/selected styles if supplied
+	for (auto style : *styles) {
+		if (style.name == "hot")
+			hotTextStyle = style;
+		else if (style.name == "hotSelected")
+			selectedHotTextStyle = style;
+	}
+}
+
 /** Set the text of the current text object.*/
 void CGUIrichText::setText(std::string newText) {
-//	textData.text = newText;
 	firstVisibleText = 0;
 	textObjs[currentTextObj].text = newText;
 }
@@ -320,6 +339,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 }
 
 /** Add clickable text to the end of the existing body copy. */
+/*
 void CGUIrichText::appendHotText(std::string newText, int msgId, int objId) {
 	TRichTextRec newObj = textObjs.back(); //clone existing style for now
 	newObj.text.clear();
@@ -333,7 +353,7 @@ void CGUIrichText::appendHotText(std::string newText, int msgId, int objId) {
 	textObjs.back().text += newText;
 	updateText();
 	overrunCorrect = true;
-}
+}*/
 
 
 
@@ -359,10 +379,11 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 
 /** Highlight the given text object.*/
 void CGUIrichText::highlight(int textObj) {
-	textBuf.setTextColour(hotTextHighlightColour);
+	//textBuf.setTextColour(hotTextHighlightColour);
+	textBuf.setTextColour(selectedHotTextStyle.colour);
 	for (auto hotTextFrag : hotTextFrags) {
 		if (hotTextFrag.textObj == textObj) {
-			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, hotTextFrag.text);
+			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY , hotTextFrag.text);
 		}
 	}
 }
@@ -393,8 +414,8 @@ void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 
 /** Unhighlight the given text object.*/
 void CGUIrichText::unhighlight(int textObj) {
-	//glm::vec4 defaultColour = textObjs[textObj].textColour;
-	textBuf.setTextColour(hotTextColour);
+	//textBuf.setTextColour(hotTextColour);
+	textBuf.setTextColour(hotTextStyle.colour);
 	for (auto hotTextFrag : hotTextFrags) {
 		if (hotTextFrag.textObj == textObj) {
 			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, hotTextFrag.text);

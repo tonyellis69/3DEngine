@@ -4,6 +4,11 @@
 
 enum TMouseWheelMode {scroll,hotText};
 
+struct TtextTheme {
+	std::vector<TtextStyle> styles;
+
+};
+
 struct TCharacterPos {
 	int textObj;
 	int pos;
@@ -59,6 +64,7 @@ public:
 	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
 	void setTextStyle(std::string styleName);
+	void setTextStyles(std::vector<TtextStyle>* styles);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	bool scrollDown();
@@ -124,15 +130,19 @@ public:
 	int smoothScrollStep;
 	TMouseWheelMode mouseWheelMode; ///<Either scrolling or hot text selecting.
 
-	glm::vec4 hotTextColour; ///<colour for unselected hot text.
-	glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
-	glm::vec4 defaultTextColour;
-	CFont* currentSetFont;
+	//glm::vec4 hotTextColour; ///<colour for unselected hot text.
+	//glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
+
+	//CFont* currentSetFont;
+
+	TtextStyle defaultTextStyle; //The one we start with and fall back to
 	TtextStyle currentTextStyle;
 
 	bool mouseMode; ///<True for selection hot text with mouse pointer.
 
 	TResizeMode resizeMode;
 
-	std::vector<TtextStyle> styles; ///<List of available styles
+	std::vector<TtextStyle>* styles; ///<List of available styles
+	TtextStyle hotTextStyle;
+	TtextStyle selectedHotTextStyle;
 };

@@ -32,6 +32,8 @@ void CRenderDrawFuncs::loadShaders() {
 
 }
 
+///////////////////////////////////////////////////////////
+//TO DO!!! Need a function to remove registered controls, and destructing controls need to call it
 
 
 /** Register this control with the uiEngine, storing its details for drawing. */
@@ -86,7 +88,7 @@ void CRenderDrawFuncs::drawCtrlRect(CGUIbase & control) {
 	uiRectShader->setShaderValue(hColour2,(vec4&)control.backColour2);
 	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
 	pRenderer->drawBuf(*buf, drawTriStrip);
-	pRenderer->setShader(0);
+	pRenderer->setShader(0); //TO DO: seems unnecessary
 }
 
 void CRenderDrawFuncs::drawCtrlBorder(CGUIbase & control) {

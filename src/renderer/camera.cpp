@@ -46,7 +46,7 @@ void CCamera::setPos(glm::vec3& pos)  {
 }
 
 
-/** Create a transformation to clip space based on this camera's position and orientation.*/
+/** Create a transformation to clip space based on this camera's position, orientation and perspective.*/
 void CCamera::createClipMatrix() {
 	camMatrix = glm::inverse(worldMatrix);
 	clipMatrix = perspectiveMatrix * camMatrix;
@@ -88,9 +88,9 @@ void CCamera::keepUpright(const glm::vec3& target) {
 	desiredUp = glm::cross(right, target);
 	desiredUp = glm::normalize(desiredUp);
 	
-	glm::vec3 newUp = orientation * glm::vec3(0.0f, 1.0f, 0.0f);
-	newUp = glm::normalize(newUp);
-	glm::quat adjustment = glm::rotation(newUp, desiredUp);
+	glm::vec3 currentUp = orientation * glm::vec3(0.0f, 1.0f, 0.0f);
+	currentUp = glm::normalize(currentUp);
+	glm::quat adjustment = glm::rotation(currentUp, desiredUp);
 
 	orientation = adjustment * orientation;
 }

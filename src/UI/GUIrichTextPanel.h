@@ -20,8 +20,8 @@ public:
 	void appendText(std::string newText);
 	void clear();
 	void setResizeMode(TResizeMode mode);
-	void setTextStyle(TtextStyle & newStyle);
-	void addStyle(TtextStyle & newStyle);
+	void setTextStyles(std::vector<TtextStyle>* styles);
+	void setTextStyle(std::string styleName);
 	void purgeHotText(int msgId, int objId);
 	void update(float dT);
 

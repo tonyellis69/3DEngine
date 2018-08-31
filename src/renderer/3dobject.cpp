@@ -25,6 +25,8 @@ glm::vec3 C3dObject::getPos() {
 	return glm::vec3(glm::column(worldMatrix,3));
 }
 
+///////////////////
+//TO DO: why don't I just use the glm quaterion rotate (rotate(q,angle,axis)) to do this???
 /** Rotate object about the given axis. */
 void C3dObject::rotate(float angle,glm::vec3 axis) {
 	//create a quaternion of the rotation
