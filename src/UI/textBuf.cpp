@@ -16,7 +16,7 @@ CTextBuffer::CTextBuffer() {
 void CTextBuffer::setSize(int w, int h) {
 	size = glm::i32vec2(w, h);
 	textTexture.resize(w, h);
-	
+	clearBuffer(); //this fixes some corruption that otherwise crops up
 }
 
 void CTextBuffer::setFont(CFont* newFont) {

@@ -142,6 +142,8 @@
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
+    <ClCompile Include="..\src\texGen\compositor.cpp" />
+    <ClCompile Include="..\src\texGen\texGen.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\UIengine.cpp" />
@@ -149,6 +151,7 @@
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
+    <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIrichText.cpp" />
     <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
@@ -233,6 +236,8 @@
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
+    <ClInclude Include="..\src\texGen\compositor.h" />
+    <ClInclude Include="..\src\texGen\texGen.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
     <ClInclude Include="..\Src\Timer.h" />
@@ -242,6 +247,7 @@
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
+    <ClInclude Include="..\src\UI\GUIpaletteBar.h" />
     <ClInclude Include="..\src\UI\GUIpopMenu.h" />
     <ClInclude Include="..\src\UI\GUIrichText.h" />
     <ClInclude Include="..\src\UI\GUIcontainer.h" />

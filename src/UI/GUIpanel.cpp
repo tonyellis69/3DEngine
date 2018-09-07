@@ -3,6 +3,7 @@
 CGUIpanel::CGUIpanel(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y); 
 	//width = w; height = h;
+	//TO DO: start scrapping width and height for controls based on panel
 
 	drawBorder = true;
 	setBorderColour(UIdarkGrey);

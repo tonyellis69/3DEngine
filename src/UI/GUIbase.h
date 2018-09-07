@@ -113,6 +113,7 @@ public:
 	DelegatePP<void,float,float> setScale;
 
 	virtual void registerControl(CGUIbase& control) {};
+	virtual void deregisterControl(CGUIbase & control) {};
 	virtual void drawCtrlRect(CGUIbase& control) {};
 	virtual void drawCtrlBorder(CGUIbase& control) {};
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
@@ -120,6 +121,7 @@ public:
 	virtual void updateScreenDimensions(CGUIbase& control) {};
 	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
 	virtual CFont* getFont(std::string name) { return NULL; };
+	virtual void drawTextureGradient(CGUIbase & control, CBaseTexture& texture) {};
 };
 
 
@@ -174,7 +176,6 @@ public:
 	virtual bool getVisible();
 	unsigned int getID();
 	void makeModal(CGUIbase * control);
-	void destroy();
 
 	void setBackColour1(const UIcolour & colour);
 	void setBackColour1(const glm::vec4 & colour);
@@ -224,7 +225,7 @@ public:
 	CGUIbase* parent; ///<Points to the parent control of this control.
 	//CGUIbetterBase* parent; ///<Points to the parent control of this control.
 
-	char* Name; ///<Points to the string identifying this control.
+	std::string Name; ///<String identifying this control.
 
 	static int Count; ///<Records how many of this control have been created.
 

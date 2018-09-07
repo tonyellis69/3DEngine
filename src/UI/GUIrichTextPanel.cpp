@@ -100,7 +100,7 @@ void CGUIrichTextPanel::updateAppearance() {
 	CGUIbase::updateAppearance();
 	richText->setPos(inset, inset);
 	richText->resize(drawBox.size.x - (2*inset), drawBox.size.y - (2*inset));
-	richText->updateAppearance();
+	//richText->updateAppearance();
 }
 
 

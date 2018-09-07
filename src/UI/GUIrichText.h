@@ -98,13 +98,15 @@ public:
 
 	void updateAppearance();
 	void resizeToFit();
-
+	void resize(int w, int h);
 	void resizeByRatio();
 	void resizeByWidth();
 
 	bool isActiveHotText(int hotId);
 
 	void setResizeMode(TResizeMode mode);
+
+	~CGUIrichText();
 
 	int overrun;
 	int underrun;

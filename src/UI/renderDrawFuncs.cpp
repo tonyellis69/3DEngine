@@ -9,6 +9,30 @@ using namespace glm;
 CRenderDrawFuncs::CRenderDrawFuncs() {
 	cursorOn = false;
 	lastCursorFlash = chrono::system_clock::now();
+
+	//create a template quad:
+	vBuf::T2DtexVert corners[4];
+
+	corners[0].v = vec2(-0.5,-0.5); //A
+	corners[1].v = vec2(0.5,-0.5); //B  1,0
+	corners[2].v = vec2(-0.5,0.5); //C  0,1
+	corners[3].v = vec2(0.5, 0.5); //D  1,1
+
+	corners[0].tex = vec2(0);
+	corners[1].tex = vec2(1, 0);
+	corners[2].tex = vec2(0, 1);
+	corners[3].tex = vec2(1, 1);
+
+	unsigned int index[4] = { 2,3,0,1 };
+	templateQuad.storeVertexes(corners, sizeof(corners), 4);
+	templateQuad.storeIndex(index, 4);
+	templateQuad.storeLayout(2, 2, 0, 0);
+
+	//create border template quad
+	unsigned int index2[4] = { 1,0,2,3 };
+	borderTemplateQuad.storeVertexes(corners, sizeof(corners), 4);
+	borderTemplateQuad.storeIndex(index2, 4);
+	borderTemplateQuad.storeLayout(2, 2, 0, 0);
 }
 
 
@@ -32,83 +56,56 @@ void CRenderDrawFuncs::loadShaders() {
 
 }
 
-///////////////////////////////////////////////////////////
-//TO DO!!! Need a function to remove registered controls, and destructing controls need to call it
-
-
 /** Register this control with the uiEngine, storing its details for drawing. */
-void CRenderDrawFuncs::registerControl(CGUIbase & control) {
-	quadBufs[control.uniqueID].border = (CBuf*)pRenderer->createBuffer();
-	quadBufs[control.uniqueID].rect = (CBuf*)pRenderer->createBuffer();
+void CRenderDrawFuncs::registerControl(CGUIbase & control) {	
+	controlRects[control.uniqueID].ctrlMatrix = glm::mat4(1);
+	controlRects[control.uniqueID].ctrlBorderMatrix = glm::mat4(1);
 
 	setScreenDimensions(control);
 }
 
+void CRenderDrawFuncs::deregisterControl(CGUIbase & control) {
+	controlRects.erase(control.uniqueID);
+}
+
 void CRenderDrawFuncs::setScreenDimensions(CGUIbase & control) {
+	//update matrices
+	glm::mat4 shape = glm::scale(glm::mat4(1), glm::vec3(control.drawBox.size.x, (float)control.drawBox.size.y, 1));
+	
+	mat4 trans = glm::translate(mat4(1), vec3(control.drawBox.pos, 0) + (0.5f * vec3(control.drawBox.size, 0)) );
+	controlRects[control.uniqueID].ctrlMatrix = orthoView * trans * shape;
 
-	//A B
-	//C D
-	vBuf::T2DtexVert corners[4];
-	//corners[0].v = vec2(control.drawBox.pos); //A
-	//corners[1].v = vec2(control.drawBox.pos + i32vec2(control.drawBox.size.x, 0)); //B
-	//corners[2].v = vec2(control.drawBox.pos + i32vec2(0, control.drawBox.size.y)); //C
-	//corners[3].v = vec2(control.drawBox.pos + control.drawBox.size); //D
-
-	corners[0].v = vec2(0); //A
-	corners[1].v = vec2( i32vec2(control.drawBox.size.x, 0)); //B
-	corners[2].v = vec2( i32vec2(0, control.drawBox.size.y)); //C
-	corners[3].v = vec2(control.drawBox.size); //D
-
-	corners[0].tex = vec2(0);
-	corners[1].tex = vec2(1,0);
-	corners[2].tex = vec2(0,1);
-	corners[3].tex = vec2(1,1);
-
-	unsigned int index[4] = { 2,3,0,1 };
-	quadBufs[control.uniqueID].rect->storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].rect->storeIndex(index,  4);
-	quadBufs[control.uniqueID].rect->storeLayout(2, 2, 0, 0);
-
-	corners[0].v += vec2(0.5f); ///A little bodge, because rounding errors can put the border coords
-	corners[1].v += vec2(0,0.5f); ///outside of the clipping area. The trouble is that a vertical line starting at
-	corners[2].v += vec2(0.5f,0); // 0,0 is halfway into -1,0, and the clipping area is described in integers.
-	unsigned int index2 [4] = { 1,0,2,3 };
-	quadBufs[control.uniqueID].border->storeVertexes(corners, sizeof(corners), 4);
-	quadBufs[control.uniqueID].border->storeIndex(index2,  4);
-	quadBufs[control.uniqueID].border->storeLayout(2, 2,0, 0);
-
-	quadBufs[control.uniqueID].posM = glm::translate(orthoView, vec3(control.drawBox.pos,0));
+	glm::mat4 borderShape = glm::scale(glm::mat4(1), glm::vec3(control.drawBox.size.x - 1, (float)control.drawBox.size.y - 1, 1));
+	controlRects[control.uniqueID].ctrlBorderMatrix = orthoView * trans * borderShape;
 }
 
 /** Draw the drawBox rectangle of this control. */
 void CRenderDrawFuncs::drawCtrlRect(CGUIbase & control) {
-	CBuf* buf = quadBufs[control.uniqueID].rect;
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1,(vec4&)control.backColour1);
 	uiRectShader->setShaderValue(hColour2,(vec4&)control.backColour2);
-	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
-	pRenderer->drawBuf(*buf, drawTriStrip);
+	uiRectShader->setShaderValue(hOrtho, controlRects[control.uniqueID].ctrlMatrix);
+	pRenderer->drawBuf(templateQuad, drawTriStrip);
+
 	pRenderer->setShader(0); //TO DO: seems unnecessary
 }
 
 void CRenderDrawFuncs::drawCtrlBorder(CGUIbase & control) {
-	CBuf* buf = quadBufs[control.uniqueID].border;
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1, (vec4&)control.borderColour);
 	uiRectShader->setShaderValue(hColour2, (vec4&)control.borderColour);
-	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
-	pRenderer->drawBuf(*buf, drawLineLoop);
-	pRenderer->setShader(0);
+	uiRectShader->setShaderValue(hOrtho, controlRects[control.uniqueID].ctrlBorderMatrix);
+	pRenderer->drawBuf(borderTemplateQuad, drawLineLoop);
 
+	pRenderer->setShader(0);
 }
 
 void CRenderDrawFuncs::setScreenSize(int width, int height) {
-	mat4 flip;
-	flip[1].y = -1;
-	flip[2].y = float(height);
-	//orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height) ;
-	orthoView = flip * glm::ortho<float>(0.1f, (float)width, 0.1f, (float)height);
-
+	//mat4 flip;
+	//flip[1].y = -1;
+	//flip[2].y = float(height);
+	//orthoView = flip * glm::ortho<float>(0.0f, (float)width, 0.0f, (float)height);
+	orthoView =  glm::ortho<float>(0.0f, (float)width,  (float)height, 0.0f);
 	screenWidth = width; screenHeight = height;
 }
 
@@ -118,31 +115,21 @@ unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName)
 }
 
 void CRenderDrawFuncs::drawTexture(CGUIbase & control, CBaseTexture& texture) {
-	CBuf* buf = quadBufs[control.uniqueID].rect;
-	//set shader
 	pRenderer->setShader(uiTexShader);
 	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
 	pRenderer->attachTexture(0, rendTex->handle);
-	
-	glm::mat4 posm = quadBufs[control.uniqueID].posM;
-	//DO any scaling like this:
-	//glm::mat4 posm = glm::scale(quadBufs[control.uniqueID].posM, vec3(0.5f));
 
-	//uiTexShader->setShaderValue(hTextureUnit, rendTex);
 	uiTexShader->setTextureUnit(hTextureUnit, 0);
 	uiTexShader->setShaderValue(hTile,vec2(1,1));
 	uiTexShader->setShaderValue(hOffset,vec2(0));
-	uiTexShader->setShaderValue(hTexOrtho, posm);
-	pRenderer->drawBuf(*buf, drawTriStrip);
-
-
+	uiRectShader->setShaderValue(hTexOrtho, controlRects[control.uniqueID].ctrlMatrix);
+	pRenderer->drawBuf(templateQuad, drawTriStrip);
 }
 
 /** Update the vertexes defining the dimensions of this control. */
 void CRenderDrawFuncs::updateScreenDimensions(CGUIbase & control) {
 	setScreenDimensions(control);
-	//TO DO: more elegant and efficient to update matrix, not all the verts!
 }
 
 /** Assuming this is an interactive text control, draw its cursor. */
@@ -158,7 +145,7 @@ void CRenderDrawFuncs::drawCursor(CGUIbase& control,CBuf& cursorPos) {
 	pRenderer->setShader(uiRectShader);
 	uiRectShader->setShaderValue(hColour1, (vec4&)UIblack); //TO DO: pass colour choice as parameter
 	uiRectShader->setShaderValue(hColour2, (vec4&)UIblack);
-	uiRectShader->setShaderValue(hOrtho, quadBufs[control.uniqueID].posM);
+	uiRectShader->setShaderValue(hOrtho, controlRects[control.uniqueID].ctrlMatrix);
 	pRenderer->drawBuf(cursorPos, drawLineLoop);
 	pRenderer->setShader(0);
 }
@@ -172,12 +159,22 @@ CFont * CRenderDrawFuncs::getFont(std::string name) {
 	return &pRenderer->fontManager.getFont(name);
 }
 
+void CRenderDrawFuncs::drawTextureGradient(CGUIbase & control, CBaseTexture & texture) {
+	pRenderer->setShader(uiTexShader);
+	//pass the texture
+	CRenderTexture* rendTex = (CRenderTexture*)&texture;
+	pRenderer->attachTexture(0, rendTex->handle);
+
+	uiTexShader->setTextureUnit(hTextureUnit, 0);
+	uiRectShader->setShaderValue(hTexOrtho, controlRects[control.uniqueID].ctrlMatrix);
+	pRenderer->drawBuf(templateQuad, drawTriStrip);
+}
+
 
 
 CRenderDrawFuncs::~CRenderDrawFuncs() {
 	for (size_t s = 0; s < shaderList.size(); s++) {
 		delete shaderList[s];
-
 	}
 }
 

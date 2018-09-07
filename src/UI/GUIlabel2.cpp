@@ -21,6 +21,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	mousePassthru = true;
 	pDrawFuncs->registerControl(*this);
 	renderOffset = i32vec2(0, 0);
+	
 }
 
 void CGUIlabel2::setFont(CFont* newFont) {
@@ -58,9 +59,10 @@ TTextAlign CGUIlabel2::getJustification() {
 
 
 void CGUIlabel2::DrawSelf() {
-	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
-
-	if (drawBorder) {
+	//if (textData.text.size()) //TO DO: blank text is sometimes corrupted, not sure why
+		pDrawFuncs->drawTexture(*this, textBuf.textTexture);
+	
+	 if (drawBorder) {
 		pDrawFuncs->drawCtrlBorder(*this);
 	}
 }

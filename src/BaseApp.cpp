@@ -357,12 +357,12 @@ void CBaseApp::initWatches() {
 	wLabel1->setTextColour(UIwhite);
 	GUIroot.Add(wLabel1);
 
-	wLabel2 = new CGUIlabel2(800,150,400,50);
+	wLabel2 = new CGUIlabel2(800,350,400,50);
 	wLabel2->setFont(sysFont);
 	wLabel2->setTextColour(UIwhite);
 	GUIroot.Add(wLabel2);
 
-	wLabel3 = new CGUIlabel2(800,200,400,50);
+	wLabel3 = new CGUIlabel2(800,500,400,50);
 	wLabel3->setFont(sysFont);
 	wLabel3->setTextColour(UIwhite);
 	GUIroot.Add(wLabel3);
@@ -439,6 +439,7 @@ CBaseApp::~CBaseApp() {
 	fflush(ErrStream);
 	fclose(ErrStream);
 	delete drawFuncs;
+	GUIroot.setDrawFuncs(NULL);
 	watch::con.str(""); //Simple fix to ensure console memory freed.
 }
 

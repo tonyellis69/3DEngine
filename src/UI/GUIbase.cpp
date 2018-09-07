@@ -17,8 +17,7 @@ CGUIbase::CGUIbase()  {
 	foreColour1 = UIlightGrey;
 	foreColour2 = UIlightGrey;
 	parent = this; 
-	Name = new char[6];
-	strcpy(Name,"Blank");
+	Name = "Blank";
 	hFormat = hNone;
 	vFormat = vNone;
 	MouseOver = NULL;
@@ -52,9 +51,27 @@ CGUIbase::CGUIbase()  {
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
 CGUIbase::~CGUIbase(void) {
-	delete Name;
-	for (size_t  i=0;i < Control.size();i++)
-		delete Control[i];
+	if (pDrawFuncs)
+		pDrawFuncs->deregisterControl(*this);
+	for (auto control = modalControls.begin(); control != modalControls.end(); control++) {
+		if (*control == this) {
+			modalControls.erase(control);
+			break;
+		}
+	}
+
+	//remove from parent's controls if any
+	auto it = parent->Control.begin();
+	for (; it != parent->Control.end(); it++) {
+		if (*it == this) {
+			parent->Control.erase(it);
+			break;
+		}
+	}
+
+	for (unsigned int i = 0; i < Control.size(); i++)
+		if (Control[i] != NULL)
+			delete Control[i];
 }
 
 
@@ -306,8 +323,12 @@ void CGUIbase::Draw() {
 
 	DrawSelf(); 
 	//then draw each subcontrol
-	for (size_t i=0;i<Control.size();i++) 
+//	if (Control.size() > 1)
+	//	Control[0]->Draw();
+	for (size_t i = 0; i < Control.size(); i++) {
+		
 		Control[i]->Draw();
+	}
 }
 
 /** Fire off the necessary drawing instructions to draw this control. */
@@ -392,10 +413,7 @@ void CGUIbase::GenName(char* NameStr, int iCount) {
 }
 
 void CGUIbase::SetName(char* NameStr) {
-	int l = strlen(NameStr);
-	delete Name;
-	Name =  new char[l+1];
-	strcpy(Name,NameStr);
+	Name = NameStr;
 }
 
 void CGUIbase::setDefaultFont(CFont* font) {
@@ -565,19 +583,5 @@ void CGUIbase::makeModal(CGUIbase * control) {
 	modalControls.push_back(control);
 }
 
-void CGUIbase::destroy() {
-	auto it = parent->Control.begin();
-	for (; it != parent->Control.end(); it++) {
-		if (*it == this) {
-			for (auto control = modalControls.begin(); control != modalControls.end(); control++) {
-				if (*control == this) {
-					modalControls.erase(control);
-					break;
-				}
-			}
-			parent->Control.erase(it);
-			return;
-		}
-	}
-}
+
 

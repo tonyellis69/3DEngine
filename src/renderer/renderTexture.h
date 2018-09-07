@@ -11,6 +11,7 @@ class CRenderTexture : public CBaseTexture {
 public:
 	CRenderTexture();
 	CRenderTexture(int w, int h);
+	CRenderTexture(int w);
 	~CRenderTexture();
 	void resize(int w, int h);
 	glm::uvec4 getPixel(int x, int y);

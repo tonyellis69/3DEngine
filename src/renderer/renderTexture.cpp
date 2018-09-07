@@ -31,12 +31,17 @@ CRenderTexture::CRenderTexture()  {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, width, height, 0, GL_RGBA, GL_FLOAT, pixels); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 	
 }
 
 CRenderTexture::CRenderTexture(int w, int h) {
 	resize(w, h);
+}
+
+/** Create a 1D texture.*/
+CRenderTexture::CRenderTexture(int w) {
+	resize(w, 0);
 }
 
 CRenderTexture::~CRenderTexture() {
@@ -46,17 +51,33 @@ CRenderTexture::~CRenderTexture() {
 /** Resize this texture, freeing any previously used memory. */
 //TO DO: careful! We may not want to set mipmapping to GL_NEAREST.
 void CRenderTexture::resize(int w, int h) {
-	glDeleteTextures(1, &handle);
-	glGenTextures(1, &handle);
-	glBindTexture(GL_TEXTURE_2D, handle);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, w, h, 0, GL_RGBA, GL_FLOAT, NULL); //GL_FLOAT was GL_UNSIGNED_BYTE
 	channels = 4; //lazily assume rgba
 	width = w;
 	height = h;
+	glDeleteTextures(1, &handle);
+	glGenTextures(1, &handle);
+	if (h > 0) {
+		glBindTexture(GL_TEXTURE_2D, handle);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //GL_FLOAT was GL_UNSIGNED_BYTE
+		return;
+	}
+	
+
+	unsigned char* pixels = new unsigned char[w * 4];
+	int b = 0;
+	for (int p = 0; p < width; p++) {
+		b = p * 4;
+		pixels[b] =  (p / (float)width) * 255;
+		pixels[b + 1] = pixels[b + 2] = pixels[b];  pixels[b + 3] = 255;
+	}
+	glBindTexture(GL_TEXTURE_1D, handle);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 }
 
 glm::uvec4  CRenderTexture::getPixel(int x, int y) {

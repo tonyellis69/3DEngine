@@ -9,6 +9,7 @@ public:
 	virtual void createRGBA(unsigned char* data, int w, int h) {};
 	virtual void createGreyscale(unsigned char* data, int w, int h) {};
 
+
 	int width;
 	int height;
 

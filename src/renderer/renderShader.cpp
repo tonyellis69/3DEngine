@@ -99,6 +99,7 @@ void CRenderShader::setShaderValue(unsigned int intHandle, int value) {
 
 void CRenderShader::setShaderValue(unsigned int matrixHandle, glm::mat4 & matrix) {
 	pRenderer->setShaderValue(matrixHandle, 1, matrix);
+
 }
 
 void CRenderShader::setShaderValue(unsigned int floatHandle, float value) {

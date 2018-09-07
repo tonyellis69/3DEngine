@@ -24,6 +24,9 @@
     <Filter Include="win">
       <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="texGen">
+      <UniqueIdentifier>{d613a150-3276-4d6b-a9f8-110f621a3eef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -280,6 +283,15 @@
     </ClCompile>
     <ClCompile Include="..\src\renderer\fontManager.cpp">
       <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\compositor.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\texGen.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIpaletteBar.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -567,6 +579,15 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\fontManager.h">
       <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\compositor.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\texGen.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIpaletteBar.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

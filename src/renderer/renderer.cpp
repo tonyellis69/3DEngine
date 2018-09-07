@@ -378,6 +378,8 @@ void CRenderer::setShader(int program) {
 
 void CRenderer::setShader(CShader * shader) {
 	glUseProgram(shader->getShaderHandle());
+
+
 }
 
 void CRenderer::drawModel(CRenderModel& model) {
@@ -433,17 +435,22 @@ void CRenderer::createFrameBuffer() {
 /** Create a reusable quad in NDC coordinated for when we want to render to the entire screen, */
 void CRenderer::createScreenQuad() {
 	screenQuad = (CBuf*)createBuffer();
-	//vBuf::T2DtexVert vert[4];
-	glm::vec2 vert[4];
-	vert[0] = glm::vec2(-1, 1);
-	vert[1] = glm::vec2(1, 1);
-	vert[2] = glm::vec2(-1, -1);
-	vert[3] = glm::vec2(1, -1);
+	vBuf::T2DtexVert vert[4];
+	//glm::vec2 vert[4];
+	vert[0].v = glm::vec2(-1, 1);
+	vert[1].v = glm::vec2(1, 1);
+	vert[2].v = glm::vec2(-1, -1);
+	vert[3].v = glm::vec2(1, -1);
+
+	vert[0].tex = glm::vec2(0,1);
+	vert[1].tex = glm::vec2(1, 1);
+	vert[2].tex = glm::vec2(0, 0);
+	vert[3].tex = glm::vec2(1, 0);
 
 	unsigned int index[4] = { 2,3,0,1 };
 	screenQuad->storeVertexes(vert, sizeof(vert), 4);
 	screenQuad->storeIndex(index, 4);
-	screenQuad->storeLayout(2, 0, 0, 0);
+	screenQuad->storeLayout(2, 2, 0, 0);
 }
 
 /** Draw a full-screen quad to the given texture using the current shader. */
@@ -470,7 +477,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 	
 	CRenderTexture* glTex = (CRenderTexture*)&texture;
 	glDisable(GL_BLEND); //Otherwise this messes up text texture alpha
-	
+
 	glGenFramebuffers(1, &hFrameBuffer);
 	
 	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
@@ -818,6 +825,8 @@ void CRenderer::createTextShader() {
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */
 CShader* CRenderer::createShader(std::string name) {
 	CRenderShader* shader = new CRenderShader();
+	if (name.compare(0, dataPath.size(), dataPath))
+		name = dataPath + name;
 	shader->create( name);
 	shaderList.push_back(shader);
 	return shader;
