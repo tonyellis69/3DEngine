@@ -9,7 +9,6 @@ CTextBuffer::CTextBuffer() {
 	pRenderer = &CRenderer::getInstance();
 	textData.style.colour = glm::vec4(1, 1, 1, 1);
 	textData.font = NULL;
-	
 }
 
 /** Set the absolute dimensions, in pixels, of the buffer texture.*/
@@ -39,26 +38,27 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	vector<unsigned int> index;
 	chars.resize(textLine.size() * 4);
 
-	glm::vec2 blCorner = glm::vec2(x, y);
+	glm::vec2 blCorner = glm::vec2( x, y);
 
 	//return blCorner;
 
 	int v = 0; 
 	glyph* glyph;
 	unsigned int numChars = textLine.size();
-	for (unsigned int c = 0; c < numChars; c++) { //1 iterations takes it way down
+	for (unsigned int c = 0; c < numChars; c++) { 
 		if (textLine[c] != '\n') 
 		{
 			glyph = textData.font->table[textLine[c]];
 			//construct quads
 			chars[v].v = blCorner; //A
 			chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
-			chars[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->height); //C
-			chars[v + 3].v = blCorner + glm::vec2(glyph->width, -glyph->height); //D
-			chars[v].tex = glm::vec2(glyph->u, glyph->v);
-			chars[v + 1].tex = glm::vec2(glyph->s, glyph->v);
-			chars[v + 2].tex = glm::vec2(glyph->u, glyph->t);
-			chars[v + 3].tex = glm::vec2(glyph->s, glyph->t);
+			chars[v + 2].v = blCorner + glm::vec2(0.0f, glyph->height); //C
+			chars[v + 3].v = blCorner + glm::vec2(glyph->width, glyph->height); //D
+			//NB this quad gets flipped by the ortho matrix putting the origin top-left
+			chars[v].tex = glm::vec2(glyph->u, glyph->t);
+			chars[v + 1].tex = glm::vec2(glyph->s, glyph->t);
+			chars[v + 2].tex = glm::vec2(glyph->u, glyph->v);
+			chars[v + 3].tex = glm::vec2(glyph->s, glyph->v);
 
 			index.push_back(v + 2); index.push_back(v + 3); index.push_back(v);
 			index.push_back(v); index.push_back(v + 3); index.push_back(v + 1);
@@ -86,11 +86,17 @@ void CTextBuffer::clearBuffer() {
 
 void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
-	float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
+	//float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
 	
-	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, -halfSize.y, halfSize.y);
+	//glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, -halfSize.y, halfSize.y);
+	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, 0, size.y);
 
-	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
+//	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
+
+	glm::vec4 test(0, 7, 0,1);
+
+	if (size.y == 40)
+		test =  orthoMatrix * test;
 
 	glm::vec4 textColour = textData.style.colour;
 	//textColour.a = 0.5;
@@ -100,7 +106,6 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
-	
 	pRenderer->renderToTextureTris(glyphQuads, textTexture);
 }
 

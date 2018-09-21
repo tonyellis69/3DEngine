@@ -3,6 +3,7 @@
 #include "..\BaseApp.h"
 #include "..\UI\GUIimage.h"
 #include "..\UI\GUIpaletteBar.h"
+#include "..\UI\GUInumeric2.h"
 
 #include "texGen.h"
 
@@ -16,10 +17,14 @@ public:
 //private:
 	void initGUI();
 
+static	void colourPickerCallback(CGUIbase* sender, CMessage & msg);
+
 	CBaseApp* pApp;
 	CRenderTexture sample;
 	CGUIimage* image;
 
 	CGUIpaletteBar* palette;
-
+	CRenderTexture paletteGradient;
+	CGUInumeric2* num;
+	static CGUIcolourPicker* tmp;
 };

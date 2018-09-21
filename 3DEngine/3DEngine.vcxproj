@@ -96,6 +96,7 @@
     <ClCompile Include="..\Src\BaseApp.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
+    <ClCompile Include="..\src\colourGradient.cpp" />
     <ClCompile Include="..\src\createShape.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
@@ -151,6 +152,8 @@
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
+    <ClCompile Include="..\src\UI\GUIcolourPicker.cpp" />
+    <ClCompile Include="..\src\UI\GUIimage1D.cpp" />
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIrichText.cpp" />
@@ -187,6 +190,7 @@
     <ClInclude Include="..\src\chunk.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
+    <ClInclude Include="..\src\colourGradient.h" />
     <ClInclude Include="..\src\createShape.h" />
     <ClInclude Include="..\src\Delegate.h" />
     <ClInclude Include="..\src\direction.h" />
@@ -247,6 +251,8 @@
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
+    <ClInclude Include="..\src\UI\GUIcolourPicker.h" />
+    <ClInclude Include="..\src\UI\GUIimage1D.h" />
     <ClInclude Include="..\src\UI\GUIpaletteBar.h" />
     <ClInclude Include="..\src\UI\GUIpopMenu.h" />
     <ClInclude Include="..\src\UI\GUIrichText.h" />

@@ -80,7 +80,7 @@ void CWin::setApp(CBaseApp * app) {
 void CWin::getMousePos(int & x, int & y) {
 	double dx, dy;
 	glfwGetCursorPos(window, &dx, &dy);
-	x = int(dx); y = int(dy);
+	x = floor(dx); y = floor(dy);
 }
 
 /** Poll cached left mouse button state. */
@@ -152,6 +152,9 @@ void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
 }
 
 void CWin::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+
+
+
 	pApp->onMouseButton(button, action, mods);
 }
 

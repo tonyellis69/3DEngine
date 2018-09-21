@@ -38,10 +38,10 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 }
 
 void CGUIrichText::DrawSelf() {
-	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
+	pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
 
 	if (drawBorder) {
-		pDrawFuncs->drawCtrlBorder(*this);
+		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
 	}
 }
 

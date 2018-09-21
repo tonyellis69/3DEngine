@@ -130,4 +130,15 @@ void CRenderTexture::clear() {
 	resize(width, height);
 }
 
+void CRenderTexture::setData(void * pixels) {
+	if (height > 0) {
+		glBindTexture(GL_TEXTURE_2D, handle);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+		return;
+	}
+	glBindTexture(GL_TEXTURE_1D, handle);
+	glTexSubImage1D(GL_TEXTURE_1D, 0, 0, width, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+}
+
 

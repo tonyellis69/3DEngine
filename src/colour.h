@@ -8,6 +8,6 @@
 
 namespace col {
 	glm::vec3 randHue();
-	
+	glm::vec4 byteToFloat(glm::i32vec4 colour255);
 
 }

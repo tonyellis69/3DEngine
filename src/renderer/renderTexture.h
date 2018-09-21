@@ -18,6 +18,7 @@ public:
 	void createRGBA(unsigned char* data, int w, int h);
 	void createGreyscale(unsigned char * data, int w, int h);
 	void clear();
+	void setData(void* pixels);
 
 	unsigned int handle;
 	CRenderer* pRenderer;	

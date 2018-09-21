@@ -60,10 +60,11 @@ TTextAlign CGUIlabel2::getJustification() {
 
 void CGUIlabel2::DrawSelf() {
 	//if (textData.text.size()) //TO DO: blank text is sometimes corrupted, not sure why
-		pDrawFuncs->drawTexture(*this, textBuf.textTexture);
+		pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
 	
 	 if (drawBorder) {
-		pDrawFuncs->drawCtrlBorder(*this);
+		//pDrawFuncs->drawCtrlBorder(*this);
+		 pDrawFuncs->drawBorder2(drawBox, (glm::vec4&)borderColour);
 	}
 }
 

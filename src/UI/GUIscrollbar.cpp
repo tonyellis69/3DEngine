@@ -18,6 +18,11 @@ CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y
 
 	lastMouseDownX = lastMouseDownY = 0;
 	id = uiScrollbarID;
+
+	drawBox.pos = glm::i32vec2(x, y); drawBox.size = glm::i32vec2(width, height);
+	//pDrawFuncs->registerControl(*this);
+	setBackColour1(UIlightGrey);
+	setBackColour2(UIlightGrey);
 }
 
 /** Make the slider size a proportion of the scrollbar's total length. */
@@ -43,26 +48,48 @@ void CGUIbaseScrollbar::updateSliderAppearance() {
 	SliderPos = (int)(Travel * Ratio);
 }
 
+void CGUIbaseScrollbar::setValue(int newValue) {
+	Value = newValue;
+	updateSliderAppearance();
+}
+
 
 void CGUIbaseScrollbar::DrawSelf( ) {
-	pDrawFuncs->setDrawColours(UIlightGrey, UIlightGrey);
-	pDrawFuncs->drawRect(screenPos,width,height);
+	//pDrawFuncs->setClip(Clipbox);
 
+	//pDrawFuncs->setDrawColours(UIlightGrey, UIlightGrey);
+	//pDrawFuncs->drawRect(screenPos,width,height);
+
+
+	pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
+
+	glm::vec4 drawColour;
 	if ((MouseOver == this)||(KeyCapture == this)) {
-		pDrawFuncs->setDrawColours(UIblack, UIblack);
+		drawColour = (glm::vec4&)UIblack;
+		
 	} else {
-		pDrawFuncs->setDrawColours(UIdarkGrey, UIdarkGrey);
+		drawColour = (glm::vec4&)UIdarkGrey;
 	}
-
-	UIcoord sliderScrnPos = screenPos;
+	
+	guiRect drawbox;
+	//UIcoord sliderScrnPos = screenPos;
 		if (orientation == horizontal) {
-			sliderScrnPos.x += SliderPos+2; sliderScrnPos.y += 2;
-			pDrawFuncs->drawRect(sliderScrnPos,SliderSize-4,height-4);
+			//sliderScrnPos.x += SliderPos+2; sliderScrnPos.y += 2;
+			drawbox.pos.x = drawBox.pos.x + SliderPos + 2;
+			drawbox.pos.y = drawBox.pos.y +  2;
+			drawbox.size.x = SliderSize - 4;
+			drawbox.size.y = drawBox.size.y - 4;
+			//drawbox = {sliderScrnPos,SliderSize-4,height-4);
 		}
 		else {
-			sliderScrnPos.x += 2; sliderScrnPos.y += (height - SliderPos - SliderSize) +2;
-			pDrawFuncs->drawRect(sliderScrnPos,width-4,SliderSize-4);
+			//sliderScrnPos.x += 2; sliderScrnPos.y += (height - SliderPos - SliderSize) +2;
+			drawbox.pos.x = drawBox.pos.x + 2;
+			drawbox.pos.y = drawBox.pos.y + (drawBox.size.y - SliderPos - SliderSize) + 2;
+			//pDrawFuncs->drawRect(sliderScrnPos,width-4,SliderSize-4);
+			drawbox.size.x = drawBox.size.x - 4;
+			drawbox.size.y = SliderSize - 4;
 		}
+		pDrawFuncs->drawRect2(drawbox, drawColour, drawColour);
 }
 
 
@@ -147,6 +174,7 @@ void CGUIsysScrollbar::updateValue() {
 	Value =(int) ((Max - Min) * ratio) + Min;
 
 	CMessage msg;
+	msg.Msg = uiMsgSlide;
 	msg.value = Value;
 	parent->message(*this,msg);
 }

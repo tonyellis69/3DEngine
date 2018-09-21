@@ -87,7 +87,7 @@ void CRenderShader::setShaderValue(unsigned int vecHandle, glm::vec3 & vector) {
 	pRenderer->setShaderValue(vecHandle, 1, vector);
 }
 
-void CRenderShader::setShaderValue(unsigned int vecHandle, glm::vec4 & vector) {
+void CRenderShader::setShaderValue(unsigned int vecHandle, const glm::vec4 & vector) {
 	pRenderer->setShaderValue(vecHandle, 1, vector);
 }
 

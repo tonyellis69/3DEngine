@@ -11,6 +11,7 @@ public:
 	CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y, int length);
 	void updateAppearance();
 	void updateSliderAppearance();
+	void setValue(int newValue);
 	void DrawSelf( );
 	void OnMouseMove(const int mouseX,const  int mouseY,int key);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);

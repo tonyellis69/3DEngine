@@ -157,10 +157,21 @@ void CBaseApp::onMouseMove(int x, int y) {
 void CBaseApp::onMouseButton(int button, int action, int mods) {
 	unsigned int msg = 0; int x, y;
 	getMousePos(x, y);
+	std::cerr << "\nmouse y at " << y;
 
 	if (action == GLFW_RELEASE) {
-		if (button == GLFW_MOUSE_BUTTON_LEFT) 
+		if (button == GLFW_MOUSE_BUTTON_LEFT) {
 			msg = WM_LBUTTONUP;
+			static auto before = Time; // std::chrono::system_clock::now();
+			auto now = Time;
+			double diff_ms = now - before;
+			before = now;
+			if (diff_ms > 0.01 && diff_ms < 0.5) {
+				msg = MY_DOUBLECLICK;
+				std::cerr << "\nmouse y at " << y;
+			}
+
+		}
 		if (button == GLFW_MOUSE_BUTTON_RIGHT)
 			msg = WM_RBUTTONUP;
 	}
@@ -176,11 +187,11 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 /** Event handler for mouse wheel messages. */
 void CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
 	int x, y;
-	win.getMousePos(x, y);
+//	getMousePos(x, y); //gives negative y for some reason!
 	int delta = yoffset;
 	int keyState = 0; //can get key state if ever needed
-	if (GUIroot.IsOnControl(GUIroot,x, y)) //checks that the mouse isn't outside our app altogether
-		GUIroot.MouseWheelMsg(x,y,delta,keyState);
+	if (GUIroot.IsOnControl(GUIroot,mouseX, mouseY)) //checks that the mouse isn't outside our app altogether
+		GUIroot.MouseWheelMsg(mouseX, mouseY,delta,keyState);
 }
 
 
@@ -258,7 +269,7 @@ void CBaseApp::RegisterUIfunctors() {
 	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
 	drawFuncs->drawIcon.Set(&UIeng, &CGUIengine::drawIcon);
 	drawFuncs->handleUImsg.Set(this, &CBaseApp::HandleUImsg);
-	drawFuncs->drawRect.Set(&UIeng, &CGUIengine::drawRect);
+	//drawFuncs->drawRect.Set(&UIeng, &CGUIengine::drawRect);
 	drawFuncs->drawBorder.Set(&UIeng, &CGUIengine::DrawBorder);
 	drawFuncs->setClip.Set(&UIeng, &CGUIengine::setClip);
 	drawFuncs->drawLine.Set(&UIeng, &CGUIengine::drawLine);
@@ -313,7 +324,7 @@ void CBaseApp::drawSkyDome() {
 
 
 
-
+/** Ensures we still get mouse input when the mouse is outside the app window. */
 void CBaseApp::mouseCaptured(bool capture) {
 	//Window.mouseCaptured(capture);
 	if (capture)

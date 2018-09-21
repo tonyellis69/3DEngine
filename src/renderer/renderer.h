@@ -71,7 +71,7 @@ public:
 	void setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix);
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec2& vector);
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector);
-	void setShaderValue(unsigned int vecHandle, int elements, glm::vec4& vector);
+	void setShaderValue(unsigned int vecHandle, int elements, const glm::vec4& vector);
 	void setShaderValue(unsigned int intHandle, int elements, int value);
 	void setShaderValue(unsigned int floatHandle, int elements, float value);
 	void setShader(int program);
@@ -99,6 +99,7 @@ public:
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
+	void attachTexture1D(unsigned int textureUnit, unsigned int hTexture);
 	void attachTexture(unsigned int textureUnit, CBaseTexture& texture);
 	void drawBuf(CBuf& buf, TdrawMode drawMode);
 	unsigned int getGLdrawMode(TdrawMode);

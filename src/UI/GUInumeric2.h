@@ -13,6 +13,7 @@ class CGUInumeric2 : public CGUIbase {
 public:
 	CGUInumeric2(int x, int y, int w, int h);
 	void setValue(float newValue);
+	void setValue(int newValue);
 	void message(CGUIbase& sender, CMessage& msg);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void setEnabled(bool onOff);
@@ -40,7 +41,9 @@ const int downButtonID = 20;
 class CGUInumericIconButton : public CGUIsysIconButton {
 public:
 	CGUInumericIconButton(int x, int y) : CGUIsysIconButton(x, y) {};
+	CGUInumericIconButton(int x, int y, int w, int h) : CGUIsysIconButton(x, y,w,h) {};
 	void OnClick(const  int mouseX, const  int mouseY);
+	void onDoubleClick(int mouseX, int mouseY);
 
 };
 
@@ -50,5 +53,5 @@ public:
 	CGUInumericTextbox2(int x, int y, int w, int h);
 	void OnCharEntry(unsigned int Key, long Mod);
 	void onKeyPress(unsigned int Key, long Mod);
-	void dataEnteredAlert();
+	//void dataEnteredAlert();
 };

@@ -6,6 +6,7 @@
 class CGUIsysIconButton : public CGUIbase {
 public:
 	CGUIsysIconButton(int x, int y);
+	CGUIsysIconButton(int x, int y, int w, int h);
 	void DrawSelf();
 
 	int icon; ///<References the icon for this button.
@@ -17,7 +18,9 @@ public:
 class CGUIiconButton : public CGUIsysIconButton {
 public:
 	CGUIiconButton(int x, int y);
+	CGUIiconButton(int x, int y, int w, int h) : CGUIsysIconButton(x, y, w, h) {};
 	void OnClick(const  int mouseX, const  int mouseY);
+
 
 	static int Count;
 };

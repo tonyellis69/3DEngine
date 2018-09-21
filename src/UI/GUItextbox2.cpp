@@ -5,7 +5,7 @@ using namespace glm;
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x,y); width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
-	renderOffset = i32vec2(0);
+	renderOffset = i32vec2(2,0);
 	textBuf.setFont(defaultFont);
 	font = defaultFont;
 	cursorTextPos = 0;
@@ -18,8 +18,8 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 
 	//drawBorder = false;
 
-	pDrawFuncs->registerControl(*this);
-
+//	pDrawFuncs->registerControl(*this);
+	//renderBorder = 2;
 }
 
 void CGUItextbox2::setFont(CFont* newFont) {
@@ -50,49 +50,52 @@ void CGUItextbox2::DrawSelf() {
 	pDrawFuncs->setClip(Clipbox);
 
 	//draw box
-	setBackColour1(UIwhite);
-	setBackColour2(UIwhite);
-	pDrawFuncs->drawCtrlRect(*this);
+	//setBackColour1(UIwhite);
+//	setBackColour2(UIwhite);
+//	pDrawFuncs->drawCtrlRect(*this);
+	pDrawFuncs->drawRect2(drawBox, uiWhite, uiWhite);
 
 	if (KeyCapture == this) {
 		//draw cursor
-		pDrawFuncs->drawCursor(*this, *getCursorPos());
+		//pDrawFuncs->drawCursor(*this, *getCursorPos());
+		pDrawFuncs->drawCursor2(cursor);
 	}
 
-	pDrawFuncs->drawTexture(*this, textBuf.textTexture);
+	pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
 
 	//draw border
 	if (MouseOver == this || KeyCapture == this) {
-		setBorderColour(UIdarkGrey);
+		//setBorderColour(UIdarkGrey);
+		pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
 	}
 	else {
-		setBorderColour(UIlightGrey);
+		//setBorderColour(UIlightGrey);
+		pDrawFuncs->drawBorder2(drawBox, uiLightGrey);
 	}
-	pDrawFuncs->drawCtrlBorder(*this);
+	//pDrawFuncs->drawCtrlBorder(*this);
 }
 
-CBuf * CGUItextbox2::getCursorPos() {
-	return &cursor;
+guiRect& CGUItextbox2::getCursorPos() {
+	return cursor;
 }
 
 void CGUItextbox2::calcCursorPosition() {
 	//lazily assuming single line text for now
-	float dist = 0;
+	float dist = renderOffset.x;
 	for (int c = 0; c < cursorTextPos; c++) {
 		dist += font->table[text[c]]->width;
 	}
-	float halfHeight = height / 2.0f;
-	float yOffset = int(0 - (font->lineHeight / 2.0f) + halfHeight);
-	vBuf::T2DtexVert cursorVert[2];
-	cursorVert[0].v = glm::vec2(dist, yOffset);
-	cursorVert[1].v = glm::vec2(dist, yOffset + font->lineHeight);
-	cursor.storeVertexes(cursorVert, sizeof(cursorVert), 2);
-	cursor.storeLayout(2, 2, 0, 0);
+
+	float yLength = font->lineHeight;
+	float xPos = dist;
+
+	cursor.pos = drawBox.pos + glm::i32vec2( xPos, (drawBox.size.y - yLength)/2 );
+	cursor.size = {1,  yLength };
 }
 
 /** Determine offset due to centering, etc. */
 void CGUItextbox2::calcLineOffset() {
-	renderOffset.y = font->lineHeight / 2.0;
+	renderOffset.y = (drawBox.size.y - font->lineHeight + 2) / 2.0;
 }
 
 
@@ -146,6 +149,7 @@ void CGUItextbox2::dataEnteredAlert() {
 	CMessage msg;
 	msg.Msg = uiDataEntered;
 	pDrawFuncs->handleUImsg(*this, msg);
+	parent->message(*this, msg);
 }
 
 /** User has pressed a character key, and we have focus. */
@@ -163,8 +167,8 @@ void CGUItextbox2::message(CGUIbase& sender, CMessage& msg) {
 
 /** Render the text according to current settings. */
 void CGUItextbox2::renderText() {
-	if (!text.size())
-		return;
+	//if (!text.size())
+	//	return;
 	textBuf.clearBuffer();
 	//calcLineRenderedWidth();
 	calcLineOffset();

@@ -1,5 +1,7 @@
 #include "compositor.h"
 
+CGUIcolourPicker* Compositor::tmp = NULL;
+
 Compositor::Compositor() {
 	
 }
@@ -32,6 +34,15 @@ void Compositor::initGUI() {
 	pApp->GUIroot.Add(image);
 	//image->setVisible(false);
 
+	paletteGradient.resize(256, 0);
 	palette = new CGUIpaletteBar(700, 100, 280, 80);
-	pApp->GUIroot.Add(palette);
+	palette->setGradientTexture(paletteGradient);
+	pApp->GUIroot.addModal(palette);
+
+
+
+//	num = new CGUInumeric2(800, 300, 100, 22);
+	//pApp->GUIroot.addModal(num);
 }
+
+

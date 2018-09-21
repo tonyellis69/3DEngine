@@ -13,7 +13,7 @@ public:
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
 	void DrawSelf();
-	CBuf * getCursorPos();
+	guiRect& getCursorPos();
 	void calcCursorPosition();
 	void calcLineOffset();
 	void OnClick(const  int mouseX, const  int mouseY);
@@ -38,6 +38,7 @@ private:
 	glm::i32vec2 renderOffset;///<Due to centering, multiline, etc.
 
 	int cursorTextPos; ///<String index of character cursor precedes.
-	CBuf cursor; ///<Holds verts for the cursor position and size.
+	guiRect cursor; ///<Holds cursor position and size.
 
+	//int renderBorder; ///<Clear space around inner edge of text buffer
 };

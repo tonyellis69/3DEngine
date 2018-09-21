@@ -293,6 +293,15 @@
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUIimage1D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIcolourPicker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\colourGradient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -587,6 +596,15 @@
       <Filter>texGen</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIpaletteBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIimage1D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIcolourPicker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\colourGradient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

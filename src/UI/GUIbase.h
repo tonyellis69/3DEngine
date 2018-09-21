@@ -83,7 +83,12 @@ const glm::vec4 uiWhite = { 1,1,1,1 };
 const glm::vec4 uiBlue = { 0,0,0.7f,1 };
 const glm::vec4 uiBlack = { 0,0,0.0,1 };
 const glm::vec4 uialmostBlack = { 0.1,0.1,0.1,1 };
-const glm::vec4 uiDarkGrey = { 0.25,0.25,0.25,1 };
+//const glm::vec4 uiDarkGrey = { 0.25,0.25,0.25,1 };
+const glm::vec4 uiDarkGrey = { 0.49f,0.49f,0.49f,1 };
+const glm::vec4 uiLightGrey = { 0.75f,0.75f,0.75f,1 };
+
+const glm::vec4 uiOldbackColour1 = { 0.99f,0.99f, 0.99f,1.0f };
+const glm::vec4 uiOldbackColour2 = { 0.75f, 0.75f, 0.75f,1.0f };
 
 class CGUIbase;
 
@@ -99,7 +104,7 @@ public:
 	DelegatePP<void,const UIcolour&,const UIcolour&> setDrawColours;
 	DelegatePPP<void,int,int,int> drawIcon;
 	DelegatePP<void,CGUIbase&, CMessage&> handleUImsg;
-	DelegatePPP<void,UIcoord&,int,int> drawRect;
+	//DelegatePPP<void,UIcoord&,int,int> drawRect;
 	DelegatePPPP<void,int,int,int,int> drawBorder;
 	DelegateP<void,UIrect&> setClip;
 	DelegatePPPP<void,int,int,int,int> drawLine;
@@ -117,11 +122,15 @@ public:
 	virtual void drawCtrlRect(CGUIbase& control) {};
 	virtual void drawCtrlBorder(CGUIbase& control) {};
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
-	virtual void drawTexture(CGUIbase & control, CBaseTexture& texture) {};
+	virtual void drawTexture(guiRect& drawBox, CBaseTexture& texture) {};
 	virtual void updateScreenDimensions(CGUIbase& control) {};
 	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
 	virtual CFont* getFont(std::string name) { return NULL; };
-	virtual void drawTextureGradient(CGUIbase & control, CBaseTexture& texture) {};
+	virtual void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture) {};
+	virtual void drawRect2(guiRect& drawBox,const glm::vec4& colour1, const glm::vec4&  colour2) {};
+	virtual void drawBorder2(guiRect& drawBox, const glm::vec4& colour) {};
+	virtual void drawCursor2(guiRect & drawBox) {};
+
 };
 
 
@@ -132,13 +141,17 @@ enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 			uiRichTextPanel };
 
 
+class Icallback {
+public:
+	virtual void GUIcallback(CGUIbase* sender, CMessage& msg) {};
+};
 
 /** A class defining the basis of all GUI controls. */
 class CGUIradio;
 class CGUImouse;
 class CGUIroot;
 class CGUIbaseEngine;
-class CGUIbase {
+class CGUIbase : public Icallback {
 public:
 	CGUIbase() ;
 	//CGUIbase(int x, int y, int w, int h);
@@ -151,6 +164,7 @@ public:
 	virtual void OnLMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void onRMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void OnClick(const  int mouseX, const  int mouseY) {};
+	virtual void onDoubleClick(const int mouseX, const int mouseY) {};
 	virtual void onKeyPress(unsigned int Key, long Mod) {};
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
@@ -175,7 +189,9 @@ public:
 	virtual void setVisible(bool onOff);
 	virtual bool getVisible();
 	unsigned int getID();
-	void makeModal(CGUIbase * control);
+	void makeModal();
+
+	void makeUnModal();
 
 	void setBackColour1(const UIcolour & colour);
 	void setBackColour1(const glm::vec4 & colour);
@@ -195,6 +211,8 @@ public:
 	int getWidth();
 	int getHeight();
 	virtual void resize(int w, int h);
+	void setGUIcallback(Icallback* callbackInstance);
+	virtual void GUIcallback(CGUIbase* sender, CMessage& msg) {};
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -259,6 +277,7 @@ public:
 
 	UIcolour borderColour; ///<Colour for the border of this control.
 	bool drawBorder; ///<true if we draw this control's border.
+	Icallback * callbackObj;
 protected:
 	bool enabled; ///<False if this control has been deactivated.
 	static CFont* defaultFont;
@@ -283,13 +302,15 @@ const int uiScrollbarID = 1003;
 const int uiContainerVbarID = 1004;
 const int uiContainerHbarID = 1005;
 
+const int uiOKid = 2000;
+
 
 
 //message types
 enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiDataEntered, uiSpin, uiLostKeyboard,
-	uiMsgHotTextClick, uiMsgChildResize
+	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide
 };
 
 #define NONE -1
@@ -335,3 +356,6 @@ enum Messagetypes {
 #define GLFW_KEY_LEFT               263
 #define GLFW_KEY_DOWN               264
 #define GLFW_KEY_UP                 265
+
+//because GLFW doesn't have this
+#define MY_DOUBLECLICK 0x00060006

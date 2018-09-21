@@ -13,15 +13,15 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y); width = w; height = h;
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 
-	pDrawFuncs->registerControl(*this);
+	//pDrawFuncs->registerControl(*this);
 	//SetPos(x, y, w, h);
 	
 
 	//create the two buttons.
-	downButton = new CGUInumericIconButton(0, 0);
+	downButton = new CGUInumericIconButton(0, 0,h,h);
 	downButton->icon = leftIconArrow;
 	downButton->id = downButtonID;
-	upButton = new CGUInumericIconButton(0, 0);
+	upButton = new CGUInumericIconButton(0, 0,h,h);
 	upButton->hFormat = hRight;
 	upButton->icon = rightIconArrow;
 	upButton->id = upButtonID;
@@ -29,9 +29,10 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	Add(upButton);
 
 	//create numBox
-	numBox = new CGUInumericTextbox2(downButton->width, 0,
-		width - (downButton->width + upButton->width), defaultNumericHeight);
+	numBox = new CGUInumericTextbox2(h, 0,
+		width - (h * 2), h);
 	////////////////numBox->TextAlign = tcentred;
+	
 	Add(numBox);
 
 	valMin = 0; valMax = 10;
@@ -61,6 +62,9 @@ void CGUInumeric2::setValue(float newValue) {
 	numBox->setText(numStr);
 }
 
+void CGUInumeric2::setValue(int newValue) {
+	setValue((float)newValue);
+}
 
 /** Handle any internal messages telling us the control has been spun or otherwise updated.*/
 void  CGUInumeric2::message(CGUIbase& sender, CMessage& msg) {
@@ -82,6 +86,7 @@ void  CGUInumeric2::message(CGUIbase& sender, CMessage& msg) {
 	CMessage userMsg;
 	userMsg.fValue = value;
 	pDrawFuncs->handleUImsg(*this, userMsg);
+	parent->message(*this, msg);
 }
 
 /** Overloads the default handler to scroll the numeric control. */
@@ -136,11 +141,12 @@ void CGUInumericTextbox2::onKeyPress(unsigned int Key, long Mod) {
 }
 
 /** Alert the parent device that Enter has been pressed or keycapture lost, making the current text 'entered'. */
+/*
 void CGUInumericTextbox2::dataEnteredAlert() {
 	CMessage msg;
 	msg.Msg = uiDataEntered;
 	parent->message(*this, msg);
-}
+}*/
 
 /** Overload the usual onclick message, to alert the numeric control instead. */
 void CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
@@ -150,4 +156,8 @@ void CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
 	msg.value = direction;
 	msg.Msg = uiSpin;
 	parent->message(*this, msg);
+}
+
+void CGUInumericIconButton::onDoubleClick(int mouseX, int mouseY) {
+	OnClick(mouseX, mouseY);
 }

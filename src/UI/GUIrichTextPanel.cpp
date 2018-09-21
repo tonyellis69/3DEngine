@@ -6,7 +6,7 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 	drawBox.pos = glm::i32vec2(x, y);
 	drawBox.size = glm::i32vec2(w, h);
 	type = uiRichTextPanel;
-	pDrawFuncs->registerControl(*this);
+	//pDrawFuncs->registerControl(*this);
 
 	setBackColour1(oldbackColour1);
 	setBackColour2(oldbackColour2);

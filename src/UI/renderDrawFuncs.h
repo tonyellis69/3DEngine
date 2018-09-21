@@ -16,6 +16,7 @@ functionality. */
 struct TControlRects {
 	glm::mat4 ctrlMatrix;
 	glm::mat4 ctrlBorderMatrix;
+	glm::mat4 orthoTransMatrix;
 };
 
 class CRenderDrawFuncs : public CDrawFuncs {
@@ -30,13 +31,17 @@ public:
 	void drawCtrlBorder(CGUIbase& control);
 	void setScreenSize(int width, int height);
 	unsigned int getTextureHandle(const std::string& textureName);
-	void drawTexture(CGUIbase & control, CBaseTexture& texture);
+	void drawTexture(guiRect& drawBox, CBaseTexture& texture);
 	void setScreenDimensions(CGUIbase & control);
 	void updateScreenDimensions(CGUIbase& control);
 	void drawCursor(CGUIbase& control,CBuf& cursorPos);
+	void drawCursor2(guiRect & drawBox);
 	float getTime();
 	CFont* getFont(std::string name);
-	void drawTextureGradient(CGUIbase & control, CBaseTexture& texture);
+	void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture);
+	void drawRect2(guiRect& drawBox, const glm::vec4& colour1, const glm::vec4&  colour2);
+    void drawBorder2(guiRect& drawBox, const glm::vec4& colour);
+
 
 //private:
 	CRenderer* pRenderer;
@@ -54,6 +59,10 @@ public:
 	GLuint hTile;
 	GLuint hOffset;
 
+	CShader* uiTexGradientShader;
+	GLuint hTexGradOrtho;
+	GLuint hTextureUnitGrad;
+
 	std::vector<CShader*> shaderList; ///<Tracks ui shaders
 
 	glm::mat4 orthoView; ///<A matrix for viewing 2D drawing;
@@ -65,6 +74,7 @@ public:
 
 	CBuf templateQuad;
 	CBuf borderTemplateQuad;
+	//CBuf cursorTemplateLine;
 };
 
 const float cursorFlashDelay = 0.5f;

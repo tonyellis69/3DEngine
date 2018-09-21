@@ -1,7 +1,7 @@
 #include "GUIroot.h"
 #include "GUImouse.h"
 
-CGUIroot* CGUIbase::rootUI;
+CGUIroot* CGUIbase::rootUI = NULL;
 
  
 CGUIroot::CGUIroot() {
@@ -22,7 +22,7 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
 		return;
 
-	if (modalControls.size() > 0) {
+	if (modalControls.size() > 0 && scrollbarHasMouse == NULL) {
 		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
 		//TO DO: why did I ever do the above?
 		modalControls.back()->MouseMsg(Msg, mouseX - modalControls.back()->drawBox.pos.x, mouseY - modalControls.back()->drawBox.pos.y, key);
@@ -33,7 +33,7 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	}
 	if (( Msg == WM_MOUSEMOVE )) { 
 		if (scrollbarHasMouse) { //a scrollbar has captured the mouse, so pass the message straight there.
-				scrollbarHasMouse->OnMouseMove(mouseX - scrollbarHasMouse->screenPos.x,mouseY - scrollbarHasMouse->screenPos.y, key);
+				scrollbarHasMouse->OnMouseMove(mouseX - scrollbarHasMouse->drawBox.pos.x,mouseY - scrollbarHasMouse->drawBox.pos.y, key);
 				return;
 		}
 		OnMouseMove(mouseX,mouseY,key);
@@ -53,7 +53,7 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 		return false;
 
 	if (modalControls.size()) {
-		return modalControls.back()->MouseWheelMsg(mouseX - modalControls.back()->screenPos.x ,mouseY - modalControls.back()->screenPos.y,wheelDelta,key);
+		return modalControls.back()->MouseWheelMsg(mouseX - modalControls.back()->drawBox.pos.x,mouseY - modalControls.back()->drawBox.pos.y,wheelDelta,key);
 	}
 
 	if (focusControl)

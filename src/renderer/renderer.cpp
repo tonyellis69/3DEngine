@@ -89,8 +89,8 @@ void CRenderer::init() {
 
 	glClampColor(GL_CLAMP_VERTEX_COLOR, GL_FALSE);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+//	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
 	setTextureMode(true);
@@ -356,7 +356,7 @@ void CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec2 &
 void  CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector) {
 	glUniform3fv(vecHandle, elements, glm::value_ptr(vector));
 }
-void  CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec4& vector) {
+void  CRenderer::setShaderValue(unsigned int vecHandle, int elements, const glm::vec4& vector) {
 	glUniform4fv(vecHandle, elements, glm::value_ptr(vector));
 }
 
@@ -691,6 +691,11 @@ void CRenderer::createTextureFromImageFile(std::string filename) {
 void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, hTexture);
+}
+
+void CRenderer::attachTexture1D(unsigned int textureUnit, unsigned int hTexture) {
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_1D, hTexture);
 }
 
 void CRenderer::attachTexture(unsigned int textureUnit, CBaseTexture & texture) {

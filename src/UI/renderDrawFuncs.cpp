@@ -13,17 +13,23 @@ CRenderDrawFuncs::CRenderDrawFuncs() {
 	//create a template quad:
 	vBuf::T2DtexVert corners[4];
 
-	corners[0].v = vec2(-0.5,-0.5); //A
-	corners[1].v = vec2(0.5,-0.5); //B  1,0
-	corners[2].v = vec2(-0.5,0.5); //C  0,1
-	corners[3].v = vec2(0.5, 0.5); //D  1,1
+	//corners[0].v = vec2(-0.5,-0.5); //A
+	//corners[1].v = vec2(0.5,-0.5); //B  1,0
+	//corners[2].v = vec2(-0.5,0.5); //C  0,1
+	//corners[3].v = vec2(0.5, 0.5); //D  1,1
+
+	corners[0].v = vec2(0, 0); //A
+	corners[1].v = vec2(1, 0); //B  1,0
+	corners[2].v = vec2(0, 1); //C  0,1
+	corners[3].v = vec2(1, 1); //D  1,1
+	//NB the top-left origin used for 2D flips Y. By pre-flipping quads we ensure they end up facing the right way
 
 	corners[0].tex = vec2(0);
 	corners[1].tex = vec2(1, 0);
 	corners[2].tex = vec2(0, 1);
 	corners[3].tex = vec2(1, 1);
 
-	unsigned int index[4] = { 2,3,0,1 };
+	unsigned int index[4] = { 2,3,0,1};
 	templateQuad.storeVertexes(corners, sizeof(corners), 4);
 	templateQuad.storeIndex(index, 4);
 	templateQuad.storeLayout(2, 2, 0, 0);
@@ -33,6 +39,14 @@ CRenderDrawFuncs::CRenderDrawFuncs() {
 	borderTemplateQuad.storeVertexes(corners, sizeof(corners), 4);
 	borderTemplateQuad.storeIndex(index2, 4);
 	borderTemplateQuad.storeLayout(2, 2, 0, 0);
+
+	//create cursor template line;
+/*	unsigned int index3[2] = {0,2 };
+	cursorTemplateLine.storeVertexes(corners, sizeof(corners), 2);
+	cursorTemplateLine.storeIndex(index3, 2);
+	cursorTemplateLine.storeLayout(2, 2, 0, 0);
+	*/
+	//Looks like we can get by using draw rect
 }
 
 
@@ -54,6 +68,13 @@ void CRenderDrawFuncs::loadShaders() {
 	hTile = uiTexShader->getUniformHandle("tile");
 	hOffset = uiTexShader->getUniformHandle("offset");
 
+	uiTexGradientShader = pRenderer->createShader( "uiTextureGradient");
+	uiTexGradientShader->setType(uiTex);
+	hTexGradOrtho = uiTexGradientShader->getUniformHandle("orthoMatrix");
+	hTextureUnitGrad = uiTexGradientShader->getUniformHandle("textureUnit");
+
+
+
 }
 
 /** Register this control with the uiEngine, storing its details for drawing. */
@@ -72,11 +93,17 @@ void CRenderDrawFuncs::setScreenDimensions(CGUIbase & control) {
 	//update matrices
 	glm::mat4 shape = glm::scale(glm::mat4(1), glm::vec3(control.drawBox.size.x, (float)control.drawBox.size.y, 1));
 	
-	mat4 trans = glm::translate(mat4(1), vec3(control.drawBox.pos, 0) + (0.5f * vec3(control.drawBox.size, 0)) );
-	controlRects[control.uniqueID].ctrlMatrix = orthoView * trans * shape;
+	mat4 trans = glm::translate(mat4(1), vec3(control.drawBox.pos, 0) );
 
-	glm::mat4 borderShape = glm::scale(glm::mat4(1), glm::vec3(control.drawBox.size.x - 1, (float)control.drawBox.size.y - 1, 1));
-	controlRects[control.uniqueID].ctrlBorderMatrix = orthoView * trans * borderShape;
+	controlRects[control.uniqueID].orthoTransMatrix = orthoView * trans;
+
+	controlRects[control.uniqueID].ctrlMatrix = controlRects[control.uniqueID].orthoTransMatrix * shape;
+
+	glm::mat4 borderShape = glm::scale(glm::mat4(1), glm::vec3(control.drawBox.size.x - 0.5f, (float)control.drawBox.size.y - 1, 1));
+
+	mat4 borderTrans = glm::translate(mat4(1), vec3(control.drawBox.pos, 0) + vec3(0.5f,0.5,0));
+	controlRects[control.uniqueID].ctrlBorderMatrix = orthoView * borderTrans * borderShape;
+
 }
 
 /** Draw the drawBox rectangle of this control. */
@@ -114,16 +141,17 @@ unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName)
 	return renTex->handle;
 }
 
-void CRenderDrawFuncs::drawTexture(CGUIbase & control, CBaseTexture& texture) {
+void CRenderDrawFuncs::drawTexture(guiRect& drawBox, CBaseTexture& texture) {
+	mat4 trans = glm::translate(mat4(1), vec3(drawBox.pos, 0));
+	mat4 shape = glm::scale(trans, glm::vec3(drawBox.size.x,drawBox.size.y, 1));
+	mat4 ctrlMatrix = orthoView * shape;
+
+
 	pRenderer->setShader(uiTexShader);
-	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
 	pRenderer->attachTexture(0, rendTex->handle);
-
 	uiTexShader->setTextureUnit(hTextureUnit, 0);
-	uiTexShader->setShaderValue(hTile,vec2(1,1));
-	uiTexShader->setShaderValue(hOffset,vec2(0));
-	uiRectShader->setShaderValue(hTexOrtho, controlRects[control.uniqueID].ctrlMatrix);
+	uiTexShader->setShaderValue(hTexOrtho, ctrlMatrix);
 	pRenderer->drawBuf(templateQuad, drawTriStrip);
 }
 
@@ -150,6 +178,22 @@ void CRenderDrawFuncs::drawCursor(CGUIbase& control,CBuf& cursorPos) {
 	pRenderer->setShader(0);
 }
 
+void CRenderDrawFuncs::drawCursor2(guiRect& drawBox) { 
+	chrono::system_clock::time_point currentTime = chrono::system_clock::now();
+	chrono::duration<float> time_span = chrono::duration_cast<chrono::duration<float>>(currentTime - lastCursorFlash);
+	if (time_span.count() > cursorFlashDelay) {
+		cursorOn = !cursorOn;
+		lastCursorFlash = currentTime;
+	}
+	if (!cursorOn)
+		return;
+
+	drawRect2(drawBox, (vec4&)UIblack, (vec4&)UIblack);
+
+}
+
+
+
 float CRenderDrawFuncs::getTime() {
 	time_t currentTime = time(NULL);
 	return 0.0f;
@@ -159,15 +203,43 @@ CFont * CRenderDrawFuncs::getFont(std::string name) {
 	return &pRenderer->fontManager.getFont(name);
 }
 
-void CRenderDrawFuncs::drawTextureGradient(CGUIbase & control, CBaseTexture & texture) {
-	pRenderer->setShader(uiTexShader);
+void CRenderDrawFuncs::drawTextureGradient(guiRect & drawBox, CBaseTexture & texture) {
+	pRenderer->setShader(uiTexGradientShader);
 	//pass the texture
 	CRenderTexture* rendTex = (CRenderTexture*)&texture;
-	pRenderer->attachTexture(0, rendTex->handle);
+	pRenderer->attachTexture1D(0, rendTex->handle);
 
-	uiTexShader->setTextureUnit(hTextureUnit, 0);
-	uiRectShader->setShaderValue(hTexOrtho, controlRects[control.uniqueID].ctrlMatrix);
+	mat4 trans = glm::translate(mat4(1), vec3(drawBox.pos, 0));
+	mat4 shape = glm::scale(trans, glm::vec3(drawBox.size.x, drawBox.size.y, 1));
+	mat4 ctrlMatrix = orthoView * shape;
+
+	uiTexGradientShader->setTextureUnit(hTextureUnitGrad, 0);
+	uiTexGradientShader->setShaderValue(hTexGradOrtho, ctrlMatrix);
 	pRenderer->drawBuf(templateQuad, drawTriStrip);
+}
+
+void CRenderDrawFuncs::drawRect2(guiRect& drawBox, const glm::vec4& colour1,const  glm::vec4&  colour2) {
+	mat4 trans = glm::translate(mat4(1), vec3(drawBox.pos, 0));
+	mat4 shape = glm::scale(trans, glm::vec3(drawBox.size.x, drawBox.size.y, 1));
+	mat4 ctrlMatrix = orthoView *  shape;
+
+	pRenderer->setShader(uiRectShader);
+	uiRectShader->setShaderValue(hColour1, colour1);
+	uiRectShader->setShaderValue(hColour2, colour2);
+	uiRectShader->setShaderValue(hOrtho, ctrlMatrix);
+	pRenderer->drawBuf(templateQuad, drawTriStrip);
+}
+
+void CRenderDrawFuncs::drawBorder2(guiRect & drawBox, const glm::vec4 & colour) {
+	mat4 borderTrans = glm::translate(mat4(1), vec3(drawBox.pos, 0) + vec3(0.5f, 0.5, 0));
+	glm::mat4 borderShape = glm::scale(borderTrans, glm::vec3(drawBox.size.x - 0.5f, (float)drawBox.size.y - 1, 1));
+	mat4 borderCtrlMatrix = orthoView *  borderShape;
+
+	pRenderer->setShader(uiRectShader);
+	uiRectShader->setShaderValue(hColour1, colour);
+	uiRectShader->setShaderValue(hColour2, colour);
+	uiRectShader->setShaderValue(hOrtho, borderCtrlMatrix);
+	pRenderer->drawBuf(borderTemplateQuad, drawLineLoop);
 }
 
 

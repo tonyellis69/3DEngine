@@ -11,19 +11,20 @@ CGUIimage::CGUIimage(int x, int y, int w, int h) {
 
 	texture = NULL;
 
-	pDrawFuncs->registerControl(*this);
+	//pDrawFuncs->registerControl(*this);
 }
 
 void CGUIimage::DrawSelf() {
 	if (texture) { //let's draw a texture!
-		pDrawFuncs->drawTexture(*this,*texture);
+		pDrawFuncs->drawTexture(drawBox,*texture);
 	} else
-		pDrawFuncs->drawCtrlRect(*this);
-	if (drawBorder) {
-		pDrawFuncs->drawCtrlBorder(*this);
-	}
+		//pDrawFuncs->drawCtrlRect(*this);
+		pDrawFuncs->drawRect2(drawBox, (vec4&)backColour1, (vec4&) backColour2);
 
-	
+	if (drawBorder) {
+		//pDrawFuncs->drawCtrlBorder(*this);
+		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
+	}
 
 }
 

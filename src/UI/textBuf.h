@@ -63,4 +63,6 @@ private:
 	//CBuf buf2;
 	vector<vBuf::T2DtexVert> textQuads;
 	vector<unsigned int> textQuadsIndex;
+
+	
 };

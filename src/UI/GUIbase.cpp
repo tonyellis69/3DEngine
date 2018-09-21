@@ -47,12 +47,15 @@ CGUIbase::CGUIbase()  {
 	drawBorder = true;
 	uniqueID = UIuniqueIDgen++;
 	visible = true;
+	callbackObj = NULL;
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
 CGUIbase::~CGUIbase(void) {
 	if (pDrawFuncs)
 		pDrawFuncs->deregisterControl(*this);
+	if (MouseOver == this)
+		MouseOver = NULL;
 	for (auto control = modalControls.begin(); control != modalControls.end(); control++) {
 		if (*control == this) {
 			modalControls.erase(control);
@@ -105,7 +108,7 @@ bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  in
 void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
 		return;
-
+	
 	//otherwise, recursively test message against this control's child controls
 	for (size_t i = 0; i < Control.size(); i++) {
 		if (IsOnControl(*Control[i], mouseX, mouseY)) {		
@@ -115,43 +118,46 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	}
 	//Still here? Message is for this control
 	switch (Msg) {
-	case WM_MOUSEMOVE : {
-		if (MouseOver != this){ //mouse has just entered this control 
+	case WM_MOUSEMOVE: {
+		if (MouseOver != this) { //mouse has just entered this control 
 			MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
 			if (MouseOver)
 				MouseOver->onMouseOff(mouseX, mouseY, key);
 		}
-		MouseOver = this; 
-		OnMouseMove(mouseX, mouseY,key); return; }
-	case WM_LBUTTONDOWN : {
+		MouseOver = this;
+		OnMouseMove(mouseX, mouseY, key); return; }
+	case WM_LBUTTONDOWN: {
 		uncaptureKeyboard();
-		MouseDown = this; 
-		OnLMouseDown(mouseX,mouseY,key);
+		MouseDown = this;
+		OnLMouseDown(mouseX, mouseY, key);
 		return; }
-  	case WM_RBUTTONDOWN : {
+	case WM_RBUTTONDOWN: {
 		uncaptureKeyboard();
-		MouseDown = this; 
-		OnRMouseDown(mouseX,mouseY);
+		MouseDown = this;
+		OnRMouseDown(mouseX, mouseY);
 		return; }
-	case WM_LBUTTONUP : {
-		OnLMouseUp(mouseX,mouseY);
+	case WM_LBUTTONUP: {
+		OnLMouseUp(mouseX, mouseY);
 		if (MouseDown == this) //we've been clicked on!
 			OnClick(mouseX, mouseY);
-		if (MouseOver != this)	
+		if (MouseOver != this)
 			MouseOver = this;
 		scrollbarHasMouse = NULL;
 		pDrawFuncs->mouseCaptured(false);
-		MouseDown = NULL; 
-		return;}
-	case WM_RBUTTONUP : {
-		onRMouseUp(mouseX,mouseY);
-		return;}
-	case LM_HELD_DOWN : {
-		if (  (MouseDown == MouseOver) && (scrollbarHasMouse == NULL)) {
-			OnLMouseDown(mouseX ,mouseY, key );
-		return;
+		MouseDown = NULL;
+		return; }
+	case WM_RBUTTONUP: {
+		onRMouseUp(mouseX, mouseY);
+		return; }
+	case LM_HELD_DOWN: {
+		if ((MouseDown == MouseOver) && (scrollbarHasMouse == NULL)) {
+			OnLMouseDown(mouseX, mouseY, key);
+			return;
+		}
+	case MY_DOUBLECLICK: {
+		onDoubleClick(mouseX, mouseY);
+		return; }
 	}
-						  }
 	};
 }
 
@@ -401,6 +407,9 @@ void CGUIbase::CalculateClipbox() {
 
 	if ((Clipbox.y + Clipbox.height) >(parentClipbox.y + parentClipbox.height))
 		Clipbox.height -= (Clipbox.y + Clipbox.height) - (parentClipbox.y + parentClipbox.height);
+
+	//Clipbox.x -= 1; Clipbox.width += 1;
+//	Clipbox.height += 1;
 }
 
 /** Generate a name for this control. */
@@ -437,6 +446,10 @@ void CGUIbase::resize(int w, int h) {
 	width = w; height = h;
 	drawBox.size = glm::i32vec2(w, h);
 	updateAppearance();
+}
+
+void CGUIbase::setGUIcallback(Icallback * callbackInstance) {
+	callbackObj = callbackInstance;
 }
 
 
@@ -579,8 +592,15 @@ void CGUIbase::borderOn(bool onOff) {
 	drawBorder = onOff;
 }
 
-void CGUIbase::makeModal(CGUIbase * control) {
-	modalControls.push_back(control);
+void CGUIbase::makeModal() {
+	modalControls.push_back(this);
+}
+
+void CGUIbase::makeUnModal() {
+	for (unsigned int ctrl = 0; ctrl< modalControls.size(); ctrl++)
+		if (modalControls[ctrl] == this) {
+			modalControls.erase(modalControls.begin() + ctrl);
+		}
 }
 
 

@@ -36,7 +36,7 @@ public:
 	virtual void setShaderValue(unsigned int matrixHandle,  glm::mat3& matrix) {};
 	virtual void setShaderValue(unsigned int vecHandle, glm::vec2& vector) {};
 	virtual void setShaderValue(unsigned int vecHandle,  glm::vec3& vector) {};
-	virtual void setShaderValue(unsigned int vecHandle, glm::vec4& vector) {};
+	virtual void setShaderValue(unsigned int vecHandle, const glm::vec4& vector) {};
 	virtual void setShaderValue(unsigned int intHandle,  int value) {};
 	virtual void setShaderValue(unsigned int floatHandle,  float value) {};
 	virtual void setShaderValue(unsigned int textureHandle, CBaseTexture& texture) {};
