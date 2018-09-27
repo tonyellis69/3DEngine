@@ -11,7 +11,8 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 		h = defaultNumericHeight;
 
 	localPos = glm::i32vec2(x, y); width = w; height = h;
-	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	//drawBox.pos = i32vec2(x, y); 
+	drawBox.size = i32vec2(w, h);
 
 	//pDrawFuncs->registerControl(*this);
 	//SetPos(x, y, w, h);
@@ -67,7 +68,7 @@ void CGUInumeric2::setValue(int newValue) {
 }
 
 /** Handle any internal messages telling us the control has been spun or otherwise updated.*/
-void  CGUInumeric2::message(CGUIbase& sender, CMessage& msg) {
+void  CGUInumeric2::message(CGUIbase* sender, CMessage& msg) {
 	float tmpValue = value;
 	if (msg.Msg == uiSpin) {
 		if (msg.value == -1)
@@ -86,7 +87,7 @@ void  CGUInumeric2::message(CGUIbase& sender, CMessage& msg) {
 	CMessage userMsg;
 	userMsg.fValue = value;
 	pDrawFuncs->handleUImsg(*this, userMsg);
-	parent->message(*this, msg);
+	parent->message(this, msg);
 }
 
 /** Overloads the default handler to scroll the numeric control. */
@@ -100,7 +101,7 @@ bool CGUInumeric2::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheel
 	CMessage msg;
 	msg.Msg = uiSpin;
 	msg.value = direction;
-	message(*this, msg);
+	message(this, msg);
 	return true;
 }
 
@@ -155,7 +156,7 @@ void CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.value = direction;
 	msg.Msg = uiSpin;
-	parent->message(*this, msg);
+	parent->message(this, msg);
 }
 
 void CGUInumericIconButton::onDoubleClick(int mouseX, int mouseY) {

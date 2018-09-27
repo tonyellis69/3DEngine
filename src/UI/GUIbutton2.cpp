@@ -7,7 +7,8 @@ using namespace glm;
 CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y);
 	//width = w; height = h;
-	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	//drawBox.pos = i32vec2(x, y);
+	drawBox.size = i32vec2(w, h);
 
 	type = uiButton;
 
@@ -51,7 +52,7 @@ void CGUIbutton2::OnClick(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
 	pDrawFuncs->handleUImsg(*this, msg);
-	parent->message(*this, msg);
+	parent->message(this, msg);
 }
 
 void CGUIbutton2::setText(const std::string & text) {

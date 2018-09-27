@@ -19,7 +19,8 @@ CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y
 	lastMouseDownX = lastMouseDownY = 0;
 	id = uiScrollbarID;
 
-	drawBox.pos = glm::i32vec2(x, y); drawBox.size = glm::i32vec2(width, height);
+	//drawBox.pos = glm::i32vec2(x, y); 
+	drawBox.size = glm::i32vec2(width, height);
 	//pDrawFuncs->registerControl(*this);
 	setBackColour1(UIlightGrey);
 	setBackColour2(UIlightGrey);
@@ -176,6 +177,6 @@ void CGUIsysScrollbar::updateValue() {
 	CMessage msg;
 	msg.Msg = uiMsgSlide;
 	msg.value = Value;
-	parent->message(*this,msg);
+	parent->message(this,msg);
 }
 

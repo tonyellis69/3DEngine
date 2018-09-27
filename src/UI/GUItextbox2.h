@@ -22,7 +22,7 @@ public:
 	void backSpace();
 	void insert(std::string inText);
 	void OnCharEntry(unsigned int Key, long Mod);
-	void message(CGUIbase& sender, CMessage& msg);
+	void message(CGUIbase* sender, CMessage& msg);
 	void renderText();
 
 	CTextBuffer textBuf;

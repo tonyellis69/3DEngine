@@ -55,11 +55,11 @@ void CGUIsysContainer::Add(CGUIbase* child) {
 
 
 /** Handles a scroll message from the container's scrollbars. */
-void CGUIsysContainer::message(CGUIbase& sender, CMessage& msg) {
-	if (sender.id == uiContainerVbarID) 
+void CGUIsysContainer::message(CGUIbase* sender, CMessage& msg) {
+	if (sender->id == uiContainerVbarID) 
 		surface->localPos.y =  0 - (verticalBar->Max - msg.value);
 
-	if (sender.id == uiContainerHbarID) 
+	if (sender->id == uiContainerHbarID) 
 		surface->localPos.x = 0 - msg.value;
 	needsUpdate = true;
 }

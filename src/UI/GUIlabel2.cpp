@@ -5,7 +5,7 @@ using namespace glm;
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y);
 	width = w; height = h;
-	drawBox.pos = i32vec2(x, y); 
+	//drawBox.pos = i32vec2(x, y); 
 	drawBox.size = i32vec2(w, h);
 	textureHeight = h;
 	textureWidth = w;
@@ -19,7 +19,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	multiLine = false;
 	drawBorder = false;
 	mousePassthru = true;
-	pDrawFuncs->registerControl(*this);
+	//pDrawFuncs->registerControl(*this);
 	renderOffset = i32vec2(0, 0);
 	
 }

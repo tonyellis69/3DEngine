@@ -14,7 +14,7 @@ struct colourTab { //wraps the colour slider tabs
 };
 
 class CGUIpaletteTab;
-class CGUIpaletteBar : public CGUIpanel , public Icallback {
+class CGUIpaletteBar : public CGUIpanel  {
 public:
 	CGUIpaletteBar(int x, int y, int w, int h);
 	//void DrawSelf();
@@ -22,10 +22,16 @@ public:
 	void OnClick(const  int mouseX, const  int mouseY);
 	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 
-	void createTab(int mouseX, int mouseY);
-	void message(CGUIbase& sender, CMessage& msg);
+	void createTab(int mouseX);
+	void message(CGUIbase* sender, CMessage& msg);
+	void deleteTab(CGUIpaletteTab * tab);
+	void moveTab(CGUIpaletteTab * tab, int newPos);
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
-	void changeTabColour(CGUIpaletteTab* sender);
+	void editTabColour(CGUIpaletteTab* sender);
+	void changeTabColour(glm::i32vec4& newColour);
+
+	int paletteImageStartX;
+	int paletteImageEndX;
 
 	CGUIimage1D* paletteImage;
 	int upperPadding;
@@ -42,10 +48,14 @@ public:
 
 class CGUIpaletteTab : public CGUIpanel {
 public:
-	CGUIpaletteTab(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {};
+	CGUIpaletteTab(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {
+		borderOn(false); 
+	};
 	void onDoubleClick(const int mouseX, const int mouseY);
+	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onRMouseUp(const int mouseX, const int mouseY);
-	float position;
+	void OnMouseMove(int mouseX, int mouseY, int key);
+	int position;
 	glm::vec4 colour;
-
+	int lastMouseX;
 };

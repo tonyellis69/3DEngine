@@ -7,7 +7,7 @@ CGUIpanel::CGUIpanel(int x, int y, int w, int h) {
 
 	drawBorder = true;
 	setBorderColour(UIdarkGrey);
-	drawBox.pos = glm::i32vec2(x, y); 
+//	drawBox.pos = glm::i32vec2(x, y); 
 	drawBox.size = glm::i32vec2(w, h);
 
 	type = uiPanel;

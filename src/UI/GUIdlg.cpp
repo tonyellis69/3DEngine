@@ -56,7 +56,7 @@ CGUIdlgButton::CGUIdlgButton(int x, int y, int w, int h) : CGUIbutton2(x,y,w,h) 
 void CGUIdlgButton::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = dlgOKID;
-	parent->message(*this,msg);
+	parent->message(this,msg);
 
 }
 
@@ -78,7 +78,7 @@ CGUIokDlg::CGUIokDlg(int w, int h)  : CGUIsysDlg()  {
 }
 
 
-void CGUIokDlg::message(CGUIbase& sender, CMessage& msg) {
+void CGUIokDlg::message(CGUIbase* sender, CMessage& msg) {
 	//mark this modal control for deleting
 	rootUI->removeModal();
 	//rootUI->killModal = true;

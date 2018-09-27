@@ -14,7 +14,7 @@ public:
 	void setColour(glm::i32vec4 newColour);
 	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	void OnClick(const  int mouseX, const  int mouseY);
-	void message(CGUIbase& sender, CMessage& msg);
+	void message(CGUIbase* sender, CMessage& msg);
 	//void setMsgCallback(msgCallback callbackFn);
 	void updateColour();
 	glm::i32vec4 getColour();

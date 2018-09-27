@@ -1,11 +1,11 @@
 #pragma once
 
 #include<vector>
+#include<map>
 
 #include "glm/glm.hpp"
 
 struct TColour {
-	unsigned char index;
 	glm::i32vec4 colour;
 };
 
@@ -19,10 +19,13 @@ class ColourGradient {
 public:
 	ColourGradient();
 	void* getData();
-	void insertColour(unsigned int index, glm::i32vec4 newColour);
+	void insertColour(unsigned char index, glm::i32vec4& newColour);
+	void changeColour(unsigned char tabPos, glm::i32vec4& newColour);
+	glm::i32vec4 getColour(int index);
+	void moveTab(int oldPos, int newPos);
+	void deleteTab(unsigned char tabPos);
 
-	TColour getNextEntry(unsigned char index);
 
-	std::vector<TColour> colours;
+	std::map<int, glm::i32vec4> colours;
 	std::vector<TPixel> pixels;
 };

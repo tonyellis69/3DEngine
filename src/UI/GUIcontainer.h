@@ -14,7 +14,7 @@ public:
 	void createSurface();
 	void Add(CGUIbase* child);
 
-	void message(CGUIbase& sender, CMessage& msg);
+	void message(CGUIbase* sender, CMessage& msg);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	
 

@@ -791,7 +791,7 @@ void CGUIrichText::resizeToFit() {
 
 	if (parent) {
 		CMessage msg = { uiMsgChildResize,0,0,0,0 };
-		parent->message(*this, msg);
+		parent->message(this, msg);
 	}
 }
 

@@ -72,16 +72,16 @@ void CGUIcolourPicker::OnClick(const  int mouseX, const  int mouseY) {
 	}
 }
 
-void CGUIcolourPicker::message(CGUIbase & sender, CMessage & msg) {
+void CGUIcolourPicker::message(CGUIbase* sender, CMessage & msg) {
 	if (msg.Msg == uiSpin || msg.Msg == uiDataEntered) {
 		updateColour();
 	}
 	if (msg.Msg == uiClick) {
 		if (callbackObj)
-			callbackObj->GUIcallback(&sender,msg);
+			callbackObj->GUIcallback(sender,msg);
 	}
 	if (msg.Msg == uiMsgSlide) {
-		int component = sender.id;
+		int component = sender->id;
 		colour255[component] = slider[component]->Value;
 		setColour(colour255);
 	}

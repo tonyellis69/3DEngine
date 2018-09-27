@@ -143,6 +143,8 @@
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
+    <ClCompile Include="..\src\terrain\shell.cpp" />
+    <ClCompile Include="..\src\terrain\terrain2.cpp" />
     <ClCompile Include="..\src\texGen\compositor.cpp" />
     <ClCompile Include="..\src\texGen\texGen.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
@@ -240,6 +242,8 @@
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
+    <ClInclude Include="..\src\terrain\shell.h" />
+    <ClInclude Include="..\src\terrain\terrain2.h" />
     <ClInclude Include="..\src\texGen\compositor.h" />
     <ClInclude Include="..\src\texGen\texGen.h" />
     <ClInclude Include="..\Src\TexLoader.h" />

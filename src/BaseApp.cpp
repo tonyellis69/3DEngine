@@ -157,7 +157,6 @@ void CBaseApp::onMouseMove(int x, int y) {
 void CBaseApp::onMouseButton(int button, int action, int mods) {
 	unsigned int msg = 0; int x, y;
 	getMousePos(x, y);
-	std::cerr << "\nmouse y at " << y;
 
 	if (action == GLFW_RELEASE) {
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -168,7 +167,6 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 			before = now;
 			if (diff_ms > 0.01 && diff_ms < 0.5) {
 				msg = MY_DOUBLECLICK;
-				std::cerr << "\nmouse y at " << y;
 			}
 
 		}

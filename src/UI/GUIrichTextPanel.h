@@ -36,7 +36,7 @@ public:
 
 	void resizeToFit();
 
-	void message(CGUIbase & sender, CMessage & msg);
+	void message(CGUIbase* sender, CMessage & msg);
 
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.

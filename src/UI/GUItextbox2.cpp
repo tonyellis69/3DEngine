@@ -4,7 +4,8 @@ using namespace glm;
 
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x,y); width = w; height = h;
-	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	//drawBox.pos = i32vec2(x, y); 
+	drawBox.size = i32vec2(w, h);
 	renderOffset = i32vec2(2,0);
 	textBuf.setFont(defaultFont);
 	font = defaultFont;
@@ -149,7 +150,7 @@ void CGUItextbox2::dataEnteredAlert() {
 	CMessage msg;
 	msg.Msg = uiDataEntered;
 	pDrawFuncs->handleUImsg(*this, msg);
-	parent->message(*this, msg);
+	parent->message(this, msg);
 }
 
 /** User has pressed a character key, and we have focus. */
@@ -160,7 +161,7 @@ void CGUItextbox2::OnCharEntry(unsigned int Key, long Mod) {
 	insert(inString);
 }
 
-void CGUItextbox2::message(CGUIbase& sender, CMessage& msg) {
+void CGUItextbox2::message(CGUIbase* sender, CMessage& msg) {
 	if (msg.Msg == uiLostKeyboard)
 		dataEnteredAlert();
 }

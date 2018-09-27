@@ -181,7 +181,7 @@ public:
 	CGUIbase* findControl(int childID);
 	CGUIbase* findControl(CGUIbase* child);
 	int getControlNo();
-	virtual void message(CGUIbase& sender, CMessage& msg);
+	virtual void message(CGUIbase* sender, CMessage& msg) {};
 	virtual void setEnabled(bool onOff);
 	virtual bool getEnabled();
 	virtual void captureKeyboard();

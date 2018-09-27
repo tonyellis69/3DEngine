@@ -46,7 +46,7 @@ class CGUIokDlg : public CGUIsysDlg {
 public:
 	CGUIokDlg(int w, int h);
 
-	void message(CGUIbase& sender, CMessage& msg);
+	void message(CGUIbase* sender, CMessage& msg);
 	CGUIdlgButton* ok;
 };
 

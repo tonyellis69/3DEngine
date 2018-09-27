@@ -14,7 +14,7 @@ public:
 	CGUInumeric2(int x, int y, int w, int h);
 	void setValue(float newValue);
 	void setValue(int newValue);
-	void message(CGUIbase& sender, CMessage& msg);
+	void message(CGUIbase* sender, CMessage& msg);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void setEnabled(bool onOff);
 	void setMinMax(float newMin, float mewMax);

@@ -27,6 +27,9 @@
     <Filter Include="texGen">
       <UniqueIdentifier>{d613a150-3276-4d6b-a9f8-110f621a3eef}</UniqueIdentifier>
     </Filter>
+    <Filter Include="terrain2">
+      <UniqueIdentifier>{27ed68a3-1a9e-4120-8c53-13d02f5fcf55}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -301,6 +304,12 @@
     </ClCompile>
     <ClCompile Include="..\src\colourGradient.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\terrain\terrain2.cpp">
+      <Filter>terrain2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\terrain\shell.cpp">
+      <Filter>terrain2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -606,6 +615,12 @@
     </ClInclude>
     <ClInclude Include="..\src\colourGradient.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\terrain\terrain2.h">
+      <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\terrain\shell.h">
+      <Filter>terrain2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

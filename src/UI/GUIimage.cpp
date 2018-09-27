@@ -5,7 +5,8 @@ using namespace glm;
 CGUIimage::CGUIimage(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y);
 	width = w; height = h;
-	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	//drawBox.pos = i32vec2(x, y); 
+	drawBox.size = i32vec2(w, h);
 
 	type = uiImage;
 

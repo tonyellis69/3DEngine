@@ -189,14 +189,14 @@ void CGUIbase::SetPos(int x, int y, int w, int h) {
 void CGUIbase::SetPos(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y);
 	width = w; height = h;
-	drawBox.pos = glm::i32vec2(x, y);
+	//drawBox.pos = glm::i32vec2(x, y);
 	drawBox.size = glm::i32vec2(w, h);
 	updateAppearance();
 }
 
 void CGUIbase::setPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
-	drawBox.pos = glm::i32vec2(x, y);
+	//drawBox.pos = glm::i32vec2(x, y);
 	updateAppearance();
 }
 
@@ -517,18 +517,18 @@ int CGUIbase::getControlNo() {
 
 	
 /** Handle a UI-internal message from another control.*/
-
-void CGUIbase::message(CGUIbase& sender, CMessage& msg) {
-	if (sender.type == radioButton) { //several controls can be radio parents, so catch it here
+/*
+void CGUIbase::message(CGUIbase* sender, CMessage& msg) {
+	if (sender->type == radioButton) { //several controls can be radio parents, so catch it here
 		//set the other radio buttons to 'off'.
 		for (size_t i=0;i<Control.size();i++)
 			if ( Control[i]->type == radioButton ) {
-				if ( Control[i] != &sender) {
+				if ( Control[i] != sender) {
 					static_cast<CGUIradio*>(Control[i])->Set = false; 
 				}
 			} 
 	}
-}
+}*/
 
 /** Disable or enable this contol. */
 void CGUIbase::setEnabled(bool onOff) {
@@ -552,7 +552,7 @@ void CGUIbase::uncaptureKeyboard() {
 	CMessage msg;
 	msg.Msg  = uiLostKeyboard;
 	if (KeyCapture != NULL)
-		KeyCapture->message(*this,msg);
+		KeyCapture->message(this,msg);
 	KeyCapture = NULL;
 }
 
