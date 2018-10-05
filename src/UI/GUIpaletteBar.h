@@ -29,6 +29,11 @@ public:
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
 	void editTabColour(CGUIpaletteTab* sender);
 	void changeTabColour(glm::i32vec4& newColour);
+	void logPalette();
+	void loadPalette();
+	void clearTabControls();
+	void* getPixels();
+	void updatePalette();
 
 	int paletteImageStartX;
 	int paletteImageEndX;
@@ -38,18 +43,22 @@ public:
 	int barHeight;
 	glm::i32vec2 tabSize;
 
-	std::vector<colourTab> colourTabs;
+
 	CGUIpaletteTab* colourChangeTab;
 
 	CGUIcolourPicker* colourPicker;
 
 	ColourGradient colourGradient;
+	CRenderTexture paletteTexture;
+
+	int logButtonID;
 };
 
 class CGUIpaletteTab : public CGUIpanel {
 public:
 	CGUIpaletteTab(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {
 		borderOn(false); 
+		type = uiPaletteTab;
 	};
 	void onDoubleClick(const int mouseX, const int mouseY);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
@@ -59,3 +68,4 @@ public:
 	glm::vec4 colour;
 	int lastMouseX;
 };
+

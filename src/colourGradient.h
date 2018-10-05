@@ -22,8 +22,9 @@ public:
 	void insertColour(unsigned char index, glm::i32vec4& newColour);
 	void changeColour(unsigned char tabPos, glm::i32vec4& newColour);
 	glm::i32vec4 getColour(int index);
-	void moveTab(int oldPos, int newPos);
+	int moveTab(int oldPos, int newPos);
 	void deleteTab(unsigned char tabPos);
+	const std::map<int, glm::i32vec4>& getTabs();
 
 
 	std::map<int, glm::i32vec4> colours;

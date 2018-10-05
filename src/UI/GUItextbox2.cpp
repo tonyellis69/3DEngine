@@ -96,7 +96,8 @@ void CGUItextbox2::calcCursorPosition() {
 
 /** Determine offset due to centering, etc. */
 void CGUItextbox2::calcLineOffset() {
-	renderOffset.y = (drawBox.size.y - font->lineHeight + 2) / 2.0;
+	renderOffset.y = (drawBox.size.y - font->lineHeight + 4) / 2.0;
+	//renderOffset.y = ( font->lineHeight + 4) ;
 }
 
 

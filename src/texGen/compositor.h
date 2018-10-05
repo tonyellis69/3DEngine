@@ -8,23 +8,29 @@
 #include "texGen.h"
 
 /** A class for creating, viewing and experimenting with procedural textures. */
-class Compositor {
+class Compositor : public Icallback {
 public:
 	Compositor();
 	void init(CBaseApp* app);
 	void compose();
+	void hide(bool onOff);
 
 //private:
 	void initGUI();
+	void GUIcallback(CGUIbase* sender, CMessage& msg);
 
-static	void colourPickerCallback(CGUIbase* sender, CMessage & msg);
 
 	CBaseApp* pApp;
 	CRenderTexture sample;
+	CRenderTexture sample2;
+	CRenderTexture sample3;
+	CRenderTexture sample4;
+	CRenderTexture noise;
+	CRenderTexture noise1;
 	CGUIimage* image;
 
-	CGUIpaletteBar* palette;
-	CRenderTexture paletteGradient;
+	CGUIpaletteBar* paletteBar;
+
 	CGUInumeric2* num;
 	static CGUIcolourPicker* tmp;
 };

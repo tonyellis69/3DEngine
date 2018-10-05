@@ -381,7 +381,7 @@ CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
 	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
 
 	std::vector<glm::vec3> verts, normals; std::vector<unsigned int> index;
-	shape::cube(verts, normals, index);
+	shape::cube(&verts, &normals, &index);
 	shape::scale(verts, size);
 
 	cube->getBuffer()->storeVertexes(verts, normals);

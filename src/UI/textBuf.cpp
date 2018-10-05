@@ -60,8 +60,8 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 			chars[v + 2].tex = glm::vec2(glyph->u, glyph->v);
 			chars[v + 3].tex = glm::vec2(glyph->s, glyph->v);
 
-			index.push_back(v + 2); index.push_back(v + 3); index.push_back(v);
-			index.push_back(v); index.push_back(v + 3); index.push_back(v + 1);
+			index.push_back(v);  index.push_back(v + 3); index.push_back(v + 2);
+			index.push_back(v + 1); index.push_back(v + 3);  index.push_back(v);
 			v += 4;
 			blCorner += glm::vec2(glyph->width, 0);
 		}
@@ -93,10 +93,7 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 
 //	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
 
-	glm::vec4 test(0, 7, 0,1);
 
-	if (size.y == 40)
-		test =  orthoMatrix * test;
 
 	glm::vec4 textColour = textData.style.colour;
 	//textColour.a = 0.5;

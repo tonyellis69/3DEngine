@@ -8,6 +8,8 @@ class CTerrain2 {
 public:
 	void createLoD1shell(float _LoD1cubeSize, int chunkCubes, int SCchunks, int shellSCs);
 	void addShell(int extent);
+	float getShellSize(unsigned int shellNo);
+
 
 	std::vector<CShell> shells;
 

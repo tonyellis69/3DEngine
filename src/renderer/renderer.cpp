@@ -89,8 +89,8 @@ void CRenderer::init() {
 
 	glClampColor(GL_CLAMP_VERTEX_COLOR, GL_FALSE);
 
-	//glEnable(GL_CULL_FACE);
-//	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
 	setTextureMode(true);
@@ -341,6 +341,7 @@ unsigned int CRenderer::getShaderDataHandle(int program, std::string varName) {
 /** Use the given matrix as directed with the current shader. */
 void  CRenderer::setShaderValue(unsigned int matrixHandle, int elements, glm::mat4& matrix) {
 	glUniformMatrix4fv(matrixHandle, elements, GL_FALSE, glm::value_ptr(matrix));
+	unsigned int err = glGetError();
 }
 
 void CRenderer::setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix) {
@@ -376,10 +377,8 @@ void CRenderer::setShader(int program) {
 
 }
 
-void CRenderer::setShader(CShader * shader) {
+void CRenderer::setShader(CShader * shader) {	
 	glUseProgram(shader->getShaderHandle());
-
-
 }
 
 void CRenderer::drawModel(CRenderModel& model) {

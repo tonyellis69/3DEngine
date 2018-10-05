@@ -14,6 +14,10 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 void CTerrain2::addShell(int extent) {	
 	int newShellLoD = shells.back().LoD * 2;
 	float newShellChunkSize = shells.back().chunkSize * 2;
-	int newShellSCs = shells.back().shellSCs + (extent * 2);
+	int newShellSCs = shells.back().shellSCs + extent; // was (extent * 2);
 	shells.push_back({ newShellLoD, newShellChunkSize, SCchunks, newShellSCs });
+}
+
+float CTerrain2::getShellSize(unsigned int shellNo) {
+	return shells[shellNo].worldSpaceSize;
 }

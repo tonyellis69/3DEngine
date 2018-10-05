@@ -138,7 +138,7 @@ enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
 			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel,
-			uiRichTextPanel };
+			uiRichTextPanel, uiPaletteTab };
 
 
 class Icallback {
@@ -310,7 +310,7 @@ const int uiOKid = 2000;
 enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiDataEntered, uiSpin, uiLostKeyboard,
-	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide
+	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide, uiMsgUpdate
 };
 
 #define NONE -1

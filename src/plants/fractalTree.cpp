@@ -315,7 +315,7 @@ void CFractalTree::addHead(TStem & stem, glm::vec3 headPos) {
 	std::vector<glm::vec3> headVerts, normals;
 	std::vector<unsigned int> headIndex;
 	float scale = stem.baseRadius * 20.0f; //or something
-	shape::cube(headVerts, normals, headIndex);
+	shape::cube(&headVerts, &normals, &headIndex);
 	shape::scale(headVerts,glm::vec3(scale));
 
 	//rotate to stem angle

@@ -25,6 +25,7 @@ void * ColourGradient::getData() {
 			nextTab++;
 		}
 	}
+	//pixels[254] = { 255,0,0,255 };
 	return (void*)pixels.data();
 }
 
@@ -53,18 +54,24 @@ glm::i32vec4 ColourGradient::getColour(int index) {
 }
 
 /** Move a tab somewhere else - if it exists at this index position. */
-void ColourGradient::moveTab(int oldPos, int newPos) {
-	if (colours.find(oldPos) == colours.end() || oldPos == newPos) {
-		return;
+int ColourGradient::moveTab(int oldPos, int newPos) {
+
+	if (colours.find(newPos) != colours.end() && newPos != 255 && newPos != 0) {
+		return oldPos;
 	}
-	
+
 	colours[newPos] = colours[oldPos];;
 	
 	if (oldPos != 0 && oldPos != 255)
 		colours.erase(oldPos);
+	return newPos;
 }
 
 void ColourGradient::deleteTab(unsigned char tabPos) {
 	if (tabPos != 0 && tabPos != 255 && colours.find(tabPos) != colours.end() )
 		colours.erase(tabPos);
+}
+
+const std::map<int, glm::i32vec4>& ColourGradient::getTabs() {
+	return colours;
 }

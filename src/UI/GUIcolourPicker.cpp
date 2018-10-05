@@ -66,10 +66,7 @@ void CGUIcolourPicker::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int ke
 }
 
 void CGUIcolourPicker::OnClick(const  int mouseX, const  int mouseY) {
-	if (IsOnControl(*numeric[0], mouseX, mouseY)) {
-		int b = 0;
 
-	}
 }
 
 void CGUIcolourPicker::message(CGUIbase* sender, CMessage & msg) {
