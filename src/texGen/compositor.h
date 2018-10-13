@@ -13,6 +13,9 @@ public:
 	Compositor();
 	void init(CBaseApp* app);
 	void compose();
+	void composeJade();
+	void composeWood();
+	void composeGranite();
 	void hide(bool onOff);
 
 //private:
@@ -25,6 +28,9 @@ public:
 	CRenderTexture sample2;
 	CRenderTexture sample3;
 	CRenderTexture sample4;
+	CRenderTexture sample5;
+	CRenderTexture sample6;
+	CRenderTexture sample7;
 	CRenderTexture noise;
 	CRenderTexture noise1;
 	CGUIimage* image;

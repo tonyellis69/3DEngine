@@ -4,7 +4,7 @@
 
 using namespace glm;
 
-CTexGen::CTexGen() {
+CTexGen::CTexGen() : frequency(1) {
 	pRenderer = &CRenderer::getInstance();
 
 	//create target quad
@@ -38,8 +38,12 @@ void CTexGen::setFrequency(float freq) {
 	frequency = freq;
 }
 
-void CTexGen::setAngles(glm::vec3 rotationAngles) {
-	matrix = glm::rotate(glm::mat4(1), glm::radians(rotationAngles.x), vec3(1, 0, 0));
+void CTexGen::setTranslation(glm::vec3 & translation) {
+	matrix = glm::translate(matrix, translation);
+}
+
+void CTexGen::setAngles(glm::vec3& rotationAngles) {
+	matrix = glm::rotate(matrix, glm::radians(rotationAngles.x), vec3(1, 0, 0));
 	matrix = glm::rotate(glm::mat4(1), glm::radians(-rotationAngles.y), vec3(0, 1, 0)) * matrix;
 	matrix = glm::rotate(glm::mat4(1), glm::radians(rotationAngles.z), vec3(0, 0, 1)) * matrix;
 }
@@ -66,6 +70,7 @@ void CNoiseTex::loadShader() {
 	hSampleSize = shader->getUniformHandle("sampleSize");
 	hMatrix = shader->getUniformHandle("matrix");
 	hOctaves = shader->getUniformHandle("octaves");
+	hFrequency = shader->getUniformHandle("frequency");
 }
 
 void CNoiseTex::render() {
@@ -75,6 +80,7 @@ void CNoiseTex::render() {
 	shader->setShaderValue(hSampleSize, sampleSize);
 	shader->setShaderValue(hMatrix, matrix);
 	shader->setShaderValue(hOctaves, octaves);
+	shader->setShaderValue(hFrequency, frequency);
 
 	pRenderer->renderToTextureQuad(*mTarget);
 }
@@ -144,6 +150,8 @@ void CTurbulenceTex::loadShader() {
 	hSource = shader->getUniformHandle("source");
 	hPower = shader->getUniformHandle("power");
 	hRoughness = shader->getUniformHandle("roughness");
+	hSamplePos = shader->getUniformHandle("samplePos");
+	hSampleSize = shader->getUniformHandle("sampleSize");
 }
 
 void CTurbulenceTex::render() {
@@ -154,6 +162,8 @@ void CTurbulenceTex::render() {
 	shader->setShaderValue(hFrequency, frequency);
 	shader->setShaderValue(hPower, power);
 	shader->setShaderValue(hRoughness, roughness);
+	shader->setShaderValue(hSamplePos, samplePos);
+	shader->setShaderValue(hSampleSize, sampleSize);
 
 	pRenderer->renderToTextureQuad(*mTarget);
 }
@@ -164,6 +174,11 @@ void CTurbulenceTex::setPower(float power) {
 
 void CTurbulenceTex::setRoughness(int roughness) {
 	this->roughness = roughness;
+}
+
+void CTurbulenceTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
+	samplePos = pos;
+	sampleSize = size;
 }
 
 
@@ -211,4 +226,125 @@ void CAddTex::render() {
 	shader->setShaderValue(hSource2, 1);
 
 	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+
+void CSeamlessTex::loadShader() {
+	shader = pRenderer->createShader("texSeamless");
+	hSource = shader->getUniformHandle("source");
+}
+
+void CSeamlessTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	pRenderer->attachTexture(0, mSource->handle);
+	shader->setShaderValue(hSource, 0);
+
+	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+
+void CScalePointTex::setScale(glm::vec3 & scale) {
+	this->scale = scale;
+}
+
+void CScalePointTex::loadShader() {
+	shader = pRenderer->createShader("texScalePoint");
+	hSource = shader->getUniformHandle("source");
+	hScale = shader->getUniformHandle("scale");
+}
+
+void CScalePointTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	pRenderer->attachTexture(0, mSource->handle);
+	shader->setShaderValue(hSource, 0);
+	shader->setShaderValue(hScale, scale);
+
+	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+void CBillowTex::loadShader() {
+	shader = pRenderer->createShader("texBillow");
+	hSamplePos = shader->getUniformHandle("samplePos");
+	hSampleSize = shader->getUniformHandle("sampleSize");
+	hMatrix = shader->getUniformHandle("matrix");
+	hOctaves = shader->getUniformHandle("octaves");
+	hFrequency = shader->getUniformHandle("frequency");
+	hPersistence = shader->getUniformHandle("persistence");
+}
+
+void CBillowTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	shader->setShaderValue(hSamplePos, samplePos);
+	shader->setShaderValue(hSampleSize, sampleSize);
+	shader->setShaderValue(hMatrix, matrix);
+	shader->setShaderValue(hOctaves, octaves);
+	shader->setShaderValue(hFrequency, frequency);
+	shader->setShaderValue(hPersistence, persistence);
+
+	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+void CBillowTex::setPersistence(float persistence) {
+	this->persistence = persistence;
+}
+
+void CVoronoiTex::loadShader() {
+	shader = pRenderer->createShader("texVoronoi");
+	hFrequency = shader->getUniformHandle("frequency");
+	hSamplePos = shader->getUniformHandle("samplePos");
+	hSampleSize = shader->getUniformHandle("sampleSize");
+}
+
+void CVoronoiTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	shader->setShaderValue(hFrequency, frequency);
+	shader->setShaderValue(hSamplePos, samplePos);
+	shader->setShaderValue(hSampleSize, sampleSize);
+
+	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+
+void CSelectTex::loadShader() {
+	shader = pRenderer->createShader("texSelect");
+	hSource = shader->getUniformHandle("source1");
+	hSource2 = shader->getUniformHandle("source2");
+	hMap = shader->getUniformHandle("map");
+	hLowerBound = shader->getUniformHandle("lowerBound");
+	hUpperBound = shader->getUniformHandle("upperBound");
+}
+
+void CSelectTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	pRenderer->attachTexture(0, mSource->handle);
+	shader->setShaderValue(hSource, 0);
+
+	pRenderer->attachTexture(1, source2->handle);
+	shader->setShaderValue(hSource2, 1);
+
+	pRenderer->attachTexture(2, map->handle);
+	shader->setShaderValue(hMap, 2);
+
+	shader->setShaderValue(hLowerBound, lowerBound);
+	shader->setShaderValue(hUpperBound, upperBound);
+
+	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+void CSelectTex::setSource2(CRenderTexture * src2) {
+	source2 = src2;
+}
+
+void CSelectTex::setControl(CRenderTexture * map) {
+	this->map = map;
+}
+
+void CSelectTex::setBounds(float lower, float upper) {
+	lowerBound = lower;
+	upperBound = upper;
 }
