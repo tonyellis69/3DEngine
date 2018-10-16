@@ -85,7 +85,7 @@ public:
 
 class CTurbulenceTex : public CTexGen {
 public:
-	CTurbulenceTex() : samplePos(0), sampleSize(2, 2, 0) {};
+	CTurbulenceTex() : samplePos(0), sampleSize(1, 1, 0) {};
 	void loadShader();
 	void render();
 	void setPower(float power);
@@ -157,16 +157,23 @@ public:
 
 class CVoronoiTex : public CTexGen {
 public:
-	CVoronoiTex() : samplePos(0), sampleSize(2, 2, 0) {};
+	CVoronoiTex() : samplePos(0), sampleSize(2, 2, 0),
+	distance(true), randomHue(false) {};
 	void loadShader();
 	void render();
+	void setDistance(bool onOff);
+	void setRandomHue(bool onOff);
+	void setSample(glm::vec3& pos, glm::vec3& size);
 
 	unsigned int hSamplePos;
 	unsigned int hSampleSize;
+	unsigned int hDistance;
+	unsigned int hRandomHue;
 
 	glm::vec3 samplePos;
 	glm::vec3 sampleSize;
-
+	bool distance;
+	bool randomHue;
 };
 
 class CSelectTex : public CTexGen {
@@ -176,14 +183,27 @@ public:
 	void setSource2(CRenderTexture* src2);
 	void setControl(CRenderTexture* map);
 	void setBounds(float lower, float upper);
+	void setFalloff(float falloff);
 
 	unsigned int hSource2;
 	unsigned int hMap;
 	unsigned int hLowerBound;
 	unsigned int hUpperBound;
+	unsigned int hFalloff;
 
 	CRenderTexture* source2;
 	CRenderTexture* map;
 	float lowerBound;
 	float upperBound;
+	float falloff;
+};
+
+
+class CLayerTex : public CAddTex {
+public:
+	
+	void loadShader();
+	void render();
+
+
 };

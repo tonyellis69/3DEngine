@@ -189,6 +189,7 @@ void CGUIpaletteBar::loadPalette() {
 	colourGradient.changeColour(255, glm::i32vec4(60, 10, 8, 255));
 	*/
 
+	/* granite
 	colourGradient.changeColour(0, glm::i32vec4(0, 0, 0, 255));
 	colourGradient.changeColour(8, glm::i32vec4(0, 0, 0, 255));
 	colourGradient.changeColour(16, glm::i32vec4(216, 216, 242, 255));
@@ -196,6 +197,12 @@ void CGUIpaletteBar::loadPalette() {
 	colourGradient.changeColour(191, glm::i32vec4(210, 116, 125, 255));
 	colourGradient.changeColour(223, glm::i32vec4(210, 113, 98, 255));
 	colourGradient.changeColour(255, glm::i32vec4(255, 176, 192, 255));
+	*/
+
+
+	colourGradient.changeColour(0, glm::i32vec4(160, 64, 42, 255));
+	colourGradient.changeColour(127, glm::i32vec4(64, 192, 64, 255));
+	colourGradient.changeColour(255, glm::i32vec4(128, 255, 128, 255));
 
 
 	updatePalette();

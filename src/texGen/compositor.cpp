@@ -25,6 +25,108 @@ void Compositor::compose() {
 	sample6.resize(512, 512);
 	sample7.resize(512, 512);
 
+	// Base of the water texture.  The Voronoi polygons generate the waves.  At
+ // the center of the polygons, the values are at their lowest.  At the edges
+ // of the polygons, the values are at their highest.  The values smoothly
+ // change between the center and the edges of the polygons, producing a
+ // wave-like effect.
+	CVoronoiTex voronoiTex;
+	voronoiTex.setTarget(&sample);
+	voronoiTex.setFrequency(8);
+	voronoiTex.setDistance(true);
+	voronoiTex.setRandomHue(false);
+	voronoiTex.setSample(vec3(0), vec3(2, 6, 0));
+	voronoiTex.render();
+
+
+	// Smoothly perturb the water texture for more realism.
+	CTurbulenceTex turbulenceTex;
+	turbulenceTex.setSource(&sample);
+	turbulenceTex.setTarget(&sample2);
+	turbulenceTex.setFrequency(8);
+	turbulenceTex.setRoughness(1);
+	turbulenceTex.setPower(1.0 / 32.0);
+	turbulenceTex.render();
+
+	//Produces the basic shape of soft, fluffy clouds.
+	/*module::Billow cloudBase;
+	cloudBase.SetSeed(2);
+	cloudBase.SetFrequency(2.0);
+	cloudBase.SetPersistence(0.375);
+	cloudBase.SetLacunarity(2.12109375);
+	cloudBase.SetOctaveCount(4);
+	cloudBase.SetNoiseQuality(QUALITY_BEST); */
+
+	CBillowTex billowTex;
+	billowTex.setTarget(&noise);
+	billowTex.setOctaves(4);
+	billowTex.setFrequency(2);
+	billowTex.setPersistence(0.375);
+	billowTex.render();
+
+	// Perturb the cloud texture for more realism.
+/*	module::Turbulence finalClouds;
+	finalClouds.SetSourceModule(0, cloudBase);
+	finalClouds.SetSeed(3);
+	finalClouds.SetFrequency(16.0);
+	finalClouds.SetPower(1.0 / 64.0);
+	finalClouds.SetRoughness(2);*/
+
+	CTurbulenceTex turbulenceTex2;
+	turbulenceTex2.setSource(&noise);
+	turbulenceTex2.setTarget(&noise1);
+	turbulenceTex2.setFrequency(16);
+	turbulenceTex2.setRoughness(2);
+	turbulenceTex2.setPower(1.0 / 64.0);
+	turbulenceTex2.render();
+
+
+
+
+	ColourGradient waterColour = { 0, 48, 64, 192, 255,
+								191, 96, 192, 255, 255,
+								255, 255, 255, 255, 255 };
+	palette1.resize(256,0);
+	palette1.setData(waterColour.getData());
+
+	CColourTex colourTex;
+	colourTex.setSource(&sample2);
+	colourTex.setTarget(&sample3);
+	colourTex.setPalette(&palette1);
+	colourTex.render();
+
+	ColourGradient cloudColour = { 0, 255, 255, 255, 0,
+							64, 255,255, 255, 0,
+							255, 255, 255, 255, 255 };
+	palette2.resize(256, 0);
+	palette2.setData(cloudColour.getData());
+
+	CColourTex colourTex2;
+	colourTex2.setSource(&noise1);
+	colourTex2.setTarget(&sample4);
+	colourTex2.setPalette(&palette2);
+	colourTex2.render();
+
+	CLayerTex layerTex;
+	layerTex.setSource(&sample3);
+	layerTex.setSource2(&sample4);
+	layerTex.setTarget(&sample5);
+	layerTex.render();
+
+	image->setTexture(sample5);
+}
+
+void Compositor::composeSlime() {
+	sample.resize(512, 512);
+	noise.resize(512, 512);
+	noise1.resize(512, 512);
+	sample2.resize(512, 512);
+	sample3.resize(512, 512);
+	sample4.resize(512, 512);
+	sample5.resize(512, 512);
+	sample6.resize(512, 512);
+	sample7.resize(512, 512);
+
 	// Large slime bubble texture.
 //	module::Billow largeSlime;
 //	largeSlime.SetSeed(0);
@@ -68,7 +170,18 @@ void Compositor::compose() {
 	selectTex.setControl(&noise1);
 	selectTex.setTarget(&sample3);
 	selectTex.setBounds(0.3125, 0.6875);
+	selectTex.setFalloff(0.5);
 	selectTex.render();
+
+	// Finally, perturb the slime texture to add realism.
+
+	CTurbulenceTex turbulenceTex;
+	turbulenceTex.setSource(&sample3);
+	turbulenceTex.setTarget(&sample4);
+	turbulenceTex.setFrequency(8);
+	turbulenceTex.setRoughness(2);
+	turbulenceTex.setPower(1.0 / 32.0);
+	turbulenceTex.render();
 
 	CColourTex colourTex;
 	colourTex.setSource(&sample4);
@@ -79,7 +192,7 @@ void Compositor::compose() {
 
 
 
-	image->setTexture(sample3);
+	image->setTexture(sample5);
 
 }
 
@@ -97,14 +210,6 @@ void Compositor::composeGranite() {
 
 	// Primary granite texture.  This generates the "roughness" of the texture
 // when lit by a light source.
-/*	module::Billow primaryGranite;
-	primaryGranite.SetSeed(0);
-	primaryGranite.SetFrequency(8.0);
-	primaryGranite.SetPersistence(0.625);
-	primaryGranite.SetLacunarity(2.18359375);
-	primaryGranite.SetOctaveCount(6);
-	primaryGranite.SetNoiseQuality(QUALITY_STD);
-	*/
 
 	CBillowTex billowTex;
 	billowTex.setTarget(&noise);
@@ -154,7 +259,7 @@ void Compositor::composeGranite() {
 
 
 
-	image->setTexture(sample5);
+	image->setTexture(sample3);
 
 	//image->setTexture(noise);
 }

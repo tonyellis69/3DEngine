@@ -2,9 +2,26 @@
 #include <algorithm> 
 #include <iostream>
 
+using namespace glm;
+
+
 ColourGradient::ColourGradient() {
 	colours[0] = glm::i32vec4( 0,0,0,255);
 	colours[255] = glm::i32vec4( 255,255,255,255);
+}
+
+/** Create a colourGradient object with the given palette. */
+ColourGradient::ColourGradient(std::initializer_list<int> bytes) : ColourGradient() {
+	int elements[5];
+	int count = 0;
+	for (auto element : bytes) {
+		elements[count] = element;
+		count++;
+		if (count == 5) {
+			changeColour(elements[0], i32vec4(elements[1], elements[2], elements[3], elements[4]));
+			count = 0;
+		}
+	}
 }
 
 /** Provide 256 entries of colour data suitable for a 1D texture. */
@@ -16,7 +33,7 @@ void * ColourGradient::getData() {
 	for (int slot = 0; slot < 256; slot++) {
 		float ratio = float(slot - prevTab->first) / (nextTab->first - prevTab->first);
 		glm::i32vec4 colour = glm::mix(prevTab->second, nextTab->second, ratio);
-		TPixel pixel = { colour.r,colour.g,colour.b,colour.a };
+		TPixel pixel = {(unsigned char) colour.r,(unsigned char)colour.g,(unsigned char)colour.b,(unsigned char)colour.a };
 		pixels.push_back(pixel);
 
 

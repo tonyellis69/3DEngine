@@ -14,6 +14,7 @@ public:
 	void addShell(int extent);
 	float getShellSize(unsigned int shellNo);
 	void playerWalk(glm::vec3& move);
+	void fillShells();
 
 	std::vector<CShell> shells;
 

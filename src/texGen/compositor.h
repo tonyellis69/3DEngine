@@ -16,6 +16,7 @@ public:
 	void composeJade();
 	void composeWood();
 	void composeGranite();
+	void composeSlime();
 	void hide(bool onOff);
 
 //private:
@@ -33,6 +34,10 @@ public:
 	CRenderTexture sample7;
 	CRenderTexture noise;
 	CRenderTexture noise1;
+	CRenderTexture palette1;
+	CRenderTexture palette2;
+
+
 	CGUIimage* image;
 
 	CGUIpaletteBar* paletteBar;

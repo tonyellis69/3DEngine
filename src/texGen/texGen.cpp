@@ -296,6 +296,8 @@ void CVoronoiTex::loadShader() {
 	hFrequency = shader->getUniformHandle("frequency");
 	hSamplePos = shader->getUniformHandle("samplePos");
 	hSampleSize = shader->getUniformHandle("sampleSize");
+	hDistance = shader->getUniformHandle("distance");
+	hRandomHue = shader->getUniformHandle("randomHue");
 }
 
 void CVoronoiTex::render() {
@@ -304,8 +306,23 @@ void CVoronoiTex::render() {
 	shader->setShaderValue(hFrequency, frequency);
 	shader->setShaderValue(hSamplePos, samplePos);
 	shader->setShaderValue(hSampleSize, sampleSize);
+	shader->setShaderValue(hDistance, distance);
+	shader->setShaderValue(hRandomHue, randomHue);
 
 	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+void CVoronoiTex::setDistance(bool onOff) {
+	distance = onOff;
+}
+
+void CVoronoiTex::setRandomHue(bool onOff) {
+	randomHue = onOff;
+}
+
+void CVoronoiTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
+	samplePos = pos;
+	sampleSize = size;
 }
 
 
@@ -316,6 +333,7 @@ void CSelectTex::loadShader() {
 	hMap = shader->getUniformHandle("map");
 	hLowerBound = shader->getUniformHandle("lowerBound");
 	hUpperBound = shader->getUniformHandle("upperBound");
+	hFalloff = shader->getUniformHandle("falloff");
 }
 
 void CSelectTex::render() {
@@ -332,6 +350,7 @@ void CSelectTex::render() {
 
 	shader->setShaderValue(hLowerBound, lowerBound);
 	shader->setShaderValue(hUpperBound, upperBound);
+	shader->setShaderValue(hFalloff, falloff);
 
 	pRenderer->renderToTextureQuad(*mTarget);
 }
@@ -347,4 +366,27 @@ void CSelectTex::setControl(CRenderTexture * map) {
 void CSelectTex::setBounds(float lower, float upper) {
 	lowerBound = lower;
 	upperBound = upper;
+}
+
+void CSelectTex::setFalloff(float falloff) {
+	this->falloff = falloff;
+}
+
+
+void CLayerTex::loadShader() {
+	shader = pRenderer->createShader("texLayer");
+	hSource = shader->getUniformHandle("source");
+	hSource2 = shader->getUniformHandle("source2");
+}
+
+void CLayerTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	pRenderer->attachTexture(0, mSource->handle);
+	pRenderer->attachTexture(1, source2->handle);
+
+	shader->setShaderValue(hSource, 0);
+	shader->setShaderValue(hSource2, 1);
+
+	pRenderer->renderToTextureQuad(*mTarget);
 }

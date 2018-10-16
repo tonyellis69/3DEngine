@@ -10,7 +10,6 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 	chunkCubes = _chunkCubes;
 	SCchunks = _SCchunks;
 
-
 	LoD1chunkSize = chunkCubes * LoD1cubeSize;
 	shells.push_back({1, LoD1chunkSize, SCchunks, _shellSCs });
 }
@@ -60,7 +59,19 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 
 	if (inDirection != none) {
 		////////////message LoD1 shell to advance in in direction
-		shells[0].advancePlayer(inDirection);
+		shells[0].playerAdvance(inDirection);
 	}
 
+}
+
+/** Fill all shells with chunks where they are intersected by the terrain. */
+void CTerrain2::fillShells() {
+	//TO DO: iterate through all shells
+	//for now, just do the LoD1shell
+
+	//chunkExtent = how many chunks from the shell origin to fill
+	int chunkExtent = ((shells[0].shellSCs - 1) / 2) * SCchunks;
+	//TO DO: find the best way to calculate this!
+
+	shells[0].fill(chunkExtent);
 }

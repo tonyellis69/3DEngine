@@ -7,8 +7,9 @@
 class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
-	void advancePlayer(Tdirection direction);
-	int chunkExtent(Tdirection direction);
+	void playerAdvance(Tdirection direction);
+	int getChunkExtent(Tdirection direction);
+	void fill(int chunkExtent);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -20,4 +21,6 @@ public:
 	glm::i32vec3 worldSpacePos;
 	int minimumChunkExtent; //<Terrain must always extend this far from player.
 	glm::i32vec3 playerChunkPos;  //<Player position in chunks, relative to origin
+
+	int chunkExtent[6]; //<How far chunks extend from origin in each direction
 };
