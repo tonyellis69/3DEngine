@@ -19,6 +19,7 @@ public:
 	CGUIpaletteBar(int x, int y, int w, int h);
 	//void DrawSelf();
 	void setGradientTexture(CBaseTexture& texture);
+	void setGradient(ColourGradient& gradient);
 	void OnClick(const  int mouseX, const  int mouseY);
 	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 

@@ -6,7 +6,6 @@
 #include "GUIbutton2.h"
 #include "GUIscrollbar.h"
 
-//typedef void(*msgCallback)(CGUIbase*, CMessage& );
 
 class CGUIcolourPicker : public CGUIpanel {
 public:

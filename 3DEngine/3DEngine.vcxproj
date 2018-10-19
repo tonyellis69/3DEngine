@@ -145,8 +145,11 @@
     <ClCompile Include="..\src\terrain.cpp" />
     <ClCompile Include="..\src\terrain\shell.cpp" />
     <ClCompile Include="..\src\terrain\terrain2.cpp" />
+    <ClCompile Include="..\src\texGen\composeJade.cpp" />
+    <ClCompile Include="..\src\texGen\composeWood.cpp" />
     <ClCompile Include="..\src\texGen\compositor.cpp" />
     <ClCompile Include="..\src\texGen\texGen.cpp" />
+    <ClCompile Include="..\src\texGen\texGenUI.cpp" />
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\UIengine.cpp" />
@@ -244,8 +247,11 @@
     <ClInclude Include="..\src\terrain.h" />
     <ClInclude Include="..\src\terrain\shell.h" />
     <ClInclude Include="..\src\terrain\terrain2.h" />
+    <ClInclude Include="..\src\texGen\composeJade.h" />
+    <ClInclude Include="..\src\texGen\composeWood.h" />
     <ClInclude Include="..\src\texGen\compositor.h" />
     <ClInclude Include="..\src\texGen\texGen.h" />
+    <ClInclude Include="..\src\texGen\texGenUI.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
     <ClInclude Include="..\Src\Timer.h" />

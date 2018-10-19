@@ -303,6 +303,7 @@ const int uiContainerVbarID = 1004;
 const int uiContainerHbarID = 1005;
 
 const int uiOKid = 2000;
+const int uiCancelId = 2001;
 
 
 

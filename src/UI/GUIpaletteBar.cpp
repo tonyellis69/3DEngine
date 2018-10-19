@@ -34,6 +34,17 @@ void CGUIpaletteBar::setGradientTexture(CBaseTexture & texture) {
 	updatePalette();
 }
 
+/** Set the colour gradient we're going to use, updating the palette texture and tabs accordingly. */
+void CGUIpaletteBar::setGradient(ColourGradient & gradient) {
+	colourGradient = gradient;
+	paletteTexture.setData(gradient.getData());
+	clearTabControls();
+	for (auto tab : colourGradient.getTabs()) {
+		createTab(tab.first);
+	}
+
+}
+
 void CGUIpaletteBar::OnClick(const int mouseX, const int mouseY) {
 
 }
@@ -64,6 +75,7 @@ void CGUIpaletteBar::createTab(int mouseX) {
 	
 	glm::vec4 colour = glm::vec4(colourGradient.getColour(tab->position)); 
 	colourGradient.changeColour(tab->position, glm::i32vec4(colour));
+	tab->colour = colour;
 	colour = colour / 255.0f;
 	tab->setBackColour1(colour);
 	tab->setBackColour2(colour);
@@ -128,7 +140,7 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 
 void CGUIpaletteBar::GUIcallback(CGUIbase* sender, CMessage& msg) {
 	if (msg.Msg == uiClick) {
-		if (sender->id = uiOKid) {
+		if (sender->id == uiOKid) {
 			changeTabColour(colourPicker->getColour());
 		}
 		colourChangeTab = NULL;
@@ -140,6 +152,7 @@ void CGUIpaletteBar::GUIcallback(CGUIbase* sender, CMessage& msg) {
 void CGUIpaletteBar::editTabColour(CGUIpaletteTab* sender) {
 	colourChangeTab = sender;
 	//display colour picker modally
+	colourPicker->setColour(sender->colour);
 	colourPicker->makeModal();
 	colourPicker->setVisible(true);
 }
@@ -147,11 +160,11 @@ void CGUIpaletteBar::editTabColour(CGUIpaletteTab* sender) {
 void CGUIpaletteBar::changeTabColour(glm::i32vec4& newColour) {
 	int position = colourChangeTab->position;
 	colourGradient.changeColour(position, newColour);
-	//paletteImage->setTextureData(colourGradient.getData());
 	updatePalette();
 	glm::vec4 floatColour = glm::vec4(newColour) / 255.0f;
 	colourChangeTab->setBackColour1(floatColour);
 	colourChangeTab->setBackColour2(floatColour);
+	colourChangeTab->colour = newColour;
 }
 
 void CGUIpaletteBar::logPalette() {
@@ -163,47 +176,12 @@ void CGUIpaletteBar::logPalette() {
 }
 
 void CGUIpaletteBar::loadPalette() {
-/*	colourGradient.changeColour(0, glm::i32vec4(0, 0, 238, 255));
-	colourGradient.changeColour(10, glm::i32vec4(0, 0, 238, 255));
-	colourGradient.changeColour(130, glm::i32vec4(67, 69, 245, 255));
-	colourGradient.changeColour(132, glm::i32vec4(231, 175, 0, 255));
-	colourGradient.changeColour(136, glm::i32vec4(42, 175, 0, 255));
-	colourGradient.changeColour(200, glm::i32vec4(42, 117, 0, 255));
-	colourGradient.changeColour(246, glm::i32vec4(225, 221, 227, 255));
-	colourGradient.changeColour(255, glm::i32vec4(225, 221, 227, 255));
-	*/
-
-	/*
-	//Jade
-	colourGradient.changeColour(0, glm::i32vec4(24, 146, 102, 255));
-	colourGradient.changeColour(128, glm::i32vec4(78, 154, 115, 255));
-	colourGradient.changeColour(159, glm::i32vec4(128, 204, 165, 255));
-	colourGradient.changeColour(175, glm::i32vec4(78, 154, 115, 255));
-	colourGradient.changeColour(255, glm::i32vec4(29, 135, 102, 255));
-	*/
-
 	/**
 	//wood
 	colourGradient.changeColour(0, glm::i32vec4(189, 94, 4, 255));
 	colourGradient.changeColour(191, glm::i32vec4(144, 48, 6, 255));
 	colourGradient.changeColour(255, glm::i32vec4(60, 10, 8, 255));
 	*/
-
-	/* granite
-	colourGradient.changeColour(0, glm::i32vec4(0, 0, 0, 255));
-	colourGradient.changeColour(8, glm::i32vec4(0, 0, 0, 255));
-	colourGradient.changeColour(16, glm::i32vec4(216, 216, 242, 255));
-	colourGradient.changeColour(128, glm::i32vec4(191, 191, 191, 255));
-	colourGradient.changeColour(191, glm::i32vec4(210, 116, 125, 255));
-	colourGradient.changeColour(223, glm::i32vec4(210, 113, 98, 255));
-	colourGradient.changeColour(255, glm::i32vec4(255, 176, 192, 255));
-	*/
-
-
-	colourGradient.changeColour(0, glm::i32vec4(160, 64, 42, 255));
-	colourGradient.changeColour(127, glm::i32vec4(64, 192, 64, 255));
-	colourGradient.changeColour(255, glm::i32vec4(128, 255, 128, 255));
-
 
 	updatePalette();
 	clearTabControls();

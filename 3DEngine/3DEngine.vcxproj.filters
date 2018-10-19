@@ -311,6 +311,15 @@
     <ClCompile Include="..\src\terrain\shell.cpp">
       <Filter>terrain2</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\texGen\composeJade.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\texGenUI.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\composeWood.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -621,6 +630,15 @@
     </ClInclude>
     <ClInclude Include="..\src\terrain\shell.h">
       <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeJade.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\texGenUI.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeWood.h">
+      <Filter>texGen</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

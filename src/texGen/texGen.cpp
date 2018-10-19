@@ -96,9 +96,13 @@ void CNoiseTex::setOctaves(int octaves) {
 
 
 
+CColourTex::CColourTex() {
+	palette.resize(256, 0);
+}
+
 /** Set the 1D texture to use as a colour map. */
-void CColourTex::setPalette(CRenderTexture * newPalette) {
-	palette = newPalette;
+void CColourTex::setPalette(ColourGradient& newGradient) {
+	palette.setData(newGradient.getData());
 }
 
 void CColourTex::loadShader() {
@@ -111,7 +115,7 @@ void CColourTex::render() {
 	loadShader();
 	pRenderer->setShader(shader);
 	pRenderer->attachTexture(0, mSource->handle);
-	pRenderer->attachTexture1D(1, palette->handle);
+	pRenderer->attachTexture1D(1, palette.handle);
 
 	shader->setShaderValue(hSource, 0);
     shader->setShaderValue(hPalette, 1);

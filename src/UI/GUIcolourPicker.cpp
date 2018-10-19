@@ -20,10 +20,7 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 		slider[component]->setMax(255); slider[component]->setMin(0);
 		slider[component]->id = component;
 		Add(slider[component]);
-
 	}
-
-
 
 	setColour(glm::i32vec4(255));
 
@@ -32,6 +29,13 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 	OKbutton->setText("OK");
 	OKbutton->id = uiOKid;
 	Add(OKbutton);
+
+	int cancelXpos = sliderX;
+	CGUIbutton2* CancelButton = new CGUIbutton2(cancelXpos, numeric[3]->localPos.y + numeric[3]->drawBox.size.y + padding,
+		numericWidth, numericHeight);
+	CancelButton->setText("Cancel");
+	CancelButton->id = uiCancelId;
+	Add(CancelButton);
 }
 
 /** Set the current selected colour. */
@@ -74,8 +78,9 @@ void CGUIcolourPicker::message(CGUIbase* sender, CMessage & msg) {
 		updateColour();
 	}
 	if (msg.Msg == uiClick) {
-		if (callbackObj)
-			callbackObj->GUIcallback(sender,msg);
+		if (callbackObj) {
+			callbackObj->GUIcallback(sender, msg);
+		}
 	}
 	if (msg.Msg == uiMsgSlide) {
 		int component = sender->id;

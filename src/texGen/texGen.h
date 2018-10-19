@@ -2,6 +2,7 @@
 
 //#include "..\renderer\renderTexture.h"
 #include "..\renderer\renderer.h"
+#include "..\colourGradient.h"
 
 /** A base class for creating texture generators. */
 class CTexGen {
@@ -63,12 +64,15 @@ public:
 
 class CColourTex : public CTexGen {
 public:
-	void setPalette(CRenderTexture* newPalette);
+	CColourTex();
+	void setPalette(ColourGradient& newGradient);
 	void loadShader();
 	void render();
 
-	CRenderTexture* palette;
+	CRenderTexture palette;
 	unsigned int hPalette;
+
+
 };
 
 class CRidgedMultiTex : public CNoiseTex {
