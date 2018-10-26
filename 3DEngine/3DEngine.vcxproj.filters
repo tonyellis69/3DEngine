@@ -320,6 +320,27 @@
     <ClCompile Include="..\src\texGen\composeWood.cpp">
       <Filter>texGen</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\texGen\composeGranite.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\composeSlime.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\composeSky.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\GUInoiseCtrl.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\composeNoise.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\composeRidged.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\composeTest.cpp">
+      <Filter>texGen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -638,6 +659,27 @@
       <Filter>texGen</Filter>
     </ClInclude>
     <ClInclude Include="..\src\texGen\composeWood.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeGranite.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeSlime.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeSky.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\GUInoiseCtrl.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeNoise.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeRidged.h">
+      <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\composeTest.h">
       <Filter>texGen</Filter>
     </ClInclude>
   </ItemGroup>

@@ -7,6 +7,13 @@
 #include "texGen.h"
 #include "composeJade.h"
 #include "composeWood.h"
+#include "composeGranite.h"
+#include "composeSlime.h"
+#include "composeSky.h"
+#include "GUInoiseCtrl.h"
+#include "composeNoise.h"
+#include "composeRidged.h"
+#include "composeTest.h"
 
 class CTexGenUI : public Icallback {
 public:
@@ -15,13 +22,15 @@ public:
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
 	void hide(bool onOff);
 	void compose();
-	void colourise();
+	void display();
 
 
 	CBaseApp* pApp;
 	CGUIimage* image;
 	CGUIpaletteBar* paletteBar;
-	ColourGradient texColourGradient;
+//	ColourGradient texColourGradient;
 
-	ComposeWood texCompositor;
+	ComposeTest texCompositor;
+
+	CGUInoiseCtrl* GUInoiseCtrl;
 };

@@ -9,12 +9,21 @@ class CTexGen {
 public:
 	CTexGen() ;
 	void setTarget(CRenderTexture* newTarget);
+	CRenderTexture* getTarget();
 	virtual void loadShader() {};
 	virtual void render() {};
 	virtual void setSource(CRenderTexture* newSource);
+	virtual void setSource2(CRenderTexture* newSource) {};
 	virtual void setFrequency(float freq);
 	virtual void setAngles(glm::vec3& rotationAngles);
 	virtual void setTranslation(glm::vec3& translation);
+	virtual void setOctaves(int octave) {};
+	virtual void setPower(float power) {};
+	virtual void setPalette(ColourGradient& gradient) {};
+	virtual void setScale(float scale) {};
+	virtual void setBias(float bias) {};
+
+	virtual void compose() {};
 
 	CRenderer* pRenderer;
 	CShader* shader;
@@ -49,6 +58,7 @@ public:
 	void render();
 	void setSample(glm::vec3& pos, glm::vec3& size);
 	void setOctaves(int octaves);
+	void compose();
 
 	unsigned int hSamplePos;
 	unsigned int hSampleSize;
@@ -78,23 +88,25 @@ public:
 class CRidgedMultiTex : public CNoiseTex {
 public:
 	void loadShader();
+	void render();
 };
 
 class CylinderTex : public CTexGen {
 public:
 	void loadShader();
 	void render();
-
 };
 
 class CTurbulenceTex : public CTexGen {
 public:
-	CTurbulenceTex() : samplePos(0), sampleSize(1, 1, 0) {};
+	CTurbulenceTex() : samplePos(0), sampleSize(1, 1, 0),
+		power(0.1f), octaves(1) {};
 	void loadShader();
 	void render();
 	void setPower(float power);
-	void setRoughness(int roughness);
+	void setOctaves(int octave);
 	void setSample(glm::vec3& pos, glm::vec3& size);
+	
 
 	unsigned int hPower;
 	unsigned int hRoughness;
@@ -102,7 +114,7 @@ public:
 	unsigned int hSampleSize;
 
 	float power;
-	int roughness;
+	int octaves;
 
 	glm::vec3 samplePos;
 	glm::vec3 sampleSize;
@@ -110,8 +122,11 @@ public:
 
 class CScaleBiasTex : public CTexGen {
 public:
+	CScaleBiasTex() : scale(1), bias(0) {};
 	void loadShader();
 	void setScaleBias(float scale, float bias);
+	void setScale(float scale);
+	void setBias(float bias);
 	void render();
 
 	unsigned int hScale;

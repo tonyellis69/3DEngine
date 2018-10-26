@@ -10,7 +10,6 @@ CGUIroot::CGUIroot() {
 	rootUI = this;
 	mouse = new CGUImouse(); //create default mouse.
 	id = uiRootID;
-	killModal = false;
 	focusControl = NULL;
 	borderWidth = 0;
 
@@ -25,7 +24,7 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	
 	if (scrollbarHasMouse) { //a scrollbar has captured the mouse, so pass the message straight there.
 		if ((Msg == WM_MOUSEMOVE)) { //TO DO: pass all messages to the scrollbar instead?
-			scrollbarHasMouse->OnMouseMove(mouseX - scrollbarHasMouse->drawBox.pos.x, mouseY - scrollbarHasMouse->drawBox.pos.y, key);
+			scrollbarHasMouse->OnMouseMove(mouseX , mouseY , key);
 			return;
 		}
 	}
@@ -33,10 +32,8 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if (modalControls.size() > 0 /*&& scrollbarHasMouse == NULL*/) {
 		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
 		//TO DO: why did I ever do the above?
-		modalControls.back()->MouseMsg(Msg, mouseX - modalControls.back()->drawBox.pos.x, mouseY - modalControls.back()->drawBox.pos.y, key);
+		modalControls.back()->MouseMsg(Msg, mouseX , mouseY , key);
 		//modalControl->MouseMsg(Msg, mouseX , mouseY, key);
-		if (killModal) 
-			deleteModal();
 		return;
 	}
 
@@ -59,7 +56,7 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 		return false;
 
 	if (modalControls.size()) {
-		return modalControls.back()->MouseWheelMsg(mouseX - modalControls.back()->drawBox.pos.x,mouseY - modalControls.back()->drawBox.pos.y,wheelDelta,key);
+		return modalControls.back()->MouseWheelMsg(mouseX,mouseY,wheelDelta,key);
 	}
 
 	if (focusControl)
@@ -116,7 +113,22 @@ void CGUIroot::setDrawFuncs(CDrawFuncs* drawFunc) {
 
 /** Overload function to draw the mouse after drawing everything else, so it's on top. */
 void CGUIroot::Draw() {
-	CGUIbase::Draw(); //draw every other child control of root first
+	//CGUIbase::Draw(); //draw every other child control of root first
+
+	UIrect* parentClipbox = &parent->Clipbox;
+	pDrawFuncs->setClip(Clipbox);
+
+	//then draw each subcontrol
+	for (size_t i = 0; i < Control.size(); i++) {
+		if (!Control[i]->isModal)
+			Control[i]->Draw();
+	}
+
+	//draw modal controls last
+	for (auto modalCtrl : modalControls) {
+		modalCtrl->Draw();
+	}
+
 	//draw mouse control if any
 	pDrawFuncs->setClip(Clipbox);
 	mouse->DrawSelf();
@@ -184,15 +196,11 @@ void CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
 	the rest of the UI. Normally used for modal dialogue boxes.*/
 void CGUIroot::addModal(CGUIbase* control) {
 	modalControls.push_back(control);
+	control->isModal = true;
 	Add(control);
 }
 
-/** Schedule the modal control for deletion. We don't delete it now because it
-	may still get accessed. */
-void CGUIroot::removeModal() {
-	killModal = true;
-	updateAppearance();
-}
+
 
 /** Set the given control as the control with focus, to which input can be sent even if the mouse pointer
 isn't over it. */
@@ -201,15 +209,6 @@ void CGUIroot::setFocus(CGUIbase * control) {
 }
 
 
-//TO DO: this runs the risk of a method of the modal control being called
-//after modalControl has been deleted.
-/** Delete the current modal control, if any.*/
-void CGUIroot::deleteModal() {
-	if (modalControls.size() > 0 ) {
-		modalControls.pop_back();
-	}
-	killModal = false;
-}
 
 
 

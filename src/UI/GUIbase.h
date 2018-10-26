@@ -208,11 +208,14 @@ public:
 	void setDefaultFont(CFont* font);
 
 	glm::i32vec2 getScreenCoords(int x, int y);
+	glm::i32vec2 getLocalPos(int x, int y);
 	int getWidth();
 	int getHeight();
 	virtual void resize(int w, int h);
 	void setGUIcallback(Icallback* callbackInstance);
 	virtual void GUIcallback(CGUIbase* sender, CMessage& msg) {};
+
+
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -278,6 +281,7 @@ public:
 	UIcolour borderColour; ///<Colour for the border of this control.
 	bool drawBorder; ///<true if we draw this control's border.
 	Icallback * callbackObj;
+	bool isModal;
 protected:
 	bool enabled; ///<False if this control has been deactivated.
 	static CFont* defaultFont;

@@ -57,7 +57,7 @@ void ComposeWood::compose() {
 	turbulenceTex.setSource(&sample3);
 	turbulenceTex.setTarget(&sample1);
 	turbulenceTex.setFrequency(4);
-	turbulenceTex.setRoughness(4);
+	turbulenceTex.setOctaves(4);
 	turbulenceTex.setPower(1.0 / 256.0);
 	turbulenceTex.render();
 
@@ -67,7 +67,7 @@ void ComposeWood::compose() {
 	turbulenceTex2.setSource(&sample1);
 	turbulenceTex2.setTarget(&composedTex);
 	turbulenceTex2.setFrequency(2);
-	turbulenceTex2.setRoughness(4);
+	turbulenceTex2.setOctaves(4);
 	turbulenceTex2.setPower(1.0 / 64.0);
 	turbulenceTex2.render();
 

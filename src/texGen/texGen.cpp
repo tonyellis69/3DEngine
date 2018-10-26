@@ -30,6 +30,10 @@ void CTexGen::setTarget(CRenderTexture * newTarget) {
 	mTarget = newTarget;
 }
 
+CRenderTexture * CTexGen::getTarget() {
+	return mTarget;
+}
+
 void CTexGen::setSource(CRenderTexture * newSource) {
 	mSource = newSource;
 }
@@ -43,7 +47,7 @@ void CTexGen::setTranslation(glm::vec3 & translation) {
 }
 
 void CTexGen::setAngles(glm::vec3& rotationAngles) {
-	matrix = glm::rotate(matrix, glm::radians(rotationAngles.x), vec3(1, 0, 0));
+	matrix = glm::rotate(glm::mat4(1), glm::radians(rotationAngles.x), vec3(1, 0, 0));
 	matrix = glm::rotate(glm::mat4(1), glm::radians(-rotationAngles.y), vec3(0, 1, 0)) * matrix;
 	matrix = glm::rotate(glm::mat4(1), glm::radians(rotationAngles.z), vec3(0, 0, 1)) * matrix;
 }
@@ -94,6 +98,10 @@ void CNoiseTex::setOctaves(int octaves) {
 	this->octaves = octaves;
 }
 
+void CNoiseTex::compose() {
+	
+}
+
 
 
 CColourTex::CColourTex() {
@@ -129,6 +137,19 @@ void CRidgedMultiTex::loadShader() {
 	hSampleSize = shader->getUniformHandle("sampleSize");
 	hMatrix = shader->getUniformHandle("matrix");
 	hOctaves = shader->getUniformHandle("octaves");
+	hFrequency = shader->getUniformHandle("frequency");
+}
+
+void CRidgedMultiTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	shader->setShaderValue(hSamplePos, samplePos);
+	shader->setShaderValue(hSampleSize, sampleSize);
+	shader->setShaderValue(hMatrix, matrix);
+	shader->setShaderValue(hOctaves, octaves);
+	shader->setShaderValue(hFrequency, frequency);
+
+	pRenderer->renderToTextureQuad(*mTarget);
 }
 
 
@@ -165,7 +186,7 @@ void CTurbulenceTex::render() {
 	shader->setShaderValue(hSource, 0);
 	shader->setShaderValue(hFrequency, frequency);
 	shader->setShaderValue(hPower, power);
-	shader->setShaderValue(hRoughness, roughness);
+	shader->setShaderValue(hRoughness, octaves);
 	shader->setShaderValue(hSamplePos, samplePos);
 	shader->setShaderValue(hSampleSize, sampleSize);
 
@@ -176,9 +197,10 @@ void CTurbulenceTex::setPower(float power) {
 	this->power = power;
 }
 
-void CTurbulenceTex::setRoughness(int roughness) {
-	this->roughness = roughness;
+void CTurbulenceTex::setOctaves(int octave) {
+	this->octaves = octave;
 }
+
 
 void CTurbulenceTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
 	samplePos = pos;
@@ -195,6 +217,14 @@ void CScaleBiasTex::loadShader() {
 
 void CScaleBiasTex::setScaleBias(float scale, float bias) {
 	this->scale = scale;
+	this->bias = bias;
+}
+
+void CScaleBiasTex::setScale(float scale) {
+	this->scale = scale;
+}
+
+void CScaleBiasTex::setBias(float bias) {
 	this->bias = bias;
 }
 

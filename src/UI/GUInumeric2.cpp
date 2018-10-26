@@ -84,9 +84,9 @@ void  CGUInumeric2::message(CGUIbase* sender, CMessage& msg) {
 		value = valMax;
 	setValue(value); //lazy way to add suffix
 
-	CMessage userMsg;
-	userMsg.fValue = value;
-	pDrawFuncs->handleUImsg(*this, userMsg);
+	//CMessage userMsg;
+	msg.fValue = value;
+	pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
 }
 
@@ -118,6 +118,10 @@ void CGUInumeric2::setMinMax(float newMin, float mewMax) {
 
 void CGUInumeric2::setSuffix(const string& newSuffix) {
 	suffix = newSuffix;
+}
+
+void CGUInumeric2::setIncrement(float increment) {
+	this->increment = increment;
 }
 
 

@@ -9,16 +9,12 @@
 /** A class for creating, viewing and experimenting with procedural textures. */
 class Compositor : public Icallback {
 public:
+	Compositor() : colourise(true) {};
 	virtual void initTex() {};
 	virtual void compose() {};
-	void composeJade();
-	void composeWood();
-	void composeGranite();
-	void composeSlime();
-	void composeSky();
-
-	
-
+	virtual void updateOctaves(int octaves) {};
+	virtual void updateFrequency(float freq) {};
+	virtual void updateAngle(glm::vec3 angle) {};
 
 	CRenderTexture sample;
 	CRenderTexture sample1;
@@ -33,4 +29,5 @@ public:
 	CRenderTexture colouredTex;
 
 	ColourGradient texColourGradient;
+	bool colourise;
 };

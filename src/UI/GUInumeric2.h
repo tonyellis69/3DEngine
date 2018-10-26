@@ -19,6 +19,7 @@ public:
 	void setEnabled(bool onOff);
 	void setMinMax(float newMin, float mewMax);
 	void setSuffix(const string& newSuffix);
+	void setIncrement(float increment);
 
 
 	CGUInumericIconButton* downButton; ///<Points to decrement button.

@@ -55,7 +55,8 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 		if (Msg == MY_DOUBLECLICK) {
 			if (MouseDown == paletteImage) {
 				MouseDown = NULL;
-				float unitPos = ( mouseX - paletteImageStartX) / float(paletteImage->drawBox.size.x);
+				glm::i32vec2 localMouse = getLocalPos(mouseX, mouseY);
+				float unitPos = (localMouse.x - paletteImageStartX) / float(paletteImage->drawBox.size.x);
 				createTab(unitPos * 255.0f);
 			}
 		}
@@ -234,7 +235,7 @@ void CGUIpaletteTab::OnLMouseDown(const  int mouseX, const  int mouseY, int key)
 
 	scrollbarHasMouse = this;
 	pDrawFuncs->mouseCaptured(true);
-	lastMouseX = getScreenCoords(mouseX, mouseY).x;
+	lastMouseX = mouseX; //getScreenCoords(mouseX, mouseY).x;
 }
 
 void CGUIpaletteTab::onRMouseUp(const int mouseX, const int mouseY) {
@@ -247,8 +248,8 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 	if ((MouseDown == this) && (scrollbarHasMouse == this)) {
 		CMessage msg;
 		msg.Msg = WM_MOUSEMOVE;
-		msg.x = getScreenCoords(mouseX, mouseY).x - lastMouseX + localPos.x;
-		lastMouseX = getScreenCoords(mouseX, mouseY).x;
+		msg.x = mouseX  - lastMouseX + localPos.x; // getScreenCoords(mouseX, mouseY).x - lastMouseX + localPos.x;
+		lastMouseX = mouseX;// getScreenCoords(mouseX, mouseY).x;
 		parent->message(this, msg);
 
 	}

@@ -48,6 +48,7 @@ CGUIbase::CGUIbase()  {
 	uniqueID = UIuniqueIDgen++;
 	visible = true;
 	callbackObj = NULL;
+	isModal = false;
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
@@ -97,8 +98,8 @@ bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  in
 		return false;
 	//return ( (Control.localPos.x < mouseX) && ((Control.localPos.x + Control.width) > mouseX)
 	//	&& (Control.localPos.y < mouseY) && ((Control.localPos.y + Control.height) > mouseY));
-	return glm::all(glm::lessThan(Control.localPos, glm::i32vec2(mouseX, mouseY))) &&
-		glm::all(glm::greaterThan(Control.localPos + Control.drawBox.size,
+	return glm::all(glm::lessThan(Control.drawBox.pos, glm::i32vec2(mouseX, mouseY))) &&
+		glm::all(glm::greaterThan(Control.drawBox.pos + Control.drawBox.size,
 			glm::i32vec2(mouseX, mouseY)));
 
 }
@@ -112,7 +113,7 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	//otherwise, recursively test message against this control's child controls
 	for (size_t i = 0; i < Control.size(); i++) {
 		if (IsOnControl(*Control[i], mouseX, mouseY)) {		
-			Control[i]->MouseMsg(Msg, mouseX - Control[i]->localPos.x, mouseY - Control[i]->localPos.y, key);
+			Control[i]->MouseMsg(Msg, mouseX, mouseY, key);
 			return;
 		}
 	}
@@ -172,7 +173,7 @@ bool CGUIbase::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 
 	for (size_t i=0;i < Control.size();i++)
 		if ( IsOnControl( *Control[i],mouseX, mouseY) ) {
-			if (Control[i]->MouseWheelMsg(mouseX - Control[i]->localPos.x, mouseY - Control[i]->localPos.y,wheelDelta,key))
+			if (Control[i]->MouseWheelMsg(mouseX , mouseY ,wheelDelta,key))
 				return true;
 		}
 	return false;
@@ -329,11 +330,9 @@ void CGUIbase::Draw() {
 
 	DrawSelf(); 
 	//then draw each subcontrol
-//	if (Control.size() > 1)
-	//	Control[0]->Draw();
 	for (size_t i = 0; i < Control.size(); i++) {
-		
-		Control[i]->Draw();
+		if (!Control[i]->isModal)
+			Control[i]->Draw();
 	}
 }
 
@@ -432,6 +431,10 @@ void CGUIbase::setDefaultFont(CFont* font) {
 /** Convert these local coordinate to absolute screen coordinates. */
 glm::i32vec2 CGUIbase::getScreenCoords(int x, int y) {
 	return glm::i32vec2(drawBox.pos.x + x, drawBox.pos.y + y);
+}
+
+glm::i32vec2 CGUIbase::getLocalPos(int x, int y) {
+	return glm::i32vec2( x - drawBox.pos.x, y - drawBox.pos.y);
 }
 
 int CGUIbase::getWidth() {
@@ -594,12 +597,14 @@ void CGUIbase::borderOn(bool onOff) {
 
 void CGUIbase::makeModal() {
 	modalControls.push_back(this);
+	isModal = true;
 }
 
 void CGUIbase::makeUnModal() {
 	for (unsigned int ctrl = 0; ctrl< modalControls.size(); ctrl++)
 		if (modalControls[ctrl] == this) {
 			modalControls.erase(modalControls.begin() + ctrl);
+			isModal = false;
 		}
 }
 
