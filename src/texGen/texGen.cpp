@@ -4,7 +4,8 @@
 
 using namespace glm;
 
-CTexGen::CTexGen() : frequency(1) {
+CTexGen::CTexGen(TexGenType derivedType) : 
+	texGenType(derivedType), srcTex1(NULL), srcTex2(NULL)  {
 	pRenderer = &CRenderer::getInstance();
 
 	//create target quad
@@ -34,37 +35,45 @@ CRenderTexture * CTexGen::getTarget() {
 	return mTarget;
 }
 
-void CTexGen::setSource(CRenderTexture * newSource) {
-	mSource = newSource;
+void CTexGen::setSource(CTexGen * newSource) {
+	mSource = newSource->getTarget();
+	srcTex1 = newSource;
 }
 
-void CTexGen::setFrequency(float freq) {
-	frequency = freq;
+void CTexGen::setSource2(CTexGen * newSource) {
+	source2 = newSource->getTarget();
+	srcTex2 = newSource;
 }
+
+
 
 void CTexGen::setTranslation(glm::vec3 & translation) {
-	matrix = glm::translate(matrix, translation);
+	this->translation = translation;
+	buildMatrix();
+}
+
+void CTexGen::write(std::ofstream & out) {
+	writeObject(matrix, out);
+	writeObject(rotationAngles, out);
+	writeObject(translation, out);
+}
+
+void CTexGen::read(std::ifstream & in) {
+	readObject(matrix, in);
+	readObject(rotationAngles, in);
+	readObject(translation, in);
 }
 
 void CTexGen::setAngles(glm::vec3& rotationAngles) {
-	matrix = glm::rotate(glm::mat4(1), glm::radians(rotationAngles.x), vec3(1, 0, 0));
+	this->rotationAngles = rotationAngles;
+	buildMatrix();
+}
+
+void CTexGen::buildMatrix() {
+	matrix = glm::translate(mat4(1), translation);
+	matrix = glm::rotate(matrix, glm::radians(rotationAngles.x), vec3(1, 0, 0));
 	matrix = glm::rotate(glm::mat4(1), glm::radians(-rotationAngles.y), vec3(0, 1, 0)) * matrix;
 	matrix = glm::rotate(glm::mat4(1), glm::radians(rotationAngles.z), vec3(0, 0, 1)) * matrix;
-}
-
-
-
-void CTestTex::loadShader() {
-	shader = pRenderer->createShader("texTest");
-	hMatrix = shader->getUniformHandle("matrix");
-}
-
-void CTestTex::render() {
-	loadShader();
-	pRenderer->setShader(shader);
-	shader->setShaderValue(hMatrix, matrix);
-
-	pRenderer->renderToTextureQuad( *mTarget);
 }
 
 
@@ -89,6 +98,10 @@ void CNoiseTex::render() {
 	pRenderer->renderToTextureQuad(*mTarget);
 }
 
+void CNoiseTex::setFrequency(float freq) {
+	frequency = freq;
+}
+
 void CNoiseTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
 	samplePos = pos;
 	sampleSize = size;
@@ -102,15 +115,35 @@ void CNoiseTex::compose() {
 	
 }
 
+void CNoiseTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(octaves, out);
+	writeObject(frequency, out);
+	writeObject(persistence, out);
+	writeObject(samplePos, out);
+	writeObject(sampleSize, out);
+}
+
+void CNoiseTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(octaves, in);
+	readObject(frequency, in);
+	readObject(persistence, in);
+	readObject(samplePos, in);
+	readObject(sampleSize, in);
+}
 
 
-CColourTex::CColourTex() {
+
+
+CColourTex::CColourTex() : CTexGen(texColour) {
 	palette.resize(256, 0);
 }
 
 /** Set the 1D texture to use as a colour map. */
 void CColourTex::setPalette(ColourGradient& newGradient) {
 	palette.setData(newGradient.getData());
+	colourGradient = newGradient;
 }
 
 void CColourTex::loadShader() {
@@ -128,6 +161,19 @@ void CColourTex::render() {
 	shader->setShaderValue(hSource, 0);
     shader->setShaderValue(hPalette, 1);
 	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+void CColourTex::write(std::ofstream & out) {
+	int tabCount = colourGradient.colours.size();
+	writeObject(tabCount,out);
+	for (auto tab : colourGradient.colours) {
+		writeObject(tab.first, out);
+		writeObject(tab.second, out);
+	}
+}
+
+void CColourTex::read(std::ifstream & in) {
+//	readObject(colourGradient.colours, in);
 }
 
 
@@ -166,6 +212,20 @@ void CylinderTex::render() {
 	shader->setShaderValue(hMatrix, matrix);
 	pRenderer->renderToTextureQuad(*mTarget);
 	
+}
+
+void CylinderTex::setFrequency(float freq) {
+	this->frequency = freq;
+}
+
+void CylinderTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(frequency, out);
+}
+
+void CylinderTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(frequency, in);
 }
 
 
@@ -207,6 +267,16 @@ void CTurbulenceTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
 	sampleSize = size;
 }
 
+void CTurbulenceTex::write(std::ofstream & out) {
+	CNoiseTex::write(out);
+	writeObject(power, out);
+}
+
+void CTurbulenceTex::read(std::ifstream & in) {
+	CNoiseTex::read(in);
+	readObject(power, in);
+}
+
 
 void CScaleBiasTex::loadShader() {
 	shader = pRenderer->createShader("texScaleBias");
@@ -239,10 +309,19 @@ void CScaleBiasTex::render() {
 	pRenderer->renderToTextureQuad(*mTarget);
 }
 
-
-void CAddTex::setSource2(CRenderTexture * src2) {
-	source2 = src2;
+void CScaleBiasTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(scale, out);
+	writeObject(bias, out);
 }
+
+void CScaleBiasTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(scale, in);
+	readObject(bias, in);
+}
+
+
 
 void CAddTex::loadShader() {
 	shader = pRenderer->createShader("texAdd");
@@ -263,6 +342,8 @@ void CAddTex::render() {
 }
 
 
+
+
 void CSeamlessTex::loadShader() {
 	shader = pRenderer->createShader("texSeamless");
 	hSource = shader->getUniformHandle("source");
@@ -278,9 +359,11 @@ void CSeamlessTex::render() {
 }
 
 
-void CScalePointTex::setScale(glm::vec3 & scale) {
+void CScalePointTex::setScalePt(glm::vec3 & scale) {
 	this->scale = scale;
 }
+
+
 
 void CScalePointTex::loadShader() {
 	shader = pRenderer->createShader("texScalePoint");
@@ -296,6 +379,20 @@ void CScalePointTex::render() {
 	shader->setShaderValue(hScale, scale);
 
 	pRenderer->renderToTextureQuad(*mTarget);
+}
+
+void CScalePointTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(scale, out);
+}
+
+void CScalePointTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(scale, in);
+}
+
+glm::vec3 & CScalePointTex::getScalePt() {
+	return scale;
 }
 
 void CBillowTex::loadShader() {
@@ -359,6 +456,10 @@ void CVoronoiTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
 	sampleSize = size;
 }
 
+void CVoronoiTex::setFrequency(float freq) {
+	frequency = freq;
+}
+
 
 void CSelectTex::loadShader() {
 	shader = pRenderer->createShader("texSelect");
@@ -389,9 +490,7 @@ void CSelectTex::render() {
 	pRenderer->renderToTextureQuad(*mTarget);
 }
 
-void CSelectTex::setSource2(CRenderTexture * src2) {
-	source2 = src2;
-}
+
 
 void CSelectTex::setControl(CRenderTexture * map) {
 	this->map = map;
@@ -424,3 +523,5 @@ void CLayerTex::render() {
 
 	pRenderer->renderToTextureQuad(*mTarget);
 }
+
+

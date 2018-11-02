@@ -24,7 +24,7 @@ void ComposeGranite::initTex()
 
 void ComposeGranite::compose() {
 	// Primary granite texture.  This generates the "roughness" of the texture when lit by a light source.
-	CBillowTex billowTex;
+/*	CBillowTex billowTex;
 	billowTex.setTarget(&sample1);
 	billowTex.setOctaves(6);
 	billowTex.setFrequency(8);
@@ -60,5 +60,5 @@ void ComposeGranite::compose() {
 	turbulenceTex.setOctaves(6);
 	turbulenceTex.setPower(1.0 / 8.0);
 	turbulenceTex.render();
-
+	*/
 }

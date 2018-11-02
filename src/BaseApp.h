@@ -135,5 +135,6 @@ public:
 
 	CRenderer& renderer;
 
+	std::string dataPath; //<Path to app data folder
 	};
 

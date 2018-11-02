@@ -100,9 +100,9 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 	int mousePos;
 
 	if (orientation == horizontal) 
-		mousePos = mouseX;
+		mousePos = getLocalPos(mouseX, mouseY).x; 
 	else
-		mousePos = height - mouseY;
+		mousePos = height - getLocalPos(mouseX, mouseY).y;
 
 	if (mousePos < SliderPos) {
 		SliderPos -= clickIncrement; 
@@ -123,9 +123,9 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 void CGUIbaseScrollbar::OnMouseMove(int mouseX, int mouseY,int key) {
 	if ((MouseDown == this) && ( scrollbarHasMouse  == this)) {//scrollbar dragging appears to be going on
 		if (orientation == horizontal) 
-			SliderPos = mouseX - mouseSliderOffset;
+			SliderPos = getLocalPos(mouseX, mouseY).x - mouseSliderOffset;
 		else {
-			SliderPos = (height - mouseY) - mouseSliderOffset;
+			SliderPos = (height - getLocalPos(mouseX, mouseY).y) - mouseSliderOffset;
 		}
 		updateValue();
 	}

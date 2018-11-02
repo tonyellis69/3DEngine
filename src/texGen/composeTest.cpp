@@ -10,12 +10,12 @@ ComposeTest::~ComposeTest() {
 }
 
 void ComposeTest::initTex() {
-	sample1.resize(512, 512);
-	sample2.resize(512, 512);
-	sample3.resize(512, 512);
-	sample4.resize(512, 512);
-	composedTex.resize(512, 512);
-	colouredTex.resize(512, 512);
+	//sample1.resize(512, 512);
+//	sample2.resize(512, 512);
+	//sample3.resize(512, 512);
+	//sample4.resize(512, 512);
+	//composedTex.resize(512, 512);
+	//colouredTex.resize(512, 512);
 
 	colourise = true;
 	//octaves = 1;
@@ -34,69 +34,77 @@ void ComposeTest::compose() {
 }
 
 CTexGen * ComposeTest::createNoiseTex() {
-	currentTexGen = new CNoiseTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	return currentTexGen;
+	CNoiseTex* texGen = new CNoiseTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
 }
 
 CTexGen * ComposeTest::createRidgedMFTex() {
-	currentTexGen = new CRidgedMultiTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	return currentTexGen;
+	CRidgedMultiTex* texGen = new CRidgedMultiTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
 }
 
 CTexGen * ComposeTest::createCylinderTex() {
-	currentTexGen = new CylinderTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	return currentTexGen;
+	CylinderTex* texGen = new CylinderTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
 }
 
 CTexGen * ComposeTest::createTurbulenceTex(CTexGen* source) {
-	currentTexGen = new CTurbulenceTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	currentTexGen->setSource(source->getTarget());
-	return currentTexGen;
+	CTurbulenceTex* texGen = new CTurbulenceTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(source);
+	return texGen;
 }
 
-CTexGen * ComposeTest::createColouriseTex(CTexGen* source, ColourGradient & colourGradient) {
+CTexGen * ComposeTest::createColouriseTex(CTexGen* source, ColourGradient* colourGradient) {
 	CColourTex* colourTex = new CColourTex();
 	texGens.push_back(colourTex);
 	colourTex->setTarget(createTarget());
-	colourTex->setPalette(colourGradient);
-	colourTex->setSource(source->getTarget());
+	colourTex->setPalette(*colourGradient);
+	colourTex->setSource(source);
 	/////////////currentTexGen = colourTex;
 	return colourTex;
 }
 
 CTexGen * ComposeTest::createScaleBiasTex(CTexGen * source) {
-	currentTexGen = new CScaleBiasTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	currentTexGen->setSource(source->getTarget());
-	return currentTexGen;
+	CScaleBiasTex* texGen = new CScaleBiasTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(source);
+	return texGen;
+}
+
+CTexGen * ComposeTest::createScalePointTex(CTexGen * source) {
+	CScalePointTex* texGen = new CScalePointTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(source);
+	return texGen;
 }
 
 CTexGen * ComposeTest::createAddTex(CTexGen * source1, CTexGen * source2) {
-	currentTexGen = new CAddTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	currentTexGen->setSource(source1->getTarget());
-	currentTexGen->setSource2(source2->getTarget());
-	return currentTexGen;
+	CAddTex* texGen = new CAddTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(source1);
+	texGen->setSource2(source2);
+	return texGen;
 }
-/*
-CTexGen * ComposeTest::createScaleBiasTex(CTexGen * source) {
-	currentTexGen = new CScaleBiasTex();
-	texGens.push_back(currentTexGen);
-	currentTexGen->setTarget(createTarget());
-	currentTexGen->setSource(source->getTarget());
-	return currentTexGen;
+
+CTexGen * ComposeTest::createLayerTex(CTexGen * source1, CTexGen * source2) {
+	CLayerTex* texGen = new CLayerTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(source1);
+	texGen->setSource2(source2);
+	return texGen;
 }
-*/
 
 /** Create a new texture to use as a rendering target. */
 CRenderTexture * ComposeTest::createTarget() {
@@ -120,6 +128,16 @@ void ComposeTest::updateAngle(glm::vec3 angle) {
 	compose();
 }
 
+void ComposeTest::updatePosition(glm::vec3 translation) {
+	currentTexGen->setTranslation(translation);
+	compose();
+}
+
+void ComposeTest::updateScalePt(glm::vec3 scale) {
+	currentTexGen->setScalePt(scale);
+	compose();
+}
+
 void ComposeTest::updatePower(float power) {
 	currentTexGen->setPower(power);
 	compose();
@@ -135,6 +153,7 @@ void ComposeTest::updateBias(float bias) {
 	compose();
 }
 
+/** Change the colour gradient of the current tex gen, if it has one. */
 void ComposeTest::updateColourGradient(ColourGradient& gradient) {
 	currentTexGen->setPalette(gradient);
 	//compose();
@@ -146,6 +165,13 @@ void ComposeTest::scrollStack(int direction) {
 		stackPosition++;
 	else
 		stackPosition--;
+	setCurrentLayer(stackPosition);
+}
+
+void ComposeTest::setCurrentLayer(int layerNo) {
+	if (texGens.size() == 0)
+		return;
+	stackPosition = layerNo;
 	if (stackPosition < 0)
 		stackPosition = 0;
 	else if (stackPosition >= texGens.size())

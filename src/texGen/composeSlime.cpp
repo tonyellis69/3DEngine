@@ -17,7 +17,7 @@ void ComposeSlime::initTex()
 }
 
 void ComposeSlime::compose() {
-	CBillowTex billowTex;
+/*	CBillowTex billowTex;
 	billowTex.setTarget(&sample1);
 	billowTex.setOctaves(1);
 	billowTex.setFrequency(4);
@@ -62,5 +62,5 @@ void ComposeSlime::compose() {
 	turbulenceTex.setOctaves(2);
 	turbulenceTex.setPower(1.0 / 32.0);
 	turbulenceTex.render();
-
+	*/
 }

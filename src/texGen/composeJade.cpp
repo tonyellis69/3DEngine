@@ -18,7 +18,7 @@ void ComposeJade::initTex() {
 }
 
 void ComposeJade::compose() {
-	CRidgedMultiTex multiTex;
+/*	CRidgedMultiTex multiTex;
 	multiTex.setTarget(&sample1);
 	multiTex.setOctaves(6);
 	multiTex.setSample(vec3(0), vec3(2, 2, 0));
@@ -55,5 +55,5 @@ void ComposeJade::compose() {
 	//seamlessTex.setTarget(&composedTex);
 	//seamlessTex.render();
 
-
+	*/
 }

@@ -19,6 +19,7 @@ void ComposeSky::initTex()
 }
 
 void ComposeSky::compose() {
+	/*
 	// Base of the water texture.  The Voronoi polygons generate the waves.  At
 	 // the center of the polygons, the values are at their lowest.  At the edges
 	 // of the polygons, the values are at their highest.  The values smoothly
@@ -43,13 +44,8 @@ void ComposeSky::compose() {
 	turbulenceTex.render();
 
 	//Produces the basic shape of soft, fluffy clouds.
-	/*module::Billow cloudBase;
-	cloudBase.SetSeed(2);
-	cloudBase.SetFrequency(2.0);
-	cloudBase.SetPersistence(0.375);
-	cloudBase.SetLacunarity(2.12109375);
-	cloudBase.SetOctaveCount(4);
-	cloudBase.SetNoiseQuality(QUALITY_BEST); */
+	
+	
 
 	CBillowTex billowTex;
 	billowTex.setTarget(&sample1);
@@ -59,12 +55,7 @@ void ComposeSky::compose() {
 	billowTex.render();
 
 	// Perturb the cloud texture for more realism.
-/*	module::Turbulence finalClouds;
-	finalClouds.SetSourceModule(0, cloudBase);
-	finalClouds.SetSeed(3);
-	finalClouds.SetFrequency(16.0);
-	finalClouds.SetPower(1.0 / 64.0);
-	finalClouds.setOctaves(2);*/
+
 
 	CTurbulenceTex turbulenceTex2;
 	turbulenceTex2.setSource(&sample1);
@@ -106,5 +97,5 @@ void ComposeSky::compose() {
 	layerTex.setSource2(&sample2);
 	layerTex.setTarget(&composedTex);
 	layerTex.render();
-
+	*/
 }

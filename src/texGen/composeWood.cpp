@@ -19,7 +19,7 @@ void ComposeWood::initTex()
 }
 
 void ComposeWood::compose() {
-	CylinderTex cylinderTex;
+/*	CylinderTex cylinderTex;
 	cylinderTex.setTarget(&sample1);
 	cylinderTex.setFrequency(16);
 	cylinderTex.setTranslation(vec3(0, -1.48, 0));
@@ -70,5 +70,5 @@ void ComposeWood::compose() {
 	turbulenceTex2.setOctaves(4);
 	turbulenceTex2.setPower(1.0 / 64.0);
 	turbulenceTex2.render();
-
+	*/
 }

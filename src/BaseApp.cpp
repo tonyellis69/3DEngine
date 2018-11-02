@@ -25,6 +25,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	
 
 	Engine.dataPath = homeDir + "Data\\";
+	dataPath = homeDir + "Data\\";
 	Engine.Renderer.dataPath = homeDir + "Data\\";
 	
 	//Set up our handlers for window events

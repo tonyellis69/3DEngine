@@ -23,14 +23,22 @@ public:
 	void hide(bool onOff);
 	void compose();
 	void display();
+	void updateGUI();
+	void save();
+	void restore();
+	void clear();
 
 
 	CBaseApp* pApp;
 	CGUIimage* image;
 	CGUIpaletteBar* paletteBar;
-//	ColourGradient texColourGradient;
+
 
 	ComposeTest texCompositor;
 
 	CGUInoiseCtrl* GUInoiseCtrl;
 };
+
+
+
+
