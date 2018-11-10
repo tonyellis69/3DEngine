@@ -10,13 +10,17 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl->setText("Octaves");
 	Add(lbl);
 
-	int CtrlCol2X = 200;
+	int CtrlCol2X = 190;
 	lbl = new CGUIlabel2(CtrlCol2X, CtrlStartY, 50, 20);
 	lbl->setText("Power");
 	Add(lbl);
 
 	lbl = new CGUIlabel2(20, CtrlStartY + 30, 80, 20);
 	lbl->setText("Frequency");
+	Add(lbl);
+
+	lbl = new CGUIlabel2(CtrlCol2X, CtrlStartY + 30, 80, 20);
+	lbl->setText("Persistance");
 	Add(lbl);
 
 	lbl = new CGUIlabel2(20, CtrlStartY + 60, 80, 20);
@@ -27,6 +31,14 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl->setText("Bias");
 	Add(lbl);
 
+	lbl = new CGUIlabel2(20, CtrlStartY + 90, 80, 20);
+	lbl->setText("Distance");
+	Add(lbl);
+
+	lbl = new CGUIlabel2(CtrlCol2X, CtrlStartY + 90, 80, 20);
+	lbl->setText("Random hue");
+	Add(lbl);
+
 
 	int ctrlX = 100;
 	octaveCtrl = new CGUInumeric2(ctrlX, CtrlStartY, 70, 18);
@@ -34,7 +46,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	octaveCtrl->setMinMax(0, 32);
 	Add(octaveCtrl);
 
-	powerCtrl = new CGUInumeric2(CtrlCol2X + 60, CtrlStartY, 80, 18);
+	powerCtrl = new CGUInumeric2(CtrlCol2X + 90, CtrlStartY, 70, 18);
 	powerCtrl->setValue(0.1f); powerCtrl->setIncrement(0.1f);
 	powerCtrl->setMinMax(0, 32);
 	Add(powerCtrl);
@@ -44,17 +56,36 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	freqCtrl->setMinMax(0, 100);
 	Add(freqCtrl);
 
+	persistCtrl = new CGUInumeric2(CtrlCol2X + 90, CtrlStartY + 30, 70, 18);
+	persistCtrl->setValue(0.5f); persistCtrl->setIncrement(0.1f);
+	persistCtrl->setMinMax(0, 100);
+	Add(persistCtrl);
+
+
+
 	scaleCtrl = new CGUInumeric2(ctrlX, CtrlStartY + 60, 70, 18);
 	scaleCtrl->setValue(1); scaleCtrl->setIncrement(0.1f);
 	scaleCtrl->setMinMax(-100, 100);
 	Add(scaleCtrl);
 
-	biasCtrl = new CGUInumeric2(CtrlCol2X + 60, CtrlStartY + 60, 70, 18);
+	biasCtrl = new CGUInumeric2(CtrlCol2X + 90, CtrlStartY + 60, 70, 18);
 	biasCtrl->setValue(0.0f); biasCtrl->setIncrement(0.1f);
-	biasCtrl->setMinMax(0, 32);
+	biasCtrl->setMinMax(-32, 32);
 	Add(biasCtrl);
 
-	int saveButtonY = 240;
+	distCtrl = new CGUIcheckButton(ctrlX, CtrlStartY + 90, 18, 18);
+	distCtrl->Set = true;
+	distCtrl->setText("xxxx");
+	Add(distCtrl);
+
+	randHueCtrl = new CGUIcheckButton(CtrlCol2X + 90, CtrlStartY + 90, 18, 18);
+	randHueCtrl->Set = false;
+	randHueCtrl->setText("xxxx");
+	Add(randHueCtrl);
+
+
+
+	int saveButtonY = 330;
 	saveButton = new CGUIbutton2(ctrlX, saveButtonY, 70, 20);
 	saveButton->setText("Save");
 	Add(saveButton);
@@ -94,6 +125,47 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 		scalePtCtrl[axis]->setIncrement(0.1f);
 		Add(scalePtCtrl[axis]);
 	}
+
+	lbl = new CGUIlabel2(20, posStartY + 90, 80, 20);
+	lbl->setText("Lower");
+	Add(lbl);
+
+	lowerCtrl = new CGUInumeric2(ctrlX, posStartY + 90, 70, 18);
+	lowerCtrl->setValue(0); lowerCtrl->setMinMax(0, 1); lowerCtrl->setIncrement(0.1f);
+	Add(lowerCtrl);
+
+	lbl = new CGUIlabel2(CtrlCol2X, posStartY + 90, 80, 20);
+	lbl->setText("Upper");
+	Add(lbl);
+
+	upperCtrl = new CGUInumeric2(CtrlCol2X + 70, posStartY + 90, 70, 18);
+	upperCtrl->setValue(1); upperCtrl->setMinMax(0, 1); upperCtrl->setIncrement(0.1f);
+	Add(upperCtrl);
+
+	lbl = new CGUIlabel2(20, posStartY + 120, 80, 20);
+	lbl->setText("Falloff");
+	Add(lbl);
+
+	falloffCtrl = new CGUInumeric2(ctrlX, posStartY + 120, 70, 18);
+	falloffCtrl->setValue(0); falloffCtrl->setMinMax(0, 1); falloffCtrl->setIncrement(0.1f);
+	Add(falloffCtrl);
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 80, 20);
+	lbl->setText("Samp. width");
+	Add(lbl);
+
+	widthCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	widthCtrl->setValue(2); widthCtrl->setMinMax(0, 10);
+	Add(widthCtrl);
+
+	lbl = new CGUIlabel2(CtrlCol2X, posStartY + 150, 80, 20);
+	lbl->setText("height");
+	Add(lbl);
+
+	heightCtrl = new CGUInumeric2(CtrlCol2X + 70, posStartY + 150, 70, 18);
+	heightCtrl->setValue(2); heightCtrl->setMinMax(0, 10);
+	Add(heightCtrl);
+
 
 }
 

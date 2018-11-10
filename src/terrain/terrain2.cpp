@@ -58,7 +58,6 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 	}
 
 	if (inDirection != none) {
-		////////////message LoD1 shell to advance in in direction
 		shells[0].playerAdvance(inDirection);
 	}
 
@@ -69,9 +68,9 @@ void CTerrain2::fillShells() {
 	//TO DO: iterate through all shells
 	//for now, just do the LoD1shell
 
-	//how many chunks from the shell origin to fill:
+	//how many chunk layers from the shell origin to fill:
 	int chunkExtent = ((shells[0].shellSCs - 1) / 2) * SCchunks;
 	//TO DO: find the best way to calculate this!
 
-	shells[0].fill(chunkExtent);
+	shells[0].fillEntire(chunkExtent);
 }

@@ -9,11 +9,13 @@
 
 enum TexGenType { texNoise, texColour, texRidged, texCylinder, texTurbulence,
 	texScaleBias, texAdd, texSeamless, texScalePoint, texBillow, texVoronoi,
-	texSelect, texLayer};
+	texSelect, texLayer, texNull
+};
 
 /** A base class for creating texture generators. */
 class CTexGen {
 public:
+	CTexGen() {};
 	CTexGen(TexGenType derivedType)  ;
 	void setTarget(CRenderTexture* newTarget);
 	CRenderTexture* getTarget();
@@ -22,6 +24,7 @@ public:
 	virtual void setSource(CTexGen* newSource);
 	virtual void setSource2(CTexGen* newSource);
 	virtual void setFrequency(float freq) {};
+	virtual void setPersistence(float persist) {};
 	virtual void setAngles(glm::vec3& rotationAngles);
 	virtual void setTranslation(glm::vec3& translation);
 	virtual void setOctaves(int octave) {};
@@ -29,17 +32,33 @@ public:
 	virtual void setPalette(ColourGradient& gradient) {};
 	virtual void setScale(float scale) {};
 	virtual void setBias(float bias) {};
+	virtual void setDistance(bool onOff) {};
+	virtual void setRandomHue(bool onOff) {};
 	virtual void setScalePt(glm::vec3& scale) { };
+	virtual void setLowerBound(float lower) {};
+	virtual void setUpperBound(float upper) {};
+	virtual void setFalloff(float falloff) {};
+	virtual void setSampleWidth(float width) {};
+	virtual void setSampleHeight(float falloff) {};
 
 	virtual int getOctaves() { return 0; }
 	virtual float getFrequency() { return 0; }
+	virtual float getPersistence() { return 0; }
 	virtual float getPower() { return 0; }
 	virtual float getScale() { return 0; }
 	virtual float getBias() { return 0; }
+	virtual bool getDistance() { return 0; }
+	virtual bool getRandomHue() { return 0; }
 	virtual glm::vec3& getAngle() { return rotationAngles; }
 	virtual glm::vec3& getTranslation() { return translation; }
 	virtual ColourGradient* getColourGradient() { return NULL; }
 	virtual glm::vec3& getScalePt() { return glm::vec3(0); }
+	virtual float getLowerBound() { return 0; }
+	virtual float getUpperBound() { return 0; }
+	virtual float getFalloff() { return 0; };
+	virtual float getSampleWidth() { return 0; }
+	virtual float getSampleHeight() { return 0; }
+
 
 	virtual void compose() {};
 
@@ -59,10 +78,12 @@ public:
 
 	CTexGen* srcTex1;
 	CTexGen* srcTex2;
+	CTexGen* srcTex3;
 
 	unsigned int hSource;
 
 	TexGenType texGenType;
+	std::string name;
 private:
 	void buildMatrix();
 
@@ -85,16 +106,24 @@ std::istream& readObject(T& to_read, S& in) {
 class CNoiseTex : public CTexGen {
 public:
 	CNoiseTex() : samplePos(0), sampleSize(2,2,0) , octaves(1), persistence(0.5),
-		frequency(1), CTexGen(texNoise) {};
+		frequency(1), CTexGen(texNoise) {
+		name = "Noise";
+	};
 	void loadShader();
 	void render();
 	void setSample(glm::vec3& pos, glm::vec3& size);
 	void setOctaves(int octaves);
 	void setFrequency(float freq);
+	void setPersistence(float persist);
+	void setSampleWidth(float width);
+	void setSampleHeight(float height);
 	void compose();
 
 	int getOctaves() { return octaves; }
 	float getFrequency() { return frequency; }
+	float getPersistence() { return persistence; }
+	float getSampleWidth() { return sampleSize.x; }
+	float getSampleHeight() { return sampleSize.y; }
 
 	void write(std::ofstream & out);
 	void read(std::ifstream& in);
@@ -134,7 +163,7 @@ public:
 
 class CRidgedMultiTex : public CNoiseTex {
 public:
-	CRidgedMultiTex() { texGenType = texRidged; }
+	CRidgedMultiTex() { texGenType = texRidged; name = "RidgedMF"; }
 	void loadShader();
 	void render();
 
@@ -144,7 +173,7 @@ public:
 
 class CylinderTex : public CTexGen {
 public:
-	CylinderTex() : CTexGen(texCylinder), frequency(1) {};
+	CylinderTex() : CTexGen(texCylinder), frequency(1) { name = "Cylinder"; };
 	void loadShader();
 	void render();
 	void setFrequency(float freq);
@@ -161,7 +190,9 @@ public:
 class CTurbulenceTex : public CNoiseTex {
 public:
 	CTurbulenceTex() : samplePos(0), sampleSize(1, 1, 0),
-		power(0.1f) { texGenType = texTurbulence; }
+		power(0.1f) {
+		texGenType = texTurbulence; name = "Turbulence";
+	}
 	void loadShader();
 	void render();
 	void setPower(float power);
@@ -187,7 +218,7 @@ public:
 
 class CScaleBiasTex : public CTexGen {
 public:
-	CScaleBiasTex() : CTexGen(texScaleBias), scale(1), bias(0)  {};
+	CScaleBiasTex() : CTexGen(texScaleBias), scale(1), bias(0) { name = "ScaleBias"; };
 	void loadShader();
 	void setScaleBias(float scale, float bias);
 	void setScale(float scale);
@@ -209,7 +240,7 @@ public:
 
 class CAddTex : public CTexGen {
 public:
-	CAddTex() : CTexGen(texAdd) {}
+	CAddTex() : CTexGen(texAdd) { name = "Add";  }
 	void loadShader();
 	void render();
 
@@ -220,14 +251,14 @@ public:
 
 class CSeamlessTex : public CTexGen {
 public:
-	CSeamlessTex() : CTexGen(texSeamless) {}
+	CSeamlessTex() : CTexGen(texSeamless) { name = "Seamless";  }
 	void loadShader();
 	void render();
 };
 
 class CScalePointTex : public CTexGen {
 public:
-	CScalePointTex() : CTexGen(texScalePoint), scale(1) {}
+	CScalePointTex() : CTexGen(texScalePoint), scale(1) { name = "ScalePoint"; }
 	void setScalePt(glm::vec3& scale);
 	void loadShader();
 	void render();
@@ -242,7 +273,7 @@ public:
 
 class CBillowTex : public CNoiseTex {
 public:
-	CBillowTex() { texGenType = texBillow;  }
+	CBillowTex() { texGenType = texBillow; name = "Billow"; }
 	void loadShader();
 	void render();
 	void setPersistence(float persistence);
@@ -251,38 +282,53 @@ public:
 
 };
 
-class CVoronoiTex : public CTexGen {
+class CVoronoiTex : public CNoiseTex {
 public:
-	CVoronoiTex() : CTexGen(texVoronoi), samplePos(0), sampleSize(2, 2, 0),
-	distance(true), randomHue(false) {};
+	CVoronoiTex() : 
+		distance(true), randomHue(false) {
+		texGenType = texVoronoi; frequency = 8; name = "Voronoi";
+	}
 	void loadShader();
 	void render();
 	void setDistance(bool onOff);
 	void setRandomHue(bool onOff);
 	void setSample(glm::vec3& pos, glm::vec3& size);
-	void setFrequency(float freq);
 
-	unsigned int hSamplePos;
-	unsigned int hSampleSize;
+	bool getDistance() { return distance; }
+	bool getRandomHue() { return randomHue; }
+
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+
 	unsigned int hDistance;
 	unsigned int hRandomHue;
-	unsigned int hFrequency;
 
-	glm::vec3 samplePos;
-	glm::vec3 sampleSize;
 	bool distance;
 	bool randomHue;
-	float frequency;
+
 };
 
 class CSelectTex : public CTexGen {
 public:
-	CSelectTex() : CTexGen(texSelect) {}
+	CSelectTex() : CTexGen(texSelect), lowerBound(0.2f), upperBound(0.8f),
+		falloff(0.5f) {
+		name = "Select"; 
+	};
 	void loadShader();
 	void render();
-	void setControl(CRenderTexture* map);
+	void setControl(CTexGen* map);
 	void setBounds(float lower, float upper);
+	void setLowerBound(float lower);
+	void setUpperBound(float upper);
 	void setFalloff(float falloff);
+
+	float getLowerBound() { return lowerBound; }
+	float getUpperBound() { return upperBound; }
+	float getFalloff() { return falloff; }
+
+	void write(std::ofstream& out);
+	void read(std::ifstream& in);
 
 	unsigned int hSource2;
 	unsigned int hMap;
@@ -290,7 +336,7 @@ public:
 	unsigned int hUpperBound;
 	unsigned int hFalloff;
 
-	CRenderTexture* source2;
+
 	CRenderTexture* map;
 	float lowerBound;
 	float upperBound;
@@ -300,9 +346,17 @@ public:
 
 class CLayerTex : public CAddTex {
 public:
-	CLayerTex() { texGenType = texLayer;  }
+	CLayerTex() { texGenType = texLayer; name = "Layer"; }
 	void loadShader();
 	void render();
 
+
+};
+
+class CNullTex : public CTexGen {
+public:
+	CNullTex();
+
+	CRenderTexture nullTexture;
 
 };

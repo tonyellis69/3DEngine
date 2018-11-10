@@ -7,22 +7,30 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 	itemFont = defaultFont;
 	textColour = UIblack;
-	selectedColour = UIblue;
+	selectedColour = uiLightGrey;
 	type = uiMenu;
-	vPad =  4;
+	vItemPad =  4;
+	hItemPad = 1;
 	itemWidth = width;
-	maxItemWidth = 0;// itemWidth;
-	itemHeight = itemFont->lineHeight + vPad;
+	maxTextWidth = 0;// itemWidth;
+	itemHeight = itemFont->lineHeight + vItemPad;
 	clear();
 	
 	drawBorder = true;
 	pDrawFuncs->registerControl(*this);
+	itemTextAlignment = tleft;
+	leftAlignIndent = 10;
+	hItemInteriorPadding = 4;
+	highlightStyle = menuHighlightBar;
+
+	setBackColour1(uiWhite);
+	setBackColour2(uiWhite);
 }
 
 /** Set the font used by the menu items. */
 void CGUImenu::setFont(CFont * newFont) {
 	itemFont = newFont;
-	itemHeight = itemFont->lineHeight + vPad;
+	itemHeight = itemFont->lineHeight + vItemPad;
 }
 
 /** Set colour of menu items. */
@@ -30,46 +38,68 @@ void CGUImenu::setTextColour(UIcolour  colour) {
 	textColour = colour;
 }
 
-void CGUImenu::setSelectedColour(UIcolour colour) {
+void CGUImenu::setSelectedColour(glm::vec4 colour) {
 	selectedColour = colour;
 }
 
 
 void CGUImenu::DrawSelf() {
-	if (drawBorder) {
-		pDrawFuncs->drawCtrlBorder(*this);
+	//if (drawBorder) {
+	//	pDrawFuncs->drawCtrlBorder(*this);
+	//}
+	CGUIpanel::DrawSelf();
+	if (selected >= 0 && highlightStyle == menuHighlightBar) {
+		pDrawFuncs->drawRect2(items[selected]->drawBox, selectedColour, selectedColour);
+
 	}
 }
 
-void CGUImenu::addItem(std::string  itemText) {
-	CGUIlabel2* item = new CGUIlabel2(0, nextItemPos, itemWidth, itemHeight);
-	item->setMultiLine(false);
-	item->setFont(itemFont);
-	item->borderOn(false);
-	if (selected == nItems)
-		item->setTextColour(selectedColour);
-	else
-		item->setTextColour(textColour);
-	item->setText(itemText);
-	nextItemPos += itemHeight + vPad;
-	item->id = nItems++;
-	if (maxItemWidth < item->getTextWidth())
-		maxItemWidth = item->getTextWidth();
-	item->mousePassthru =  true;
-	Add(item);
-	items.push_back(item);
+void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
+	for (auto itemText : itemTexts) {
+		CGUIlabel2* item = new CGUIlabel2(hItemPad, nextItemPos, itemWidth, itemHeight);
+		item->setMultiLine(false);
+		item->setFont(itemFont);
+		item->borderOn(false);
+		item->textAlign = itemTextAlignment;
+		item->setLeftAlignIndent(leftAlignIndent);
 
+		item->setTextColour(textColour);
+		item->setText(itemText);
+		nextItemPos += itemHeight + vItemPad;
+		item->id = nItems++;
+		if (maxTextWidth < item->getTextWidth()) {
+			maxTextWidth = item->getTextWidth();
+			//if (itemTextAlignment == tleft)
+			//	maxItemWidth += leftAlignIndent ;
+		}
+		itemWidth = maxTextWidth + 2 * hItemInteriorPadding;
+		if (itemTextAlignment == tleft)
+			itemWidth += leftAlignIndent;
+		//item->resize(itemWidth, itemHeight);
+
+		item->mousePassthru = true;
+		Add(item);
+		items.push_back(item);
+	}
 	resizeToFit();
 }
 
 /** Resize to fit current items. */
 void CGUImenu::resizeToFit() {
-	itemWidth = maxItemWidth + 2 * vPad;
-	width = itemWidth;
-	height = (itemHeight + vPad) * items.size();
+	width = itemWidth + 2 * hItemPad;
+	height = (itemHeight + vItemPad) * items.size() + vItemPad;
 	drawBox.size = i32vec2(width, height);
+	for (auto item : items)
+		item->resize(itemWidth, itemHeight);
 	updateAppearance();
 }
+
+
+
+void CGUImenu::onMouseOff(const  int mouseX, const  int mouseY, int key) {
+		selected = -1;
+};
+
 
 /** User rolling the mouse wheel, so scroll the selection. */
 bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key) {
@@ -82,19 +112,31 @@ bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta,
 		selected = 0;
 	if (selected < 0)
 		selected = nItems - 1;
-	items[selected]->setTextColour(selectedColour);
+	if (highlightStyle == menuHighlightText)
+		items[selected]->setTextColour(selectedColour);
 	return true;
 }
 
 /** If the mouse moves over a menu item, select it. */
 void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
-	items[selected]->setTextColour(textColour);
-	selected = 0;
-	if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-		selected = mouseY / itemHeight;
+	if (items.size() == 0)
+		return;
+	i32vec2 mouse = getLocalPos(mouseX, mouseY);
+	if (selected >=0 && highlightStyle == menuHighlightText)
+		items[selected]->setTextColour(textColour);
+	selected = -1;
+	if (mouse.x > 0 && mouse.x < drawBox.size.x && mouse.y > 0 && mouse.y < drawBox.size.y) {
+		selected = mouse.y / (itemHeight + vItemPad);
 		if (selected > nItems - 1)
 			selected = nItems - 1;
-		items[selected]->setTextColour(selectedColour);
+		if (selected >= 0 && highlightStyle == menuHighlightText)
+			items[selected]->setTextColour(selectedColour);
+		if (callbackObj) {
+			CMessage msg;
+			msg.value = selected;
+			msg.Msg = uiMsgMouseMove;
+			callbackObj->GUIcallback(this, msg);
+		}
 	}
 		
 }
@@ -110,16 +152,22 @@ void CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 /** User pressed left-mouse, affirming the currently selected item. */
 void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
-	msg.Msg = uiClick;
+	if (IsOnControl(*this,mouseX,mouseY))
+		msg.Msg = uiClick;
+	else
+		msg.Msg = uiClickOutside;
 	msg.value = selected;
 	pDrawFuncs->handleUImsg(*this, msg);
+	if (callbackObj) {
+		callbackObj->GUIcallback(this, msg);
+	}
 }
 
 
 void CGUImenu::clear() {
 	nItems = 0;
-	nextItemPos = 0;
-	selected = 0;
+	nextItemPos = vItemPad;
+	selected = -1;
 	items.clear();
 	for (size_t i = 0; i < Control.size(); i++)
 		delete Control[i];

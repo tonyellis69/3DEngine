@@ -14,6 +14,8 @@ CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
 	type = checkButton;
 	iconset = defaultIconset;
 
+	inset = 3;
+
 	label = new CGUIlabel2(5, 5, w - (10 + iconOffset), h - 10);
 	label->setText("check");
 	label->setHorizontalAlignment(tright);
@@ -43,16 +45,21 @@ void CGUIcheckButton::DrawSelf( ) {
 		iconPos = drawBox.pos.x + (iconOffset >> 1);
 		label->setPos(10 + iconOffset, 5);
 	}
+
+	guiRect checkBox;
+	checkBox.pos = drawBox.pos + inset;
+	checkBox.size = glm::i32vec2(drawBox.size.y - 2 * inset);
  
-	//Write the text at the given point
-	//pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
+
 	//draw the icon
 	pDrawFuncs->setIconset(iconset);
 	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
 	if (Set)
-		pDrawFuncs->drawIcon(checked, iconPos,drawBox.pos.y + (drawBox.size.y >> 1));
+		//pDrawFuncs->drawIcon(checked, iconPos,drawBox.pos.y + (drawBox.size.y >> 1));
+		pDrawFuncs->drawRect2(checkBox, uiBlack, uiBlack);
 	else
-		pDrawFuncs->drawIcon(unChecked, iconPos, drawBox.pos.y + (drawBox.size.y >> 1));
+		//pDrawFuncs->drawIcon(unChecked, iconPos, drawBox.pos.y + (drawBox.size.y >> 1));
+		pDrawFuncs->drawRect2(checkBox, uiWhite, uiWhite);
 	
 	if (MouseOver == this)
 		setBorderColour(UIdarkGrey);
@@ -68,6 +75,7 @@ void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
 	msg.Msg = uiClick;
 	msg.value = Set;
 	pDrawFuncs->handleUImsg(*this,msg);
+	parent->message(this, msg);
 }
 
 void CGUIcheckButton::setText(std::string newText) {

@@ -15,13 +15,14 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	textBuf.setSize(textureWidth, textureHeight);
 
 	type = uiLabel;
-	setTextColour(0, 0, 0, 1);
+	setTextColour(vec4(0, 0, 0, 1));
 	multiLine = false;
 	drawBorder = false;
 	mousePassthru = true;
 	//pDrawFuncs->registerControl(*this);
 	renderOffset = i32vec2(0, 0);
-	
+	leftAlignIndent = 0;
+	textAlign = tleft;
 }
 
 void CGUIlabel2::setFont(CFont* newFont) {
@@ -34,15 +35,23 @@ void CGUIlabel2::setText(std::string newText) {
 	renderText();
 }
 
+/*
 void CGUIlabel2::setTextColour(float r, float g, float b, float a) {
 	textData.style.colour = glm::vec4(r, g, b, a);
 	textBuf.setTextColour(textData.style.colour);
 	renderText();
-}
+}*/
 
 void CGUIlabel2::setTextColour(UIcolour  colour) {
-	setTextColour(colour.r, colour.g, colour.b, colour.a);
+	setTextColour(vec4(colour.r, colour.g, colour.b, colour.a));
 }
+
+void CGUIlabel2::setTextColour(vec4  colour) {
+	textData.style.colour = colour;
+	textBuf.setTextColour(textData.style.colour);
+	renderText();
+}
+
 
 void CGUIlabel2::setMultiLine(bool onOff) {
 	multiLine = onOff;
@@ -51,6 +60,10 @@ void CGUIlabel2::setMultiLine(bool onOff) {
 
 void CGUIlabel2::setHorizontalAlignment(TTextAlign align) {
 	textAlign = align;
+}
+
+void CGUIlabel2::setLeftAlignIndent(int indent) {
+	leftAlignIndent = indent;
 }
 
 TTextAlign CGUIlabel2::getJustification() {
@@ -111,6 +124,9 @@ void CGUIlabel2::calcLineOffset() {
 		renderOffset.x = (textureWidth - lineRenderedWidth) / 2.0f;
 	} else if (textAlign == tright) {
 		renderOffset.x = textureWidth - lineRenderedWidth;
+	}
+	else if (textAlign == tleft) {
+		renderOffset.x = leftAlignIndent;
 	}
 
 

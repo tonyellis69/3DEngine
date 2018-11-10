@@ -10,10 +10,12 @@ public:
 	CGUIlabel2(int x, int y, int w, int h);
 	void setFont(CFont* font);
 	void setText(std::string newText);
-	void setTextColour(float r, float g, float b, float a);
+	//void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
 	void setMultiLine(bool onOff);
+	void setTextColour(glm::vec4 colour);
 	void setHorizontalAlignment(TTextAlign align);
+	void setLeftAlignIndent(int indent);
 	TTextAlign getJustification();
 	void DrawSelf();
 	//void borderOn(bool onOff);
@@ -42,4 +44,7 @@ public:
 
 	int textureHeight; ///<Height of the texture being drawn to.
 	int textureWidth; ///<Guess.
+
+	int leftAlignIndent; ///<How much left-aligned text is indented.
+
 	};

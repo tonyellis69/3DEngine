@@ -3,9 +3,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace glm;
-
-CTexGen::CTexGen(TexGenType derivedType) : 
-	texGenType(derivedType), srcTex1(NULL), srcTex2(NULL)  {
+/*
+CTexGen::CTexGen() : srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)
+{
+}
+*/
+CTexGen::CTexGen(TexGenType derivedType) :
+	texGenType(derivedType), srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)  {
 	pRenderer = &CRenderer::getInstance();
 
 	//create target quad
@@ -102,6 +106,18 @@ void CNoiseTex::setFrequency(float freq) {
 	frequency = freq;
 }
 
+void CNoiseTex::setPersistence(float persist) {
+	persistence = persist;
+}
+
+void CNoiseTex::setSampleWidth(float width) {
+	sampleSize.x = width;
+}
+
+void CNoiseTex::setSampleHeight(float height) {
+	sampleSize.y = height;
+}
+
 void CNoiseTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
 	samplePos = pos;
 	sampleSize = size;
@@ -138,10 +154,12 @@ void CNoiseTex::read(std::ifstream & in) {
 
 CColourTex::CColourTex() : CTexGen(texColour) {
 	palette.resize(256, 0);
+	name = "Colourise";
 }
 
 /** Set the 1D texture to use as a colour map. */
 void CColourTex::setPalette(ColourGradient& newGradient) {
+
 	palette.setData(newGradient.getData());
 	colourGradient = newGradient;
 }
@@ -456,8 +474,18 @@ void CVoronoiTex::setSample(glm::vec3 & pos, glm::vec3 & size) {
 	sampleSize = size;
 }
 
-void CVoronoiTex::setFrequency(float freq) {
-	frequency = freq;
+
+
+void CVoronoiTex::write(std::ofstream & out) {
+	CNoiseTex::write(out);
+	writeObject(distance, out);
+	writeObject(randomHue, out);
+}
+
+void CVoronoiTex::read(std::ifstream & in) {
+	CNoiseTex::read(in);
+	readObject(distance, in);
+	readObject(randomHue, in);
 }
 
 
@@ -492,8 +520,9 @@ void CSelectTex::render() {
 
 
 
-void CSelectTex::setControl(CRenderTexture * map) {
-	this->map = map;
+void CSelectTex::setControl(CTexGen * control) {
+	this->map = control->getTarget();
+	srcTex3 = control;
 }
 
 void CSelectTex::setBounds(float lower, float upper) {
@@ -501,8 +530,28 @@ void CSelectTex::setBounds(float lower, float upper) {
 	upperBound = upper;
 }
 
+void CSelectTex::setLowerBound(float lower) {
+	lowerBound = lower;
+}
+
+void CSelectTex::setUpperBound(float upper) {
+	upperBound = upper;
+}
+
 void CSelectTex::setFalloff(float falloff) {
 	this->falloff = falloff;
+}
+
+void CSelectTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(lowerBound, out);
+	writeObject(falloff, out);
+}
+
+void CSelectTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(lowerBound, in);
+	readObject(falloff, in);
 }
 
 
@@ -524,4 +573,9 @@ void CLayerTex::render() {
 	pRenderer->renderToTextureQuad(*mTarget);
 }
 
+CNullTex::CNullTex() {
+	texGenType = texNull;
 
+	mSource = &nullTexture;
+	mTarget = &nullTexture;
+}

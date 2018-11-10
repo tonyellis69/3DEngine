@@ -9,7 +9,10 @@ public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
 	void playerAdvance(Tdirection direction);
 	int getPlayerChunkExtent(Tdirection direction);
-	void fill(int chunkExtent);
+	void fillEntire(int chunkExtent);
+	void addToFaceLayer(Tdirection direction);
+	void scroll(Tdirection direction);
+	void requestWorldAdvance(Tdirection scrollDirection);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.

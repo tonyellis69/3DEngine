@@ -108,7 +108,7 @@ public:
 	void exit();
 	void showMouse(bool on);
 	void setMousePos(int x, int y);
-	void getMousePos(int& x, int& y);
+	glm::i32vec2 getMousePos();
 	bool keyNow(int vKey);
 
 	int mouseX,mouseY;

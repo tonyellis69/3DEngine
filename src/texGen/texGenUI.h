@@ -3,6 +3,7 @@
 #include "..\BaseApp.h"
 #include "..\UI\GUIimage.h"
 #include "..\UI\GUIpaletteBar.h"
+#include "..\UI\GUImenu.h"
 
 #include "texGen.h"
 #include "composeJade.h"
@@ -27,6 +28,8 @@ public:
 	void save();
 	void restore();
 	void clear();
+	void fillMenu();
+	void addTexGen(int itemNo);
 
 
 	CBaseApp* pApp;
@@ -37,6 +40,11 @@ public:
 	ComposeTest texCompositor;
 
 	CGUInoiseCtrl* GUInoiseCtrl;
+
+	CGUImenu* menu;
+	CGUImenu* addTexGenMenu;
+
+	CNullTex nullTexGen;
 };
 
 

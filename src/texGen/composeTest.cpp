@@ -54,6 +54,20 @@ CTexGen * ComposeTest::createCylinderTex() {
 	return texGen;
 }
 
+CTexGen * ComposeTest::createBillowTex() {
+	CBillowTex* texGen = new CBillowTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
+}
+
+CTexGen * ComposeTest::createVoronoiTex() {
+	CVoronoiTex* texGen = new CVoronoiTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
+}
+
 CTexGen * ComposeTest::createTurbulenceTex(CTexGen* source) {
 	CTurbulenceTex* texGen = new CTurbulenceTex();
 	texGens.push_back(texGen);
@@ -66,9 +80,10 @@ CTexGen * ComposeTest::createColouriseTex(CTexGen* source, ColourGradient* colou
 	CColourTex* colourTex = new CColourTex();
 	texGens.push_back(colourTex);
 	colourTex->setTarget(createTarget());
-	colourTex->setPalette(*colourGradient);
-	colourTex->setSource(source);
-	/////////////currentTexGen = colourTex;
+	if (colourGradient)
+		colourTex->setPalette(*colourGradient);
+	if (source)
+		colourTex->setSource(source);
 	return colourTex;
 }
 
@@ -106,6 +121,16 @@ CTexGen * ComposeTest::createLayerTex(CTexGen * source1, CTexGen * source2) {
 	return texGen;
 }
 
+CTexGen * ComposeTest::createSelectTex(CTexGen * source1, CTexGen * source2, CTexGen * control) {
+	CSelectTex* texGen = new CSelectTex();
+	texGens.push_back(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(source1);
+	texGen->setSource2(source2);
+	texGen->setControl(control);
+	return texGen;
+}
+
 /** Create a new texture to use as a rendering target. */
 CRenderTexture * ComposeTest::createTarget() {
 	currentTarget = new CRenderTexture(textureSize, textureSize);
@@ -120,6 +145,11 @@ void ComposeTest::updateOctaves(int octaves) {
 
 void ComposeTest::updateFrequency(float freq) {
 	currentTexGen->setFrequency(freq);
+	compose();
+}
+
+void ComposeTest::updatePersistence(float persist) {
+	currentTexGen->setPersistence(persist);
 	compose();
 }
 
@@ -153,10 +183,45 @@ void ComposeTest::updateBias(float bias) {
 	compose();
 }
 
+void ComposeTest::updateDistance(bool dist) {
+	currentTexGen->setDistance(dist);
+	compose();
+}
+
+void ComposeTest::updateRandomHue(bool hue) {
+	currentTexGen->setRandomHue(hue);
+	compose();
+}
+
 /** Change the colour gradient of the current tex gen, if it has one. */
 void ComposeTest::updateColourGradient(ColourGradient& gradient) {
 	currentTexGen->setPalette(gradient);
 	//compose();
+}
+
+void ComposeTest::updateLower(float lower) {
+	currentTexGen->setLowerBound(lower);
+	compose();
+}
+
+void ComposeTest::updateUpper(float upper) {
+	currentTexGen->setUpperBound(upper);
+	compose();
+}
+
+void ComposeTest::updateFalloff(float falloff) {
+	currentTexGen->setFalloff(falloff);
+	compose();
+}
+
+void ComposeTest::updateSampleWidth(float width) {
+	currentTexGen->setSampleWidth(width);
+	compose();
+}
+
+void ComposeTest::updateSampleHeight(float height) {
+	currentTexGen->setSampleHeight(height);
+	compose();
 }
 
 /** Make the next or previous texGen the current one. */
@@ -180,4 +245,9 @@ void ComposeTest::setCurrentLayer(int layerNo) {
 	currentTexGen = texGens[stackPosition];
 	currentTarget = currentTexGen->getTarget();
 
+}
+
+/** Add this tex gen to the stack. */
+void ComposeTest::addTexGen(CTexGen* texGen) {
+	texGens.push_back(texGen);
 }

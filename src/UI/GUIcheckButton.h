@@ -19,6 +19,8 @@ public:
 	bool Set; ///<Whether this button is selected or not.
 	int iconset; ///<Identifies what tileset icons will be taken from.
 
+	int inset; //<margin between drawbox and actual on/off inner box.
+
 	CGUIlabel2* label;
 };
 

@@ -156,8 +156,8 @@ void CBaseApp::onMouseMove(int x, int y) {
 }
 
 void CBaseApp::onMouseButton(int button, int action, int mods) {
-	unsigned int msg = 0; int x, y;
-	getMousePos(x, y);
+	unsigned int msg = 0; 
+	glm::i32vec2 mousePos = getMousePos();
 
 	if (action == GLFW_RELEASE) {
 		if (button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -180,7 +180,7 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 		if (button == GLFW_MOUSE_BUTTON_RIGHT)
 			msg = WM_RBUTTONDOWN;
 	}
-	GUIroot.MouseMsg(msg, x, y, 0);
+	GUIroot.MouseMsg(msg, mousePos.x, mousePos.y, 0);
 }
 
 /** Event handler for mouse wheel messages. */
@@ -344,9 +344,10 @@ void CBaseApp::setMousePos(int x, int y) {
 	win.setMousePos(x, y);
 }
 
-void CBaseApp::getMousePos(int& x, int& y) {
-	//Window.getMousePos(x,y);
+glm::i32vec2 CBaseApp::getMousePos() {
+	int x, y;
 	win.getMousePos(x, y);
+	return glm::i32vec2(x, y);
 }
 
 bool CBaseApp::keyNow(int vKey) {
