@@ -26,14 +26,27 @@ void CTexGenUI::initGUI() {
 	pApp->GUIroot.Add(GUInoiseCtrl);
 	//pApp->GUIroot.focusControl = GUInoiseCtrl;
 
-	menu = new CGUImenu(700, 210, 200, 300);
-	menu->setGUIcallback(this);
-	pApp->GUIroot.Add(menu);
+	texGenListPanel = new CGUIpanel(700, 210, 150, 210);
+	pApp->GUIroot.Add(texGenListPanel);
+
+	CGUIlabel2* listTitle = new CGUIlabel2(10, 10, 100, 20);
+	listTitle->setText("Tex gen stack:");
+	texGenListPanel->Add(listTitle);
+
+	container = new CGUIcontainer(10, 30, 130, 175);
+	texGenListPanel->Add(container);
+
+	texGenList = new CGUImenu(0, 0, 130, 300);
+	texGenList->setGUIcallback(this);
+	//texGenListPanel->Add(texGenList);
+	container->Add(texGenList);
 
 
 	addTexGenMenu = new CGUImenu(700, 210, 200, 300);
 	addTexGenMenu->setGUIcallback(this);
 	addTexGenMenu->setVisible(false);
+	addTexGenMenu->resizeHorizontal = true;
+	addTexGenMenu->drawBorder = true;
 	addTexGenMenu->addItem({ "Noise","Colourise","RidgedMF","Cylinder","Turbulence","ScaleBias",
 		"Add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer" });
 	pApp->GUIroot.Add(addTexGenMenu);
@@ -119,13 +132,13 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		updateGUI();
 	}
 
-	if (sender == menu && msg.Msg == uiMsgMouseMove) {
+	if (sender == texGenList && msg.Msg == uiMsgMouseMove) {
 		//texCompositor.setCurrentLayer(msg.value);
 		//update the GUI with the settings for this layer
 		//updateGUI();
 	}
 
-	if (sender == menu && msg.Msg == uiClick) {
+	if (sender == texGenList && msg.Msg == uiClick) {
 		if (msg.value == texCompositor.texGens.size()) {
 			i32vec2 pos = pApp->getMousePos();
 			addTexGenMenu->setPos(pos.x,pos.y);
@@ -134,6 +147,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 			return;
 		}
 		texCompositor.setCurrentLayer(msg.value);
+		configureGUI(texCompositor.currentTexGen->texGenType);
 		updateGUI();
 	}
 
@@ -141,14 +155,19 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		addTexGenMenu->makeUnModal();
 		addTexGenMenu->setVisible(false);
 		addTexGen(msg.value);
+		return;
 	}
 
 	if (sender == addTexGenMenu && msg.Msg == uiClickOutside) {
 		addTexGenMenu->makeUnModal();
 		addTexGenMenu->setVisible(false);
+		return;
 	}
 
-
+	if (sender == GUInoiseCtrl->src1Ctrl && msg.Msg == uiClick) {
+		texCompositor.currentTexGen->setSource(texCompositor.texGens[msg.value]);
+		texCompositor.currentTexGen->render();
+	}
 
 
 	display();
@@ -167,90 +186,12 @@ void CTexGenUI::hide(bool onOff) {
 void CTexGenUI::compose() {
 	texCompositor.initTex();
 
-	/*
-	ColourGradient jade = { 0, 24, 146, 102, 255,
-		128, 78, 154, 115, 255,
-		159, 128, 204, 165, 255,
-		175, 78, 154, 115, 255,
-		255, 29, 135, 102, 255 };
-
-	CTexGen* multiF = texCompositor.createRidgedMFTex();
-	CTexGen* cylinder = texCompositor.createCylinderTex();
-	CTexGen* turb = texCompositor.createTurbulenceTex(cylinder);
-	CTexGen* scale = texCompositor.createScaleBiasTex(turb);
-	CTexGen* add = texCompositor.createAddTex(scale,multiF);
-	texCompositor.createColouriseTex(add, &jade);
-	*/
-
-
-	/*
-	ColourGradient wood = { 0, 189, 94, 4, 255,
-	191, 144, 48, 6, 255,
-	255, 60, 10, 8, 255 };
-	CTexGen* cylinder = texCompositor.createCylinderTex();
-	CTexGen* noise = texCompositor.createNoiseTex();
-	CTexGen* scale = texCompositor.createScalePointTex(noise);
-	CTexGen* scaleBias = texCompositor.createScaleBiasTex(scale);
-	CTexGen* add = texCompositor.createAddTex(cylinder,scaleBias);
-	CTexGen* turb1 = texCompositor.createTurbulenceTex(add);
-	CTexGen* turb2 = texCompositor.createTurbulenceTex(turb1);
-	texCompositor.createColouriseTex(turb2, &wood);
-	*/
-
-
-	/*
-	ColourGradient granite = { 0, 0, 0, 0, 255,
-	8, 0, 0, 0, 255,
-	16, 216, 216, 242, 255,
-	128, 191, 191, 191, 255,
-	191, 210, 116, 125, 255,
-	223, 210, 113, 98, 255,
-	255, 255, 176, 192, 255 };
-	CTexGen* billow = texCompositor.createBillowTex();
-	CTexGen* voronoi = texCompositor.createVoronoiTex();
-	CTexGen* scaleBias = texCompositor.createScaleBiasTex(voronoi);
-	CTexGen* add = texCompositor.createAddTex(billow, scaleBias);
-	CTexGen* turb1 = texCompositor.createTurbulenceTex(add);
-	texCompositor.createColouriseTex(turb1, &granite);
-	*/
-
-	
 	//restore();
-	
-	/*
-	ColourGradient slime = { 0, 160, 64, 42, 255,
-	127, 64, 192, 64, 255,
-	255, 128, 255, 128, 255 };
-	CTexGen* billow = texCompositor.createBillowTex();
-	CTexGen* billow2 = texCompositor.createBillowTex();
-	CTexGen* scaleBias = texCompositor.createScaleBiasTex(billow2);
-	CTexGen* multiF = texCompositor.createRidgedMFTex();
-	CTexGen* select = texCompositor.createSelectTex(billow,scaleBias, multiF);
-	CTexGen* turb1 = texCompositor.createTurbulenceTex(select);
-	texCompositor.createColouriseTex(turb1, &slime);
-	*/
-
-	/*
-	CTexGen* voronoi = texCompositor.createVoronoiTex();
-	CTexGen* turb1 = texCompositor.createTurbulenceTex(voronoi);
-	CTexGen* billow = texCompositor.createBillowTex();
-	CTexGen* turb2 = texCompositor.createTurbulenceTex(billow);
-	ColourGradient waterColour = { 0, 48, 64, 192, 255,
-								191, 96, 192, 255, 255,
-								255, 255, 255, 255, 255 };
-	CTexGen* water = texCompositor.createColouriseTex(turb1, &waterColour);
-
-	ColourGradient cloudColour = { 0, 255, 255, 255, 0,
-							64, 255,255, 255, 0,
-							255, 255, 255, 255, 255 };
-	CTexGen* cloud = texCompositor.createColouriseTex(turb2, &cloudColour);
-	texCompositor.createLayerTex(water, cloud);
-	*/
-	restore();
 
 	texCompositor.setCurrentLayer(0);
-	updateGUI();
 	texCompositor.compose();
+	updateGUI();
+	fillMenu();
 	display();
 }
 
@@ -262,6 +203,8 @@ void CTexGenUI::display() {
 
 /** Update the GUI with the control settings for the current tex gen layer. */
 void CTexGenUI::updateGUI() {
+	if (texCompositor.texGens.size() == 0)
+		return;
 	GUInoiseCtrl->octaveCtrl->setValue(texCompositor.currentTexGen->getOctaves());
 	GUInoiseCtrl->freqCtrl->setValue(texCompositor.currentTexGen->getFrequency());
 	GUInoiseCtrl->persistCtrl->setValue(texCompositor.currentTexGen->getPersistence());
@@ -292,10 +235,13 @@ void CTexGenUI::updateGUI() {
 	GUInoiseCtrl->widthCtrl->setValue(texCompositor.currentTexGen->getSampleWidth());
 	GUInoiseCtrl->heightCtrl->setValue(texCompositor.currentTexGen->getSampleHeight());
 
+	if (texCompositor.currentTexGen->srcTex1)
+		GUInoiseCtrl->src1Ctrl->setText(texCompositor.currentTexGen->srcTex1->name);
+
 }
 
 void CTexGenUI::save() {
-	std::ofstream out(pApp->dataPath + "skyTex.gen", std::ios::binary);
+	std::ofstream out(pApp->dataPath + "testTex.gen", std::ios::binary);
 
 	auto writeTexIndex = [&](CTexGen* texGen) {
 		int x;
@@ -327,7 +273,7 @@ void CTexGenUI::save() {
 void CTexGenUI::restore() {
 	clear();
 
-	std::ifstream in(pApp->dataPath + "skyTex.gen", std::ios::binary);
+	std::ifstream in(pApp->dataPath + "testTex.gen", std::ios::binary);
 	TexGenType texGenType;
 
 	auto getSourceByIndex = [&]() { int index; readObject(index, in); return texCompositor.texGens[index]; };
@@ -377,11 +323,13 @@ void CTexGenUI::clear() {
 
 /** Fill the menu with the names of the tex gens on the stack.*/
 void CTexGenUI::fillMenu() {
-	menu->clear();
+	texGenList->clear();
+	GUInoiseCtrl->src1Ctrl->clear();
 	for (auto texGen : texCompositor.texGens) {
-		menu->addItem({ texGen->name });
+		texGenList->addItem({ texGen->name });
+		GUInoiseCtrl->src1Ctrl->addItem({ texGen->name });
 	}
-	menu->addItem({ "[Add texgen]" });
+	texGenList->addItem({ "[Add texgen]" });
 }
 
 /** Add the tex gen indicated to the stack. */
@@ -392,6 +340,43 @@ void CTexGenUI::addTexGen(int itemNo) {
 	case 2: texCompositor.createRidgedMFTex(); break;
 	case 3: texCompositor.createCylinderTex(); break;
 	case 4: texCompositor.createTurbulenceTex(&nullTexGen); break;
+	case 5: texCompositor.createScaleBiasTex(&nullTexGen); break;
+	case 6: texCompositor.createAddTex(&nullTexGen, &nullTexGen); break;
+	case 8: texCompositor.createScalePointTex(&nullTexGen); break;
+	case 9: texCompositor.createBillowTex(); break;
+	case 10: texCompositor.createVoronoiTex(); break;
+	case 11: texCompositor.createSelectTex(&nullTexGen, &nullTexGen, &nullTexGen); break;
+	case 12: texCompositor.createLayerTex(&nullTexGen, &nullTexGen); break;
+
 	}
+	texCompositor.setCurrentLayer(texCompositor.texGens.size() - 1);
+	configureGUI(texCompositor.currentTexGen->texGenType);
+	updateGUI();
 	fillMenu();
+	texCompositor.compose();
+	display();
+}
+
+/** Configure the GUI to show only the controls for the given layer. */
+void CTexGenUI::configureGUI(TexGenType texType) {
+	//first clear all controls
+	GUInoiseCtrl->hideAllRows();
+	switch (texType) {
+	case texNoise: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight"}); break;
+	case texColour: break;
+	case texRidged: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
+	case texCylinder: GUInoiseCtrl->activateRows({ "freq","rotation" }); break;
+	case texTurbulence: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight",
+		"source1"}); break;
+	case texScaleBias: GUInoiseCtrl->activateRows({ "scaleBias" }); break;
+	case texAdd: break;
+	case texSeamless: break;
+	case texScalePoint: GUInoiseCtrl->activateRows({ "scalePoint" }); break;
+	case texBillow: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
+	case texVoronoi: GUInoiseCtrl->activateRows({ "freq","sampWidthHeight", "distHue"}); break;
+	case texSelect: GUInoiseCtrl->activateRows({ "lowerUpper","falloff" }); break;
+	case texLayer: break;
+	}
+	GUInoiseCtrl->activateRows({ "save" });
+	GUInoiseCtrl->autoArrangeRows(0, 20);
 }

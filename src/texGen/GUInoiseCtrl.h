@@ -4,6 +4,7 @@
 #include "..\UI\GUInumeric2.h"
 #include "..\UI\GUIbutton2.h"
 #include "..\UI\GUIcheckButton.h"
+#include "..\UI\GUIdropdownMenu.h"
 
 /** A developer-only class for playing with noise functions, live. */
 class CGUInoiseCtrl : public CGUIpanel {
@@ -14,6 +15,8 @@ public:
 	glm::vec3 getFullRotation();
 	glm::vec3 getFullPosition();
 	glm::vec3 getScalePt();
+	void GUIcallback(CGUIbase* sender, CMessage& msg);
+
 
 	CGUInumeric2* octaveCtrl;
 	CGUInumeric2* freqCtrl;
@@ -35,6 +38,8 @@ public:
 
 	CGUInumeric2* widthCtrl;
 	CGUInumeric2* heightCtrl;
+
+	CGUIdropdownMenu* src1Ctrl;
 
 	CGUIbutton2* saveButton;
 };

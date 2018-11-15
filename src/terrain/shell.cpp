@@ -1,5 +1,7 @@
 #include "shell.h"
 
+#include "terrain2.h"
+
 using namespace glm;
 
 CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
@@ -43,7 +45,7 @@ void CShell::playerAdvance(Tdirection direction) {
 		Tdirection scrollDir = flipDir(direction);
 		scroll(scrollDir);
 		addToFaceLayer(direction);
-		requestWorldAdvance(scrollDir);
+		requestWorldMove(scrollDir);
 	}
 
 }
@@ -88,7 +90,8 @@ void CShell::scroll(Tdirection scrollDirection) {
 
 /** Ask the other shells of the world to move in the given direction. This is done to ensure that the 
 	terrain of this shell still lines up with the rest after a scroll. */
-void CShell::requestWorldAdvance(Tdirection scrollDirection){
-	//TO DO@
+void CShell::requestWorldMove(Tdirection scrollDirection){
+	//TO DO:
 	//message the parent terrain, asking it to move/advance the other shells by 1 LoD1 SC width.
+	pTerrain->worldMove(*this, scrollDirection);
 }

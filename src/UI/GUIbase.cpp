@@ -198,7 +198,9 @@ void CGUIbase::SetPos(int x, int y, int w, int h) {
 void CGUIbase::setPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
 	//drawBox.pos = glm::i32vec2(x, y);
-	updateAppearance();
+	//updateAppearance();
+	needsUpdate = true;
+
 }
 
 
@@ -384,10 +386,10 @@ void CGUIbase::CalculateClipbox() {
 	parentClipbox.x += parent->borderWidth;	parentClipbox.y += parent->borderWidth;
 	parentClipbox.width -= parent->borderWidth * 2; parentClipbox.height -= parent->borderWidth * 2;
 
-	Clipbox.width = drawBox.size.x;
-	Clipbox.x = parent->drawBox.pos.x + localPos.x;
-	if (Clipbox.x <parentClipbox.x) {
-		Clipbox.width -= (parentClipbox.x - Clipbox.x);
+	Clipbox.width = drawBox.size.x; //drawable width of this control
+	Clipbox.x = parent->drawBox.pos.x + localPos.x; //screen x position where drawing of control starts
+	if (Clipbox.x <parentClipbox.x) { //is it outside the clipbox of the parent control?
+		Clipbox.width -= (parentClipbox.x - Clipbox.x); //clip it to the parent clipbox start
 		Clipbox.x = parentClipbox.x;
 	}
 
@@ -453,6 +455,63 @@ void CGUIbase::resize(int w, int h) {
 
 void CGUIbase::setGUIcallback(Icallback * callbackInstance) {
 	callbackObj = callbackInstance;
+}
+
+/** Add given controls to the named row, creating it if necessary. */
+void CGUIbase::addToRow(const std::string & name, std::initializer_list<CGUIbase*> childControls) {
+	auto row = std::find_if(rowObjects.begin(), rowObjects.end(), [&](CRowObject& obj) { return obj.name == name; });
+	int index = row - rowObjects.begin();
+	if (row == rowObjects.end()) {
+		CRowObject newRowObj;
+		newRowObj.setName(name);
+		rowObjects.push_back(newRowObj);
+		index = rowObjects.size() -1;
+	}
+
+	for (auto control : childControls) {
+		if (!findControl(control)) //may have already been added
+			Add(control); 
+		control->setVisible(false);
+		rowObjects[index].addControl(control);
+	}
+}
+
+/** Position every control in every active row object into the next available space, working downwards. */
+void CGUIbase::autoArrangeRows(int offsetX, int offsetY) {
+	int rowY = offsetY;
+	for (auto rowObj : rowObjects) {
+		if (rowObj.isActive) {
+			for (auto control : rowObj.controls) {
+				control->setPos(control->localPos.x + offsetX, rowY);
+				control->setVisible(true);
+			}
+			rowY += rowObj.rowHeight;
+		}
+		else {
+			for (auto control : rowObj.controls) {
+				// control->setVisible(false);
+			}
+		}
+	}
+}
+
+/** Make all controls in all rows invisible. */
+void CGUIbase::hideAllRows() {
+	for (auto& rowObj : rowObjects) {
+		rowObj.isActive = false;
+		for (auto control : rowObj.controls) {
+			 control->setVisible(false);
+		}
+	}
+
+}
+
+/** Activate the given rows. */
+void CGUIbase::activateRows( std::initializer_list< std::string> rowNames) {
+	for (auto rowName : rowNames) {
+		auto row = std::find_if(rowObjects.begin(), rowObjects.end(), [&](CRowObject& obj) { return obj.name == rowName; });
+		row->isActive = true;
+	}
 }
 
 
@@ -589,6 +648,10 @@ void CGUIbase::setBackColour2(const glm::vec4 & colour) {
 
 void CGUIbase::setBorderColour(const UIcolour& colour) {
 	borderColour = colour;
+}
+
+void CGUIbase::setBorderColour(const glm::vec4& colour) {
+	borderColour = (UIcolour&)colour;
 }
 
 void CGUIbase::borderOn(bool onOff) {

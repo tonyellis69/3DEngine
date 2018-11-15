@@ -41,4 +41,7 @@ public:
 	TTextAlign itemTextAlignment;
 	int leftAlignIndent;
 	TMenuHighlight highlightStyle;
+	unsigned int minItemsShown; ///<Adjusts height on resizeToFit.
+	unsigned int maxItemsShown; ///<Adjusts height on resizeToFit.
+	bool resizeHorizontal;
 };

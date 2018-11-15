@@ -30,7 +30,7 @@ public:
 	int getNextLineStart(int lineStart);
 
 	void resize(int w, int h);
-
+	std::string& getText();
 
 
 	CTextBuffer textBuf;

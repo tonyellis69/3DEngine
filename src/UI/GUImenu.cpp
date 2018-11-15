@@ -16,7 +16,6 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	itemHeight = itemFont->lineHeight + vItemPad;
 	clear();
 	
-	drawBorder = true;
 	pDrawFuncs->registerControl(*this);
 	itemTextAlignment = tleft;
 	leftAlignIndent = 10;
@@ -25,6 +24,10 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 
 	setBackColour1(uiWhite);
 	setBackColour2(uiWhite);
+	minItemsShown = 8;
+	maxItemsShown = 1000;
+	resizeHorizontal = false;
+	drawBorder = false;
 }
 
 /** Set the font used by the menu items. */
@@ -72,10 +75,11 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 			//if (itemTextAlignment == tleft)
 			//	maxItemWidth += leftAlignIndent ;
 		}
-		itemWidth = maxTextWidth + 2 * hItemInteriorPadding;
-		if (itemTextAlignment == tleft)
-			itemWidth += leftAlignIndent;
-		//item->resize(itemWidth, itemHeight);
+		if (resizeHorizontal) {
+			itemWidth = maxTextWidth + 2 * hItemInteriorPadding;
+			if (itemTextAlignment == tleft)
+				itemWidth += leftAlignIndent;
+		}
 
 		item->mousePassthru = true;
 		Add(item);
@@ -87,11 +91,16 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 /** Resize to fit current items. */
 void CGUImenu::resizeToFit() {
 	width = itemWidth + 2 * hItemPad;
-	height = (itemHeight + vItemPad) * items.size() + vItemPad;
+	unsigned int visibleItems = std::max(items.size(), minItemsShown);
+	visibleItems = std::min(visibleItems, maxItemsShown);
+	height = (itemHeight + vItemPad) * visibleItems + vItemPad;
 	drawBox.size = i32vec2(width, height);
 	for (auto item : items)
 		item->resize(itemWidth, itemHeight);
 	updateAppearance();
+	CMessage msg;
+	msg.Msg = uiMsgChildResize;
+	parent->message(this, msg);
 }
 
 
@@ -157,6 +166,7 @@ void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 	else
 		msg.Msg = uiClickOutside;
 	msg.value = selected;
+	//parent->message(this, msg);
 	pDrawFuncs->handleUImsg(*this, msg);
 	if (callbackObj) {
 		callbackObj->GUIcallback(this, msg);

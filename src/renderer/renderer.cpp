@@ -476,6 +476,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 	
 	CRenderTexture* glTex = (CRenderTexture*)&texture;
 	glDisable(GL_BLEND); //Otherwise this messes up text texture alpha
+	glDisable(GL_SCISSOR_TEST);
 
 	glGenFramebuffers(1, &hFrameBuffer);
 	
@@ -500,6 +501,7 @@ void CRenderer::endRenderToTexture() {
 	glDeleteFramebuffers(1, &hFrameBuffer);
 	glViewport(0, 0, Width, Height);
 	glEnable(GL_BLEND);
+	glEnable(GL_SCISSOR_TEST);
 }
 
 void CRenderer::rendertToTextureClear(CBaseTexture& texture,glm::vec4& colour) {

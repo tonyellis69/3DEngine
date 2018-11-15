@@ -54,6 +54,8 @@ public:
 	virtual void addPanel(CGUIpanel* panel) {};
 	virtual void assignPanelPositions() {};
 	void setViewbox(int x, int y, int w, int h);
+	void message(CGUIbase* sender, CMessage& msg);
+
 
 	void DrawSelf( );
 

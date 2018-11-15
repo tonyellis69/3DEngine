@@ -4,6 +4,7 @@
 
 #include "..\direction.h"
 
+class CTerrain2;
 class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
@@ -12,7 +13,7 @@ public:
 	void fillEntire(int chunkExtent);
 	void addToFaceLayer(Tdirection direction);
 	void scroll(Tdirection direction);
-	void requestWorldAdvance(Tdirection scrollDirection);
+	void requestWorldMove(Tdirection scrollDirection);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -27,4 +28,6 @@ public:
 
 	int chunkExtent[6]; //<How far chunks extend from origin in each direction
 	bool faceLayerFull[6]; //<True if there's no room to add chunks to this face layer of SCs
+
+	CTerrain2* pTerrain; ///<Pointer to parent terrain object
 };

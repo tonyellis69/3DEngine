@@ -4,6 +4,7 @@
 #include "..\UI\GUIimage.h"
 #include "..\UI\GUIpaletteBar.h"
 #include "..\UI\GUImenu.h"
+#include "..\UI\GUIcontainer.h"
 
 #include "texGen.h"
 #include "composeJade.h"
@@ -30,6 +31,7 @@ public:
 	void clear();
 	void fillMenu();
 	void addTexGen(int itemNo);
+	void configureGUI(TexGenType texType);
 
 
 	CBaseApp* pApp;
@@ -41,7 +43,10 @@ public:
 
 	CGUInoiseCtrl* GUInoiseCtrl;
 
-	CGUImenu* menu;
+	CGUIcontainer* container;
+	CGUIpanel* texGenListPanel;
+	CGUImenu* texGenList;
+
 	CGUImenu* addTexGenMenu;
 
 	CNullTex nullTexGen;

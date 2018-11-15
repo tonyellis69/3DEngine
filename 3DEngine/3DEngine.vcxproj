@@ -165,6 +165,7 @@
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
     <ClCompile Include="..\src\UI\GUIcolourPicker.cpp" />
+    <ClCompile Include="..\src\UI\GUIdropdownMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIimage1D.cpp" />
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
+    <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
@@ -276,6 +278,7 @@
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
     <ClInclude Include="..\src\UI\GUIcolourPicker.h" />
+    <ClInclude Include="..\src\UI\GUIdropdownMenu.h" />
     <ClInclude Include="..\src\UI\GUIimage1D.h" />
     <ClInclude Include="..\src\UI\GUIpaletteBar.h" />
     <ClInclude Include="..\src\UI\GUIpopMenu.h" />
@@ -299,6 +302,7 @@
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
+    <ClInclude Include="..\src\UI\rowObject.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\userTypes.h" />

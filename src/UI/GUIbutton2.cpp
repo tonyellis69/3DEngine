@@ -12,7 +12,7 @@ CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) {
 
 	type = uiButton;
 
-	pDrawFuncs->registerControl(*this);
+	//pDrawFuncs->registerControl(*this);
 
 	label = new CGUIlabel2(5, 5, w - 10, h - 10);
 	label->setText("Button");

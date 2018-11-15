@@ -31,6 +31,8 @@ void CTextBuffer::setTextColour(glm::vec4 & newColour) {
 
 /** Draw textLine at the offset x,y on the text buffer. */
 glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
+
+
 	if (!textLine.size())
 		return glm::i32vec2(0);
 //	pRenderer->initTimerQuery();
@@ -41,7 +43,7 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	glm::vec2 blCorner = glm::vec2( x, y);
 
 	//return blCorner;
-
+	
 	int v = 0; 
 	glyph* glyph;
 	unsigned int numChars = textLine.size();
@@ -75,7 +77,9 @@ glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
 	buf.storeIndex(index.data(), index.size());
 	buf.storeLayout(2, 2, 0, 0);
 	
+
 	writeToTexture2(buf);   
+	
 	return blCorner;
 }
 
@@ -85,6 +89,7 @@ void CTextBuffer::clearBuffer() {
 
 
 void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
+	
 	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
 	//float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
 	
@@ -103,7 +108,9 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
+	
 	pRenderer->renderToTextureTris(glyphQuads, textTexture);
+
 }
 
 /** Prepare to compose a buffer-full of text for rendering. */
@@ -151,7 +158,6 @@ void CTextBuffer::render() {
 	buf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
 	buf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
 	buf.storeLayout(2, 2, 0, 0);
-
 	writeToTexture2(buf);
 
 }

@@ -1,13 +1,17 @@
 #include "GUIcontainer.h"
 
+using namespace glm;
+
 int CGUIcontainer::Count = 1;
-const int defaultSpaceAroundControls = 20;
+const int defaultSpaceAroundControls = 0;// 20;
 
 
 CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 	type = container;
 	borderWidth = 1;
 	localPos = glm::i32vec2(x, y);
+	drawBox.size = i32vec2(w, h);
+
 	width = w; height = h;
 	horizontalBarActive = false;
 	createScrollbars();
@@ -61,6 +65,8 @@ void CGUIsysContainer::message(CGUIbase* sender, CMessage& msg) {
 
 	if (sender->id == uiContainerHbarID) 
 		surface->localPos.x = 0 - msg.value;
+	if (msg.Msg == uiMsgChildResize)
+		adaptToContents();
 	needsUpdate = true;
 }
 
@@ -80,8 +86,8 @@ bool CGUIsysContainer::MouseWheelMsg(const  int mouseX, const  int mouseY, int w
 }
 
 void CGUIsysContainer::DrawSelf( ) {
-	pDrawFuncs->setDrawColours(UIlightGrey, UIlightGrey);
-	pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
+	
+	pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
 }
 
 
@@ -89,7 +95,6 @@ void CGUIsysContainer::updateAppearance() {
 	CGUIbase::updateAppearance();
 	// container may have been resized. Surface might now be too big for the viewbox, or viewbox so big bars no longer needed
 	//or, a child control may have grown, necessitating scrollbars.
-	
 	adaptToContents();
 	fitViewBoxToContainer();
 }
@@ -113,12 +118,13 @@ bool CGUIsysContainer::verticalBarCheck() {
 		float diff = (float) verticalBar->Max - verticalBar->Min;
 		float ratio = diff / verticalBar->Value;
 
-		verticalBar->setMax(surface->height - surface->viewBox.height);
+		verticalBar->setMax(surface->height - (surface->viewBox.height + borderWidth));
 		verticalBar->Value = (int)(verticalBar->Max / ratio);
 		verticalBar->setSliderSize((float) surface->viewBox.height / surface->height);  
 		verticalBar->updateSliderAppearance();
 		//adust scrolling of surface accordingly:
 		surface->localPos.y =  surface->viewBox.y - (verticalBar->Max - verticalBar->Value) ;
+		
 		return newBar;
 
 	}
@@ -207,7 +213,7 @@ void CGUIsysContainer::fitViewBoxToContainer() {
 		viewWidth -= barWidth;
 	if (horizontalBar->visible) 
 		viewHeight -= barWidth;
-	surface->setViewbox(borderWidth,borderWidth, viewWidth,viewHeight);
+	surface->setViewbox(borderWidth, borderWidth, viewWidth,viewHeight);
 }
 
 /** Respond to contents, if any, by resizing the surface and adding scrollbars as
@@ -220,7 +226,10 @@ void CGUIsysContainer::adaptToContents() {
 		verticalBarCheck();
 	
 	//child controls may now be clipped, so an updateAppearance is needed.
-	needsUpdate = true;
+	//needsUpdate = true; //No! Should only set this if we *know* something has changed
+	//moved this to the methods that do the changing
+	if (needsUpdate)
+		updateAppearance();
 }
 
 
@@ -235,16 +244,17 @@ CGUIbaseSurface::CGUIbaseSurface()  {
 /** Overload the default clipbox calculation, basing it on the rectangle described by viewBox. */
 void CGUIbaseSurface::CalculateClipbox() {
 	UIrect parentClipbox = parent->Clipbox;
+	
 
 	Clipbox.width = viewBox.width ; 
-	Clipbox.x = parent->screenPos.x + viewBox.x ;
+	Clipbox.x = parent->drawBox.pos.x + viewBox.x ;
 	if (Clipbox.x <parentClipbox.x) {
 		Clipbox.width -= (parentClipbox.x -Clipbox.x); //reduce width by amount it's been clipped
 		Clipbox.x = parentClipbox.x ;
 	}
 
 	Clipbox.height = viewBox.height;// -2; 
-	Clipbox.y = parent->screenPos.y + viewBox.y;
+	Clipbox.y = parent->drawBox.pos.y + viewBox.y;
 	if (Clipbox.y < parentClipbox.y) {
 		Clipbox.height -= (parentClipbox.y -Clipbox.y); //reduce height by amount it's been clipped
 		if (Clipbox.height < 0)
@@ -282,11 +292,13 @@ void CGUIbaseSurface::encompassChildControls() {
 			newWidth = child->localPos.x + child->width + spaceAroundControls;
 	}
 
-	if ((height != newHeight) || (width != newWidth))
+	if ((height != newHeight) || (width != newWidth)) {
 		parent->needsUpdate = true;
+		//needsUpdate = true;
+	}
 	height = newHeight;
 	width = newWidth;
-	
+	drawBox.setSize(width, height);
 }
 
 
@@ -294,6 +306,12 @@ void CGUIbaseSurface::encompassChildControls() {
 /** Set the viewbox to the given size and position on the container.*/
 void CGUIbaseSurface::setViewbox(int x, int y, int w, int h) {
 	viewBox.x = x; viewBox.y = y; viewBox.width = w;viewBox.height = h;
+}
+
+/** Here we can catch something like a menu resizing itself. */
+void CGUIbaseSurface::message(CGUIbase * sender, CMessage & msg) {
+	if (msg.Msg == uiMsgChildResize)
+		parent->message(this, msg);
 }
 
 

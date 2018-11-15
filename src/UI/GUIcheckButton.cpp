@@ -1,59 +1,41 @@
 #include "GUIcheckButton.h"
 
-
+using namespace glm;
 
 const int checked = 2;
 const int unChecked = 0;
 
 int CGUIcheckButton::Count = 1;
 CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
-	pDrawFuncs->registerControl(*this);
-	SetPos(x,y,w,h);
+//	pDrawFuncs->registerControl(*this);
+	localPos = glm::i32vec2(x, y);
+
+	
+	drawBox.setSize(w, h);
 	Orientation = lblFirst;
 	Set = false;
 	type = checkButton;
 	iconset = defaultIconset;
 
 	inset = 3;
+	int boxWidth = h - (2 * inset);
+	int labelWidth = w - (boxWidth + 2 * inset);
 
-	label = new CGUIlabel2(5, 5, w - (10 + iconOffset), h - 10);
+	
+	checkBox.size = glm::i32vec2(boxWidth);
+
+	label = new CGUIlabel2(0,0, labelWidth, h);
 	label->setText("check");
-	label->setHorizontalAlignment(tright);
-	//label->borderOn(true);
+	label->setHorizontalAlignment(tleft);
+	label->borderOn(false);
 	Add(label);
 
 }
 
 void CGUIcheckButton::DrawSelf( ) {
-////////////	pDrawFuncs->setFont(TextFont);
-	//pDrawFuncs->setDrawColours(txtColour, txtColour);
 
-	int w = 0; int reducedWidth = drawBox.size.x - iconOffset;
 
-	if (label->getJustification() == tcentred)
-		w = reducedWidth;
-	if (label->getJustification() == tright)
-		w = -reducedWidth;
-
-	int lblPos, iconPos;
-	if (Orientation == lblFirst) {
-		iconPos = drawBox.pos.x + reducedWidth + (iconOffset >> 1) ;
-		lblPos = drawBox.pos.x;
-		label->setPos(5,5);
-	} else {
-		lblPos = drawBox.pos.x + iconOffset;
-		iconPos = drawBox.pos.x + (iconOffset >> 1);
-		label->setPos(10 + iconOffset, 5);
-	}
-
-	guiRect checkBox;
-	checkBox.pos = drawBox.pos + inset;
-	checkBox.size = glm::i32vec2(drawBox.size.y - 2 * inset);
- 
-
-	//draw the icon
-	pDrawFuncs->setIconset(iconset);
-	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
+	checkBox.pos = drawBox.pos + i32vec2(drawBox.size.x - (checkBox.size.x+inset), inset);
 	if (Set)
 		//pDrawFuncs->drawIcon(checked, iconPos,drawBox.pos.y + (drawBox.size.y >> 1));
 		pDrawFuncs->drawRect2(checkBox, uiBlack, uiBlack);
@@ -62,10 +44,12 @@ void CGUIcheckButton::DrawSelf( ) {
 		pDrawFuncs->drawRect2(checkBox, uiWhite, uiWhite);
 	
 	if (MouseOver == this)
-		setBorderColour(UIdarkGrey);
+		//setBorderColour(UIdarkGrey);
+		pDrawFuncs->drawBorder2(checkBox, uiDarkGrey);
 	else
-		setBorderColour(UIlightGrey);
-	pDrawFuncs->drawCtrlBorder(*this);
+		//setBorderColour(UIlightGrey);
+		pDrawFuncs->drawBorder2(checkBox, uiLightGrey);
+	//pDrawFuncs->drawCtrlBorder(*this);
 }
 
 void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {

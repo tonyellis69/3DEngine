@@ -22,5 +22,6 @@ public:
 	int inset; //<margin between drawbox and actual on/off inner box.
 
 	CGUIlabel2* label;
+	guiRect checkBox;
 };
 

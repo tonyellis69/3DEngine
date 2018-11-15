@@ -20,10 +20,11 @@ CRenderTexture::CRenderTexture()  {
 		return;
 
 	 channels = 4; //lazily assume rgba
-	width = 2;
-	 height = 2;
-	float pixels[] = {	0.0f, 0.0f, 0.0f, 1.0f,   1.0f, 1.0f, 1.0f,1.0f,
-						1.0f, 1.0f, 1.0f,1.0f,   0.0f, 0.0f, 0.0f,1.0f };
+	width = 128;
+	height = 128;
+	
+	unsigned char* chequerBoardPixels = getChequePattern();
+
 
 	glGenTextures(1, &handle);
 	glBindTexture(GL_TEXTURE_2D, handle);
@@ -31,8 +32,8 @@ CRenderTexture::CRenderTexture()  {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, chequerBoardPixels);
+	delete chequerBoardPixels;
 }
 
 CRenderTexture::CRenderTexture(int w, int h) {
@@ -57,16 +58,18 @@ void CRenderTexture::resize(int w, int h) {
 	glDeleteTextures(1, &handle);
 	glGenTextures(1, &handle);
 	if (h > 0) {
+		unsigned char* chequerBoardPixels = getChequePattern();
 		glBindTexture(GL_TEXTURE_2D, handle);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); //GL_FLOAT was GL_UNSIGNED_BYTE
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, chequerBoardPixels); //GL_FLOAT was GL_UNSIGNED_BYTE
+		delete chequerBoardPixels;
 		return;
 	}
 	
-
+	//1D? fill with greyscale gradient, probably what's wanted.
 	unsigned char* pixels = new unsigned char[w * 4];
 	int b = 0;
 	for (int p = 0; p < width; p++) {
@@ -79,6 +82,7 @@ void CRenderTexture::resize(int w, int h) {
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	delete pixels;
 }
 
 glm::uvec4  CRenderTexture::getPixel(int x, int y) {
@@ -115,8 +119,6 @@ void CRenderTexture::createGreyscale(unsigned char * data, int w, int h) {
 	channels = 1;
 	glGenTextures(1, &handle);
 	glBindTexture(GL_TEXTURE_2D, handle);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -140,6 +142,29 @@ void CRenderTexture::setData(void * pixels) {
 	glBindTexture(GL_TEXTURE_1D, handle);
 	glTexSubImage1D(GL_TEXTURE_1D, 0, 0, width, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
+}
+
+/** Return pixels for a pattern to fill the current texture.*/
+unsigned char * CRenderTexture::getChequePattern() {
+	int noChecks = 32;
+	int xStep = width / noChecks;
+	int yStep = height / noChecks;
+
+	unsigned char* pixels = new unsigned char[width * height * channels];
+	memset(pixels, 255, width * height * channels);
+	if (xStep == 0 || yStep == 0)
+		return pixels;
+	int p = 0;
+	for (int x = 0; x < width; x++) {
+		for (int y = 0; y < height; y++) {
+			int b = (x / xStep) % 2;
+			b = b ^ (y / yStep) % 2;
+			b = b * 255;
+			pixels[p] = pixels[p + 1] = pixels[p + 2] = b; pixels[p + 3] = 32;
+			p += 4;
+		}
+	}
+	return pixels;
 }
 
 

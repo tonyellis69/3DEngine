@@ -5,6 +5,7 @@
 #include "..\renderer\texManager.h"
 #include "font.h"
 #include "..\renderer\buf.h"
+#include "rowObject.h"
 
 //#include "GUIbetterBase.h"
 
@@ -17,6 +18,11 @@ using namespace std;
 
 class guiRect {
 public:
+	void setSize(int w, int h) {
+		if (w < 8) w = 8;
+		if (h < 8) h = 8;
+		size = glm::i32vec2(w, h);
+	}
 	glm::i32vec2 pos;
 	glm::i32vec2 size;
 };
@@ -138,7 +144,7 @@ enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
 			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel,
-			uiRichTextPanel, uiPaletteTab };
+			uiRichTextPanel, uiPaletteTab, uiDropdownMenu};
 
 
 class Icallback {
@@ -151,6 +157,7 @@ class CGUIradio;
 class CGUImouse;
 class CGUIroot;
 class CGUIbaseEngine;
+class CRowObject;
 class CGUIbase : public Icallback {
 public:
 	CGUIbase() ;
@@ -190,7 +197,6 @@ public:
 	virtual bool getVisible();
 	unsigned int getID();
 	void makeModal();
-
 	void makeUnModal();
 
 	void setBackColour1(const UIcolour & colour);
@@ -199,6 +205,7 @@ public:
 	void setBackColour2(const glm::vec4 & colour);
 
 	void setBorderColour(const UIcolour & colour);
+	void setBorderColour(const glm::vec4& colour);
 
 	void borderOn(bool onOff);
 
@@ -214,7 +221,11 @@ public:
 	virtual void resize(int w, int h);
 	void setGUIcallback(Icallback* callbackInstance);
 	virtual void GUIcallback(CGUIbase* sender, CMessage& msg) {};
-
+	
+	void addToRow(const std::string& name, std::initializer_list<CGUIbase*> childControls);
+	void autoArrangeRows(int offsetX, int offsetY);
+	void hideAllRows();
+	void activateRows(  std::initializer_list< std::string> rows);
 
 
 	static	CMessage Message; ///<Any UI messages are returned here.
@@ -288,6 +299,8 @@ protected:
 public:
 	//static DelegateP<void,int> setFont;
 	static std::vector<CGUIbase*> modalControls; ///<List of modal controls, if any.
+
+	std::vector<CRowObject> rowObjects;
 };
 
 

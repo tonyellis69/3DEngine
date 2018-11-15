@@ -4,11 +4,12 @@ using namespace glm;
 
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
 	localPos = glm::i32vec2(x, y);
-	width = w; height = h;
-	//drawBox.pos = i32vec2(x, y); 
-	drawBox.size = i32vec2(w, h);
-	textureHeight = h;
-	textureWidth = w;
+	drawBox.setSize(w, h);
+
+	//TO DO: get rid of width/height!
+	width = drawBox.size.x; height = drawBox.size.y;
+	textureHeight = drawBox.size.y;
+	textureWidth = drawBox.size.x;
 	
 	textData.font = defaultFont;
 	textBuf.setFont(defaultFont);
@@ -193,6 +194,10 @@ void CGUIlabel2::resize(int w, int h) {
 	drawBox.size = glm::i32vec2(w, h);
 	updateAppearance();
 	renderText();
+}
+
+std::string & CGUIlabel2::getText() {
+	return textData.text;
 }
 
 

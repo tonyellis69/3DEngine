@@ -11,23 +11,6 @@ CTexGen::CTexGen() : srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)
 CTexGen::CTexGen(TexGenType derivedType) :
 	texGenType(derivedType), srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)  {
 	pRenderer = &CRenderer::getInstance();
-
-	//create target quad
-	vBuf::T2DtexVert corners[4];
-	corners[0].v = glm::vec2(-0.5, 0.5); //A
-	corners[1].v = glm::vec2(0.5, 0.5); //B  0.5,0
-	corners[2].v = glm::vec2(-0.5, -0.5); //C  0,0.5
-	corners[3].v = glm::vec2(0.5, -0.5); //D  1,1
-
-	corners[0].tex = glm::vec2(0);
-	corners[1].tex = glm::vec2(1, 0);
-	corners[2].tex = glm::vec2(0, 1);
-	corners[3].tex = glm::vec2(1, 1);
-
-	unsigned int index[6] = { 2,3,0,0,3,1 };
-	targetQuad.storeVertexes(corners, sizeof(corners), 4);
-	targetQuad.storeIndex(index, 6);
-	targetQuad.storeLayout(2, 2, 0, 0);
 }
 
 /** Set the texture to draw to. */
@@ -575,6 +558,7 @@ void CLayerTex::render() {
 
 CNullTex::CNullTex() {
 	texGenType = texNull;
+	nullTexture.resize(512, 512);
 
 	mSource = &nullTexture;
 	mTarget = &nullTexture;

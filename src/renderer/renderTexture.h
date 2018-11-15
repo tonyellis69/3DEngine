@@ -19,6 +19,7 @@ public:
 	void createGreyscale(unsigned char * data, int w, int h);
 	void clear();
 	void setData(void* pixels);
+	unsigned char* getChequePattern();
 
 	unsigned int handle;
 	CRenderer* pRenderer;	

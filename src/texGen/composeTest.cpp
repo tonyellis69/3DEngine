@@ -10,12 +10,7 @@ ComposeTest::~ComposeTest() {
 }
 
 void ComposeTest::initTex() {
-	//sample1.resize(512, 512);
-//	sample2.resize(512, 512);
-	//sample3.resize(512, 512);
-	//sample4.resize(512, 512);
-	//composedTex.resize(512, 512);
-	//colouredTex.resize(512, 512);
+
 
 	colourise = true;
 	//octaves = 1;
