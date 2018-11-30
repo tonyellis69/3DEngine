@@ -79,7 +79,8 @@ void CGUIcolourPicker::message(CGUIbase* sender, CMessage & msg) {
 	}
 	if (msg.Msg == uiClick) {
 		if (callbackObj) {
-			callbackObj->GUIcallback(sender, msg);
+			msg.Msg = sender->id;
+			callbackObj->GUIcallback(this, msg);
 		}
 	}
 	if (msg.Msg == uiMsgSlide) {

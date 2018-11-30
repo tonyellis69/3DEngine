@@ -122,7 +122,7 @@ CTexGen * ComposeTest::createSelectTex(CTexGen * source1, CTexGen * source2, CTe
 	texGen->setTarget(createTarget());
 	texGen->setSource(source1);
 	texGen->setSource2(source2);
-	texGen->setControl(control);
+	texGen->setSource3(control);
 	return texGen;
 }
 

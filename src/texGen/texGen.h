@@ -23,6 +23,7 @@ public:
 	virtual void render() {};
 	virtual void setSource(CTexGen* newSource);
 	virtual void setSource2(CTexGen* newSource);
+	virtual void setSource3(CTexGen* newSource);
 	virtual void setFrequency(float freq) {};
 	virtual void setPersistence(float persist) {};
 	virtual void setAngles(glm::vec3& rotationAngles);
@@ -75,6 +76,7 @@ public:
 	CRenderTexture * mTarget;
 	CRenderTexture * mSource;
 	CRenderTexture * source2;
+	CRenderTexture * source3;
 
 	CTexGen* srcTex1;
 	CTexGen* srcTex2;
@@ -317,7 +319,7 @@ public:
 	};
 	void loadShader();
 	void render();
-	void setControl(CTexGen* map);
+	//void setSource3(CTexGen* map);
 	void setBounds(float lower, float upper);
 	void setLowerBound(float lower);
 	void setUpperBound(float upper);
@@ -337,7 +339,7 @@ public:
 	unsigned int hFalloff;
 
 
-	CRenderTexture* map;
+	
 	float lowerBound;
 	float upperBound;
 	float falloff;

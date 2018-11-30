@@ -24,6 +24,7 @@ public:
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void OnClick(const int mouseX, const int mouseY);
 	void clear();
+	std::string& getItemName(int itemNo);
 	
 	std::vector<CGUIlabel2*> items;
 	int nItems;

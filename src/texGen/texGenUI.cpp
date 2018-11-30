@@ -1,12 +1,18 @@
 #include "texGenUI.h"
 
 #include <iostream>
+#include <filesystem>
+#include <string>
 
 using namespace glm;
+namespace fs = std::experimental::filesystem;
 
 void CTexGenUI::init(CBaseApp * app) {
 	pApp = app;
 	initGUI();
+	fillRestoreMenu();
+	fillPaletteRestoreMenu();
+
 }
 
 /** Create the interface for viewing textures. */
@@ -15,18 +21,18 @@ void CTexGenUI::initGUI() {
 	pApp->GUIroot.Add(image);
 	//image->setVisible(false);
 
-	paletteBar = new CGUIpaletteBar(700, 10, 280, 180);
+	/*paletteBar = new CGUIpaletteBar(700, 10, 280, 180);
 	pApp->GUIroot.Add(paletteBar);
 	paletteBar->loadPalette();
-
 	paletteBar->setGUIcallback(this);
+	*/
 
 	GUInoiseCtrl = new CGUInoiseCtrl(700, 430, 380, 360);
 	GUInoiseCtrl->setGUIcallback(this);
 	pApp->GUIroot.Add(GUInoiseCtrl);
 	//pApp->GUIroot.focusControl = GUInoiseCtrl;
 
-	texGenListPanel = new CGUIpanel(700, 210, 150, 210);
+	texGenListPanel = new CGUIpanel(700, 210, 330, 210);
 	pApp->GUIroot.Add(texGenListPanel);
 
 	CGUIlabel2* listTitle = new CGUIlabel2(10, 10, 100, 20);
@@ -36,10 +42,29 @@ void CTexGenUI::initGUI() {
 	container = new CGUIcontainer(10, 30, 130, 175);
 	texGenListPanel->Add(container);
 
+	CGUIlabel2* lbl = new CGUIlabel2(150, 50, 70, 20);
+	lbl->setText("Load file");
+	lbl->setHorizontalAlignment(tright);
+	texGenListPanel->Add(lbl);
+	restoreMenu = new CGUIdropdownMenu(230, 50, 80, 20);
+	restoreMenu->setText("[select]");
+	restoreMenu->setGUIcallback(this);
+	texGenListPanel->Add(restoreMenu);
+
+	saveButton = new CGUIbutton2(150, 80, 70, 20);
+	saveButton->setText("Save as");
+	saveButton->setGUIcallback(this);
+	texGenListPanel->Add(saveButton);
+	fileName = new CGUItextbox2(230, 80, 80, 20);
+	fileName->setText("TexGen1");
+	texGenListPanel->Add(fileName);
+
+
 	texGenList = new CGUImenu(0, 0, 130, 300);
 	texGenList->setGUIcallback(this);
-	//texGenListPanel->Add(texGenList);
 	container->Add(texGenList);
+
+
 
 
 	addTexGenMenu = new CGUImenu(700, 210, 200, 300);
@@ -56,8 +81,8 @@ void CTexGenUI::initGUI() {
 
 /** Callback from the palette bar and noise control. */
 void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
-	if (sender == paletteBar && msg.Msg == uiMsgUpdate) {
-		texCompositor.updateColourGradient(paletteBar->colourGradient);
+	if (sender == GUInoiseCtrl->paletteBar && msg.Msg == uiMsgUpdate) {
+		texCompositor.updateColourGradient(GUInoiseCtrl->paletteBar->colourGradient);
 		texCompositor.currentTexGen->render();
 		//return;
 	}
@@ -168,18 +193,42 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		texCompositor.currentTexGen->setSource(texCompositor.texGens[msg.value]);
 		texCompositor.currentTexGen->render();
 	}
+	if (sender == GUInoiseCtrl->src2Ctrl && msg.Msg == uiClick) {
+		texCompositor.currentTexGen->setSource2(texCompositor.texGens[msg.value]);
+		texCompositor.currentTexGen->render();
+	}
+	if (sender == GUInoiseCtrl->src3Ctrl && msg.Msg == uiClick) {
+		texCompositor.currentTexGen->setSource3(texCompositor.texGens[msg.value]);
+		texCompositor.currentTexGen->render();
+	}
 
 
+	if (sender == saveButton) {
+		save();
+		return;
+	}
+
+	if (sender == restoreMenu && msg.Msg == uiClick) {
+		restore(restoreMenu->getItemName(msg.value));
+		return;
+	}
+
+	if (sender == GUInoiseCtrl->paletteBar) {
+		if (msg.Msg == uiMsgSave) {
+			savePalette(GUInoiseCtrl->paletteBar->fileNameBox->text);
+		}
+		if (msg.Msg == uiMsgRestore)
+			restorePalette(GUInoiseCtrl->paletteBar->restoreMenu->getItemName(msg.value));
+		return;
+	}
+		 
 	display();
 
-	if (sender == GUInoiseCtrl->saveButton) {
-		save();
-	}
 }
 
 void CTexGenUI::hide(bool onOff) {
 	image->setVisible(!onOff);
-	paletteBar->setVisible(!onOff);
+	//paletteBar->setVisible(!onOff);
 	GUInoiseCtrl->setVisible(!onOff);
 }
 
@@ -191,7 +240,7 @@ void CTexGenUI::compose() {
 	texCompositor.setCurrentLayer(0);
 	texCompositor.compose();
 	updateGUI();
-	fillMenu();
+	fillStackMenu();
 	display();
 }
 
@@ -226,7 +275,7 @@ void CTexGenUI::updateGUI() {
 
 	ColourGradient* texGenColourGrad = texCompositor.currentTexGen->getColourGradient();
 	if (texGenColourGrad)
-		paletteBar->setGradient(*texGenColourGrad);
+		GUInoiseCtrl->paletteBar->setGradient(*texGenColourGrad);
 
 	GUInoiseCtrl->lowerCtrl->setValue(texCompositor.currentTexGen->getLowerBound());
 	GUInoiseCtrl->upperCtrl->setValue(texCompositor.currentTexGen->getUpperBound());
@@ -237,11 +286,16 @@ void CTexGenUI::updateGUI() {
 
 	if (texCompositor.currentTexGen->srcTex1)
 		GUInoiseCtrl->src1Ctrl->setText(texCompositor.currentTexGen->srcTex1->name);
+	if (texCompositor.currentTexGen->srcTex2)
+		GUInoiseCtrl->src2Ctrl->setText(texCompositor.currentTexGen->srcTex2->name);
+	if (texCompositor.currentTexGen->srcTex3)
+		GUInoiseCtrl->src3Ctrl->setText(texCompositor.currentTexGen->srcTex3->name);
+
 
 }
 
 void CTexGenUI::save() {
-	std::ofstream out(pApp->dataPath + "testTex.gen", std::ios::binary);
+	std::ofstream out(pApp->dataPath + fileName->text + ".gen", std::ios::binary);
 
 	auto writeTexIndex = [&](CTexGen* texGen) {
 		int x;
@@ -267,16 +321,24 @@ void CTexGenUI::save() {
 	}
 	out.close();
 
-
+	fillRestoreMenu();
 }
 
-void CTexGenUI::restore() {
+void CTexGenUI::restore(std::string& filename) {
 	clear();
+	int finalColourise = 0;
 
-	std::ifstream in(pApp->dataPath + "testTex.gen", std::ios::binary);
+	std::ifstream in(pApp->dataPath + filename + ".gen", std::ios::binary);
 	TexGenType texGenType;
 
-	auto getSourceByIndex = [&]() { int index; readObject(index, in); return texCompositor.texGens[index]; };
+	struct TPatch { unsigned int idx;  unsigned int srcIdx; };
+	vector<TPatch> patches;
+	auto getSourceByIndex = [&]() { int index; readObject(index, in); 
+	if (index >= texCompositor.texGens.size()) {
+		patches.push_back({ texCompositor.texGens.size() ,(unsigned int)index });
+		return (CTexGen*)&nullTexGen;
+	}
+	return texCompositor.texGens[index]; };
 	auto getColourGradient = [&]() { ColourGradient gradIn; int tabCount; readObject(tabCount, in);
 	int tab; i32vec4 colour;
 	for (int x = 0; x < tabCount; x++) {
@@ -290,7 +352,9 @@ void CTexGenUI::restore() {
 	while (readObject(texGenType, in)) {
 		switch (texGenType) {
 		case texColour:		src = getSourceByIndex();
-			texCompositor.createColouriseTex(src, &getColourGradient()); break;
+			texCompositor.createColouriseTex(src, &getColourGradient()); 
+			finalColourise = texCompositor.texGens.size() - 1;
+			break;
 		case texNoise: texCompositor.createNoiseTex(); break;
 		case texVoronoi: texCompositor.createVoronoiTex(); break;
 		case texBillow: texCompositor.createBillowTex(); break;
@@ -309,11 +373,24 @@ void CTexGenUI::restore() {
 		texCompositor.texGens.back()->read(in);
 	}
 	in.close();
-	texCompositor.setCurrentLayer(0);
+
 	texCompositor.compose();
+
+	for (auto patch : patches) {
+		CTexGen* texGen = texCompositor.texGens[patch.idx];
+		if (texGen->srcTex1 == &nullTexGen)
+			texGen->setSource(texCompositor.texGens[patch.srcIdx]);
+		else if (texGen->srcTex2 == &nullTexGen)
+			texGen->setSource2(texCompositor.texGens[patch.srcIdx]);
+		else if (texGen->srcTex3 == &nullTexGen)
+			texGen->setSource3(texCompositor.texGens[patch.srcIdx]);
+		texGen->render();
+	}
+
+	texCompositor.setCurrentLayer(finalColourise);
 	display();
 
-	fillMenu();
+	fillStackMenu();
 }
 
 void CTexGenUI::clear() {
@@ -322,12 +399,16 @@ void CTexGenUI::clear() {
 }
 
 /** Fill the menu with the names of the tex gens on the stack.*/
-void CTexGenUI::fillMenu() {
+void CTexGenUI::fillStackMenu() {
 	texGenList->clear();
 	GUInoiseCtrl->src1Ctrl->clear();
+	GUInoiseCtrl->src2Ctrl->clear();
+	GUInoiseCtrl->src3Ctrl->clear();
 	for (auto texGen : texCompositor.texGens) {
 		texGenList->addItem({ texGen->name });
 		GUInoiseCtrl->src1Ctrl->addItem({ texGen->name });
+		GUInoiseCtrl->src2Ctrl->addItem({ texGen->name });
+		GUInoiseCtrl->src3Ctrl->addItem({ texGen->name });
 	}
 	texGenList->addItem({ "[Add texgen]" });
 }
@@ -352,7 +433,7 @@ void CTexGenUI::addTexGen(int itemNo) {
 	texCompositor.setCurrentLayer(texCompositor.texGens.size() - 1);
 	configureGUI(texCompositor.currentTexGen->texGenType);
 	updateGUI();
-	fillMenu();
+	fillStackMenu();
 	texCompositor.compose();
 	display();
 }
@@ -362,21 +443,77 @@ void CTexGenUI::configureGUI(TexGenType texType) {
 	//first clear all controls
 	GUInoiseCtrl->hideAllRows();
 	switch (texType) {
-	case texNoise: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight"}); break;
-	case texColour: break;
+	case texNoise: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
+	case texColour:  GUInoiseCtrl->activateRows({ "source1", "paletteBar" }); break;
 	case texRidged: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
 	case texCylinder: GUInoiseCtrl->activateRows({ "freq","rotation" }); break;
 	case texTurbulence: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight",
-		"source1"}); break;
-	case texScaleBias: GUInoiseCtrl->activateRows({ "scaleBias" }); break;
-	case texAdd: break;
+		"source1" }); break;
+	case texScaleBias: GUInoiseCtrl->activateRows({ "scaleBias","source1" }); break;
+	case texAdd: GUInoiseCtrl->activateRows({ "source1&2" }); break;
 	case texSeamless: break;
-	case texScalePoint: GUInoiseCtrl->activateRows({ "scalePoint" }); break;
+	case texScalePoint: GUInoiseCtrl->activateRows({ "source1", "scalePoint" }); break;
 	case texBillow: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
-	case texVoronoi: GUInoiseCtrl->activateRows({ "freq","sampWidthHeight", "distHue"}); break;
-	case texSelect: GUInoiseCtrl->activateRows({ "lowerUpper","falloff" }); break;
-	case texLayer: break;
+	case texVoronoi: GUInoiseCtrl->activateRows({ "freq","sampWidthHeight", "distHue" }); break;
+	case texSelect: GUInoiseCtrl->activateRows({ "lowerUpper","falloff","source1&2","source3" }); break;
+	case texLayer: GUInoiseCtrl->activateRows({ "source1&2" }); break;
 	}
-	GUInoiseCtrl->activateRows({ "save" });
 	GUInoiseCtrl->autoArrangeRows(0, 20);
 }
+
+/** Populate the restore menu with the names of all the texgen composition files that can be found. */
+void CTexGenUI::fillRestoreMenu() {
+	restoreMenu->clear();
+	//search for ".gen" files
+	for (auto& p : fs::directory_iterator(pApp->dataPath)) {
+		std::string path = p.path().string();
+		if (path.compare(path.size() - 4, 4, ".gen") == 0) {
+			restoreMenu->addItem({ p.path().stem().string() });
+		}
+	}
+}
+
+/** Handle a paletteBar request to save the named palette. */
+void CTexGenUI::savePalette(std::string filename) {
+	std::ofstream out(pApp->dataPath + filename + ".pal", std::ios::binary);
+
+	ColourGradient* colourGradient = &GUInoiseCtrl->paletteBar->colourGradient;
+	int tabCount = colourGradient->colours.size();
+	writeObject(tabCount, out);
+	for (auto tab : colourGradient->colours) {
+		writeObject(tab.first, out);
+		writeObject(tab.second, out);
+	}
+	out.close();
+	fillPaletteRestoreMenu();
+}
+
+void CTexGenUI::fillPaletteRestoreMenu() {
+	GUInoiseCtrl->paletteBar->restoreMenu->clear();
+	//search for ".pal" files
+	for (auto& p : fs::directory_iterator(pApp->dataPath)) {
+		std::string path = p.path().string();
+		if (path.compare(path.size() - 4, 4, ".pal") == 0) {
+			GUInoiseCtrl->paletteBar->restoreMenu->addItem({ p.path().stem().string() });
+		}
+	}
+}
+
+void CTexGenUI::restorePalette(std::string & filename){
+	std::ifstream in(pApp->dataPath + filename + ".pal", std::ios::binary);
+
+	ColourGradient gradIn; 
+	int tabCount;
+	readObject(tabCount, in);
+	int tab; i32vec4 colour;
+	for (int x = 0; x < tabCount; x++) {
+		readObject(tab, in); readObject(colour, in);
+		gradIn.changeColour(tab, colour);
+	}
+	GUInoiseCtrl->paletteBar->setGradient(gradIn);
+
+	texCompositor.updateColourGradient(gradIn);
+	texCompositor.currentTexGen->render();
+
+}
+

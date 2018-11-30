@@ -7,13 +7,11 @@
 #include "..\UI\GUIcontainer.h"
 
 #include "texGen.h"
-#include "composeJade.h"
 #include "composeWood.h"
 #include "composeGranite.h"
 #include "composeSlime.h"
 #include "composeSky.h"
 #include "GUInoiseCtrl.h"
-#include "composeNoise.h"
 #include "composeRidged.h"
 #include "composeTest.h"
 
@@ -27,16 +25,20 @@ public:
 	void display();
 	void updateGUI();
 	void save();
-	void restore();
+	void restore(std::string& filename);
 	void clear();
-	void fillMenu();
+	void fillStackMenu();
 	void addTexGen(int itemNo);
 	void configureGUI(TexGenType texType);
+	void fillRestoreMenu();
+	void savePalette(std::string filename);
+	void fillPaletteRestoreMenu();
+	void restorePalette(std::string& filename);
 
 
 	CBaseApp* pApp;
 	CGUIimage* image;
-	CGUIpaletteBar* paletteBar;
+	//CGUIpaletteBar* paletteBar;
 
 
 	ComposeTest texCompositor;
@@ -46,6 +48,9 @@ public:
 	CGUIcontainer* container;
 	CGUIpanel* texGenListPanel;
 	CGUImenu* texGenList;
+	CGUIbutton2* saveButton;
+	CGUItextbox2* fileName;
+	CGUIdropdownMenu* restoreMenu;
 
 	CGUImenu* addTexGenMenu;
 

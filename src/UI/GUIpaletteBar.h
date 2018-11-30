@@ -4,6 +4,7 @@
 #include "GUIpanel.h"
 #include "GUIimage1D.h"
 #include "GUIcolourPicker.h"
+#include "GUIdropdownMenu.h"
 
 #include "..\colourGradient.h"
 
@@ -35,6 +36,10 @@ public:
 	void clearTabControls();
 	void* getPixels();
 	void updatePalette();
+	void addControls();
+	void save();
+
+
 
 	int paletteImageStartX;
 	int paletteImageEndX;
@@ -52,7 +57,11 @@ public:
 	ColourGradient colourGradient;
 	CRenderTexture paletteTexture;
 
-	int logButtonID;
+	CGUIdropdownMenu* restoreMenu;
+	CGUIbutton2* saveButton;
+	CGUItextbox2* fileNameBox;
+
+	CGUIlabel2* tabPos;
 };
 
 class CGUIpaletteTab : public CGUIpanel {
@@ -65,6 +74,8 @@ public:
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onRMouseUp(const int mouseX, const int mouseY);
 	void OnMouseMove(int mouseX, int mouseY, int key);
+	bool IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY);
+
 	int position;
 	glm::vec4 colour;
 	int lastMouseX;

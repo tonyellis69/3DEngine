@@ -13,6 +13,7 @@ public:
 	void updateAppearance();
 	void GUIcallback(CGUIbase * sender, CMessage & msg);
 	void clear();
+	std::string& getItemName(int itemNo);
 
 	void addItem(std::initializer_list<std::string> itemTexts);
 

@@ -189,7 +189,6 @@ void CRenderDrawFuncs::drawCursor2(guiRect& drawBox) {
 		return;
 
 	drawRect2(drawBox, (vec4&)UIblack, (vec4&)UIblack);
-
 }
 
 

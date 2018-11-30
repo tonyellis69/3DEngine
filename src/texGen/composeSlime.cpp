@@ -48,7 +48,7 @@ void ComposeSlime::compose() {
 	CSelectTex selectTex;
 	selectTex.setSource(&sample1);
 	selectTex.setSource2(&sample3);
-	selectTex.setControl(&sample2);
+	selectTex.setSource3(&sample2);
 	selectTex.setTarget(&sample4);
 	selectTex.setBounds(0.3125, 0.6875);
 	selectTex.setFalloff(0.5);

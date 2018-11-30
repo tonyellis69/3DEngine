@@ -5,6 +5,7 @@
 #include "..\UI\GUIbutton2.h"
 #include "..\UI\GUIcheckButton.h"
 #include "..\UI\GUIdropdownMenu.h"
+#include "..\UI\GUIpaletteBar.h"
 
 /** A developer-only class for playing with noise functions, live. */
 class CGUInoiseCtrl : public CGUIpanel {
@@ -40,6 +41,10 @@ public:
 	CGUInumeric2* heightCtrl;
 
 	CGUIdropdownMenu* src1Ctrl;
+	CGUIdropdownMenu* src2Ctrl;
+	CGUIdropdownMenu* src3Ctrl;
 
 	CGUIbutton2* saveButton;
+
+	CGUIpaletteBar* paletteBar;
 };

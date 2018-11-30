@@ -328,7 +328,7 @@ const int uiCancelId = 2001;
 enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiClickOutside, uiDataEntered, uiSpin, uiLostKeyboard,
-	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide, uiMsgUpdate
+	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore
 };
 
 #define NONE -1

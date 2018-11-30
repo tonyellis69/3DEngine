@@ -311,9 +311,6 @@
     <ClCompile Include="..\src\terrain\shell.cpp">
       <Filter>terrain2</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\texGen\composeJade.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\texGen\texGenUI.cpp">
       <Filter>texGen</Filter>
     </ClCompile>
@@ -330,9 +327,6 @@
       <Filter>texGen</Filter>
     </ClCompile>
     <ClCompile Include="..\src\texGen\GUInoiseCtrl.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\composeNoise.cpp">
       <Filter>texGen</Filter>
     </ClCompile>
     <ClCompile Include="..\src\texGen\composeRidged.cpp">
@@ -657,9 +651,6 @@
     </ClInclude>
     <ClInclude Include="..\src\terrain\shell.h">
       <Filter>terrain2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeJade.h">
-      <Filter>texGen</Filter>
     </ClInclude>
     <ClInclude Include="..\src\texGen\texGenUI.h">
       <Filter>texGen</Filter>

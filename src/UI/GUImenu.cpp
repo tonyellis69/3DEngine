@@ -184,4 +184,10 @@ void CGUImenu::clear() {
 	Control.clear();
 }
 
+std::string & CGUImenu::getItemName(int itemNo) {
+	if (itemNo < items.size())
+		return items[itemNo]->getText();
+	return string("");
+}
+
 

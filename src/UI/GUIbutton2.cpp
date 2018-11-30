@@ -53,6 +53,8 @@ void CGUIbutton2::OnClick(const int mouseX, const int mouseY) {
 	msg.Msg = uiClick;
 	pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
+	if (callbackObj)
+		callbackObj->GUIcallback(this, msg);
 }
 
 void CGUIbutton2::setText(const std::string & text) {

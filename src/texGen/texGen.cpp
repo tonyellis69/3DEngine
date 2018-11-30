@@ -32,6 +32,12 @@ void CTexGen::setSource2(CTexGen * newSource) {
 	srcTex2 = newSource;
 }
 
+void CTexGen::setSource3(CTexGen * newSource) {
+	source3 = newSource->getTarget();
+	srcTex3 = newSource;
+
+}
+
 
 
 void CTexGen::setTranslation(glm::vec3 & translation) {
@@ -491,7 +497,7 @@ void CSelectTex::render() {
 	pRenderer->attachTexture(1, source2->handle);
 	shader->setShaderValue(hSource2, 1);
 
-	pRenderer->attachTexture(2, map->handle);
+	pRenderer->attachTexture(2, source3->handle);
 	shader->setShaderValue(hMap, 2);
 
 	shader->setShaderValue(hLowerBound, lowerBound);
@@ -503,10 +509,6 @@ void CSelectTex::render() {
 
 
 
-void CSelectTex::setControl(CTexGen * control) {
-	this->map = control->getTarget();
-	srcTex3 = control;
-}
 
 void CSelectTex::setBounds(float lower, float upper) {
 	lowerBound = lower;

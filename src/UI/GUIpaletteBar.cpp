@@ -16,16 +16,21 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	colourPicker->setVisible(false);
 	rootUI->Add(colourPicker);
 
+	tabPos = new CGUIlabel2(0, 0, 50, 20);
+	tabPos->borderOn(false);
+	tabPos->setVisible(false);
+	Add(tabPos);
+
 	createTab(0);
 	createTab(255);
 
-	CGUIbutton2* button = new CGUIbutton2(paletteImageStartX, 100, 70, 25);
-	button->setText("Log");
-	logButtonID = button->getID();
-	Add(button);
+	addControls();
+	autoArrangeRows(0, 80);
 
 	paletteTexture.resize(256, 0);
 	setGradientTexture(paletteTexture);
+
+
 }
 
 
@@ -60,8 +65,33 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 				createTab(unitPos * 255.0f);
 			}
 		}
+	}
+
+	//Catch user dragging a tab
+	if (Msg == WM_LBUTTONDOWN) {
+		int zPos = -1;
+		CGUIbase* topTab = NULL;
+		for (auto ctrl : Control) { //make sure it's the top one if they're stacked
+			if (ctrl->type == uiPaletteTab && IsOnControl(*ctrl, mouseX, mouseY)) {
+				if (ctrl->localPos.x > zPos) {
+					zPos = ctrl->localPos.x;
+					topTab = ctrl;
+				}
+
+			}
+		}
+		if (topTab) {
+			topTab->OnLMouseDown(mouseX, mouseY, key);
+			return;
+		}
+	}
+
+	if (Msg == WM_LBUTTONUP) {
+		tabPos->setVisible(false);
 
 	}
+
+
 	CGUIbase::MouseMsg(Msg, mouseX, mouseY, key);
 }
 
@@ -80,8 +110,10 @@ void CGUIpaletteBar::createTab(int mouseX) {
 	colour = colour / 255.0f;
 	tab->setBackColour1(colour);
 	tab->setBackColour2(colour);
-	//updateAppearance();
-	//updatePalette();
+
+	//ensure tabPos is the last thing we draw
+	auto tabPosPos = std::find(Control.begin(),Control.end(), tabPos);
+	std::iter_swap(tabPosPos, Control.end() -1);
 }
 
 void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
@@ -94,9 +126,9 @@ void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
 	if (msg.Msg == WM_MOUSEMOVE) {
 		moveTab((CGUIpaletteTab*)sender, msg.x);
 	}
-	if (msg.Msg == uiClick && sender->getID() == logButtonID) {
-		logPalette();
-	}
+//	if (msg.Msg == uiClick && sender->getID() == logButtonID) {
+	//	logPalette();
+	//}
 }
 
 void CGUIpaletteBar::deleteTab(CGUIpaletteTab* tab) {
@@ -106,48 +138,65 @@ void CGUIpaletteBar::deleteTab(CGUIpaletteTab* tab) {
 }
 
 void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
-	if (newPos < paletteImageStartX - (tabSize.x / 2))
-		newPos = paletteImageStartX - (tabSize.x / 2);
-	else if (newPos > paletteImageEndX - (tabSize.x / 2))
-		newPos = paletteImageEndX - (tabSize.x / 2);
+	int direction = newPos > tab->localPos.x ? 1 : -1;
+	int tabOffset = tabSize.x / 2;
+	//ensure tabs can travel to the edge of the palette and no further;
+	if (newPos < paletteImageStartX - tabOffset )
+		newPos = paletteImageStartX - tabOffset ;
+	else if (newPos > paletteImageEndX - tabOffset)
+		newPos = paletteImageEndX - tabOffset;
 
-
+	//ensure our tab can't move through another:
 	int ctrlPos; 
-	int minPos = min(tab->localPos.x, newPos);
-	int maxPos = max(tab->localPos.x, newPos);
+	int lowerPos = min(tab->localPos.x, newPos);
+	int higherPos = max(tab->localPos.x, newPos);
 	for (auto ctrl : Control) {
-		if (ctrl->type == uiPaletteTab && ctrl != tab) {
-			ctrlPos = ctrl->localPos.x; 
-			if (ctrlPos >= minPos && ctrlPos <= maxPos) {
-				if (tab->localPos.x == maxPos)
-					newPos = ctrlPos + 1;
-				else
-					newPos = ctrlPos - 1;
+		if (ctrl->type == uiPaletteTab && ctrl != tab) { //for each compared tab...
+			ctrlPos = ctrl->localPos.x;
+			//if it lies between this tab and the proposed new position
+			//make the new position one less than the compared tab
+			if (ctrlPos >= lowerPos && ctrlPos <= higherPos) {
+				newPos = ctrlPos - direction;
 				break;
 			}
-		}
-	}
 
-	float unitPos = float(newPos - paletteImageStartX + (tabSize.x / 2)) / paletteImage->drawBox.size.x;
-	int tabNewPos = unitPos * 255.0f;
+		}
+	} 
+
+	float unitPos = float( (newPos + tabOffset) - paletteImageStartX ) / paletteImage->drawBox.size.x;
+	float tabNewPosf = unitPos * 255.0f;
+	int tabNewPos = round(tabNewPosf);
+
+
+
 	tab->setPos(newPos, tab->localPos.y);
 	int tabOldPos = tab->position;
 	if (tabOldPos != tabNewPos)
 		tab->position = colourGradient.moveTab(tabOldPos, tabNewPos);
-	//paletteImage->setTextureData(colourGradient.getData());
 	updatePalette();
 
+	//display position
+	tabPos->setText(std::to_string(tabNewPos));
+	tabPos->setPos(tab->localPos.x + tabSize.x, tab->localPos.y);
+	tabPos->setVisible(true);
 }
 
 void CGUIpaletteBar::GUIcallback(CGUIbase* sender, CMessage& msg) {
-	if (msg.Msg == uiClick) {
-		if (sender->id == uiOKid) {
+	if (sender == colourPicker) {
+		if (msg.Msg == uiOKid) {
 			changeTabColour(colourPicker->getColour());
 		}
 		colourChangeTab = NULL;
 		colourPicker->setVisible(false);
 		colourPicker->makeUnModal();
 	}
+	if (sender == saveButton)
+		save();
+	if (sender == restoreMenu) {
+		msg.Msg = uiMsgRestore;
+		callbackObj->GUIcallback(this, msg);
+	}
+		
 }
 
 void CGUIpaletteBar::editTabColour(CGUIpaletteTab* sender) {
@@ -217,6 +266,37 @@ void CGUIpaletteBar::updatePalette() {
 		callbackObj->GUIcallback(this, msg);
 }
 
+void CGUIpaletteBar::addControls() {
+	CGUIlabel2* lbl = new CGUIlabel2(paletteImageStartX, 0, 70, 25);
+	lbl->setText("Load file");
+	restoreMenu = new CGUIdropdownMenu(paletteImageStartX + 80, 0, 80, 20);
+	restoreMenu->setText("[select]");
+	restoreMenu->setGUIcallback(this);
+	addToRow("restore", { lbl, restoreMenu });
+
+	saveButton = new CGUIbutton2(paletteImageStartX, 80, 70, 20);
+	saveButton->setText("Save as");
+	saveButton->setGUIcallback(this);
+	fileNameBox = new CGUItextbox2(paletteImageStartX + 80, 80, 80, 20);
+	fileNameBox->setText("Palette1");
+	addToRow("save", { saveButton, fileNameBox });
+}
+
+/** Save the palette as a .pal file. */
+void CGUIpaletteBar::save() {
+	if (!callbackObj)
+		return;
+	CMessage msg;
+	msg.Msg = uiMsgSave;
+	callbackObj->GUIcallback(this, msg);
+
+}
+
+
+
+
+
+
 
 
 void CGUIpaletteTab::onDoubleClick(const int mouseX, const int mouseY) {
@@ -254,5 +334,6 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 
 	}
 }
+
 
 

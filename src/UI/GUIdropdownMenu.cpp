@@ -76,6 +76,10 @@ void CGUIdropdownMenu::clear() {
 	menu->clear();
 }
 
+std::string & CGUIdropdownMenu::getItemName(int itemNo) {
+	return menu->getItemName(itemNo);
+}
+
 void CGUIdropdownMenu::addItem(std::initializer_list<std::string>  itemTexts) {
 	menu->addItem(itemTexts);
 }

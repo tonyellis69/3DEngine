@@ -156,11 +156,30 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	src1Ctrl->setGUIcallback(this);
 	addToRow("source1", {lbl, src1Ctrl });
 
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Source 2");
 
+	src2Ctrl = new CGUIdropdownMenu(CtrlCol2X + 70, 0, 80, 20);
+	src2Ctrl->setText("");
+	src2Ctrl->setGUIcallback(this);
+	addToRow("source1&2", { lbl, src1Ctrl, lbl2, src2Ctrl });
 
-	saveButton = new CGUIbutton2(ctrlX, saveButtonY, 70, 20);
-	saveButton->setText("Save");
-	addToRow("save", { saveButton });
+	lbl = new CGUIlabel2(20, 0, 80, 20);
+	lbl->setText("Source 3");
+
+	src3Ctrl = new CGUIdropdownMenu(ctrlX, 0, 80, 20);
+	src3Ctrl->setText("");
+	src3Ctrl->setGUIcallback(this);
+	addToRow("source3", { lbl, src3Ctrl });
+
+	paletteBar = new CGUIpaletteBar(20, 10, 300, 180);
+	paletteBar->loadPalette();
+	paletteBar->setGUIcallback(this);
+	addToRow("paletteBar", { paletteBar });
+
+	//saveButton = new CGUIbutton2(ctrlX, saveButtonY, 70, 20);
+	//saveButton->setText("Save");
+	//addToRow("save", { saveButton });
 
 	//autoArrangeRows(0, 10);
 }
@@ -199,6 +218,6 @@ glm::vec3 CGUInoiseCtrl::getScalePt() {
 }
 
 void CGUInoiseCtrl::GUIcallback(CGUIbase * sender, CMessage & msg) {
-	if (sender == src1Ctrl && callbackObj)
+	if ( callbackObj)
 		callbackObj->GUIcallback(sender, msg);
 }

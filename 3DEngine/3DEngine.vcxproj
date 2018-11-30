@@ -146,8 +146,6 @@
     <ClCompile Include="..\src\terrain\shell.cpp" />
     <ClCompile Include="..\src\terrain\terrain2.cpp" />
     <ClCompile Include="..\src\texGen\composeGranite.cpp" />
-    <ClCompile Include="..\src\texGen\composeJade.cpp" />
-    <ClCompile Include="..\src\texGen\composeNoise.cpp" />
     <ClCompile Include="..\src\texGen\composeRidged.cpp" />
     <ClCompile Include="..\src\texGen\composeSky.cpp" />
     <ClCompile Include="..\src\texGen\composeSlime.cpp" />
@@ -257,7 +255,6 @@
     <ClInclude Include="..\src\terrain\shell.h" />
     <ClInclude Include="..\src\terrain\terrain2.h" />
     <ClInclude Include="..\src\texGen\composeGranite.h" />
-    <ClInclude Include="..\src\texGen\composeJade.h" />
     <ClInclude Include="..\src\texGen\composeNoise.h" />
     <ClInclude Include="..\src\texGen\composeRidged.h" />
     <ClInclude Include="..\src\texGen\composeSky.h" />
