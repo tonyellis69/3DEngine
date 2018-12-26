@@ -1,6 +1,9 @@
 #include "shell.h"
 
 #include "terrain2.h"
+#include "..\colour.h"
+
+#include <iostream>
 
 using namespace glm;
 
@@ -13,9 +16,15 @@ CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
 	minimumChunkExtent = (shellSCs / 2) * SCchunks;
 	playerChunkPos = i32vec3(0);
 
-	//SCs don't chunks yet, so we can safely say:
+	scArray.setSize(shellSCs, shellSCs, shellSCs);
+
+	initSuperChunks();
+
+
+	//SCs don't have chunks yet, so we can safely say:
 	for (int face = 0; face < 6; face++)
 		faceLayerFull[face] = false;
+
 }
 
 
@@ -29,8 +38,10 @@ void CShell::playerAdvance(Tdirection direction) {
 	i32vec3 travelVector = dirToVec(direction);
 	playerChunkPos += travelVector;
 
+	//std::cerr << "\nShell " << shellNo;
 	if (getPlayerChunkExtent(direction) >= minimumChunkExtent) {
 		//1) sufficient terrain in direction, so nothing else to do
+	//	std::cerr << " suffient terrain, returning.";
 		return;
 	}
 
@@ -39,15 +50,28 @@ void CShell::playerAdvance(Tdirection direction) {
 	if (!faceLayerFull[direction]) {
 		//(2) add chunks to the face layer SCs in this direction!
 		addToFaceLayer(direction);
+		//std::cerr << " adding to face layer.";
 	}
 	else {
 		//(3) scroll the SCs, then add a layer 
 		Tdirection scrollDir = flipDir(direction);
 		scroll(scrollDir);
 		addToFaceLayer(direction);
+	//	std::cerr << " scrolling.";
 		requestWorldMove(scrollDir);
 	}
 
+	//The containing shell has been encroached upon to the tune of one layer of its chunks, so tell it to handle this.
+	if (shellNo < pTerrain->shells.size()-1)
+		pTerrain->shells[shellNo + 1].advance(direction);
+
+}
+
+/** Handle a request to advance this shell in the given direction in its LoD terrain space. */
+void CShell::advance(Tdirection direction) {
+	//as well as removing its encroached-on chunks, this shell has to  introduce more
+	//of its LoD terrain, which may result in a scroll
+	playerAdvance(direction);
 }
 
 /** Return the number of chunks of terrain lying in the given direction from the player position. */
@@ -74,17 +98,26 @@ void CShell::addToFaceLayer(Tdirection direction) {
 	//TO DO: add two layers od chunks to all the SCs in the face layer of this shell.
 
 	chunkExtent[direction] += 2;
+	int maxChunkExtent = (shellSCs * SCchunks) / 2;
+	if (chunkExtent[direction] >= maxChunkExtent)
+		faceLayerFull[direction] = true;
 }
 
 /** Rotate the SC ordering, moving them one step in the given direction, and moving the outgoing layer
 	of SCs to become the new 'in' face. */
 void CShell::scroll(Tdirection scrollDirection) {
-	//TO DO: scroll SCs
-	//we've just lost a SC's worth of chunks in the 'in' direction, so:
-	chunkExtent[flipDir(scrollDirection)] -= SCchunks;
+	Tdirection inDirection = flipDir(scrollDirection);
+	i32vec3 rotateVec = dirToVec(inDirection);
+	scArray.rotate(rotateVec);
 
-	//move player position in shell back by one SC's worth of chunks
+
+	//we've just lost a SC's worth of chunks in the 'in' direction, so:
+
+	chunkExtent[inDirection] -= SCchunks;
+	faceLayerFull[inDirection] = false;
+
 	i32vec3 scrollVec = dirToVec(scrollDirection);
+	//move player position in shell back by one SC's worth of chunks
 	playerChunkPos += scrollVec * SCchunks;
 }
 
@@ -94,4 +127,16 @@ void CShell::requestWorldMove(Tdirection scrollDirection){
 	//TO DO:
 	//message the parent terrain, asking it to move/advance the other shells by 1 LoD1 SC width.
 	pTerrain->worldMove(*this, scrollDirection);
+}
+
+/** Any SC setup required when a shell is created. */
+void CShell::initSuperChunks() {
+	for (int x = 0; x < shellSCs; x++) {
+		for (int y = 0; y < shellSCs; y++) {
+			for (int z = 0; z < shellSCs; z++) {
+				scArray.element(x, y, z).colour = vec4(col::randHue(),1);
+				scArray.element(x, y, z).origIndex = vec3(x,y,z);
+			}
+		}
+	}
 }

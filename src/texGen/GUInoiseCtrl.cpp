@@ -23,7 +23,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	powerCtrl->setValue(0.1f); powerCtrl->setIncrement(0.1f);
 	powerCtrl->setMinMax(0, 32);
 
-	addToRow("octavePower",{ lbl, octaveCtrl, lbl2, powerCtrl });
+	addToRow("octavePower", { lbl, octaveCtrl, lbl2, powerCtrl });
 
 
 	lbl = new CGUIlabel2(20, CtrlStartY + 30, 80, 20);
@@ -45,7 +45,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	persistCtrl->setMinMax(0, 100);
 
 	addToRow("freqPersist", { lbl, persistCtrl });
-	
+
 
 
 	lbl = new CGUIlabel2(20, CtrlStartY + 60, 80, 20);
@@ -90,7 +90,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 		addToRow("rotation", { angleCtrl[axis] });
 	}
 
-	lbl = new CGUIlabel2(20, posStartY +30 , 80, 20);
+	lbl = new CGUIlabel2(20, posStartY + 30, 80, 20);
 	lbl->setText("Translation");
 	addToRow("translation", { lbl });
 
@@ -113,11 +113,11 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 
 	lbl = new CGUIlabel2(20, posStartY + 90, 80, 20);
 	lbl->setText("Lower");
-	
+
 	lowerCtrl = new CGUInumeric2(ctrlX, posStartY + 90, 70, 18);
 	lowerCtrl->setValue(0); lowerCtrl->setMinMax(0, 1); lowerCtrl->setIncrement(0.1f);
 	addToRow("lowerUpper", { lbl,lowerCtrl });
-	
+
 	lbl = new CGUIlabel2(CtrlCol2X, posStartY + 90, 80, 20);
 	lbl->setText("Upper");
 
@@ -125,13 +125,13 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	upperCtrl->setValue(1); upperCtrl->setMinMax(0, 1); upperCtrl->setIncrement(0.1f);
 	addToRow("lowerUpper", { lbl,upperCtrl });
 
-	
+
 
 	lbl = new CGUIlabel2(20, posStartY + 120, 80, 20);
 	lbl->setText("Falloff");
 
 	falloffCtrl = new CGUInumeric2(ctrlX, posStartY + 120, 70, 18);
-	falloffCtrl->setValue(0); falloffCtrl->setMinMax(0, 1); falloffCtrl->setIncrement(0.1f);
+	falloffCtrl->setValue(0.5f); falloffCtrl->setMinMax(0, 1); falloffCtrl->setIncrement(0.1f);
 	addToRow("falloff", { lbl,falloffCtrl });
 
 	lbl = new CGUIlabel2(20, posStartY + 150, 80, 20);
@@ -154,7 +154,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	src1Ctrl = new CGUIdropdownMenu(ctrlX, 0, 80, 20);
 	src1Ctrl->setText("");
 	src1Ctrl->setGUIcallback(this);
-	addToRow("source1", {lbl, src1Ctrl });
+	addToRow("source1", { lbl, src1Ctrl });
 
 	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
 	lbl2->setText("Source 2");
@@ -177,11 +177,28 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	paletteBar->setGUIcallback(this);
 	addToRow("paletteBar", { paletteBar });
 
-	//saveButton = new CGUIbutton2(ctrlX, saveButtonY, 70, 20);
-	//saveButton->setText("Save");
-	//addToRow("save", { saveButton });
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Size");
+	gausSizeCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	gausSizeCtrl->setValue(5); gausSizeCtrl->setMinMax(1, 20);
 
-	//autoArrangeRows(0, 10);
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Sigma");
+	gausSigmaCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	gausSigmaCtrl->setValue(2); gausSigmaCtrl->setMinMax(1, 20);
+	gausSigmaCtrl->setIncrement(0.1f);
+	addToRow("gausSizeSigma", { lbl,gausSizeCtrl,lbl2,gausSigmaCtrl });
+
+	lbl = new CGUIlabel2(CtrlCol2X, posStartY + 150, 90, 20);
+	lbl->setText("Percent");
+	percentageCtrl = new CGUInumeric2(CtrlCol2X + 70, posStartY + 150, 70, 18);
+	percentageCtrl->setValue(10); percentageCtrl->setMinMax(1, 50);
+
+	lbl2 = new CGUIlabel2(20, 0, 80, 20);
+	lbl2->setText("Seam falloff");
+
+	addToRow("seamPercentFalloff", {lbl2, falloffCtrl,lbl, percentageCtrl });
+	
 }
 
 

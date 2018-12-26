@@ -22,6 +22,8 @@ public:
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	void OnRMouseDown(const  int mouseX, const  int mouseY);
+
 	void OnClick(const int mouseX, const int mouseY);
 	void clear();
 	std::string& getItemName(int itemNo);

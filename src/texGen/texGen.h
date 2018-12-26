@@ -9,7 +9,7 @@
 
 enum TexGenType { texNoise, texColour, texRidged, texCylinder, texTurbulence,
 	texScaleBias, texAdd, texSeamless, texScalePoint, texBillow, texVoronoi,
-	texSelect, texLayer, texNull
+	texSelect, texLayer, texNull, texGaus
 };
 
 /** A base class for creating texture generators. */
@@ -17,6 +17,7 @@ class CTexGen {
 public:
 	CTexGen() {};
 	CTexGen(TexGenType derivedType)  ;
+	~CTexGen();
 	void setTarget(CRenderTexture* newTarget);
 	CRenderTexture* getTarget();
 	virtual void loadShader() {};
@@ -41,6 +42,9 @@ public:
 	virtual void setFalloff(float falloff) {};
 	virtual void setSampleWidth(float width) {};
 	virtual void setSampleHeight(float falloff) {};
+	virtual void setGausSize(int size) {};
+	virtual void setGausSigma(float sigma) {};
+	virtual void setPercentage(float percentage) {};
 
 	virtual int getOctaves() { return 0; }
 	virtual float getFrequency() { return 0; }
@@ -59,6 +63,9 @@ public:
 	virtual float getFalloff() { return 0; };
 	virtual float getSampleWidth() { return 0; }
 	virtual float getSampleHeight() { return 0; }
+	virtual int getGausSize() { return 0; };
+	virtual float getGausSigma() { return 0; }
+	virtual float getpercentageCtrl() { return 0; }
 
 
 	virtual void compose() {};
@@ -73,7 +80,7 @@ public:
 	glm::vec3 rotationAngles;
 	glm::vec3 translation;
 	unsigned int hMatrix;
-	CRenderTexture * mTarget;
+	CRenderTexture mTarget;
 	CRenderTexture * mSource;
 	CRenderTexture * source2;
 	CRenderTexture * source3;
@@ -86,6 +93,7 @@ public:
 
 	TexGenType texGenType;
 	std::string name;
+	int count;
 private:
 	void buildMatrix();
 
@@ -253,9 +261,22 @@ public:
 
 class CSeamlessTex : public CTexGen {
 public:
-	CSeamlessTex() : CTexGen(texSeamless) { name = "Seamless";  }
+	CSeamlessTex() : CTexGen(texSeamless), falloff(0.5f), percentage(10) { name = "Seamless";  }
+	float getpercentageCtrl() { return percentage; }
+	float getFalloff() { return falloff;  }
+	void setPercentage(float percentage);
+	void setFalloff(float falloff);
+
 	void loadShader();
 	void render();
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+	float falloff;
+	float percentage;
+
+	unsigned int hFalloff;
+	unsigned int hPercentage;
 };
 
 class CScalePointTex : public CTexGen {
@@ -361,4 +382,26 @@ public:
 
 	CRenderTexture nullTexture;
 
+};
+
+class CGausTex : public CTexGen {
+public:
+	CGausTex();
+	void loadShader();
+	void render();
+
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+	void setGausSize(int size);
+	void setGausSigma(float sigma);
+
+	int getGausSize() { return size; }
+	float getGausSigma() { return sigma; }
+
+	int size;
+	float sigma;
+
+	unsigned int hSigma;
+	unsigned int hSize;
 };

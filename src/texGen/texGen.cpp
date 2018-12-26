@@ -3,23 +3,26 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 using namespace glm;
-/*
-CTexGen::CTexGen() : srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)
-{
-}
-*/
+
 CTexGen::CTexGen(TexGenType derivedType) :
 	texGenType(derivedType), srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)  {
 	pRenderer = &CRenderer::getInstance();
+	mTarget.resize(512, 512);
+	//TO DO: do without magic numbers!!!!!!!!!!!!!!!!!!!!!
+	count = 0;
+}
+
+CTexGen::~CTexGen() {
+	//int b = 0;
 }
 
 /** Set the texture to draw to. */
 void CTexGen::setTarget(CRenderTexture * newTarget) {
-	mTarget = newTarget;
+	//mTarget = newTarget;
 }
 
 CRenderTexture * CTexGen::getTarget() {
-	return mTarget;
+	return &mTarget;
 }
 
 void CTexGen::setSource(CTexGen * newSource) {
@@ -88,7 +91,7 @@ void CNoiseTex::render() {
 	shader->setShaderValue(hOctaves, octaves);
 	shader->setShaderValue(hFrequency, frequency);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CNoiseTex::setFrequency(float freq) {
@@ -167,20 +170,20 @@ void CColourTex::render() {
 
 	shader->setShaderValue(hSource, 0);
     shader->setShaderValue(hPalette, 1);
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CColourTex::write(std::ofstream & out) {
-	int tabCount = colourGradient.colours.size();
+	int tabCount = colourGradient.tabs.size();
 	writeObject(tabCount,out);
-	for (auto tab : colourGradient.colours) {
+	for (auto tab : colourGradient.tabs) {
 		writeObject(tab.first, out);
 		writeObject(tab.second, out);
 	}
 }
 
 void CColourTex::read(std::ifstream & in) {
-//	readObject(colourGradient.colours, in);
+//	readObject(colourGradient.tabs, in);
 }
 
 
@@ -202,7 +205,7 @@ void CRidgedMultiTex::render() {
 	shader->setShaderValue(hOctaves, octaves);
 	shader->setShaderValue(hFrequency, frequency);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 
@@ -217,7 +220,7 @@ void CylinderTex::render() {
 	pRenderer->setShader(shader);
 	shader->setShaderValue(hFrequency, frequency);
 	shader->setShaderValue(hMatrix, matrix);
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 	
 }
 
@@ -257,7 +260,7 @@ void CTurbulenceTex::render() {
 	shader->setShaderValue(hSamplePos, samplePos);
 	shader->setShaderValue(hSampleSize, sampleSize);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CTurbulenceTex::setPower(float power) {
@@ -313,7 +316,7 @@ void CScaleBiasTex::render() {
 	shader->setShaderValue(hScale, scale);
 	shader->setShaderValue(hBias, bias);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CScaleBiasTex::write(std::ofstream & out) {
@@ -345,15 +348,25 @@ void CAddTex::render() {
 	shader->setShaderValue(hSource, 0);
 	shader->setShaderValue(hSource2, 1);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 
 
 
+void CSeamlessTex::setPercentage(float percentage) {
+	this->percentage = percentage;
+}
+
+void CSeamlessTex::setFalloff(float falloff) {
+	this->falloff = falloff;
+}
+
 void CSeamlessTex::loadShader() {
 	shader = pRenderer->createShader("texSeamless");
 	hSource = shader->getUniformHandle("source");
+	hFalloff = shader->getUniformHandle("falloff");
+	hPercentage = shader->getUniformHandle("percentage");
 }
 
 void CSeamlessTex::render() {
@@ -361,8 +374,22 @@ void CSeamlessTex::render() {
 	pRenderer->setShader(shader);
 	pRenderer->attachTexture(0, mSource->handle);
 	shader->setShaderValue(hSource, 0);
+	shader->setShaderValue(hFalloff, falloff);
+	shader->setShaderValue(hPercentage, percentage);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
+}
+
+void CSeamlessTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(falloff, out);
+	writeObject(percentage, out);
+}
+
+void CSeamlessTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(falloff, in);
+	readObject(percentage, in);
 }
 
 
@@ -385,7 +412,7 @@ void CScalePointTex::render() {
 	shader->setShaderValue(hSource, 0);
 	shader->setShaderValue(hScale, scale);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CScalePointTex::write(std::ofstream & out) {
@@ -422,7 +449,7 @@ void CBillowTex::render() {
 	shader->setShaderValue(hFrequency, frequency);
 	shader->setShaderValue(hPersistence, persistence);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CBillowTex::setPersistence(float persistence) {
@@ -447,7 +474,7 @@ void CVoronoiTex::render() {
 	shader->setShaderValue(hDistance, distance);
 	shader->setShaderValue(hRandomHue, randomHue);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 void CVoronoiTex::setDistance(bool onOff) {
@@ -504,7 +531,7 @@ void CSelectTex::render() {
 	shader->setShaderValue(hUpperBound, upperBound);
 	shader->setShaderValue(hFalloff, falloff);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 
@@ -555,7 +582,7 @@ void CLayerTex::render() {
 	shader->setShaderValue(hSource, 0);
 	shader->setShaderValue(hSource2, 1);
 
-	pRenderer->renderToTextureQuad(*mTarget);
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 CNullTex::CNullTex() {
@@ -563,5 +590,50 @@ CNullTex::CNullTex() {
 	nullTexture.resize(512, 512);
 
 	mSource = &nullTexture;
-	mTarget = &nullTexture;
+	//mTarget = &nullTexture;
+}
+
+CGausTex::CGausTex() : CTexGen(texGaus) {
+	name = "Gaus";
+	size = 5;
+	sigma = 3;
+}
+
+void CGausTex::loadShader() {
+	shader = pRenderer->createShader("texGaus");
+	hSource = shader->getUniformHandle("source");
+	hSigma = shader->getUniformHandle("sigma");
+	hSize = shader->getUniformHandle("blurSize");
+}
+
+void CGausTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	pRenderer->attachTexture(0, mSource->handle);
+	shader->setShaderValue(hSource, 0);
+
+	shader->setShaderValue(hSigma, sigma);
+	shader->setShaderValue(hSize, size);
+
+	pRenderer->renderToTextureQuad(mTarget);
+}
+
+void CGausTex::setGausSize(int size) {
+	this->size = size;
+}
+
+void CGausTex::setGausSigma(float sigma) {
+	this->sigma = sigma;
+}
+
+void CGausTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(size, out);
+	writeObject(sigma, out);
+}
+
+void CGausTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(size, in);
+	readObject(sigma, in);
 }

@@ -314,22 +314,7 @@
     <ClCompile Include="..\src\texGen\texGenUI.cpp">
       <Filter>texGen</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\texGen\composeWood.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\composeGranite.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\composeSlime.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\composeSky.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\texGen\GUInoiseCtrl.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\composeRidged.cpp">
       <Filter>texGen</Filter>
     </ClCompile>
     <ClCompile Include="..\src\texGen\composeTest.cpp">
@@ -340,6 +325,15 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIdropdownMenu.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\terrain\scArray.cpp">
+      <Filter>terrain2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\terrain\superChunk2.cpp">
+      <Filter>terrain2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\texGen\GUItrackImage.cpp">
+      <Filter>texGen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -655,25 +649,7 @@
     <ClInclude Include="..\src\texGen\texGenUI.h">
       <Filter>texGen</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\texGen\composeWood.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeGranite.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeSlime.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeSky.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\texGen\GUInoiseCtrl.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeNoise.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeRidged.h">
       <Filter>texGen</Filter>
     </ClInclude>
     <ClInclude Include="..\src\texGen\composeTest.h">
@@ -684,6 +660,15 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIdropdownMenu.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\terrain\scArray.h">
+      <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\terrain\superChunk2.h">
+      <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\texGen\GUItrackImage.h">
+      <Filter>texGen</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

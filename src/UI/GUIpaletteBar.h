@@ -57,6 +57,10 @@ public:
 	ColourGradient colourGradient;
 	CRenderTexture paletteTexture;
 
+	CGUIsysScrollbar* hueSlider;
+	float oldHueRotation;
+
+
 	CGUIdropdownMenu* restoreMenu;
 	CGUIbutton2* saveButton;
 	CGUItextbox2* fileNameBox;

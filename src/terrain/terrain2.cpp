@@ -13,6 +13,7 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 	LoD1chunkSize = chunkCubes * LoD1cubeSize;
 	shells.push_back({1, LoD1chunkSize, SCchunks, _shellSCs });
 	shells.back().pTerrain = this;
+	shells.back().shellNo = 0;
 }
 
 /** Add an outer shell to the existing shells, its size adjusted by extent. */
@@ -21,6 +22,7 @@ void CTerrain2::addShell(int extent) {
 	float newShellChunkSize = shells.back().chunkSize * 2;
 	int newShellSCs = shells.back().shellSCs + extent; // was (extent * 2);
 	shells.push_back({ newShellLoD, newShellChunkSize, SCchunks, newShellSCs });
+	shells.back().shellNo = shells.size() -1;
 	shells.back().pTerrain = this;
 }
 
@@ -42,13 +44,13 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 		inDirection = west;
 		playerOffset.x = mod(playerOffset.x, -LoD1chunkSize);
 	}
-	else if (playerOffset.z > LoD1chunkSize) {
-		inDirection = north;
-		playerOffset.z = mod(playerOffset.z, LoD1chunkSize);
-	}
 	else if (-playerOffset.z > LoD1chunkSize) {
-		inDirection = south;
+		inDirection = north;
 		playerOffset.z = mod(playerOffset.z, -LoD1chunkSize);
+	}
+	else if (playerOffset.z > LoD1chunkSize) {
+		inDirection = south;
+		playerOffset.z = mod(playerOffset.z, LoD1chunkSize);
 	}
 	else if (playerOffset.y > LoD1chunkSize) {
 		inDirection = up;
@@ -70,11 +72,13 @@ void CTerrain2::fillShells() {
 	//TO DO: iterate through all shells
 	//for now, just do the LoD1shell
 
-	//how many chunk layers from the shell origin to fill:
-	int chunkExtent = ((shells[0].shellSCs - 1) / 2) * SCchunks;
-	//TO DO: find the best way to calculate this!
+	for (auto& shell : shells) {
+		//how many chunk layers from the shell origin to fill:
+		int chunkExtent = ((shell.shellSCs - 1) / 2) * SCchunks;
+		//TO DO: find the best way to calculate this!
 
-	shells[0].fillEntire(chunkExtent);
+		shell.fillEntire(chunkExtent);
+	}
 }
 
 /** Move all shells but the sender in the given direction. This is called to keep the terrain 
@@ -82,8 +86,6 @@ void CTerrain2::fillShells() {
 void CTerrain2::worldMove(const CShell & sender, Tdirection moveDirection) {
 	//TO DO
 	//Move all shells but the sender one SC width in the move direction
-	//NB this is analogous to the shell playerAdvance method, in that it might result in adding more 
-	//terrain or scrolling - it's just that instead of responding to the player moving within a shell
-	//wer're responding to a *shell* moving within a larger shell. Try to keep this in mind and 
-	//exploit it.
+
+
 }

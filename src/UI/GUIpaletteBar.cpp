@@ -1,6 +1,8 @@
 #include "GUIpaletteBar.h"
 #include "GUIroot.h"
 
+
+
 CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {
 	upperPadding = 20;
 	barHeight = 30;
@@ -30,7 +32,7 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	paletteTexture.resize(256, 0);
 	setGradientTexture(paletteTexture);
 
-
+	oldHueRotation = 0;
 }
 
 
@@ -126,9 +128,26 @@ void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
 	if (msg.Msg == WM_MOUSEMOVE) {
 		moveTab((CGUIpaletteTab*)sender, msg.x);
 	}
-//	if (msg.Msg == uiClick && sender->getID() == logButtonID) {
-	//	logPalette();
-	//}
+	if (msg.Msg == uiMsgSlide && sender == hueSlider) {
+		cerr << "\n" << msg.value;
+		float dHueRotation =   msg.value - oldHueRotation;
+		oldHueRotation = msg.value;
+		cerr << " d " << dHueRotation;
+		colourGradient.rotateTabHues(dHueRotation);
+		for (auto ctrl : Control) {
+			if (ctrl->type == uiPaletteTab) {
+				glm::vec4 floatColour = glm::vec4(colourGradient.getColour(((CGUIpaletteTab*)ctrl)->position)) / 255.0f;
+				ctrl->setBackColour1(floatColour);
+				ctrl->setBackColour2(floatColour);
+			}
+		}
+		updatePalette();
+		if (callbackObj) {
+			CMessage msg;
+			msg.Msg = uiMsgUpdate;
+			callbackObj->GUIcallback(this, msg);
+		}
+	}
 }
 
 void CGUIpaletteBar::deleteTab(CGUIpaletteTab* tab) {
@@ -267,6 +286,11 @@ void CGUIpaletteBar::updatePalette() {
 }
 
 void CGUIpaletteBar::addControls() {
+
+	hueSlider = new CGUIsysScrollbar(horizontal, paletteImageStartX, 0, 250);
+	hueSlider->setMin(0); hueSlider->setMax(360);
+	addToRow("hue", { hueSlider });
+
 	CGUIlabel2* lbl = new CGUIlabel2(paletteImageStartX, 0, 70, 25);
 	lbl->setText("Load file");
 	restoreMenu = new CGUIdropdownMenu(paletteImageStartX + 80, 0, 80, 20);

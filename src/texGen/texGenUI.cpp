@@ -17,15 +17,12 @@ void CTexGenUI::init(CBaseApp * app) {
 
 /** Create the interface for viewing textures. */
 void CTexGenUI::initGUI() {
-	image = new CGUIimage(0, 0, 512, 512);
+	image = new CGUItrackImage(0, 0, 512, 512);
+	image->borderOn(false);
+	image->setGUIcallback(this);
 	pApp->GUIroot.Add(image);
-	//image->setVisible(false);
 
-	/*paletteBar = new CGUIpaletteBar(700, 10, 280, 180);
-	pApp->GUIroot.Add(paletteBar);
-	paletteBar->loadPalette();
-	paletteBar->setGUIcallback(this);
-	*/
+
 
 	GUInoiseCtrl = new CGUInoiseCtrl(700, 430, 380, 360);
 	GUInoiseCtrl->setGUIcallback(this);
@@ -73,7 +70,7 @@ void CTexGenUI::initGUI() {
 	addTexGenMenu->resizeHorizontal = true;
 	addTexGenMenu->drawBorder = true;
 	addTexGenMenu->addItem({ "Noise","Colourise","RidgedMF","Cylinder","Turbulence","ScaleBias",
-		"Add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer" });
+		"Add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer","Gaus" });
 	pApp->GUIroot.Add(addTexGenMenu);
 
 
@@ -157,14 +154,13 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		updateGUI();
 	}
 
-	if (sender == texGenList && msg.Msg == uiMsgMouseMove) {
-		//texCompositor.setCurrentLayer(msg.value);
-		//update the GUI with the settings for this layer
-		//updateGUI();
+	if (sender == texGenList && msg.Msg == uiMsgRMdown) {
+		deleteTexGen(msg.value);
+		return;
 	}
 
 	if (sender == texGenList && msg.Msg == uiClick) {
-		if (msg.value == texCompositor.texGens.size()) {
+		if (msg.value == texCompositor.texGens.size()) { //clicked on 'add TexGen'
 			i32vec2 pos = pApp->getMousePos();
 			addTexGenMenu->setPos(pos.x,pos.y);
 			addTexGenMenu->setVisible(true);
@@ -221,6 +217,26 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 			restorePalette(GUInoiseCtrl->paletteBar->restoreMenu->getItemName(msg.value));
 		return;
 	}
+
+	if (sender == GUInoiseCtrl->gausSizeCtrl) {
+		texCompositor.currentTexGen->setGausSize(msg.fValue);
+		texCompositor.currentTexGen->render();
+	}
+	if (sender == GUInoiseCtrl->gausSigmaCtrl) {
+		texCompositor.currentTexGen->setGausSigma(msg.fValue);
+		texCompositor.currentTexGen->render();
+	}
+
+	if (sender == GUInoiseCtrl->percentageCtrl) {
+		texCompositor.currentTexGen->setPercentage(msg.fValue);
+		texCompositor.currentTexGen->render();
+	}
+
+	if (sender == image && msg.Msg == uiMsgMouseMove) {
+		//if current texgen is a colouriser... go to the colour-tracking routine!
+
+	}
+
 		 
 	display();
 
@@ -228,7 +244,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 
 void CTexGenUI::hide(bool onOff) {
 	image->setVisible(!onOff);
-	//paletteBar->setVisible(!onOff);
+	texGenListPanel->setVisible(!onOff);
 	GUInoiseCtrl->setVisible(!onOff);
 }
 
@@ -291,7 +307,10 @@ void CTexGenUI::updateGUI() {
 	if (texCompositor.currentTexGen->srcTex3)
 		GUInoiseCtrl->src3Ctrl->setText(texCompositor.currentTexGen->srcTex3->name);
 
+	GUInoiseCtrl->gausSizeCtrl->setValue(texCompositor.currentTexGen->getGausSize());
+	GUInoiseCtrl->gausSigmaCtrl->setValue(texCompositor.currentTexGen->getGausSigma());
 
+	GUInoiseCtrl->percentageCtrl->setValue(texCompositor.currentTexGen->getpercentageCtrl());
 }
 
 void CTexGenUI::save() {
@@ -362,12 +381,14 @@ void CTexGenUI::restore(std::string& filename) {
 		case texCylinder: texCompositor.createCylinderTex(); break;
 		case texTurbulence: texCompositor.createTurbulenceTex(getSourceByIndex()); break;
 		case texScaleBias: texCompositor.createScaleBiasTex(getSourceByIndex()); break;
+		case texSeamless: src = getSourceByIndex(); texCompositor.createSeamlessTex()->setSource(src); break;
 		case texAdd: texCompositor.createAddTex(getSourceByIndex(), getSourceByIndex()); break;
 		case texScalePoint: texCompositor.createScalePointTex(getSourceByIndex()); break;
 		case texSelect:
 			src = getSourceByIndex(); src2 = getSourceByIndex(); src3 = getSourceByIndex();
 			texCompositor.createSelectTex(src, src2, src3); break;
 		case texLayer: texCompositor.createLayerTex(getSourceByIndex(), getSourceByIndex()); break;
+		case texGaus: src = getSourceByIndex(); texCompositor.createGausTex()->setSource(src); break;
 		}
 
 		texCompositor.texGens.back()->read(in);
@@ -395,7 +416,7 @@ void CTexGenUI::restore(std::string& filename) {
 
 void CTexGenUI::clear() {
 	texCompositor.texGens.clear();
-	texCompositor.targets.clear();
+	//texCompositor.targets.clear();
 }
 
 /** Fill the menu with the names of the tex gens on the stack.*/
@@ -423,18 +444,30 @@ void CTexGenUI::addTexGen(int itemNo) {
 	case 4: texCompositor.createTurbulenceTex(&nullTexGen); break;
 	case 5: texCompositor.createScaleBiasTex(&nullTexGen); break;
 	case 6: texCompositor.createAddTex(&nullTexGen, &nullTexGen); break;
+	case 7: texCompositor.createSeamlessTex(); break;
 	case 8: texCompositor.createScalePointTex(&nullTexGen); break;
 	case 9: texCompositor.createBillowTex(); break;
 	case 10: texCompositor.createVoronoiTex(); break;
 	case 11: texCompositor.createSelectTex(&nullTexGen, &nullTexGen, &nullTexGen); break;
 	case 12: texCompositor.createLayerTex(&nullTexGen, &nullTexGen); break;
-
+	case 13: texCompositor.createGausTex(); break;
 	}
 	texCompositor.setCurrentLayer(texCompositor.texGens.size() - 1);
 	configureGUI(texCompositor.currentTexGen->texGenType);
 	updateGUI();
 	fillStackMenu();
 	texCompositor.compose();
+	display();
+}
+
+/** Remove the indicated tex gen from the stack. */
+void CTexGenUI::deleteTexGen(int itemNo) {
+	if (texCompositor.texGens.size() == 0 || itemNo == texCompositor.texGens.size())
+		return;
+	texCompositor.deleteTexGen(itemNo);
+	fillStackMenu();
+	texCompositor.compose();
+	updateGUI();
 	display();
 }
 
@@ -446,17 +479,18 @@ void CTexGenUI::configureGUI(TexGenType texType) {
 	case texNoise: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
 	case texColour:  GUInoiseCtrl->activateRows({ "source1", "paletteBar" }); break;
 	case texRidged: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
-	case texCylinder: GUInoiseCtrl->activateRows({ "freq","rotation" }); break;
+	case texCylinder: GUInoiseCtrl->activateRows({ "freq","rotation","translation" }); break;
 	case texTurbulence: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight",
 		"source1" }); break;
 	case texScaleBias: GUInoiseCtrl->activateRows({ "scaleBias","source1" }); break;
 	case texAdd: GUInoiseCtrl->activateRows({ "source1&2" }); break;
-	case texSeamless: break;
+	case texSeamless: GUInoiseCtrl->activateRows({ "source1","seamPercentFalloff" }); break;;
 	case texScalePoint: GUInoiseCtrl->activateRows({ "source1", "scalePoint" }); break;
 	case texBillow: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
 	case texVoronoi: GUInoiseCtrl->activateRows({ "freq","sampWidthHeight", "distHue" }); break;
 	case texSelect: GUInoiseCtrl->activateRows({ "lowerUpper","falloff","source1&2","source3" }); break;
 	case texLayer: GUInoiseCtrl->activateRows({ "source1&2" }); break;
+	case texGaus: GUInoiseCtrl->activateRows({ "source1", "gausSizeSigma"}); break;
 	}
 	GUInoiseCtrl->autoArrangeRows(0, 20);
 }
@@ -478,9 +512,9 @@ void CTexGenUI::savePalette(std::string filename) {
 	std::ofstream out(pApp->dataPath + filename + ".pal", std::ios::binary);
 
 	ColourGradient* colourGradient = &GUInoiseCtrl->paletteBar->colourGradient;
-	int tabCount = colourGradient->colours.size();
+	int tabCount = colourGradient->tabs.size();
 	writeObject(tabCount, out);
-	for (auto tab : colourGradient->colours) {
+	for (auto tab : colourGradient->tabs) {
 		writeObject(tab.first, out);
 		writeObject(tab.second, out);
 	}

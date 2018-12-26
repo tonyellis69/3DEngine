@@ -158,6 +158,15 @@ void CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	pDrawFuncs->handleUImsg(*this, msg);
 }
 
+void CGUImenu::OnRMouseDown(const int mouseX, const int mouseY) {
+	CMessage msg;
+	msg.Msg = uiMsgRMdown;
+	msg.value = selected;
+	if (callbackObj) {
+		callbackObj->GUIcallback(this, msg);
+	}
+}
+
 /** User pressed left-mouse, affirming the currently selected item. */
 void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;

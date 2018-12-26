@@ -47,4 +47,9 @@ public:
 	CGUIbutton2* saveButton;
 
 	CGUIpaletteBar* paletteBar;
+
+	CGUInumeric2* gausSizeCtrl;
+	CGUInumeric2* gausSigmaCtrl;
+
+	CGUInumeric2* percentageCtrl;;
 };

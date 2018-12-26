@@ -26,9 +26,9 @@ public:
 	glm::i32vec4 getColour(int index);
 	int moveTab(int oldPos, int newPos);
 	void deleteTab(unsigned char tabPos);
-
+	void rotateTabHues(float rotation);
 
 	const std::map<int, glm::i32vec4>& getTabs();
-	std::map<int, glm::i32vec4> colours;
+	std::map<int, glm::i32vec4> tabs;
 	std::vector<TPixel> pixels;
 };

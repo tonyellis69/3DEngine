@@ -15,10 +15,14 @@ public:
 	CTexGen* createTurbulenceTex(CTexGen* source);
 	CTexGen* createColouriseTex(CTexGen* source, ColourGradient* colourGradient);
 	CTexGen* createScaleBiasTex(CTexGen* source);
+	CTexGen * createSeamlessTex();
 	CTexGen* createScalePointTex(CTexGen* source);
 	CTexGen* createAddTex(CTexGen* source1, CTexGen* source2);
 	CTexGen* createLayerTex(CTexGen* source1, CTexGen* source2);
 	CTexGen* createSelectTex(CTexGen* source1, CTexGen* source2, CTexGen* control);
+	CTexGen* createGausTex();
+
+	void addToStack(CTexGen * texGen);
 	
 
 	CRenderTexture* createTarget();
@@ -46,6 +50,7 @@ public:
 	void setCurrentLayer(int layerNo);
 
 	void addTexGen(CTexGen* texGen);
+	void deleteTexGen(int stackNo);
 
 //	int octaves;
 //	float frequency;
@@ -55,8 +60,9 @@ public:
 	CTexGen* currentTexGen;
 	std::vector<CTexGen*> texGens;
 	CRenderTexture* currentTarget;
-	std::vector<CRenderTexture*> targets;
+	//std::vector<CRenderTexture*> targets;
 
 
 	int textureSize;
+	CNullTex nullTexGen;
 };

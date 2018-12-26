@@ -1,18 +1,13 @@
 #pragma once
 
 #include "..\BaseApp.h"
-#include "..\UI\GUIimage.h"
+#include "GUItrackImage.h"
 #include "..\UI\GUIpaletteBar.h"
 #include "..\UI\GUImenu.h"
 #include "..\UI\GUIcontainer.h"
 
 #include "texGen.h"
-#include "composeWood.h"
-#include "composeGranite.h"
-#include "composeSlime.h"
-#include "composeSky.h"
 #include "GUInoiseCtrl.h"
-#include "composeRidged.h"
 #include "composeTest.h"
 
 class CTexGenUI : public Icallback {
@@ -29,6 +24,7 @@ public:
 	void clear();
 	void fillStackMenu();
 	void addTexGen(int itemNo);
+	void deleteTexGen(int itemNo);
 	void configureGUI(TexGenType texType);
 	void fillRestoreMenu();
 	void savePalette(std::string filename);
@@ -37,7 +33,7 @@ public:
 
 
 	CBaseApp* pApp;
-	CGUIimage* image;
+	CGUItrackImage* image;
 	//CGUIpaletteBar* paletteBar;
 
 

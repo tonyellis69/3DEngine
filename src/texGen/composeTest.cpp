@@ -5,8 +5,8 @@ using namespace glm;
 ComposeTest::~ComposeTest() {
 	for (auto texGen : texGens)
 		delete texGen;
-	for (auto target : targets)
-		delete target;
+	//for (auto target : targets)
+		//delete target;
 }
 
 void ComposeTest::initTex() {
@@ -30,42 +30,42 @@ void ComposeTest::compose() {
 
 CTexGen * ComposeTest::createNoiseTex() {
 	CNoiseTex* texGen = new CNoiseTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	return texGen;
 }
 
 CTexGen * ComposeTest::createRidgedMFTex() {
 	CRidgedMultiTex* texGen = new CRidgedMultiTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	return texGen;
 }
 
 CTexGen * ComposeTest::createCylinderTex() {
 	CylinderTex* texGen = new CylinderTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	return texGen;
 }
 
 CTexGen * ComposeTest::createBillowTex() {
 	CBillowTex* texGen = new CBillowTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	return texGen;
 }
 
 CTexGen * ComposeTest::createVoronoiTex() {
 	CVoronoiTex* texGen = new CVoronoiTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	return texGen;
 }
 
 CTexGen * ComposeTest::createTurbulenceTex(CTexGen* source) {
 	CTurbulenceTex* texGen = new CTurbulenceTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(source);
 	return texGen;
@@ -73,7 +73,7 @@ CTexGen * ComposeTest::createTurbulenceTex(CTexGen* source) {
 
 CTexGen * ComposeTest::createColouriseTex(CTexGen* source, ColourGradient* colourGradient) {
 	CColourTex* colourTex = new CColourTex();
-	texGens.push_back(colourTex);
+	addToStack(colourTex); 
 	colourTex->setTarget(createTarget());
 	if (colourGradient)
 		colourTex->setPalette(*colourGradient);
@@ -84,15 +84,23 @@ CTexGen * ComposeTest::createColouriseTex(CTexGen* source, ColourGradient* colou
 
 CTexGen * ComposeTest::createScaleBiasTex(CTexGen * source) {
 	CScaleBiasTex* texGen = new CScaleBiasTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(source);
 	return texGen;
 }
 
+CTexGen * ComposeTest::createSeamlessTex() {
+	CSeamlessTex* texGen = new CSeamlessTex();
+	addToStack(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(&nullTexGen);
+	return texGen;
+}
+
 CTexGen * ComposeTest::createScalePointTex(CTexGen * source) {
 	CScalePointTex* texGen = new CScalePointTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(source);
 	return texGen;
@@ -100,7 +108,7 @@ CTexGen * ComposeTest::createScalePointTex(CTexGen * source) {
 
 CTexGen * ComposeTest::createAddTex(CTexGen * source1, CTexGen * source2) {
 	CAddTex* texGen = new CAddTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(source1);
 	texGen->setSource2(source2);
@@ -109,7 +117,7 @@ CTexGen * ComposeTest::createAddTex(CTexGen * source1, CTexGen * source2) {
 
 CTexGen * ComposeTest::createLayerTex(CTexGen * source1, CTexGen * source2) {
 	CLayerTex* texGen = new CLayerTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(source1);
 	texGen->setSource2(source2);
@@ -118,7 +126,7 @@ CTexGen * ComposeTest::createLayerTex(CTexGen * source1, CTexGen * source2) {
 
 CTexGen * ComposeTest::createSelectTex(CTexGen * source1, CTexGen * source2, CTexGen * control) {
 	CSelectTex* texGen = new CSelectTex();
-	texGens.push_back(texGen);
+	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(source1);
 	texGen->setSource2(source2);
@@ -126,10 +134,37 @@ CTexGen * ComposeTest::createSelectTex(CTexGen * source1, CTexGen * source2, CTe
 	return texGen;
 }
 
+CTexGen * ComposeTest::createGausTex() {
+	CGausTex* texGen = new CGausTex();
+	addToStack(texGen);
+	texGen->setTarget(createTarget());
+	texGen->setSource(&nullTexGen);
+	return texGen;
+}
+
+void ComposeTest::addToStack(CTexGen* texGen) {
+	//check for unique name
+	string newName = texGen->name;
+	for (auto existing : texGens) {
+		if (existing->name.substr(0, newName.size()) == newName) {
+			int suffix = 2;
+			for (auto existing2 : texGens) {
+				if (existing2->name.substr(0,newName.size()) == newName)
+					suffix = std::max(existing2->count+1, suffix);
+			}
+			texGen->name = newName + "#" + to_string(suffix);;
+			texGen->count = suffix;
+			break;
+		}
+	}
+	texGens.push_back(texGen);
+}
+
+
 /** Create a new texture to use as a rendering target. */
 CRenderTexture * ComposeTest::createTarget() {
 	currentTarget = new CRenderTexture(textureSize, textureSize);
-	targets.push_back(currentTarget);
+	//targets.push_back(currentTarget);
 	return currentTarget;
 }
 
@@ -245,4 +280,22 @@ void ComposeTest::setCurrentLayer(int layerNo) {
 /** Add this tex gen to the stack. */
 void ComposeTest::addTexGen(CTexGen* texGen) {
 	texGens.push_back(texGen);
+}
+
+void ComposeTest::deleteTexGen(int stackNo) {
+	//check for about-to-be-invalid sources
+	for (unsigned int gen = stackNo+1; gen < texGens.size(); gen++) {
+		if (texGens[gen]->srcTex1 == texGens[stackNo])
+			texGens[gen]->setSource(&nullTexGen);
+		if (texGens[gen]->srcTex2 == texGens[stackNo])
+			texGens[gen]->setSource2(&nullTexGen);
+		if (texGens[gen]->srcTex3 == texGens[stackNo])
+			texGens[gen]->setSource3(&nullTexGen);
+	}
+
+	delete texGens[stackNo];
+	texGens.erase(texGens.begin() + stackNo);
+	if (stackPosition >= stackNo)
+		setCurrentLayer(stackNo - 1);
+	
 }
