@@ -124,7 +124,9 @@
     <ClCompile Include="..\src\renderer\fontManager.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
     <ClCompile Include="..\src\renderer\material.cpp" />
+    <ClCompile Include="..\src\renderer\mesh.cpp" />
     <ClCompile Include="..\src\renderer\model.cpp" />
+    <ClCompile Include="..\src\renderer\model2.cpp" />
     <ClCompile Include="..\src\renderer\modelMulti.cpp" />
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
@@ -133,6 +135,7 @@
     <ClCompile Include="..\src\renderer\renderShader.cpp" />
     <ClCompile Include="..\src\renderer\renderTexture.cpp" />
     <ClCompile Include="..\src\renderer\shader.cpp" />
+    <ClCompile Include="..\src\renderer\shaderDraw.cpp" />
     <ClCompile Include="..\src\renderer\texManager.cpp" />
     <ClCompile Include="..\src\shapes.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
@@ -230,7 +233,9 @@
     <ClInclude Include="..\src\renderer\fontManager.h" />
     <ClInclude Include="..\src\renderer\light.h" />
     <ClInclude Include="..\src\renderer\material.h" />
+    <ClInclude Include="..\src\renderer\mesh.h" />
     <ClInclude Include="..\src\renderer\model.h" />
+    <ClInclude Include="..\src\renderer\model2 .h" />
     <ClInclude Include="..\src\renderer\modelMulti.h" />
     <ClInclude Include="..\src\renderer\multiBuf.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
@@ -239,6 +244,7 @@
     <ClInclude Include="..\src\renderer\renderShader.h" />
     <ClInclude Include="..\src\renderer\renderTexture.h" />
     <ClInclude Include="..\src\renderer\shader.h" />
+    <ClInclude Include="..\src\renderer\shaderDraw.h" />
     <ClInclude Include="..\src\renderer\texManager.h" />
     <ClInclude Include="..\src\shapes.h" />
     <ClInclude Include="..\src\simplexnoise.h" />

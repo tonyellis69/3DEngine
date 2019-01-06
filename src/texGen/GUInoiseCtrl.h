@@ -17,7 +17,7 @@ public:
 	glm::vec3 getFullPosition();
 	glm::vec3 getScalePt();
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
-
+	void setIndicatorPosition(int indexPos);
 
 	CGUInumeric2* octaveCtrl;
 	CGUInumeric2* freqCtrl;

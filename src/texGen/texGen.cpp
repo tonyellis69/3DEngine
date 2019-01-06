@@ -147,6 +147,7 @@ void CNoiseTex::read(std::ifstream & in) {
 CColourTex::CColourTex() : CTexGen(texColour) {
 	palette.resize(256, 0);
 	name = "Colourise";
+	selectedShade = -1;
 }
 
 /** Set the 1D texture to use as a colour map. */
@@ -160,6 +161,7 @@ void CColourTex::loadShader() {
 	shader = pRenderer->createShader("colourTex");
 	hSource = shader->getUniformHandle("source");
 	hPalette = shader->getUniformHandle("palette");
+	hSelectedShade = shader->getUniformHandle("selectedShade");
 }
 
 void CColourTex::render() {
@@ -170,6 +172,7 @@ void CColourTex::render() {
 
 	shader->setShaderValue(hSource, 0);
     shader->setShaderValue(hPalette, 1);
+	shader->setShaderValue(hSelectedShade, selectedShade);
 	pRenderer->renderToTextureQuad(mTarget);
 }
 
@@ -186,6 +189,16 @@ void CColourTex::read(std::ifstream & in) {
 //	readObject(colourGradient.tabs, in);
 }
 
+/** Return the source texture colour at this point. */
+glm::i32vec4 CColourTex::getSourceColour(int x, int y) {
+
+	return mSource->getPixel(x, y);
+}
+
+void CColourTex::setSelectedShade(int shade) {
+	selectedShade = shade;
+}
+
 
 void CRidgedMultiTex::loadShader() {
 	shader = pRenderer->createShader("texRidgedMulti");
@@ -194,6 +207,7 @@ void CRidgedMultiTex::loadShader() {
 	hMatrix = shader->getUniformHandle("matrix");
 	hOctaves = shader->getUniformHandle("octaves");
 	hFrequency = shader->getUniformHandle("frequency");
+
 }
 
 void CRidgedMultiTex::render() {

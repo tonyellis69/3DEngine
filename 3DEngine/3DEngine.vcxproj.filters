@@ -335,6 +335,15 @@
     <ClCompile Include="..\src\texGen\GUItrackImage.cpp">
       <Filter>texGen</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\mesh.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\model2.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\shaderDraw.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -669,6 +678,15 @@
     </ClInclude>
     <ClInclude Include="..\src\texGen\GUItrackImage.h">
       <Filter>texGen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\mesh.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\model2 .h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\shaderDraw.h">
+      <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

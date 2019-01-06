@@ -234,7 +234,13 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 
 	if (sender == image && msg.Msg == uiMsgMouseMove) {
 		//if current texgen is a colouriser... go to the colour-tracking routine!
+		if (texCompositor.currentTexGen && texCompositor.currentTexGen->texGenType == texColour)
+			highlightMouseColour(msg.x, msg.y);
+	}
 
+	if (sender == image && msg.Msg == uiMsgMouseOff) {
+		if (texCompositor.currentTexGen && texCompositor.currentTexGen->texGenType == texColour)
+			unhighlightMouseColour();
 	}
 
 		 
@@ -549,5 +555,26 @@ void CTexGenUI::restorePalette(std::string & filename){
 	texCompositor.updateColourGradient(gradIn);
 	texCompositor.currentTexGen->render();
 
+}
+
+/** Highlight the colour at the given point on the source texture of the current colourise texgen. */
+void CTexGenUI::highlightMouseColour(int x, int y) {
+	//ask the colourise texgen for the colour at this point
+	i32vec4 colour = texCompositor.currentTexGen->getSourceColour(x, y);
+	
+	//tell the paletteBar to highlight this colour on the gradient
+	GUInoiseCtrl->setIndicatorPosition(colour.r);
+
+	//tell colouriser to display a faded-out version of the texture
+	static_cast<CColourTex*>(texCompositor.currentTexGen)->setSelectedShade(colour.r);
+	texCompositor.currentTexGen->render();
+	cerr << "\n" << colour.r;
+}
+
+void CTexGenUI::unhighlightMouseColour() {
+	GUInoiseCtrl->setIndicatorPosition(-1);
+	static_cast<CColourTex*>(texCompositor.currentTexGen)->setSelectedShade(-1);
+	texCompositor.currentTexGen->render();
+	cerr << "\n" << -1;
 }
 

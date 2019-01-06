@@ -80,4 +80,11 @@ namespace shape {
 		}
 	}
 
+	/** Create a cube stored in a CMesh object and return it .*/
+	CMesh cubeMesh() {
+		CMesh mesh;
+		cube(&mesh.vertices, &mesh.normals, &mesh.indices);
+		return mesh;
+	}
+
 }

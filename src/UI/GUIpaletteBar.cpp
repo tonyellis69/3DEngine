@@ -33,6 +33,7 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	setGradientTexture(paletteTexture);
 
 	oldHueRotation = 0;
+	indicator = -1;
 }
 
 
@@ -97,14 +98,14 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 	CGUIbase::MouseMsg(Msg, mouseX, mouseY, key);
 }
 
-void CGUIpaletteBar::createTab(int mouseX) {
-	int paletteImagePosX = paletteImage->drawBox.size.x *  (mouseX / 255.0f);
-	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImagePosX + paletteImage->localPos.x - (tabSize.x / 2), 
+void CGUIpaletteBar::createTab(int tabIndex) {
+	int paletteImageProportion = paletteImage->drawBox.size.x *  (tabIndex / 255.0f);
+	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->localPos.x - (tabSize.x / 2), 
 		paletteImage->localPos.y + barHeight, tabSize.x, tabSize.y);
 	Add(tab);
 	//float unitPos = mouseX / float(paletteImage->drawBox.size.x);
 	//tab->position = unitPos * 255.0f;
-	tab->position = mouseX;
+	tab->position = tabIndex;
 	
 	glm::vec4 colour = glm::vec4(colourGradient.getColour(tab->position)); 
 	colourGradient.changeColour(tab->position, glm::i32vec4(colour));
@@ -314,6 +315,24 @@ void CGUIpaletteBar::save() {
 	msg.Msg = uiMsgSave;
 	callbackObj->GUIcallback(this, msg);
 
+}
+
+/** Indicate this index position graphically. */
+void CGUIpaletteBar::setIndicatorPosition(int indexPos) {
+	indicator = indexPos;
+}
+
+void CGUIpaletteBar::DrawSelf() {
+	if (indicator > -1) {
+		guiRect indicatorRect;
+		int paletteImageProportion = paletteImage->drawBox.size.x * (indicator / 255.0);
+		indicatorRect.pos = { paletteImage->drawBox.pos.x + paletteImageProportion,paletteImage->drawBox.pos.y - 10 };
+		indicatorRect.size = { 2,10 };
+
+		pDrawFuncs->drawRect2(indicatorRect,uiBlack,uiBlack);
+
+
+	}
 }
 
 

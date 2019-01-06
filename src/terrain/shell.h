@@ -15,8 +15,8 @@ public:
 	void fillEntire(int chunkExtent);
 	void addToFaceLayer(Tdirection direction);
 	void scroll(Tdirection direction);
-	void requestWorldMove(Tdirection scrollDirection);
 	void initSuperChunks();
+	void findSCintersections();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -25,7 +25,7 @@ public:
 	float chunkSize; //<In worldspace.
 	float SCsize; //<In worlsspace
 	float worldSpaceSize; 
-	glm::i32vec3 worldSpacePos;
+	glm::vec3 worldSpacePos;
 	int minimumChunkExtent; //<Terrain must always extend this far from player.
 	glm::i32vec3 playerChunkPos;  //<Player position in chunks, relative to origin
 

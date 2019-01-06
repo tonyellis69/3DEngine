@@ -38,10 +38,10 @@ void CShell::playerAdvance(Tdirection direction) {
 	i32vec3 travelVector = dirToVec(direction);
 	playerChunkPos += travelVector;
 
-	//std::cerr << "\nShell " << shellNo;
+	std::cerr << "\nAdvance shell " << shellNo << ":";
 	if (getPlayerChunkExtent(direction) >= minimumChunkExtent) {
 		//1) sufficient terrain in direction, so nothing else to do
-	//	std::cerr << " suffient terrain, returning.";
+		std::cerr << " suffient terrain, returning.";
 		return;
 	}
 
@@ -50,18 +50,22 @@ void CShell::playerAdvance(Tdirection direction) {
 	if (!faceLayerFull[direction]) {
 		//(2) add chunks to the face layer SCs in this direction!
 		addToFaceLayer(direction);
-		//std::cerr << " adding to face layer.";
+		std::cerr << " adding to face layer.";
 	}
 	else {
 		//(3) scroll the SCs, then add a layer 
 		Tdirection scrollDir = flipDir(direction);
+		std::cerr << " scrolling.";
 		scroll(scrollDir);
 		addToFaceLayer(direction);
-	//	std::cerr << " scrolling.";
-		requestWorldMove(scrollDir);
+
+	
+		if (shellNo != 0)
+			pTerrain->returnShellAndOuterShells(*this, direction);
 	}
 
 	//The containing shell has been encroached upon to the tune of one layer of its chunks, so tell it to handle this.
+	/////////////////////////////////////////////
 	if (shellNo < pTerrain->shells.size()-1)
 		pTerrain->shells[shellNo + 1].advance(direction);
 
@@ -89,7 +93,7 @@ void CShell::fillEntire(int chunkExtent) {
 		this->chunkExtent[direction] = chunkExtent;
 
 	//TO DO: fill SCs with chunks if they intersect terrain:
-
+	findSCintersections();
 }
 
 /** Extend the terrain by two layers of chunks in the given direction. Two because we have to replace entire
@@ -119,23 +123,43 @@ void CShell::scroll(Tdirection scrollDirection) {
 	i32vec3 scrollVec = dirToVec(scrollDirection);
 	//move player position in shell back by one SC's worth of chunks
 	playerChunkPos += scrollVec * SCchunks;
+
+	//move enclosing shells back to ensure terrain still lines up
+	pTerrain->displaceOuterShells(*this, scrollDirection);
 }
 
-/** Ask the other shells of the world to move in the given direction. This is done to ensure that the 
-	terrain of this shell still lines up with the rest after a scroll. */
-void CShell::requestWorldMove(Tdirection scrollDirection){
-	//TO DO:
-	//message the parent terrain, asking it to move/advance the other shells by 1 LoD1 SC width.
-	pTerrain->worldMove(*this, scrollDirection);
-}
+
 
 /** Any SC setup required when a shell is created. */
 void CShell::initSuperChunks() {
+	vec3 sampleSpacePosition;
 	for (int x = 0; x < shellSCs; x++) {
 		for (int y = 0; y < shellSCs; y++) {
 			for (int z = 0; z < shellSCs; z++) {
+				scArray.element(x, y, z).isEmpty = true;
 				scArray.element(x, y, z).colour = vec4(col::randHue(),1);
 				scArray.element(x, y, z).origIndex = vec3(x,y,z);
+				scArray.element(x, y, z).setSampleSize(SCsize / pTerrain->worldToSampleScale);
+				//find worldspace displacement of SC from terrain centre 
+				vec3 scPos = vec3(x, y, z) * SCsize;
+				scPos += SCsize * 0.5f;
+				scPos -= worldSpaceSize * 0.5f;
+				scPos += worldSpacePos;
+				//convert into a displacement in sample space
+				sampleSpacePosition = scPos / pTerrain->worldToSampleScale;
+				scArray.element(x, y, z).setSampleSpacePosition(sampleSpacePosition);
+			}
+		}
+	}
+}
+
+/** Ask all superchunks to check if they are intersected by terrain. */
+void CShell::findSCintersections() {
+	for (int x = 0; x < shellSCs; x++) {
+		for (int y = 0; y < shellSCs; y++) {
+			for (int z = 0; z < shellSCs; z++) {
+				//TO DO: exclude SCs entirely within child shell
+				scArray.element(x, y, z).checkForIntersection();
 			}
 		}
 	}

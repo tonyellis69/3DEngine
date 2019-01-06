@@ -73,6 +73,8 @@ public:
 	virtual void write(std::ofstream& out);
 	virtual void read(std::ifstream& in);
 
+	virtual glm::i32vec4 getSourceColour(int x, int y) { return glm::i32vec4(0); }
+
 	CRenderer* pRenderer;
 	CShader* shader;
 	CBuf targetQuad;
@@ -163,11 +165,15 @@ public:
 	void read(std::ifstream& in);
 
 	ColourGradient* getColourGradient() { return &colourGradient; }
+	glm::i32vec4 getSourceColour(int x, int y);
+	void setSelectedShade(int shade);
 
 	ColourGradient colourGradient;
 	CRenderTexture palette;
 	unsigned int hPalette;
 
+	int selectedShade;
+	unsigned int hSelectedShade;
 
 };
 

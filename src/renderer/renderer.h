@@ -14,6 +14,7 @@
 //#include "baseTexture.h"
 #include "texManager.h"
 #include "..\terrain.h"
+#include "shaderDraw.h"
 
 #include "renderShader.h"
 
@@ -36,7 +37,7 @@ extern int totalchunks;
 
 /** The high-level renderer class. */
 class CBaseBuf;
-class CRenderer {
+class CRenderer  {
 public:
 	CRenderer();
 	~CRenderer();
@@ -105,6 +106,7 @@ public:
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();
 	void createStandardPhongShader();
+	static void defaulPhongShaderSettings();
 	void createStandardTexShader();
 	void createStandardBillboardShader();
 	void createStandardMultiTexShader();

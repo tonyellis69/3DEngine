@@ -62,6 +62,7 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 	}
 
 	if (inDirection != none) {
+		std::cerr << "\nMovement!";
 		shells[0].playerAdvance(inDirection);
 	}
 
@@ -81,11 +82,38 @@ void CTerrain2::fillShells() {
 	}
 }
 
-/** Move all shells but the sender in the given direction. This is called to keep the terrain 
+/** Move the enclosing shells of this shell one SC length in the given direction. This is called to keep the outer terrain 
 	aligned with a shell that has just scrolled. */
-void CTerrain2::worldMove(const CShell & sender, Tdirection moveDirection) {
-	//TO DO
-	//Move all shells but the sender one SC width in the move direction
+void CTerrain2::displaceOuterShells(const CShell & sender, Tdirection moveDirection) {
+	vec3 move = dirToVec(moveDirection) * shells[sender.shellNo].SCsize;
+	for (unsigned int outerShell = sender.shellNo +1; outerShell < shells.size(); outerShell++) {
+		shells[outerShell].worldSpacePos += move;
+	}
+}
 
+
+/** Move this shell and any enclosing shells one SC length in the given direction. This is called to keep their
+	terrain in line with any inner shells after scrolling. It also prevents the shell from drifting away from shell 0.*/
+void CTerrain2::returnShellAndOuterShells(const CShell & sender, Tdirection moveDirection) {
+	vec3 move = dirToVec(moveDirection) * sender.SCsize;
+	for (int shell = sender.shellNo; shell < shells.size(); shell++) {
+		shells[shell].worldSpacePos += move;
+	}
+}
+
+/** Go through all superchunks, asking them to check if they intersect terrain. */
+void CTerrain2::findSCintersections() {
 
 }
+
+/** Centre the terrain at the give position in sample space. */
+void CTerrain2::setSampleSpacePosition(glm::vec3 & pos) {
+	sampleSpacePos = pos;
+}
+
+/** Set the number of world units per sample unit. */
+void CTerrain2::setWorldScale(float scale) {
+	worldToSampleScale = scale;
+}
+
+

@@ -15,8 +15,13 @@ public:
 	float getShellSize(unsigned int shellNo);
 	void playerWalk(glm::vec3& move);
 	void fillShells();
-	void worldMove(const CShell& sender, Tdirection moveDirection);
+	void displaceOuterShells(const CShell& sender, Tdirection moveDirection);
+	void returnShellAndOuterShells(const CShell& sender, Tdirection moveDirection);
+	void findSCintersections();
+	void setSampleSpacePosition(glm::vec3& pos);
+	void setWorldScale(float scale);
 
+	
 	std::vector<CShell> shells;
 
 	float LoD1cubeSize; //<In worldspace.
@@ -26,4 +31,6 @@ public:
 
 	glm::vec3 playerOffset; //<Deterimines if player moved far enough to advance scenery.
 
+	glm::vec3 sampleSpacePos; //<Position of terrain in sample space.
+	float worldToSampleScale; ///<Number of world units to one sample unit
 };

@@ -18,7 +18,7 @@ class CGUIpaletteTab;
 class CGUIpaletteBar : public CGUIpanel  {
 public:
 	CGUIpaletteBar(int x, int y, int w, int h);
-	//void DrawSelf();
+	
 	void setGradientTexture(CBaseTexture& texture);
 	void setGradient(ColourGradient& gradient);
 	void OnClick(const  int mouseX, const  int mouseY);
@@ -38,7 +38,8 @@ public:
 	void updatePalette();
 	void addControls();
 	void save();
-
+	void setIndicatorPosition(int indexPos);
+	void DrawSelf();
 
 
 	int paletteImageStartX;
@@ -66,6 +67,7 @@ public:
 	CGUItextbox2* fileNameBox;
 
 	CGUIlabel2* tabPos;
+	int indicator;
 };
 
 class CGUIpaletteTab : public CGUIpanel {

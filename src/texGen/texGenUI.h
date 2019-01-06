@@ -30,6 +30,8 @@ public:
 	void savePalette(std::string filename);
 	void fillPaletteRestoreMenu();
 	void restorePalette(std::string& filename);
+	void highlightMouseColour(int x, int y);
+	void unhighlightMouseColour();
 
 
 	CBaseApp* pApp;

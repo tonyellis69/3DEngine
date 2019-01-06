@@ -238,3 +238,8 @@ void CGUInoiseCtrl::GUIcallback(CGUIbase * sender, CMessage & msg) {
 	if ( callbackObj)
 		callbackObj->GUIcallback(sender, msg);
 }
+
+/** Get paletteBar control to indicate this colour on the gradient. */
+void CGUInoiseCtrl::setIndicatorPosition(int indexPos) {
+	paletteBar->setIndicatorPosition(indexPos);
+}

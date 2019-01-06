@@ -763,6 +763,13 @@ void CRenderer::createStandardPhongShader() {
 	//modify to accept list of feedback vars
 }
 
+ void CRenderer::defaulPhongShaderSettings() {
+//	phongShader->setShaderValue(hLightDirection, glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
+//	phongShader->setShaderValue(hLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+//	phongShader->setShaderValue(hAmbientLight, glm::vec4(0.2f, 0.2f, 0.2f, 1));
+//	phongShader->setShaderValue(hColour, glm::vec4(1));
+}
+
 void CRenderer::createStandardTexShader() {
 	texShader = createShader(dataPath + "texture");
 	texShader->setType(standardTex);
