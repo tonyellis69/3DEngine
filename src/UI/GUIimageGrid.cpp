@@ -34,48 +34,48 @@ void CGUIimageGrid::setCell(int cellNo, int value) {
 
 
 void CGUIimageGrid::DrawSelf( ) {
-	pDrawFuncs->setDrawColours(foreColour1, foreColour1);
-	pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
+//	pDrawFuncs->setDrawColours(foreColour1, foreColour1);
+//	pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
 
 	//draw grid
-	for (int c=1;c<cols;c++)
-		pDrawFuncs->drawLine(screenPos.x+(c*cellSize),screenPos.y,screenPos.x+(c*cellSize),screenPos.y + height);
+	//for (int c=1;c<cols;c++)
+//		pDrawFuncs->drawLine(screenPos.x+(c*cellSize),screenPos.y,screenPos.x+(c*cellSize),screenPos.y + height);
 
-	for (int r=1;r<rows;r++)
-		pDrawFuncs->drawLine(screenPos.x,screenPos.y+(r*cellSize),screenPos.x+width,screenPos.y+(r*cellSize));
+//	for (int r=1;r<rows;r++)
+	//	pDrawFuncs->drawLine(screenPos.x,screenPos.y+(r*cellSize),screenPos.x+width,screenPos.y+(r*cellSize));
 
 	UIrect cellBounds;
 
-	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
+//	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
 	cellBounds.width = cellSize;
 	cellBounds.height = cellSize;
-	pDrawFuncs->setScale(cellScale,cellScale);
+//	pDrawFuncs->setScale(cellScale,cellScale);
 	int cellNo = 0;
-	if (tilesheet != noTileset)
-		pDrawFuncs->setIconset(tilesheet);
+	//if (tilesheet != noTileset)
+	//	pDrawFuncs->setIconset(tilesheet);
 	for (int r=0;r<rows;r++) {
 		for (int c=0;c<cols;c++) {
 			cellBounds.x = screenPos.x + (c*cellSize);
 			cellBounds.y = screenPos.y + (r*cellSize);
 			if (cell[cellNo] != NONE) {
 				if (tilesheet == noTileset) {
-					pDrawFuncs->drawImage(cell[cellNo],cellBounds);
+				//	pDrawFuncs->drawImage(cell[cellNo],cellBounds);
 				}
 				else { 
-					pDrawFuncs->drawTile(cell[cellNo],cellBounds);
+				//	pDrawFuncs->drawTile(cell[cellNo],cellBounds);
 				}
 			}
 			cellNo++;
 		}
 	}
-	pDrawFuncs->setScale(1,1);
+//	pDrawFuncs->setScale(1,1);
 
 	//draw highlighter box around cell if it gets mouseovered
 	if (MouseOver == this) {
 
 		if (cell[getCellNo(mouseCol,mouseRow)] != NONE) {
-			pDrawFuncs->setDrawColours(highlightColour, highlightColour);
-			pDrawFuncs->drawBorder(screenPos.x + (mouseCol * cellSize),screenPos.y + (mouseRow * cellSize),cellSize,cellSize);
+//			pDrawFuncs->setDrawColours(highlightColour, highlightColour);
+		//	pDrawFuncs->drawBorder(screenPos.x + (mouseCol * cellSize),screenPos.y + (mouseRow * cellSize),cellSize,cellSize);
 		}
 	}
 
@@ -83,8 +83,8 @@ void CGUIimageGrid::DrawSelf( ) {
 	if (selected != NONE) {
 		int selCol, selRow;
 		getColRow(selected, selCol, selRow);
-		pDrawFuncs->setDrawColours(selectColour, selectColour);
-		pDrawFuncs->drawBorder(screenPos.x + (selCol * cellSize),screenPos.y + (selRow * cellSize),cellSize,cellSize);
+	//	pDrawFuncs->setDrawColours(selectColour, selectColour);
+	//	pDrawFuncs->drawBorder(screenPos.x + (selCol * cellSize),screenPos.y + (selRow * cellSize),cellSize,cellSize);
 	}
 }
 
@@ -96,7 +96,7 @@ void CGUIimageGrid::OnClick(const  int mouseX, const  int mouseY) {
 	if (cellNo != NONE) {
 		Message.Msg = uiClick; //iMsgLMouseUp;
 		Message.value = cell[cellNo];
-		pDrawFuncs->handleUImsg(*this,Message);	
+	//	pDrawFuncs->handleUImsg(*this,Message);	
 	}
 	selected = Message.value;
 }
@@ -165,13 +165,13 @@ CGUIgridMouse::CGUIgridMouse() {
 void CGUIgridMouse::DrawSelf( ) {
 	imageBounds.x = mouse->screenPos.x;
 	imageBounds.y = mouse->screenPos.y;
-	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
-	if (tilesheet == NULL)
-		pDrawFuncs->drawImage(dragData,imageBounds);
-	else {
-		pDrawFuncs->setIconset(tilesheet);
-		pDrawFuncs->drawTile(dragData,imageBounds);
-	}
+//	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
+//	if (tilesheet == NULL)
+	//	pDrawFuncs->drawImage(dragData,imageBounds);
+	//else {
+	//	pDrawFuncs->setIconset(tilesheet);
+	//	pDrawFuncs->drawTile(dragData,imageBounds);
+	//}
 }
 
 

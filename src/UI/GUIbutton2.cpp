@@ -51,7 +51,7 @@ void CGUIbutton2::DrawSelf() {
 void CGUIbutton2::OnClick(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
-	pDrawFuncs->handleUImsg(*this, msg);
+	//pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
 	if (callbackObj)
 		callbackObj->GUIcallback(this, msg);

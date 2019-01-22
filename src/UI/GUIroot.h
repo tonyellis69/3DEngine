@@ -29,5 +29,7 @@ public:
 
 	//CGUIbase* modalControl; ///<Pointer to the current modal control, if any.
 	CGUIbase* focusControl; ///<The current control with focus, if any.
+
+	glm::i32vec2 mousePos; ///<Current mouse screen position.
 };
 

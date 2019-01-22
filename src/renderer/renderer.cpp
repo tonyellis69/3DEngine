@@ -763,11 +763,16 @@ void CRenderer::createStandardPhongShader() {
 	//modify to accept list of feedback vars
 }
 
- void CRenderer::defaulPhongShaderSettings() {
-//	phongShader->setShaderValue(hLightDirection, glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
-//	phongShader->setShaderValue(hLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
-//	phongShader->setShaderValue(hAmbientLight, glm::vec4(0.2f, 0.2f, 0.2f, 1));
-//	phongShader->setShaderValue(hColour, glm::vec4(1));
+ void CRenderer::phongDrawCallout(void* callee, CModel2* model) {
+	 CRenderer* pThis = &CRenderer::getInstance();
+	 pThis->setShader(pThis->phongShader);
+	 pThis->phongShader->setShaderValue(pThis->hLightDirection, glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
+	 pThis->phongShader->setShaderValue(pThis->hLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	 pThis->phongShader->setShaderValue(pThis->hAmbientLight, glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	 pThis->phongShader->setShaderValue(pThis->hColour, model->colour);
+	 pThis->phongShader->setShaderValue(pThis->hNormalModelToCameraMatrix, pThis->currentCamera->clipMatrix);
+	 pThis->phongShader->setShaderValue(pThis->hMVP, pThis->currentCamera->clipMatrix * model->worldMatrix);
+	 pThis->drawBuf(model->buffer, drawTris);
 }
 
 void CRenderer::createStandardTexShader() {

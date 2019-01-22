@@ -53,21 +53,24 @@ void CGUIsysContainer::createSurface() {
 void CGUIsysContainer::Add(CGUIbase* child) {
 	surface->Add(child);
 	adaptToContents(); //resize surface as required, adding scrollbars
-	fitViewBoxToContainer();
+	//fitViewBoxToContainer();
 	needsUpdate = true;
 }
 
 
 /** Handles a scroll message from the container's scrollbars. */
 void CGUIsysContainer::message(CGUIbase* sender, CMessage& msg) {
-	if (sender->id == uiContainerVbarID) 
-		surface->localPos.y =  0 - (verticalBar->Max - msg.value);
-
-	if (sender->id == uiContainerHbarID) 
+	if (sender->id == uiContainerVbarID) {
+		surface->localPos.y = 0 - (verticalBar->Max - msg.value);
+		needsUpdate = true;
+	}
+	if (sender->id == uiContainerHbarID) {
 		surface->localPos.x = 0 - msg.value;
+		needsUpdate = true;
+	}
 	if (msg.Msg == uiMsgChildResize)
 		adaptToContents();
-	needsUpdate = true;
+
 }
 
 
@@ -96,7 +99,7 @@ void CGUIsysContainer::updateAppearance() {
 	// container may have been resized. Surface might now be too big for the viewbox, or viewbox so big bars no longer needed
 	//or, a child control may have grown, necessitating scrollbars.
 	adaptToContents();
-	fitViewBoxToContainer();
+//	fitViewBoxToContainer();
 }
 
 /** Activates the vertical scrollbar or adjusts the existing one, if the container contents
@@ -228,8 +231,9 @@ void CGUIsysContainer::adaptToContents() {
 	//child controls may now be clipped, so an updateAppearance is needed.
 	//needsUpdate = true; //No! Should only set this if we *know* something has changed
 	//moved this to the methods that do the changing
-	if (needsUpdate)
-		updateAppearance();
+//	if (needsUpdate)
+//		updateAppearance();
+	fitViewBoxToContainer();
 }
 
 
@@ -284,12 +288,16 @@ void CGUIbaseSurface::encompassChildControls() {
 	int newWidth = viewBox.width;
 	CGUIbase* child;
 
-	for (size_t i=0;i<Control.size();i++) {
-		child =Control[i];
-		if ((child->localPos.y + child->height + spaceAroundControls ) > newHeight)
-			newHeight = child->localPos.y + child->height + spaceAroundControls;
-		if ((child->localPos.x +child->width + spaceAroundControls) > newWidth)
-			newWidth = child->localPos.x + child->width + spaceAroundControls;
+	for (size_t i = 0; i < Control.size(); i++) {
+		child = Control[i];
+		if (child->anchorBottom == NONE) { //TO DO: may want to disqualify for use of vFormat too
+			if ((child->localPos.y + child->drawBox.size.y + spaceAroundControls) > newHeight)
+				newHeight = child->localPos.y + child->drawBox.size.y + spaceAroundControls;
+		}
+		if (child->anchorRight == NONE) {//TO DO: and hFormat
+			if ((child->localPos.x + child->drawBox.size.x + spaceAroundControls) > newWidth)
+				newWidth = child->localPos.x + child->drawBox.size.x + spaceAroundControls;
+		}
 	}
 
 	if ((height != newHeight) || (width != newWidth)) {
@@ -314,6 +322,12 @@ void CGUIbaseSurface::message(CGUIbase * sender, CMessage & msg) {
 		parent->message(this, msg);
 }
 
+void CGUIbaseSurface::onDoubleClick(const int mouseX, const int mouseY, int key) {
+	CMessage msg;
+	msg.Msg = uiMsgDoubleClick;
+	parent->message(this, msg);
+}
+
 
 
 void CGUIbaseSurface::DrawSelf( ) {
@@ -325,3 +339,5 @@ CGUIcontainer::CGUIcontainer(int x, int y, int w, int h) : CGUIsysContainer(x,y,
 	GenName("Container",Count++);
 	borderWidth = 1;
 }
+
+

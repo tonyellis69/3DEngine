@@ -35,6 +35,7 @@ void C3dObject::rotate(float angle,glm::vec3 axis) {
     axis = axis * sinf(angle / 2.0f);
     float scalar = cosf(angle / 2.0f);
     glm::fquat offset(scalar, axis.x, axis.y, axis.z);
+
     
 	//rotate the object's existing orientation quat by it
 	orientation = offset * orientation;
@@ -46,8 +47,14 @@ void C3dObject::rotate(float angle,glm::vec3 axis) {
 
 /** Update world matrix with current orientation. */
 void C3dObject::orientateWorldMatrix() {
-	glm::vec3 pos = getPos();
-	worldMatrix =  glm::mat4_cast(orientation);
-	worldMatrix[3] = glm::vec4(pos,1);
+	//glm::vec3 pos = getPos();
+	//worldMatrix =  glm::mat4_cast(orientation);
+
+	mat4 rotationMatrix = glm::mat4_cast(orientation);
+
+	mat4 transM = glm::translate(mat4(1), getPos());
+
+	worldMatrix = transM * rotationMatrix ;
+
 }
 

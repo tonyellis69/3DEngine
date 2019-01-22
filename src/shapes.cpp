@@ -84,6 +84,7 @@ namespace shape {
 	CMesh cubeMesh() {
 		CMesh mesh;
 		cube(&mesh.vertices, &mesh.normals, &mesh.indices);
+		mesh.type = meshTrisIndexed;
 		return mesh;
 	}
 

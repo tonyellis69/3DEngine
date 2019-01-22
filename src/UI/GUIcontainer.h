@@ -55,6 +55,7 @@ public:
 	virtual void assignPanelPositions() {};
 	void setViewbox(int x, int y, int w, int h);
 	void message(CGUIbase* sender, CMessage& msg);
+	void onDoubleClick(const int mouseX, const int mouseY, int key);
 
 
 	void DrawSelf( );

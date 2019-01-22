@@ -56,7 +56,7 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(SolutionDir)..\SFML-1.6\include;$(SolutionDir)..\glew\include\GL;$(SolutionDir)..\glm;D:\projects\glfw32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader />
@@ -126,6 +126,7 @@
     <ClCompile Include="..\src\renderer\material.cpp" />
     <ClCompile Include="..\src\renderer\mesh.cpp" />
     <ClCompile Include="..\src\renderer\model.cpp" />
+    <ClCompile Include="..\src\renderer\model2 .cpp" />
     <ClCompile Include="..\src\renderer\model2.cpp" />
     <ClCompile Include="..\src\renderer\modelMulti.cpp" />
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
@@ -135,7 +136,6 @@
     <ClCompile Include="..\src\renderer\renderShader.cpp" />
     <ClCompile Include="..\src\renderer\renderTexture.cpp" />
     <ClCompile Include="..\src\renderer\shader.cpp" />
-    <ClCompile Include="..\src\renderer\shaderDraw.cpp" />
     <ClCompile Include="..\src\renderer\texManager.cpp" />
     <ClCompile Include="..\src\shapes.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
@@ -164,6 +164,7 @@
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
     <ClCompile Include="..\src\UI\GUIcolourPicker.cpp" />
+    <ClCompile Include="..\src\UI\GUIdragDrop.cpp" />
     <ClCompile Include="..\src\UI\GUIdropdownMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIimage1D.cpp" />
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="..\src\UI\GUIrichTextPanel.cpp" />
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
+    <ClCompile Include="..\src\UI\GUIswatchContainer.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
     <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
@@ -235,7 +237,7 @@
     <ClInclude Include="..\src\renderer\material.h" />
     <ClInclude Include="..\src\renderer\mesh.h" />
     <ClInclude Include="..\src\renderer\model.h" />
-    <ClInclude Include="..\src\renderer\model2 .h" />
+    <ClInclude Include="..\src\renderer\model2.h" />
     <ClInclude Include="..\src\renderer\modelMulti.h" />
     <ClInclude Include="..\src\renderer\multiBuf.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
@@ -244,7 +246,6 @@
     <ClInclude Include="..\src\renderer\renderShader.h" />
     <ClInclude Include="..\src\renderer\renderTexture.h" />
     <ClInclude Include="..\src\renderer\shader.h" />
-    <ClInclude Include="..\src\renderer\shaderDraw.h" />
     <ClInclude Include="..\src\renderer\texManager.h" />
     <ClInclude Include="..\src\shapes.h" />
     <ClInclude Include="..\src\simplexnoise.h" />
@@ -276,12 +277,13 @@
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
     <ClInclude Include="..\src\UI\GUIcolourPicker.h" />
+    <ClInclude Include="..\src\UI\GUIcontainer.h" />
+    <ClInclude Include="..\src\UI\GUIdragDrop.h" />
     <ClInclude Include="..\src\UI\GUIdropdownMenu.h" />
     <ClInclude Include="..\src\UI\GUIimage1D.h" />
     <ClInclude Include="..\src\UI\GUIpaletteBar.h" />
     <ClInclude Include="..\src\UI\GUIpopMenu.h" />
     <ClInclude Include="..\src\UI\GUIrichText.h" />
-    <ClInclude Include="..\src\UI\GUIcontainer.h" />
     <ClInclude Include="..\src\UI\GUIdlg.h" />
     <ClInclude Include="..\src\UI\GUIgroup.h" />
     <ClInclude Include="..\src\UI\GUIiconButton.h" />
@@ -299,6 +301,7 @@
     <ClInclude Include="..\src\UI\GUIrichTextPanel.h" />
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
+    <ClInclude Include="..\src\UI\GUIswatchContainer.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
     <ClInclude Include="..\src\UI\rowObject.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />

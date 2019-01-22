@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+
+
 using namespace glm;
 
 CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
@@ -18,7 +20,7 @@ CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
 
 	scArray.setSize(shellSCs, shellSCs, shellSCs);
 
-	initSuperChunks();
+	//initSuperChunks();
 
 
 	//SCs don't have chunks yet, so we can safely say:
@@ -132,6 +134,7 @@ void CShell::scroll(Tdirection scrollDirection) {
 
 /** Any SC setup required when a shell is created. */
 void CShell::initSuperChunks() {
+	scArray.element(0, 0, 0).setCallbackApp(pTerrain->pCallbackApp);
 	vec3 sampleSpacePosition;
 	for (int x = 0; x < shellSCs; x++) {
 		for (int y = 0; y < shellSCs; y++) {
@@ -139,14 +142,24 @@ void CShell::initSuperChunks() {
 				scArray.element(x, y, z).isEmpty = true;
 				scArray.element(x, y, z).colour = vec4(col::randHue(),1);
 				scArray.element(x, y, z).origIndex = vec3(x,y,z);
-				scArray.element(x, y, z).setSampleSize(SCsize / pTerrain->worldToSampleScale);
+				//scArray.element(x, y, z).setSampleSize(SCsize / pTerrain->worldToSampleScale);
+
+				//temp!
+				float scSampleStep = SCsize / pTerrain->worldToSampleScale;
+				float lodScale = scSampleStep / 16;
+			//	std::cerr << "\n#LoD " << this->LoD << " SC sampleStep " << scSampleStep << " LoDscale " << lodScale;
+
+				scArray.element(x, y, z).setSampleSize(lodScale);
+
 				//find worldspace displacement of SC from terrain centre 
 				vec3 scPos = vec3(x, y, z) * SCsize;
-				scPos += SCsize * 0.5f;
+				//////////////////////////////scPos += SCsize * 0.5f; TO DO temporary only
 				scPos -= worldSpaceSize * 0.5f;
 				scPos += worldSpacePos;
 				//convert into a displacement in sample space
 				sampleSpacePosition = scPos / pTerrain->worldToSampleScale;
+				//should end up with around 5 .3 5 fo (0,0,0)
+				sampleSpacePosition = pTerrain->sampleSpacePos + sampleSpacePosition;
 				scArray.element(x, y, z).setSampleSpacePosition(sampleSpacePosition);
 			}
 		}
@@ -159,7 +172,7 @@ void CShell::findSCintersections() {
 		for (int y = 0; y < shellSCs; y++) {
 			for (int z = 0; z < shellSCs; z++) {
 				//TO DO: exclude SCs entirely within child shell
-				scArray.element(x, y, z).checkForIntersection();
+					scArray.element(x, y, z).checkForIntersection();
 			}
 		}
 	}

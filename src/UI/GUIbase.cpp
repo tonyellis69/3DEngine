@@ -11,6 +11,9 @@
 
 unsigned int UIuniqueIDgen = 0;
 
+CGUIdragDrop* CGUIbase::dragDropObj = NULL;
+
+
 CGUIbase::CGUIbase()  {
 	backColour1 = UItransparent;
 	backColour2 = UItransparent;
@@ -49,6 +52,9 @@ CGUIbase::CGUIbase()  {
 	visible = true;
 	callbackObj = NULL;
 	isModal = false;
+	anchorLeft = false;
+	anchorTop = false;
+	setGUIcallback(this);
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
@@ -126,7 +132,12 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 				MouseOver->onMouseOff(mouseX, mouseY, key);
 		}
 		MouseOver = this;
-		OnMouseMove(mouseX, mouseY, key); return; }
+		if (MouseDown == this) { //looks like we're dragging
+			onDrag(mouseX, mouseY);
+			return;
+		}
+		OnMouseMove(mouseX, mouseY, key); 
+		return; }
 	case WM_LBUTTONDOWN: {
 		uncaptureKeyboard();
 		MouseDown = this;
@@ -135,12 +146,18 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	case WM_RBUTTONDOWN: {
 		uncaptureKeyboard();
 		MouseDown = this;
-		OnRMouseDown(mouseX, mouseY);
+		OnRMouseDown(mouseX, mouseY, key);
 		return; }
 	case WM_LBUTTONUP: {
-		OnLMouseUp(mouseX, mouseY);
-		if (MouseDown == this) //we've been clicked on!
-			OnClick(mouseX, mouseY);
+		if (dragDropObj != NULL) {
+			onDrop(mouseX, mouseY);
+			//return;
+		}
+		else {
+			OnLMouseUp(mouseX, mouseY);
+			if (MouseDown == this) //we've been clicked on!
+				OnClick(mouseX, mouseY);
+		}
 		if (MouseOver != this)
 			MouseOver = this;
 		scrollbarHasMouse = NULL;
@@ -156,7 +173,7 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 			return;
 		}
 	case MY_DOUBLECLICK: {
-		onDoubleClick(mouseX, mouseY);
+		onDoubleClick(mouseX, mouseY, key);
 		return; }
 	}
 	};
@@ -179,6 +196,13 @@ bool CGUIbase::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 	return false;
 }
 
+
+void CGUIbase::onDrop(const int mouseX, const int mouseY) {
+	if (dragDropObj) {
+		delete dragDropObj;
+		dragDropObj = NULL;
+	}
+}
 
 /** Set the dimensions and relative position of the control. */
 /*
@@ -266,11 +290,17 @@ void CGUIbase::updateAppearance() {
 
 /** Recursively update this control's position, dimensions and clipping, and those of its children. */
 void CGUIbase::updateAppearance() {
+	if (uniqueID == 212)
+		int b = 0;
+	glm::i32vec2 oldSize = drawBox.size;
 	needsUpdate = false;
 	//1. Recalculate x,y,w,h if necessary due to justification or spanning
-	if (anchorRight != NONE)
-		//drawBox.size.x = parent->drawBox.size.x - localPos.x - anchorRight;
-		localPos.x = parent->drawBox.size.x - drawBox.size.x - anchorRight;
+	if (anchorRight != NONE) {
+		if (anchorLeft) 
+			drawBox.size.x = min(drawBox.size.x, parent->drawBox.size.x - (anchorRight + localPos.x));
+		else
+			localPos.x = parent->drawBox.size.x - drawBox.size.x - anchorRight;
+	}
 	else {
 		switch (hFormat) {
 		case hCentre: {
@@ -286,7 +316,10 @@ void CGUIbase::updateAppearance() {
 
 	if (anchorBottom != NONE)
 		//drawBox.size.y = parent->drawBox.size.y - localPos.y - anchorBottom;
-		localPos.y = parent->drawBox.size.y - drawBox.size.y - anchorBottom;
+		if (anchorLeft)
+			drawBox.size.y = min(drawBox.size.y, parent->drawBox.size.y - (anchorBottom + localPos.y));
+		else
+			localPos.y = parent->drawBox.size.y - drawBox.size.y - anchorBottom;
 	else {
 		switch (vFormat) {
 		case vCentre: {
@@ -300,7 +333,8 @@ void CGUIbase::updateAppearance() {
 		}
 	}
 
-
+	if (oldSize != drawBox.size)
+		resize(drawBox.size.x, drawBox.size.y);
 
 	//2. Recalculate clipping
 	CalculateClipbox();
@@ -312,6 +346,8 @@ void CGUIbase::updateAppearance() {
 	drawBox.pos = parent->drawBox.pos + localPos;
 	//...but screenPos becomes drawBox
 	pDrawFuncs->updateScreenDimensions(*this);
+
+
 
 	//repeat through children
 	for (size_t i = 0; i < Control.size(); i++)
@@ -450,11 +486,21 @@ int CGUIbase::getHeight() {
 void CGUIbase::resize(int w, int h) {
 	width = w; height = h;
 	drawBox.size = glm::i32vec2(w, h);
-	updateAppearance();
+	//updateAppearance();
+	//TO DO: can this be replaced with needsUpdate = true?
+	needsUpdate = true;
+	//looks like it, but keep an eye out!
 }
 
 void CGUIbase::setGUIcallback(Icallback * callbackInstance) {
 	callbackObj = callbackInstance;
+}
+
+/** Default callback for GUI messages. Controls' callbackObj is set to this on initialisation
+	to avoid calling on NULL. */
+void CGUIbase::GUIcallback(CGUIbase * sender, CMessage & msg) {
+	cerr << "\nObject with unique id " << sender->uniqueID << " called message " << msg.Msg
+		<< " value " << msg.value;
 }
 
 /** Add given controls to the named row, creating it if necessary. */
@@ -558,14 +604,15 @@ void CGUIbase::OnLMouseUp(const int mouseX, const int mouseY) {
 	CMessage msg2;
 	msg2.Msg = uiMsgLMouseUp;
 	msg2.x = mouse->screenPos.x; msg2.y = mouse->screenPos.y;
-	pDrawFuncs->handleUImsg(*this,msg2);
+//	pDrawFuncs->handleUImsg(*this,msg2);
+//	callbackObj->GUIcallback(this, msg2);
 } 
 
 void CGUIbase::onRMouseUp(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiMsgRMouseUp;
 	msg.x = mouseX; msg.y = mouseY;
-	pDrawFuncs->handleUImsg(*this,msg);
+//	callbackObj->GUIcallback(this, msg);
 }
 
 /** Returns the position of this control in the child-list of its parent. */

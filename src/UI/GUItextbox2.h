@@ -24,6 +24,8 @@ public:
 	void OnCharEntry(unsigned int Key, long Mod);
 	void message(CGUIbase* sender, CMessage& msg);
 	void renderText();
+	std::string& getText();
+	void updateAppearance();
 
 	CTextBuffer textBuf;
 	glm::vec4 textColour;

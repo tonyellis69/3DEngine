@@ -7,6 +7,7 @@
 #include "..\direction.h"
 
 
+
 class CTerrain2 {
 public:
 	CTerrain2() : playerOffset(0) {};
@@ -20,6 +21,7 @@ public:
 	void findSCintersections();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
+	void setCallbackApp(ITerrainCallback* pApp);
 
 	
 	std::vector<CShell> shells;
@@ -33,4 +35,5 @@ public:
 
 	glm::vec3 sampleSpacePos; //<Position of terrain in sample space.
 	float worldToSampleScale; ///<Number of world units to one sample unit
+	ITerrainCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
 };

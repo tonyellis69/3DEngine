@@ -26,8 +26,8 @@ void CGUIradio::DrawSelf( ) {
 	int w = 0; int reducedWidth = width - iconOffset;
 
 	if (MouseOver == this) {
-		pDrawFuncs->setDrawColours(UIblack, UIblack);
-		pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
+//		pDrawFuncs->setDrawColours(UIblack, UIblack);
+	//	pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
 	}
 
 	if (label->getJustification() == tcentred)
@@ -49,12 +49,12 @@ void CGUIradio::DrawSelf( ) {
 	//Write the text at the given point
 	//pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
 	//draw the icon
-	pDrawFuncs->setIconset(iconset);
-	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
-	if (Set)
-		pDrawFuncs->drawIcon(2, iconPos,screenPos.y + (height >> 1));
-	else
-		pDrawFuncs->drawIcon(0, iconPos,screenPos.y + (height >> 1));
+	//pDrawFuncs->setIconset(iconset);
+//	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
+	//if (Set)
+//		pDrawFuncs->drawIcon(2, iconPos,screenPos.y + (height >> 1));
+	//else
+	//	pDrawFuncs->drawIcon(0, iconPos,screenPos.y + (height >> 1));
 
 
 }

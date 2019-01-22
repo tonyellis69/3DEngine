@@ -167,6 +167,7 @@ public:
 	ColourGradient* getColourGradient() { return &colourGradient; }
 	glm::i32vec4 getSourceColour(int x, int y);
 	void setSelectedShade(int shade);
+	void adjustFalloff(int delta);
 
 	ColourGradient colourGradient;
 	CRenderTexture palette;
@@ -174,6 +175,9 @@ public:
 
 	int selectedShade;
 	unsigned int hSelectedShade;
+
+	float selectionFalloff;
+	unsigned int hSelectionFalloff;
 
 };
 

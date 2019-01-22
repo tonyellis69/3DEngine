@@ -42,7 +42,7 @@ void CGUIgroup::setDrawn(bool drawn) {
 
 
 void CGUIgroup::DrawSelf( ) {
-	if (!isDrawn)
+/*	if (!isDrawn)
 		return;
 
 	//header draws itself, so just draw border.
@@ -51,7 +51,7 @@ void CGUIgroup::DrawSelf( ) {
 	border.x = screenPos.x +1; border.y = screenPos.y + halfHeaderHeight;
 	border.width = screenPos.x + width -1; border.height= screenPos.y + height - 1;
 
-	pDrawFuncs->setDrawColours(UIblack,UIblack);
+//	pDrawFuncs->setDrawColours(UIblack,UIblack);
 
 	pDrawFuncs->drawLine(border.x + defaultHeaderIndent,border.y,border.x,border.y);
 
@@ -59,6 +59,7 @@ void CGUIgroup::DrawSelf( ) {
 	pDrawFuncs->drawLine(border.x,border.height,border.width, border.height);
 	pDrawFuncs->drawLine(border.width,  border.height,border.width,border.y);
 	pDrawFuncs->drawLine(border.width,border.y,border.x +  headerWidth + headerIndent +2  ,border.y);
+	*/
 }
 
 

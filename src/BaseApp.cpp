@@ -166,7 +166,7 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 			auto now = Time;
 			double diff_ms = now - before;
 			before = now;
-			if (diff_ms > 0.01 && diff_ms < 0.5) {
+			if (diff_ms > 0.01 && diff_ms < 0.4) {
 				msg = MY_DOUBLECLICK;
 			}
 
@@ -180,7 +180,7 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 		if (button == GLFW_MOUSE_BUTTON_RIGHT)
 			msg = WM_RBUTTONDOWN;
 	}
-	GUIroot.MouseMsg(msg, mousePos.x, mousePos.y, 0);
+	GUIroot.MouseMsg(msg, mousePos.x, mousePos.y, mods);
 }
 
 /** Event handler for mouse wheel messages. */
@@ -265,21 +265,21 @@ void CBaseApp::RegisterUIfunctors() {
 	drawFuncs->loadShaders();
 
 
-	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
-	drawFuncs->drawIcon.Set(&UIeng, &CGUIengine::drawIcon);
+//	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
+//	drawFuncs->drawIcon.Set(&UIeng, &CGUIengine::drawIcon);
 	drawFuncs->handleUImsg.Set(this, &CBaseApp::HandleUImsg);
 	//drawFuncs->drawRect.Set(&UIeng, &CGUIengine::drawRect);
-	drawFuncs->drawBorder.Set(&UIeng, &CGUIengine::DrawBorder);
+//	drawFuncs->drawBorder.Set(&UIeng, &CGUIengine::DrawBorder);
 	drawFuncs->setClip.Set(&UIeng, &CGUIengine::setClip);
-	drawFuncs->drawLine.Set(&UIeng, &CGUIengine::drawLine);
-	drawFuncs->setIconset.Set(&UIeng, &CGUIengine::setIconset);
-	drawFuncs->drawTile.Set(&UIeng, &CGUIengine::drawTile);
-	drawFuncs->drawImage.Set(&UIeng, &CGUIengine::drawImage);
+//	drawFuncs->drawLine.Set(&UIeng, &CGUIengine::drawLine);
+//	drawFuncs->setIconset.Set(&UIeng, &CGUIengine::setIconset);
+//	drawFuncs->drawTile.Set(&UIeng, &CGUIengine::drawTile);
+//	drawFuncs->drawImage.Set(&UIeng, &CGUIengine::drawImage);
 	drawFuncs->mouseCaptured.Set(this, &CBaseApp::mouseCaptured);
-	drawFuncs->setCursor.Set(&UIeng, &CGUIengine::setCursor);
-	drawFuncs->setDrawColoursConditional.Set(&UIeng, &CGUIengine::setDrawColoursConditional);
-	drawFuncs->drawDottedRect.Set(&UIeng,&CGUIengine::drawDottedRect);
-	drawFuncs->setScale.Set(&UIeng,&CGUIengine::setScale);
+//	drawFuncs->setCursor.Set(&UIeng, &CGUIengine::setCursor);
+//	drawFuncs->setDrawColoursConditional.Set(&UIeng, &CGUIengine::setDrawColoursConditional);
+//	drawFuncs->drawDottedRect.Set(&UIeng,&CGUIengine::drawDottedRect);
+//	drawFuncs->setScale.Set(&UIeng,&CGUIengine::setScale);
 
 	GUIroot.setDrawFuncs(drawFuncs);
 }

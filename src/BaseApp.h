@@ -32,8 +32,7 @@ using namespace std;
 
 
 //class CVMapp;
-class CBaseApp
-{
+class CBaseApp : public Icallback {
 public:
 	CBaseApp(void);
 	~CBaseApp(void);

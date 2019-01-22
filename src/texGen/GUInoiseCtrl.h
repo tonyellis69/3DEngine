@@ -6,6 +6,7 @@
 #include "..\UI\GUIcheckButton.h"
 #include "..\UI\GUIdropdownMenu.h"
 #include "..\UI\GUIpaletteBar.h"
+#include "..\UI\GUIswatchContainer.h"
 
 /** A developer-only class for playing with noise functions, live. */
 class CGUInoiseCtrl : public CGUIpanel {
@@ -47,6 +48,7 @@ public:
 	CGUIbutton2* saveButton;
 
 	CGUIpaletteBar* paletteBar;
+	CGUIswatchContainer* swatchCtrl;
 
 	CGUInumeric2* gausSizeCtrl;
 	CGUInumeric2* gausSigmaCtrl;

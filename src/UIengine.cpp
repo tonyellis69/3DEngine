@@ -74,7 +74,7 @@ void CGUIengine::drawImage(int imageNo, UIrect& tileRect) {
 
 
 void CGUIengine::setCursor(int iCursorPos) {
-	pEngine->tmpCursorPos = iCursorPos;
+//	pEngine->tmpCursorPos = iCursorPos;
 }
 
 /** Set the UI drawing colours when a control may be disabled. */

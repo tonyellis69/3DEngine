@@ -2,7 +2,7 @@
 #include "GUImouse.h"
 
 CGUIroot* CGUIbase::rootUI = NULL;
-
+CDrawFuncs* CGUIdragDrop::pDrawFuncs = NULL;
  
 CGUIroot::CGUIroot() {
 	SetName("Root");
@@ -12,7 +12,6 @@ CGUIroot::CGUIroot() {
 	id = uiRootID;
 	focusControl = NULL;
 	borderWidth = 0;
-
 }
 
 /** Root overloads this method so it can send messages direct to any control that has trapped the
@@ -109,6 +108,7 @@ void CGUIroot::CharEntryMsg(unsigned int Key, long Mod) {
 /** Set the pointer for the GUI drawing functions to the given drawFunc bundle. */
 void CGUIroot::setDrawFuncs(CDrawFuncs* drawFunc) {
 	pDrawFuncs = drawFunc;
+	dragDropObj->pDrawFuncs = drawFunc;
 }
 
 /** Overload function to draw the mouse after drawing everything else, so it's on top. */
@@ -131,7 +131,10 @@ void CGUIroot::Draw() {
 
 	//draw mouse control if any
 	pDrawFuncs->setClip(Clipbox);
-	mouse->DrawSelf();
+	//mouse->DrawSelf();
+	if (dragDropObj) {
+		dragDropObj->drawSelf(mousePos.x, mousePos.y);
+	}
 }
 
 
@@ -139,6 +142,8 @@ void CGUIroot::Draw() {
 void CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
 	mouse->screenPos.x = mouseX; 
 	mouse->screenPos.y = mouseY;
+	mousePos.x = mouseX;
+	mousePos.y = mouseY;
 	CMessage msg;
 	msg.Msg = uiMsgMouseMove;
 	msg.value = key;
@@ -214,6 +219,14 @@ void CGUIroot::setFocus(CGUIbase * control) {
 
 
 CGUIroot::~CGUIroot() {
+
+
+	for (unsigned int i = 0; i < Control.size(); i++)
+		if (Control[i] != NULL)
+			delete Control[i];
+	
+	
+	//TO DO: ancient, get rid of
 	delete mouse;
 
 }

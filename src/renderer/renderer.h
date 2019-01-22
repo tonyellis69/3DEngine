@@ -20,7 +20,7 @@
 
 #include "fontManager.h"
 
-
+#include "model2.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, 
@@ -106,7 +106,7 @@ public:
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();
 	void createStandardPhongShader();
-	static void defaulPhongShaderSettings();
+	static void phongDrawCallout(void* callee, CModel2* model);
 	void createStandardTexShader();
 	void createStandardBillboardShader();
 	void createStandardMultiTexShader();

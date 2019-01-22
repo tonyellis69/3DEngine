@@ -103,8 +103,7 @@ void CGUIpaletteBar::createTab(int tabIndex) {
 	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->localPos.x - (tabSize.x / 2), 
 		paletteImage->localPos.y + barHeight, tabSize.x, tabSize.y);
 	Add(tab);
-	//float unitPos = mouseX / float(paletteImage->drawBox.size.x);
-	//tab->position = unitPos * 255.0f;
+
 	tab->position = tabIndex;
 	
 	glm::vec4 colour = glm::vec4(colourGradient.getColour(tab->position)); 
@@ -335,6 +334,27 @@ void CGUIpaletteBar::DrawSelf() {
 	}
 }
 
+void CGUIpaletteBar::createTabAtIndicator(float falloff) {
+	createTab(indicator);
+	if (falloff > 0.05) {
+		int lowerBound = max(0, indicator - int(255 * falloff));
+		int upperBound = min(255,indicator + int(255 * falloff));
+
+		for (auto ctrl : Control) { //ensure upper/lower tabs don't overlap an existing tab
+			if (ctrl->type == uiPaletteTab) {
+				int ctrlPos = static_cast<CGUIpaletteTab*>(ctrl)->position;
+				if (ctrlPos >= lowerBound && ctrlPos < indicator)
+					lowerBound = -1;
+				if (ctrlPos <= upperBound && ctrlPos > indicator)
+					upperBound = -1;
+			}
+		}
+		if (lowerBound != -1)
+			createTab(lowerBound);
+		if (upperBound != -1)
+			createTab(upperBound);
+	}
+}
 
 
 
@@ -342,7 +362,8 @@ void CGUIpaletteBar::DrawSelf() {
 
 
 
-void CGUIpaletteTab::onDoubleClick(const int mouseX, const int mouseY) {
+
+void CGUIpaletteTab::onDoubleClick(const int mouseX, const int mouseY, int key) {
 	scrollbarHasMouse = NULL;
 	pDrawFuncs->mouseCaptured(false);
 

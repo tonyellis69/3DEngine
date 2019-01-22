@@ -4,6 +4,8 @@
 
 using namespace glm;
 
+
+
 /** Create the central shell, establishing some variables. */
 void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchunks, int _shellSCs)  {
 	LoD1cubeSize = _LoD1cubeSize;
@@ -14,6 +16,7 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 	shells.push_back({1, LoD1chunkSize, SCchunks, _shellSCs });
 	shells.back().pTerrain = this;
 	shells.back().shellNo = 0;
+	shells.back().initSuperChunks();
 }
 
 /** Add an outer shell to the existing shells, its size adjusted by extent. */
@@ -24,6 +27,7 @@ void CTerrain2::addShell(int extent) {
 	shells.push_back({ newShellLoD, newShellChunkSize, SCchunks, newShellSCs });
 	shells.back().shellNo = shells.size() -1;
 	shells.back().pTerrain = this;
+	shells.back().initSuperChunks();
 }
 
 /** Get the worldspace size of the given shell. */
@@ -114,6 +118,10 @@ void CTerrain2::setSampleSpacePosition(glm::vec3 & pos) {
 /** Set the number of world units per sample unit. */
 void CTerrain2::setWorldScale(float scale) {
 	worldToSampleScale = scale;
+}
+
+void CTerrain2::setCallbackApp(ITerrainCallback * pApp) {
+	pCallbackApp = pApp;
 }
 
 

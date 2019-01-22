@@ -6,6 +6,7 @@
 #include "font.h"
 #include "..\renderer\buf.h"
 #include "rowObject.h"
+#include "GUIdragDrop.h"
 
 //#include "GUIbetterBase.h"
 
@@ -18,6 +19,8 @@ using namespace std;
 
 class guiRect {
 public:
+	guiRect() {};
+	guiRect(int x, int y, int w, int h) :pos(x, y), size(w, h) {};
 	void setSize(int w, int h) {
 		if (w < 8) w = 8;
 		if (h < 8) h = 8;
@@ -107,21 +110,21 @@ extern DelegateP<void,int> setFont;
 class CDrawFuncs {
 public:
 
-	DelegatePP<void,const UIcolour&,const UIcolour&> setDrawColours;
-	DelegatePPP<void,int,int,int> drawIcon;
+	//DelegatePP<void,const UIcolour&,const UIcolour&> setDrawColours;
+	//DelegatePPP<void,int,int,int> drawIcon;
 	DelegatePP<void,CGUIbase&, CMessage&> handleUImsg;
 	//DelegatePPP<void,UIcoord&,int,int> drawRect;
-	DelegatePPPP<void,int,int,int,int> drawBorder;
+	//DelegatePPPP<void,int,int,int,int> drawBorder;
 	DelegateP<void,UIrect&> setClip;
-	DelegatePPPP<void,int,int,int,int> drawLine;
-	DelegateP<void,int> setIconset;
-	DelegatePP<void,int,UIrect&> drawTile;
-	DelegatePP<void,int,UIrect&> drawImage;
+//	DelegatePPPP<void,int,int,int,int> drawLine;
+//	DelegateP<void,int> setIconset;
+//	DelegatePP<void,int,UIrect&> drawTile;
+//	DelegatePP<void,int,UIrect&> drawImage;
 	DelegateP<void,bool> mouseCaptured;
-	DelegateP<void,int> setCursor;
-	DelegatePPP<void, UIcolour, UIcolour, bool> setDrawColoursConditional;
-	DelegatePPPP<void,int,int,int,int> drawDottedRect;
-	DelegatePP<void,float,float> setScale;
+//	DelegateP<void,int> setCursor;
+//	DelegatePPP<void, UIcolour, UIcolour, bool> setDrawColoursConditional;
+//	DelegatePPPP<void,int,int,int,int> drawDottedRect;
+//	DelegatePP<void,float,float> setScale;
 
 	virtual void registerControl(CGUIbase& control) {};
 	virtual void deregisterControl(CGUIbase & control) {};
@@ -144,7 +147,7 @@ enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
 			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel,
-			uiRichTextPanel, uiPaletteTab, uiDropdownMenu};
+			uiRichTextPanel, uiPaletteTab, uiDropdownMenu, uiSwatchGroup};
 
 
 class Icallback {
@@ -167,15 +170,17 @@ public:
 	virtual void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	virtual void OnMouseMove(const  int mouseX, const  int mouseY, int key) {};
 	virtual void OnLMouseDown(const  int mouseX, const  int mouseY, int key) {};
-	virtual void OnRMouseDown(const  int mouseX, const  int mouseY) {};
+	virtual void OnRMouseDown(const  int mouseX, const  int mouseY, int key) {};
 	virtual void OnLMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void onRMouseUp(const  int mouseX, const  int mouseY) ;
 	virtual void OnClick(const  int mouseX, const  int mouseY) {};
-	virtual void onDoubleClick(const int mouseX, const int mouseY) {};
+	virtual void onDoubleClick(const int mouseX, const int mouseY, int key) {};
 	virtual void onKeyPress(unsigned int Key, long Mod) {};
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	virtual void onMouseOff(const  int mouseX, const  int mouseY, int key) {};
+	virtual void onDrag(const  int mouseX, const  int mouseY) {};
+	virtual void onDrop(const  int mouseX, const  int mouseY);
 	void SetPos(int x, int y, int w, int h);
 	virtual void setPos(int x, int y);
 	virtual void Add(CGUIbase* child);
@@ -220,13 +225,13 @@ public:
 	int getHeight();
 	virtual void resize(int w, int h);
 	void setGUIcallback(Icallback* callbackInstance);
-	virtual void GUIcallback(CGUIbase* sender, CMessage& msg) {};
+	virtual void GUIcallback(CGUIbase* sender, CMessage& msg);
 	
 	void addToRow(const std::string& name, std::initializer_list<CGUIbase*> childControls);
 	void autoArrangeRows(int offsetX, int offsetY);
 	void hideAllRows();
 	void activateRows(  std::initializer_list< std::string> rows);
-
+	virtual void dropMethod() {};
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -276,7 +281,10 @@ public:
 
 	int anchorBottom; ///<Distance achored from bottom of parent control, if at all.
 	int anchorRight; ///<Distance anchored from left of parent control, if any.
-	
+	bool anchorLeft; ///<If true, anchorRight resizes the control rather than move it.
+	bool anchorTop; ///<If true, anchorBottom resizes the control rather than move it.
+
+
 	bool needsUpdate; ///<If true, control will have updateAppearance run next opportunity.
 
 	static CGUIroot* rootUI; ///<Points to root UI control.
@@ -301,6 +309,9 @@ public:
 	static std::vector<CGUIbase*> modalControls; ///<List of modal controls, if any.
 
 	std::vector<CRowObject> rowObjects;
+
+	static CGUIdragDrop* dragDropObj;
+
 };
 
 
@@ -329,7 +340,7 @@ enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiClickOutside, uiDataEntered, uiSpin, uiLostKeyboard,
 	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore,
-	uiMsgMouseOff
+	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete
 };
 
 #define NONE -1
@@ -375,6 +386,7 @@ enum Messagetypes {
 #define GLFW_KEY_LEFT               263
 #define GLFW_KEY_DOWN               264
 #define GLFW_KEY_UP                 265
+#define GLFW_MOD_CONTROL			0x0002
 
 //because GLFW doesn't have this
 #define MY_DOUBLECLICK 0x00060006

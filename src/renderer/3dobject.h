@@ -13,11 +13,10 @@ public:
 	void translate(glm::vec3& dir);
 	glm::vec3 getPos();
 	void rotate(float angle,glm::vec3 axis);
-	void orientateWorldMatrix();
+	virtual void orientateWorldMatrix();
 
 	glm::mat4 worldMatrix; ///<Transforms this object to a place and orientation in world space.
 
 	glm::fquat orientation;
-
 
 };

@@ -86,7 +86,7 @@ void  CGUInumeric2::message(CGUIbase* sender, CMessage& msg) {
 
 	//CMessage userMsg;
 	msg.fValue = value;
-	pDrawFuncs->handleUImsg(*this, msg);
+//	pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
 }
 

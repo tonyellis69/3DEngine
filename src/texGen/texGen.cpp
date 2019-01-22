@@ -2,6 +2,7 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
+
 using namespace glm;
 
 CTexGen::CTexGen(TexGenType derivedType) :
@@ -148,6 +149,7 @@ CColourTex::CColourTex() : CTexGen(texColour) {
 	palette.resize(256, 0);
 	name = "Colourise";
 	selectedShade = -1;
+	selectionFalloff = 0.05f;
 }
 
 /** Set the 1D texture to use as a colour map. */
@@ -161,6 +163,7 @@ void CColourTex::loadShader() {
 	shader = pRenderer->createShader("colourTex");
 	hSource = shader->getUniformHandle("source");
 	hPalette = shader->getUniformHandle("palette");
+	hSelectionFalloff = shader->getUniformHandle("selectionFalloff");
 	hSelectedShade = shader->getUniformHandle("selectedShade");
 }
 
@@ -173,6 +176,7 @@ void CColourTex::render() {
 	shader->setShaderValue(hSource, 0);
     shader->setShaderValue(hPalette, 1);
 	shader->setShaderValue(hSelectedShade, selectedShade);
+	shader->setShaderValue(hSelectionFalloff, selectionFalloff);
 	pRenderer->renderToTextureQuad(mTarget);
 }
 
@@ -197,6 +201,12 @@ glm::i32vec4 CColourTex::getSourceColour(int x, int y) {
 
 void CColourTex::setSelectedShade(int shade) {
 	selectedShade = shade;
+}
+
+void CColourTex::adjustFalloff(int delta) {
+	selectionFalloff += float(delta) * 0.01f;
+	selectionFalloff = clamp(selectionFalloff,0.001f, 0.1f);
+	render();
 }
 
 

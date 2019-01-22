@@ -40,7 +40,7 @@ public:
 	void save();
 	void setIndicatorPosition(int indexPos);
 	void DrawSelf();
-
+	void createTabAtIndicator(float falloff);
 
 	int paletteImageStartX;
 	int paletteImageEndX;
@@ -66,7 +66,7 @@ public:
 	CGUIbutton2* saveButton;
 	CGUItextbox2* fileNameBox;
 
-	CGUIlabel2* tabPos;
+	CGUIlabel2* tabPos; //<Label showing index position of a dragged tab
 	int indicator;
 };
 
@@ -76,7 +76,7 @@ public:
 		borderOn(false); 
 		type = uiPaletteTab;
 	};
-	void onDoubleClick(const int mouseX, const int mouseY);
+	void onDoubleClick(const int mouseX, const int mouseY, int key);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onRMouseUp(const int mouseX, const int mouseY);
 	void OnMouseMove(int mouseX, int mouseY, int key);

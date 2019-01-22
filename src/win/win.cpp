@@ -152,9 +152,6 @@ void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
 }
 
 void CWin::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-
-
-
 	pApp->onMouseButton(button, action, mods);
 }
 

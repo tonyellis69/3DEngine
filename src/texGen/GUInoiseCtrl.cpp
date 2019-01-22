@@ -172,10 +172,15 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	src3Ctrl->setGUIcallback(this);
 	addToRow("source3", { lbl, src3Ctrl });
 
-	paletteBar = new CGUIpaletteBar(20, 10, 300, 180);
+	paletteBar = new CGUIpaletteBar(20, 10, 300, 150);
 	paletteBar->loadPalette();
 	paletteBar->setGUIcallback(this);
 	addToRow("paletteBar", { paletteBar });
+
+	swatchCtrl = new CGUIswatchContainer(20, 10, 300, 130);
+	//swatchCtrl->assignDataFile(pApp->dataPath + "swatchGroups.txt");
+	addToRow("swatches", { swatchCtrl });
+
 
 	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
 	lbl->setText("Size");

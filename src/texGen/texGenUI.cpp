@@ -12,7 +12,7 @@ void CTexGenUI::init(CBaseApp * app) {
 	initGUI();
 	fillRestoreMenu();
 	fillPaletteRestoreMenu();
-
+	shadeSelectionMode = false;
 }
 
 /** Create the interface for viewing textures. */
@@ -72,6 +72,9 @@ void CTexGenUI::initGUI() {
 	addTexGenMenu->addItem({ "Noise","Colourise","RidgedMF","Cylinder","Turbulence","ScaleBias",
 		"Add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer","Gaus" });
 	pApp->GUIroot.Add(addTexGenMenu);
+
+
+
 
 
 }
@@ -234,15 +237,42 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 
 	if (sender == image && msg.Msg == uiMsgMouseMove) {
 		//if current texgen is a colouriser... go to the colour-tracking routine!
-		if (texCompositor.currentTexGen && texCompositor.currentTexGen->texGenType == texColour)
+		if (shadeSelectionMode && texCompositor.currentTexGen->texGenType == texColour)
 			highlightMouseColour(msg.x, msg.y);
 	}
 
 	if (sender == image && msg.Msg == uiMsgMouseOff) {
-		if (texCompositor.currentTexGen && texCompositor.currentTexGen->texGenType == texColour)
+		if (/*texCompositor.currentTexGen &&*/ texCompositor.currentTexGen->texGenType == texColour)
 			unhighlightMouseColour();
 	}
 
+	if (sender == image && msg.Msg == uiMsgRMdown) {
+		if (texCompositor.currentTexGen->texGenType == texColour) {
+			shadeSelectionMode = !shadeSelectionMode;
+			if (!shadeSelectionMode)
+				unhighlightMouseColour();
+			else
+				highlightMouseColour(msg.x, msg.y);
+		}
+	}
+
+	if (sender == image && msg.Msg == uiMouseWheel) {
+		if (shadeSelectionMode && texCompositor.currentTexGen->texGenType == texColour) {
+			static_cast<CColourTex*>(texCompositor.currentTexGen)->adjustFalloff(msg.value);
+		}
+	}
+
+	if (sender == image && msg.Msg == uiMsgDoubleClick) {
+		if (shadeSelectionMode && texCompositor.currentTexGen->texGenType == texColour) {
+			if (msg.value == GLFW_MOD_CONTROL) {
+				float falloff = static_cast<CColourTex*>(texCompositor.currentTexGen)->selectionFalloff;
+				GUInoiseCtrl->paletteBar->createTabAtIndicator(falloff);
+			}
+			else
+				GUInoiseCtrl->paletteBar->createTabAtIndicator(0.0f);
+		}
+	}
+	
 		 
 	display();
 
@@ -252,6 +282,7 @@ void CTexGenUI::hide(bool onOff) {
 	image->setVisible(!onOff);
 	texGenListPanel->setVisible(!onOff);
 	GUInoiseCtrl->setVisible(!onOff);
+	tmpSwatch->setVisible(!onOff);
 }
 
 void CTexGenUI::compose() {
@@ -483,7 +514,7 @@ void CTexGenUI::configureGUI(TexGenType texType) {
 	GUInoiseCtrl->hideAllRows();
 	switch (texType) {
 	case texNoise: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
-	case texColour:  GUInoiseCtrl->activateRows({ "source1", "paletteBar" }); break;
+	case texColour:  GUInoiseCtrl->activateRows({ "source1", "paletteBar", "swatches" }); break;
 	case texRidged: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;
 	case texCylinder: GUInoiseCtrl->activateRows({ "freq","rotation","translation" }); break;
 	case texTurbulence: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight",

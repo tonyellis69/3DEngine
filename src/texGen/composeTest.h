@@ -4,7 +4,7 @@
 
 class ComposeTest : public Compositor {
 public:
-	ComposeTest() : currentTexGen(NULL) {};
+	ComposeTest() : currentTexGen(&nullTexGen) {};
 	~ComposeTest();
 	void initTex();
 	void compose();

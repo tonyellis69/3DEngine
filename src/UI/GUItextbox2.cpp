@@ -16,7 +16,8 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	type = uiTextbox;
 	setTextColour(0, 0, 0, 1);
 	setText("textbox");
-
+	setBackColour1(uiWhite);
+	setBackColour2(uiWhite);
 	//drawBorder = false;
 
 //	pDrawFuncs->registerControl(*this);
@@ -54,7 +55,7 @@ void CGUItextbox2::DrawSelf() {
 	//setBackColour1(UIwhite);
 //	setBackColour2(UIwhite);
 //	pDrawFuncs->drawCtrlRect(*this);
-	pDrawFuncs->drawRect2(drawBox, uiWhite, uiWhite);
+	pDrawFuncs->drawRect2(drawBox, (vec4&)backColour1, (vec4&)backColour2);
 
 	if (KeyCapture == this) {
 		//draw cursor
@@ -65,15 +66,17 @@ void CGUItextbox2::DrawSelf() {
 	pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
 
 	//draw border
-	if (MouseOver == this || KeyCapture == this) {
-		//setBorderColour(UIdarkGrey);
-		pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
+	if (drawBorder) {
+		if (MouseOver == this || KeyCapture == this) {
+			//setBorderColour(UIdarkGrey);
+			pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
+		}
+		else {
+			//setBorderColour(UIlightGrey);
+			pDrawFuncs->drawBorder2(drawBox, uiLightGrey);
+		}
+		//pDrawFuncs->drawCtrlBorder(*this);
 	}
-	else {
-		//setBorderColour(UIlightGrey);
-		pDrawFuncs->drawBorder2(drawBox, uiLightGrey);
-	}
-	//pDrawFuncs->drawCtrlBorder(*this);
 }
 
 guiRect& CGUItextbox2::getCursorPos() {
@@ -151,7 +154,7 @@ void CGUItextbox2::insert(std::string inText) {
 void CGUItextbox2::dataEnteredAlert() {
 	CMessage msg;
 	msg.Msg = uiDataEntered;
-	pDrawFuncs->handleUImsg(*this, msg);
+	//pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
 }
 
@@ -177,4 +180,14 @@ void CGUItextbox2::renderText() {
 	calcLineOffset();
 	textBuf.renderTextAt(renderOffset.x, renderOffset.y, text);
 	calcCursorPosition();
+}
+
+std::string & CGUItextbox2::getText() {
+	return text;
+}
+
+void CGUItextbox2::updateAppearance() {
+	CGUIbase::updateAppearance();
+	textBuf.setSize(drawBox.size.x, drawBox.size.y);
+	renderText();
 }

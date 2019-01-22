@@ -5,6 +5,7 @@
 #include "..\UI\GUIpaletteBar.h"
 #include "..\UI\GUImenu.h"
 #include "..\UI\GUIcontainer.h"
+#include "..\UI\GUIswatchContainer.h"
 
 #include "texGen.h"
 #include "GUInoiseCtrl.h"
@@ -53,6 +54,9 @@ public:
 	CGUImenu* addTexGenMenu;
 
 	CNullTex nullTexGen;
+	bool shadeSelectionMode;
+
+	CGUIswatchContainer* tmpSwatch;
 };
 
 
