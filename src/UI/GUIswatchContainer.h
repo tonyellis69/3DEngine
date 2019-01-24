@@ -77,7 +77,8 @@ public:
 class CGUIdragDropSwatch : public CGUIdragDrop {
 public:
 	virtual bool isDropType(CGUIbase* droppee) {
-		if (droppee->type == uiSwatchGroup)
+		if (droppee->type == uiSwatchGroup || droppee->type == uiPaletteTab ||
+			droppee->type == uiPaletteBar)
 			return true;
 		return false;
 	};

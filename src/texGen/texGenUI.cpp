@@ -9,10 +9,13 @@ namespace fs = std::experimental::filesystem;
 
 void CTexGenUI::init(CBaseApp * app) {
 	pApp = app;
+	trackImage = NULL;
 	initGUI();
 	fillRestoreMenu();
 	fillPaletteRestoreMenu();
 	shadeSelectionMode = false;
+
+	GUInoiseCtrl->swatchCtrl->assignDataFile(pApp->dataPath + "swatchGroups.txt");
 }
 
 /** Create the interface for viewing textures. */
@@ -29,7 +32,7 @@ void CTexGenUI::initGUI() {
 	pApp->GUIroot.Add(GUInoiseCtrl);
 	//pApp->GUIroot.focusControl = GUInoiseCtrl;
 
-	texGenListPanel = new CGUIpanel(700, 210, 330, 210);
+	texGenListPanel = new CGUIpanel(700, 80, 380, 290);
 	pApp->GUIroot.Add(texGenListPanel);
 
 	CGUIlabel2* listTitle = new CGUIlabel2(10, 10, 100, 20);
@@ -39,20 +42,20 @@ void CTexGenUI::initGUI() {
 	container = new CGUIcontainer(10, 30, 130, 175);
 	texGenListPanel->Add(container);
 
-	CGUIlabel2* lbl = new CGUIlabel2(150, 50, 70, 20);
+	CGUIlabel2* lbl = new CGUIlabel2(150, 30, 70, 20);
 	lbl->setText("Load file");
 	lbl->setHorizontalAlignment(tright);
 	texGenListPanel->Add(lbl);
-	restoreMenu = new CGUIdropdownMenu(230, 50, 80, 20);
+	restoreMenu = new CGUIdropdownMenu(230, 30, 80, 20);
 	restoreMenu->setText("[select]");
 	restoreMenu->setGUIcallback(this);
 	texGenListPanel->Add(restoreMenu);
 
-	saveButton = new CGUIbutton2(150, 80, 70, 20);
+	saveButton = new CGUIbutton2(150, 55, 70, 20);
 	saveButton->setText("Save as");
 	saveButton->setGUIcallback(this);
 	texGenListPanel->Add(saveButton);
-	fileName = new CGUItextbox2(230, 80, 80, 20);
+	fileName = new CGUItextbox2(230, 55, 80, 20);
 	fileName->setText("TexGen1");
 	texGenListPanel->Add(fileName);
 
@@ -61,7 +64,8 @@ void CTexGenUI::initGUI() {
 	texGenList->setGUIcallback(this);
 	container->Add(texGenList);
 
-
+	thumbnailImage = new CGUIimage(150, 80, 200, 200);
+	texGenListPanel->Add(thumbnailImage);
 
 
 	addTexGenMenu = new CGUImenu(700, 210, 200, 300);
@@ -158,7 +162,8 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 	}
 
 	if (sender == texGenList && msg.Msg == uiMsgRMdown) {
-		deleteTexGen(msg.value);
+		pApp->GUIroot.popupMenu({ "Delete", "Track/untrack image" },this);
+		/////////deleteTexGen(msg.value);
 		return;
 	}
 
@@ -274,7 +279,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 	}
 	
 		 
-	display();
+	updateDisplayImage();
 
 }
 
@@ -294,13 +299,18 @@ void CTexGenUI::compose() {
 	texCompositor.compose();
 	updateGUI();
 	fillStackMenu();
-	display();
+	updateDisplayImage();
 }
 
 
-void CTexGenUI::display() {
-	if (texCompositor.texGens.size() > 0)
+void CTexGenUI::updateDisplayImage() {
+	if (texCompositor.texGens.size() == 0)
+		return;
+	if (trackImage)
+		image->setTexture(*trackImage->getTarget());
+	else
 		image->setTexture(*texCompositor.currentTarget);
+	thumbnailImage->setTexture(*texCompositor.currentTarget);
 }
 
 /** Update the GUI with the control settings for the current tex gen layer. */
@@ -383,6 +393,7 @@ void CTexGenUI::save() {
 void CTexGenUI::restore(std::string& filename) {
 	clear();
 	int finalColourise = 0;
+	trackImage = NULL;
 
 	std::ifstream in(pApp->dataPath + filename + ".gen", std::ios::binary);
 	TexGenType texGenType;
@@ -446,7 +457,7 @@ void CTexGenUI::restore(std::string& filename) {
 	}
 
 	texCompositor.setCurrentLayer(finalColourise);
-	display();
+	updateDisplayImage();
 
 	fillStackMenu();
 }
@@ -494,7 +505,7 @@ void CTexGenUI::addTexGen(int itemNo) {
 	updateGUI();
 	fillStackMenu();
 	texCompositor.compose();
-	display();
+	updateDisplayImage();
 }
 
 /** Remove the indicated tex gen from the stack. */
@@ -505,7 +516,7 @@ void CTexGenUI::deleteTexGen(int itemNo) {
 	fillStackMenu();
 	texCompositor.compose();
 	updateGUI();
-	display();
+	updateDisplayImage();
 }
 
 /** Configure the GUI to show only the controls for the given layer. */
@@ -599,13 +610,33 @@ void CTexGenUI::highlightMouseColour(int x, int y) {
 	//tell colouriser to display a faded-out version of the texture
 	static_cast<CColourTex*>(texCompositor.currentTexGen)->setSelectedShade(colour.r);
 	texCompositor.currentTexGen->render();
-	cerr << "\n" << colour.r;
 }
 
 void CTexGenUI::unhighlightMouseColour() {
 	GUInoiseCtrl->setIndicatorPosition(-1);
 	static_cast<CColourTex*>(texCompositor.currentTexGen)->setSelectedShade(-1);
 	texCompositor.currentTexGen->render();
-	cerr << "\n" << -1;
+}
+
+void CTexGenUI::popupMenuCallback(int choice) {
+	int layer = texGenList->focusItem;
+	if (layer == -1)
+		return;
+	if (choice == 0) { //delete
+		if (trackImage == texCompositor.texGens[layer])
+			trackImage = NULL;
+		deleteTexGen(layer);
+	}
+	if (choice == 1) {  //track/untrack
+		if (trackImage == texCompositor.texGens[layer]) {
+			trackImage = NULL;
+			texGenList->setHighlight(layer, false);
+		}
+		else {
+			trackImage = texCompositor.texGens[layer];
+			texGenList->setHighlight(layer, true);
+		}
+	}
+		
 }
 

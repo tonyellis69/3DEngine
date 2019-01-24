@@ -6,6 +6,8 @@
 #include "GUIscrollbar.h"
 #include "GUIgroup.h"
 #include "GUImouse.h"
+#include "GUIpopMenu.h"
+#include "GUIroot.h"
 
 // TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
 
@@ -134,7 +136,7 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		MouseOver = this;
 		if (MouseDown == this) { //looks like we're dragging
 			onDrag(mouseX, mouseY);
-			return;
+			//return;
 		}
 		OnMouseMove(mouseX, mouseY, key); 
 		return; }
@@ -199,8 +201,7 @@ bool CGUIbase::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 
 void CGUIbase::onDrop(const int mouseX, const int mouseY) {
 	if (dragDropObj) {
-		delete dragDropObj;
-		dragDropObj = NULL;
+		deleteDragDropObj();
 	}
 }
 
@@ -558,6 +559,24 @@ void CGUIbase::activateRows( std::initializer_list< std::string> rowNames) {
 		auto row = std::find_if(rowObjects.begin(), rowObjects.end(), [&](CRowObject& obj) { return obj.name == rowName; });
 		row->isActive = true;
 	}
+}
+
+void CGUIbase::deleteDragDropObj() {
+	delete dragDropObj;
+	dragDropObj = NULL;
+}
+
+/** Launch a handy popup menu. */
+void CGUIbase::popupMenu(std::initializer_list<std::string> options,  IPopupMenu* callback) {
+	CGUIpopMenu* popupMenu = new CGUIpopMenu(rootUI->mousePos.x, rootUI->mousePos.y, 200, 50);
+	popupMenu->setMenuCallback(callback);
+	popupMenu->resizeHorizontal = true;
+	popupMenu->maxItemsShown = options.size();
+
+	popupMenu->addItem(options);
+	Add(popupMenu);
+	popupMenu->makeModal();
+
 }
 
 

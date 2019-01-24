@@ -10,6 +10,8 @@
 
 //#include "GUIbetterBase.h"
 
+
+
 #include <iostream> //for cerr
 
 #include "glm\glm.hpp"
@@ -95,6 +97,7 @@ const glm::vec4 uialmostBlack = { 0.1,0.1,0.1,1 };
 //const glm::vec4 uiDarkGrey = { 0.25,0.25,0.25,1 };
 const glm::vec4 uiDarkGrey = { 0.49f,0.49f,0.49f,1 };
 const glm::vec4 uiLightGrey = { 0.75f,0.75f,0.75f,1 };
+const glm::vec4 uiVeryLightGrey = { 0.88f,0.88f,0.88f,1 };
 
 const glm::vec4 uiOldbackColour1 = { 0.99f,0.99f, 0.99f,1.0f };
 const glm::vec4 uiOldbackColour2 = { 0.75f, 0.75f, 0.75f,1.0f };
@@ -147,7 +150,7 @@ enum UItype {base,root,panel,label,button,radioButton,textbox,scrollbar,
 		group,container,panelContainer,surface,imageGrid,iconButton,checkButton,
 		dlgCtrl,
 			uiImage,uiLabel,uiButton,uiTextbox, uiNumeric, uiMenu, uiPanel,
-			uiRichTextPanel, uiPaletteTab, uiDropdownMenu, uiSwatchGroup};
+			uiRichTextPanel, uiPaletteBar, uiPaletteTab, uiDropdownMenu, uiSwatchGroup};
 
 
 class Icallback {
@@ -161,6 +164,7 @@ class CGUImouse;
 class CGUIroot;
 class CGUIbaseEngine;
 class CRowObject;
+class IPopupMenu;
 class CGUIbase : public Icallback {
 public:
 	CGUIbase() ;
@@ -232,6 +236,9 @@ public:
 	void hideAllRows();
 	void activateRows(  std::initializer_list< std::string> rows);
 	virtual void dropMethod() {};
+	void deleteDragDropObj();
+	void popupMenu(std::initializer_list<std::string> options, IPopupMenu* callback);
+	
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 

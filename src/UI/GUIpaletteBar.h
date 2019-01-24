@@ -25,6 +25,7 @@ public:
 	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 
 	void createTab(int mouseX);
+	CGUIpaletteTab * addTab(int tabIndex);
 	void message(CGUIbase* sender, CMessage& msg);
 	void deleteTab(CGUIpaletteTab * tab);
 	void moveTab(CGUIpaletteTab * tab, int newPos);
@@ -41,6 +42,8 @@ public:
 	void setIndicatorPosition(int indexPos);
 	void DrawSelf();
 	void createTabAtIndicator(float falloff);
+	void onDrop(const  int mouseX, const  int mouseY);
+
 
 	int paletteImageStartX;
 	int paletteImageEndX;
@@ -66,7 +69,7 @@ public:
 	CGUIbutton2* saveButton;
 	CGUItextbox2* fileNameBox;
 
-	CGUIlabel2* tabPos; //<Label showing index position of a dragged tab
+	CGUIlabel2* tabPosLbl; //<Label showing index position of a dragged tab
 	int indicator;
 };
 
@@ -80,7 +83,8 @@ public:
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onRMouseUp(const int mouseX, const int mouseY);
 	void OnMouseMove(int mouseX, int mouseY, int key);
-	bool IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY);
+	void onDrop(const  int mouseX, const  int mouseY);
+
 
 	int position;
 	glm::vec4 colour;

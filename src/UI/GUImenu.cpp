@@ -7,7 +7,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 	itemFont = defaultFont;
 	textColour = UIblack;
-	selectedColour = uiLightGrey;
+	focusColour = uiLightGrey;
 	type = uiMenu;
 	vItemPad =  4;
 	hItemPad = 1;
@@ -20,7 +20,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	itemTextAlignment = tleft;
 	leftAlignIndent = 10;
 	hItemInteriorPadding = 4;
-	highlightStyle = menuHighlightBar;
+	focusStyle = menuHighlightBar;
 
 	setBackColour1(uiWhite);
 	setBackColour2(uiWhite);
@@ -41,8 +41,8 @@ void CGUImenu::setTextColour(UIcolour  colour) {
 	textColour = colour;
 }
 
-void CGUImenu::setSelectedColour(glm::vec4 colour) {
-	selectedColour = colour;
+void CGUImenu::setFocusColour(glm::vec4 colour) {
+	focusColour = colour;
 }
 
 
@@ -51,20 +51,21 @@ void CGUImenu::DrawSelf() {
 	//	pDrawFuncs->drawCtrlBorder(*this);
 	//}
 	CGUIpanel::DrawSelf();
-	if (selected >= 0 && highlightStyle == menuHighlightBar) {
-		pDrawFuncs->drawRect2(items[selected]->drawBox, selectedColour, selectedColour);
+	//if (selected >= 0 && highlightStyle == menuHighlightBar) {
+	//pDrawFuncs->drawRect2(items[selected]->drawBox, selectedColour, selectedColour);
 
-	}
+	//}
 }
 
 void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 	for (auto itemText : itemTexts) {
-		CGUIlabel2* item = new CGUIlabel2(hItemPad, nextItemPos, itemWidth, itemHeight);
+		CGUImenuItem* item = new CGUImenuItem(hItemPad, nextItemPos, itemWidth, itemHeight);
 		item->setMultiLine(false);
 		item->setFont(itemFont);
 		item->borderOn(false);
 		item->textAlign = itemTextAlignment;
 		item->setLeftAlignIndent(leftAlignIndent);
+		item->focusColour = focusColour;
 
 		item->setTextColour(textColour);
 		item->setText(itemText);
@@ -106,24 +107,28 @@ void CGUImenu::resizeToFit() {
 
 
 void CGUImenu::onMouseOff(const  int mouseX, const  int mouseY, int key) {
-		selected = -1;
+	setFocusItem(-1);
 };
 
 
 /** User rolling the mouse wheel, so scroll the selection. */
 bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key) {
-	items[selected]->setTextColour(textColour);
+	/*items[focusItem]->setTextColour(textColour);
+	int slot = focusItem;
 	if (wheelDelta > 0)
-		selected--;
+		slot--;
 	if (wheelDelta < 0)
-		selected++;
-	if (selected >= nItems)
-		selected = 0;
-	if (selected < 0)
-		selected = nItems - 1;
-	if (highlightStyle == menuHighlightText)
-		items[selected]->setTextColour(selectedColour);
-	return true;
+		slot++;
+	if (slot >= nItems)
+		slot = 0;
+	if (slot < 0)
+		slot = nItems - 1;
+	setFocusItem(slot);
+	if (focusStyle == menuHighlightText)
+		items[focusItem]->setTextColour(focusColour);
+	return true;*/
+	OnMouseMove(mouseX, mouseY, key); //cheap way to update focus if we scroll
+	return false;// true;
 }
 
 /** If the mouse moves over a menu item, select it. */
@@ -131,18 +136,20 @@ void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	if (items.size() == 0)
 		return;
 	i32vec2 mouse = getLocalPos(mouseX, mouseY);
-	if (selected >=0 && highlightStyle == menuHighlightText)
-		items[selected]->setTextColour(textColour);
-	selected = -1;
+	if (focusItem >=0 && focusStyle == menuHighlightText)
+		items[focusItem]->setTextColour(textColour);
+	setFocusItem(-1);
 	if (mouse.x > 0 && mouse.x < drawBox.size.x && mouse.y > 0 && mouse.y < drawBox.size.y) {
-		selected = mouse.y / (itemHeight + vItemPad);
-		if (selected > nItems - 1)
-			selected = nItems - 1;
-		if (selected >= 0 && highlightStyle == menuHighlightText)
-			items[selected]->setTextColour(selectedColour);
+		int slot = mouse.y / (itemHeight + vItemPad);
+		if (slot > nItems - 1)
+			setFocusItem(nItems - 1);
+		else
+			setFocusItem(slot);
+		if (focusItem >= 0 && focusStyle == menuHighlightText)
+			items[focusItem]->setTextColour(focusColour);
 		if (callbackObj) {
 			CMessage msg;
-			msg.value = selected;
+			msg.value = focusItem;
 			msg.Msg = uiMsgMouseMove;
 			callbackObj->GUIcallback(this, msg);
 		}
@@ -154,14 +161,14 @@ void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 void CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgLMdown;
-	msg.value = selected;
+	msg.value = focusItem;
 	pDrawFuncs->handleUImsg(*this, msg);
 }
 
-void CGUImenu::OnRMouseDown(const int mouseX, const int mouseY) {
+void CGUImenu::OnRMouseDown(const int mouseX, const int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgRMdown;
-	msg.value = selected;
+	msg.value = focusItem;
 	if (callbackObj) {
 		callbackObj->GUIcallback(this, msg);
 	}
@@ -174,7 +181,7 @@ void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 		msg.Msg = uiClick;
 	else
 		msg.Msg = uiClickOutside;
-	msg.value = selected;
+	msg.value = focusItem;
 	//parent->message(this, msg);
 	pDrawFuncs->handleUImsg(*this, msg);
 	if (callbackObj) {
@@ -186,7 +193,7 @@ void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 void CGUImenu::clear() {
 	nItems = 0;
 	nextItemPos = vItemPad;
-	selected = -1;
+	setFocusItem(-1);
 	items.clear();
 	for (size_t i = 0; i < Control.size(); i++)
 		delete Control[i];
@@ -199,4 +206,41 @@ std::string & CGUImenu::getItemName(int itemNo) {
 	return string("");
 }
 
+void CGUImenu::setHighlight(unsigned int itemNo, bool onOff) {
+	if (itemNo > (nItems - 1))
+		return;
+	items[itemNo]->hasHighlight = onOff;
+}
 
+
+
+void CGUImenu::setFocusItem(int itemNo) {
+	if (focusItem > -1)
+		items[focusItem]->hasFocus = false;
+	focusItem = itemNo;
+	if (focusItem > -1)
+		items[focusItem]->hasFocus = true;
+}
+
+
+
+
+
+CGUImenuItem::CGUImenuItem(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
+	hasFocus = false;
+	hasHighlight = false;
+	highlightStyle = menuHighlightBar;
+	focusStyle = menuHighlightBar;
+	highlightColour = uiVeryLightGrey;
+}
+
+void CGUImenuItem::DrawSelf() {
+	if (hasHighlight  && highlightStyle == menuHighlightBar) {
+		pDrawFuncs->drawRect2(drawBox, highlightColour, highlightColour);
+	}
+
+	if (hasFocus  && focusStyle == menuHighlightBar) {
+		pDrawFuncs->drawRect2(drawBox, focusColour, focusColour);
+	}
+	CGUIlabel2::DrawSelf();
+}

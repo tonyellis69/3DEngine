@@ -178,7 +178,6 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	addToRow("paletteBar", { paletteBar });
 
 	swatchCtrl = new CGUIswatchContainer(20, 10, 300, 130);
-	//swatchCtrl->assignDataFile(pApp->dataPath + "swatchGroups.txt");
 	addToRow("swatches", { swatchCtrl });
 
 

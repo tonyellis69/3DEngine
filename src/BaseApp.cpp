@@ -180,7 +180,8 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 		if (button == GLFW_MOUSE_BUTTON_RIGHT)
 			msg = WM_RBUTTONDOWN;
 	}
-	GUIroot.MouseMsg(msg, mousePos.x, mousePos.y, mods);
+	//////////GUIroot.MouseMsg(msg, mousePos.x, mousePos.y, mods);
+	GUIroot.MouseMsg(msg, mouseX, mouseY, mods);
 }
 
 /** Event handler for mouse wheel messages. */

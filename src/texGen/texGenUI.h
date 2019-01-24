@@ -6,19 +6,20 @@
 #include "..\UI\GUImenu.h"
 #include "..\UI\GUIcontainer.h"
 #include "..\UI\GUIswatchContainer.h"
+#include "..\UI\GUIpopMenu.h"
 
 #include "texGen.h"
 #include "GUInoiseCtrl.h"
 #include "composeTest.h"
 
-class CTexGenUI : public Icallback {
+class CTexGenUI : public Icallback, public IPopupMenu {
 public:
 	void init(CBaseApp* app);
 	void initGUI();
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
 	void hide(bool onOff);
 	void compose();
-	void display();
+	void updateDisplayImage();
 	void updateGUI();
 	void save();
 	void restore(std::string& filename);
@@ -33,6 +34,7 @@ public:
 	void restorePalette(std::string& filename);
 	void highlightMouseColour(int x, int y);
 	void unhighlightMouseColour();
+	void popupMenuCallback(int choice);
 
 
 	CBaseApp* pApp;
@@ -57,6 +59,10 @@ public:
 	bool shadeSelectionMode;
 
 	CGUIswatchContainer* tmpSwatch;
+
+	CTexGen* trackImage; //<Layer to use as image source.
+
+	CGUIimage* thumbnailImage;
 };
 
 

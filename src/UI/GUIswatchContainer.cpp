@@ -168,8 +168,16 @@ void CGUIswatchContainer::assignDataFile(std::string filename) {
 			}
 			colours.push_back(colour);
 		}
-
-
+		if (line[0] == '#') {
+			i32vec4 colour(255); size_t i = 0;
+			size_t n = 1;
+			//line = line.substr(1, line.size());
+			while (n < line.size()) {
+				colour[i++] = stoi(line.substr(n,2), nullptr, 16);
+				n += 2;
+			}
+			colours.push_back(colour);
+		}
 	}
 
 	if (colours.size() > 0) {
@@ -331,8 +339,7 @@ void CGUIswatchGroup::onDrop(const int mouseX, const int mouseY) {
 			setSwatchColour(index,colour);
 		}
 	}
-	delete dragDropObj;
-	dragDropObj = NULL;
+	deleteDragDropObj();
 }
 
 
@@ -378,12 +385,6 @@ void CGUIswatchGroup::addSwatch(i32vec4& newSwatch) {
 	if (((swatches.size() - 1) / totalColumns) == totalRows) {
 		int requiredHeight = calcRequiredHeight(drawBox.size.x);
 		resize(drawBox.size.x, drawBox.size.y);
-		//tell swatch container it needs to make room for new row of swatches
-	//	if (callbackObj) {
-	//		CMessage msg;
-	//		msg.Msg = uiMsgChildResize;
-		//	callbackObj->GUIcallback(this, msg);
-	//	}
 	}
 }
 

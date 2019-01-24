@@ -1,9 +1,11 @@
 #include "GUIpaletteBar.h"
 #include "GUIroot.h"
+#include "GUIswatchContainer.h"
 
 
 
 CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {
+	type = uiPaletteBar;
 	upperPadding = 20;
 	barHeight = 30;
 	tabSize = glm::i32vec2(15, 20);
@@ -18,10 +20,10 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	colourPicker->setVisible(false);
 	rootUI->Add(colourPicker);
 
-	tabPos = new CGUIlabel2(0, 0, 50, 20);
-	tabPos->borderOn(false);
-	tabPos->setVisible(false);
-	Add(tabPos);
+	tabPosLbl = new CGUIlabel2(0, 0, 50, 20);
+	tabPosLbl->borderOn(false);
+	tabPosLbl->setVisible(false);
+	Add(tabPosLbl);
 
 	createTab(0);
 	createTab(255);
@@ -90,7 +92,11 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 	}
 
 	if (Msg == WM_LBUTTONUP) {
-		tabPos->setVisible(false);
+		if (IsOnControl(*paletteImage, mouseX, mouseY) && dragDropObj != NULL) {
+			onDrop(mouseX, mouseY);
+			return;
+		}
+		tabPosLbl->setVisible(false);
 
 	}
 
@@ -99,23 +105,27 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 }
 
 void CGUIpaletteBar::createTab(int tabIndex) {
-	int paletteImageProportion = paletteImage->drawBox.size.x *  (tabIndex / 255.0f);
-	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->localPos.x - (tabSize.x / 2), 
-		paletteImage->localPos.y + barHeight, tabSize.x, tabSize.y);
-	Add(tab);
-
-	tab->position = tabIndex;
-	
+	CGUIpaletteTab* tab = addTab(tabIndex);
 	glm::vec4 colour = glm::vec4(colourGradient.getColour(tab->position)); 
-	colourGradient.changeColour(tab->position, glm::i32vec4(colour));
+	colourGradient.changeColour(tab->position, glm::i32vec4(colour)); //TO DO: why do I do this?
 	tab->colour = colour;
 	colour = colour / 255.0f;
 	tab->setBackColour1(colour);
 	tab->setBackColour2(colour);
 
-	//ensure tabPos is the last thing we draw
-	auto tabPosPos = std::find(Control.begin(),Control.end(), tabPos);
+	//ensure tabPosLbl is the last thing we draw
+	auto tabPosPos = std::find(Control.begin(),Control.end(), tabPosLbl);
 	std::iter_swap(tabPosPos, Control.end() -1);
+}
+
+CGUIpaletteTab* CGUIpaletteBar::addTab(int tabIndex) {
+	int paletteImageProportion = paletteImage->drawBox.size.x *  (tabIndex / 255.0f);
+	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->localPos.x - (tabSize.x / 2),
+		paletteImage->localPos.y + barHeight, tabSize.x, tabSize.y);
+	Add(tab);
+
+	tab->position = tabIndex;
+	return tab;
 }
 
 void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
@@ -147,6 +157,13 @@ void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
 			msg.Msg = uiMsgUpdate;
 			callbackObj->GUIcallback(this, msg);
 		}
+	}
+
+	//User dropped a swatch onto a tab
+	if (sender->type == uiPaletteTab && msg.Msg == uiMsgUpdate) {
+		CGUIpaletteTab* tab = static_cast<CGUIpaletteTab*>(sender);
+		colourGradient.changeColour(tab->position, glm::i32vec4(tab->colour * 255.0f));
+		updatePalette();
 	}
 }
 
@@ -195,9 +212,9 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 	updatePalette();
 
 	//display position
-	tabPos->setText(std::to_string(tabNewPos));
-	tabPos->setPos(tab->localPos.x + tabSize.x, tab->localPos.y);
-	tabPos->setVisible(true);
+	tabPosLbl->setText(std::to_string(tabNewPos));
+	tabPosLbl->setPos(tab->localPos.x + tabSize.x, tab->localPos.y);
+	tabPosLbl->setVisible(true);
 }
 
 void CGUIpaletteBar::GUIcallback(CGUIbase* sender, CMessage& msg) {
@@ -356,6 +373,17 @@ void CGUIpaletteBar::createTabAtIndicator(float falloff) {
 	}
 }
 
+/** Respond to a swatch being dropped on the gradient bar itself, by creating a new tab.*/
+void CGUIpaletteBar::onDrop(const int mouseX, const int mouseY) {
+	if (IsOnControl(*paletteImage, mouseX, mouseY) && dragDropObj->isDropType(this) ) {
+		int tabIndex = (float(mouseX - paletteImage->drawBox.pos.x) / (paletteImage->drawBox.size.x) ) * 255;
+		CGUIpaletteTab* tab = addTab(tabIndex);
+		colourChangeTab = tab;
+		changeTabColour(static_cast<CGUIdragDropSwatch*>(dragDropObj)->colour);
+	}
+	deleteDragDropObj();
+}
+
 
 
 
@@ -397,6 +425,20 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 		parent->message(this, msg);
 
 	}
+}
+
+/** Catch an attempt to drop a swatch. */
+void CGUIpaletteTab::onDrop(const int mouseX, const int mouseY) {
+	if (dragDropObj->isDropType(this)) {
+		glm::vec4 swatchColour = glm::vec4(static_cast<CGUIdragDropSwatch*>(dragDropObj)->colour)/255.0f;
+		setBackColour1(swatchColour);
+		setBackColour2(swatchColour);
+		colour = swatchColour;
+		CMessage msg;
+		msg.Msg = uiMsgUpdate;
+		parent->message(this, msg);
+	}
+	deleteDragDropObj();
 }
 
 
