@@ -78,8 +78,8 @@ void CRenderTexture::resize(int w, int h) {
 		pixels[b + 1] = pixels[b + 2] = pixels[b];  pixels[b + 3] = 255;
 	}
 	glBindTexture(GL_TEXTURE_1D, handle);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); //was GL_LINEAR, this fixes problem of grey creeping between black and white in colour gradients
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 	delete pixels;

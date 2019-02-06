@@ -14,9 +14,9 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 		numeric[component]->setMinMax(0, 255);
 		numeric[component]->id = component;
 		Add(numeric[component]);
-		ySpace = numeric[component]->localPos.y + numeric[component]->drawBox.size.y + padding;
+		ySpace = numeric[component]->getLocalPos().y + numeric[component]->getHeight() + padding;
 
-		slider[component] = new CGUIsysScrollbar(horizontal, sliderX, numeric[component]->localPos.y, 300);
+		slider[component] = new CGUIsysScrollbar(horizontal, sliderX, numeric[component]->getLocalPos().y, 300);
 		slider[component]->setMax(255); slider[component]->setMin(0);
 		slider[component]->id = component;
 		Add(slider[component]);
@@ -24,14 +24,14 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 
 	setColour(glm::i32vec4(255));
 
-	CGUIbutton2* OKbutton = new CGUIbutton2(padding, numeric[3]->localPos.y + numeric[3]->drawBox.size.y + padding,
+	CGUIbutton2* OKbutton = new CGUIbutton2(padding, numeric[3]->getLocalPos().y + numeric[3]->getHeight() + padding,
 		numericWidth, numericHeight);
 	OKbutton->setText("OK");
 	OKbutton->id = uiOKid;
 	Add(OKbutton);
 
 	int cancelXpos = sliderX;
-	CGUIbutton2* CancelButton = new CGUIbutton2(cancelXpos, numeric[3]->localPos.y + numeric[3]->drawBox.size.y + padding,
+	CGUIbutton2* CancelButton = new CGUIbutton2(cancelXpos, numeric[3]->getLocalPos().y + numeric[3]->getHeight() + padding,
 		numericWidth, numericHeight);
 	CancelButton->setText("Cancel");
 	CancelButton->id = uiCancelId;

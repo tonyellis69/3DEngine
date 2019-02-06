@@ -3,9 +3,13 @@
 
 CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	type = dlgCtrl;
-	localPos = glm::i32vec2(x, y); width = w; height = h;
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
+	//width = w; height = h;
+	setWidth(w);
+	setHeight(h);
 	hFormat = hCentre; vFormat = vCentre;
-	header = new CGUIlabel2(0,10,width,30);
+	header = new CGUIlabel2(0,10,w,30);
 	header->setText("Header");
 	header->hFormat = hSpan;
 	header->setHorizontalAlignment(tcentred);
@@ -23,7 +27,7 @@ void CGUIdlg::setHeader(const string& text) {
 
 
 CGUIsysDlg::CGUIsysDlg() : CGUIdlg(0,0,defaultDlgWidth,defaultDlgHeight)  {
-	body = new CGUIlabel2(20,50,width -20,70);
+	body = new CGUIlabel2(20,50,getWidth() -20,70);
 	body->setText("Body text");
 	body->setMultiLine(true);
 	body->hFormat = hCentre;
@@ -62,19 +66,19 @@ void CGUIdlgButton::OnClick(const  int mouseX, const  int mouseY) {
 
 
 CGUIokDlg::CGUIokDlg(int w, int h)  : CGUIsysDlg()  {
-	width = w;
-	height = h;
+	setWidth(w);
+	setHeight(h);
 	ok = new CGUIdlgButton(10,20,100,30);
 	ok->setText("OK");
 	ok->hFormat = hCentre;
-	ok->localPos.y = parent->height - 50;
+	ok->setPosY(parent->getHeight() - 50);
 	ok->id = dlgOKID;
 	Add(ok);
 
 
-	body->width = w - 40;
-	body->height = h-110;
-	body->localPos.y = 60;
+	body->setWidth( w - 40);
+	body->setHeight( h-110);
+	body->setPosY(60);
 }
 
 

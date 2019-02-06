@@ -76,12 +76,11 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 }
 
 
-void CGUIroot::SetPos(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y); 
-	width = w; height = h; 
-	//screenPos.x = x; screenPos.y = y;
+void CGUIroot::setLocalDimensions(int x, int y, int w, int h) {
+	setPos(x, y);
+	setWidth(w);
+	setHeight(h);
 	drawBox.pos = glm::i32vec2(x, y);
-	drawBox.size = glm::i32vec2(w, h);
 	Clipbox.x =x;Clipbox.y =y; Clipbox.width = w; Clipbox.height = h;
 	for (size_t i=0;i < Control.size();i++)
 		Control[i]->updateAppearance();
@@ -90,7 +89,7 @@ void CGUIroot::SetPos(int x, int y, int w, int h) {
 
 /** Override the normal clipping method, as GUIroot has no parent to clip against. */
 void CGUIroot::CalculateClipbox() {
-	Clipbox.x = localPos.x; Clipbox.y = localPos.y; Clipbox.width = drawBox.size.x; Clipbox.height = drawBox.size.y;
+	Clipbox.x = getLocalPos().x; Clipbox.y = getLocalPos().y; Clipbox.width = getWidth(); Clipbox.height = getHeight();
 }
 
 /** Receives a keystroke message, and passes it on to whichever control has captured the keyboard, if any. */
@@ -140,8 +139,8 @@ void CGUIroot::Draw() {
 
 /** Ensures the mouse drawing coordinates are always set to where the mouse is. */
 void CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
-	mouse->screenPos.x = mouseX; 
-	mouse->screenPos.y = mouseY;
+	//mouse->screenPos.x = mouseX; 
+	//mouse->screenPos.y = mouseY;
 	mousePos.x = mouseX;
 	mousePos.y = mouseY;
 	CMessage msg;

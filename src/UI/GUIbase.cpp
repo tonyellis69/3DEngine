@@ -39,7 +39,9 @@ CGUIbase::CGUIbase()  {
 
 
 	localPos = glm::i32vec2(0); 
-	width = 30; height = 20;
+	//width = 30; height = 20;
+	setWidth(30);
+	setHeight(20);
 
 	enabled = true;
 
@@ -57,6 +59,13 @@ CGUIbase::CGUIbase()  {
 	anchorLeft = false;
 	anchorTop = false;
 	setGUIcallback(this);
+}
+
+CGUIbase::CGUIbase(int x, int y, int w, int h) : CGUIbase(){
+	
+	setWidth(w);
+	setHeight(h);
+	setPos(x, y);
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
@@ -207,25 +216,35 @@ void CGUIbase::onDrop(const int mouseX, const int mouseY) {
 
 /** Set the dimensions and relative position of the control. */
 /*
-void CGUIbase::SetPos(int x, int y, int w, int h) {
+void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
 	xPos = x; yPos = y; width = w; height = h;
 	updateAppearance();
 }
 */
-void CGUIbase::SetPos(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
-	width = w; height = h;
-	//drawBox.pos = glm::i32vec2(x, y);
-	drawBox.size = glm::i32vec2(w, h);
-	updateAppearance();
+void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
+//	localPos = glm::i32vec2(x, y);
+	setPos(x, y);
+	setWidth(w);
+	setHeight(h);
+	//updateAppearance();
+	//TO DO: can I get away with needsUpdate????
+	needsUpdate = true;
+	//looks like it!
 }
 
 void CGUIbase::setPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
-	//drawBox.pos = glm::i32vec2(x, y);
-	//updateAppearance();
+	//NB: wait until updateAppearance to update drawBox.pos, as it depends on position of parent control
 	needsUpdate = true;
 
+}
+
+void CGUIbase::setPosX(int x) {
+	setPos(x, localPos.y);
+}
+
+void CGUIbase::setPosY(int y) {
+	setPos(localPos.x, y);
 }
 
 
@@ -291,62 +310,65 @@ void CGUIbase::updateAppearance() {
 
 /** Recursively update this control's position, dimensions and clipping, and those of its children. */
 void CGUIbase::updateAppearance() {
-	if (uniqueID == 212)
-		int b = 0;
 	glm::i32vec2 oldSize = drawBox.size;
+	drawBox.pos = parent->drawBox.pos + localPos;
 	needsUpdate = false;
-	//1. Recalculate x,y,w,h if necessary due to justification or spanning
+	//1. Recalculate x,y,w,h *if necessary* due to justification or spanning
 	if (anchorRight != NONE) {
 		if (anchorLeft) 
-			drawBox.size.x = min(drawBox.size.x, parent->drawBox.size.x - (anchorRight + localPos.x));
+			setWidth( min(getWidth(), parent->getWidth() - (anchorRight + getLocalPos().x)));
 		else
-			localPos.x = parent->drawBox.size.x - drawBox.size.x - anchorRight;
+			setPosX(parent->getWidth() - getWidth() - anchorRight);
 	}
 	else {
 		switch (hFormat) {
 		case hCentre: {
-			localPos.x = (parent->drawBox.size.x - drawBox.size.x) / 2; break; }
+			setPosX( (parent->getWidth() - getWidth()) / 2); break; }
 		case hRight: {
-			localPos.x = parent->drawBox.size.x - (drawBox.size.x + parent->borderWidth); break; }
+			setPosX(parent->getWidth() - (getWidth() + parent->borderWidth)); break; }
 		case hLeft: {
-			localPos.x = parent->borderWidth; break; }
+			setPosX( parent->borderWidth); break; }
 		case hSpan: {
-			localPos.x = 0; drawBox.size.x = parent->drawBox.size.x; break; }
+			setPosX(0); setWidth(parent->getWidth()); break; }
 		}
 	}
 
 	if (anchorBottom != NONE)
 		//drawBox.size.y = parent->drawBox.size.y - localPos.y - anchorBottom;
 		if (anchorLeft)
-			drawBox.size.y = min(drawBox.size.y, parent->drawBox.size.y - (anchorBottom + localPos.y));
+			setHeight(min(getHeight(), parent->getHeight() - (anchorBottom + getLocalPos().y)));
 		else
-			localPos.y = parent->drawBox.size.y - drawBox.size.y - anchorBottom;
+			setPosY(parent->getHeight() - getHeight() - anchorBottom);
 	else {
 		switch (vFormat) {
 		case vCentre: {
-			localPos.y = (parent->drawBox.size.y - drawBox.size.y) / 2; break; }
+			setPosY( (parent->getHeight() - getHeight()) / 2); break; }
 		case vTop: {
-			localPos.y = parent->borderWidth; break; }
+			setPosY(parent->borderWidth); break; }
 		case vBottom: {
-			localPos.y = parent->drawBox.size.y - drawBox.size.y - parent->borderWidth; break; }
+			setPosY(parent->getHeight() - getHeight() - parent->borderWidth); break; }
 		case vSpan: {
-			localPos.y = 0; drawBox.size.y = parent->drawBox.size.y; break; }
+			setPosY(0); setHeight(parent->getHeight()); break; }
 		}
 	}
 
-	if (oldSize != drawBox.size)
-		resize(drawBox.size.x, drawBox.size.y);
+	
+
+	//TO DO: looks redundant - may need updateAppearance only
+	if (oldSize != drawBox.size) {
+		//resize(getWidth(), getHeight());
+	}
+
+
 
 	//2. Recalculate clipping
 	CalculateClipbox();
-	//3. Recalculate screen position
-	screenPos.x = parent->screenPos.x + drawBox.pos.x; screenPos.y = parent->screenPos.y + drawBox.pos.y;
-	//screenPos.x = parent->screenPos.x + xPos; screenPos.y = parent->screenPos.y + yPos;
-	//TO DO: above is legacy, to be replaced with:
-	//drawBox.pos = glm::i32vec2(parent->screenPos.x, parent->screenPos.y) + drawBox.pos;
-	drawBox.pos = parent->drawBox.pos + localPos;
-	//...but screenPos becomes drawBox
-	pDrawFuncs->updateScreenDimensions(*this);
+
+
+	//drawBox.pos = parent->drawBox.pos + localPos;
+
+
+//	pDrawFuncs->updateScreenDimensions(*this);
 
 
 
@@ -423,16 +445,16 @@ void CGUIbase::CalculateClipbox() {
 	parentClipbox.x += parent->borderWidth;	parentClipbox.y += parent->borderWidth;
 	parentClipbox.width -= parent->borderWidth * 2; parentClipbox.height -= parent->borderWidth * 2;
 
-	Clipbox.width = drawBox.size.x; //drawable width of this control
-	Clipbox.x = parent->drawBox.pos.x + localPos.x; //screen x position where drawing of control starts
+	Clipbox.width = getWidth(); //drawable width of this control
+	Clipbox.x = parent->drawBox.pos.x + getLocalPos().x; //screen x position where drawing of control starts
 	if (Clipbox.x <parentClipbox.x) { //is it outside the clipbox of the parent control?
 		Clipbox.width -= (parentClipbox.x - Clipbox.x); //clip it to the parent clipbox start
 		Clipbox.x = parentClipbox.x;
 	}
 
 
-	Clipbox.height = drawBox.size.y;
-	Clipbox.y = parent->drawBox.pos.y + localPos.y;
+	Clipbox.height = getHeight();
+	Clipbox.y = parent->drawBox.pos.y + getLocalPos().y;
 	if (Clipbox.y < parentClipbox.y) {
 		Clipbox.height -= (parentClipbox.y - Clipbox.y);
 		if (Clipbox.height < 0)
@@ -472,8 +494,12 @@ glm::i32vec2 CGUIbase::getScreenCoords(int x, int y) {
 	return glm::i32vec2(drawBox.pos.x + x, drawBox.pos.y + y);
 }
 
-glm::i32vec2 CGUIbase::getLocalPos(int x, int y) {
+glm::i32vec2 CGUIbase::calcLocalPos(int x, int y) {
 	return glm::i32vec2( x - drawBox.pos.x, y - drawBox.pos.y);
+}
+
+glm::i32vec2& CGUIbase::getLocalPos() {
+	return localPos;
 }
 
 int CGUIbase::getWidth() {
@@ -484,9 +510,23 @@ int CGUIbase::getHeight() {
 	return drawBox.size.y;
 }
 
+void CGUIbase::setWidth(int w) {
+	drawBox.size.x = w;
+//	width = w;
+}
+
+void CGUIbase::setHeight(int h) {
+	drawBox.size.y = h;
+	//height = h;
+}
+
+const glm::i32vec2 CGUIbase::getScreenPos(){
+	return drawBox.pos;
+}
+
 void CGUIbase::resize(int w, int h) {
-	width = w; height = h;
-	drawBox.size = glm::i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	//updateAppearance();
 	//TO DO: can this be replaced with needsUpdate = true?
 	needsUpdate = true;
@@ -529,7 +569,7 @@ void CGUIbase::autoArrangeRows(int offsetX, int offsetY) {
 	for (auto rowObj : rowObjects) {
 		if (rowObj.isActive) {
 			for (auto control : rowObj.controls) {
-				control->setPos(control->localPos.x + offsetX, rowY);
+				control->setPos(control->getLocalPos().x + offsetX, rowY);
 				control->setVisible(true);
 			}
 			rowY += rowObj.rowHeight;
@@ -620,12 +660,12 @@ CGUIbase* CGUIbase::findControl(CGUIbase* child) {
 void CGUIbase::OnLMouseUp(const int mouseX, const int mouseY) {
 	//do the default action for mouse up:
 
-	CMessage msg2;
-	msg2.Msg = uiMsgLMouseUp;
-	msg2.x = mouse->screenPos.x; msg2.y = mouse->screenPos.y;
-//	pDrawFuncs->handleUImsg(*this,msg2);
-//	callbackObj->GUIcallback(this, msg2);
-} 
+	CMessage msg;
+	msg.Msg = uiMsgLMouseUp;
+	msg.x = mouseX; msg.y = mouseY;
+	//	callbackObj->GUIcallback(this, msg2);
+		//TO DO: check if I really want to do this. Errors?
+}
 
 void CGUIbase::onRMouseUp(const int mouseX, const int mouseY) {
 	CMessage msg;

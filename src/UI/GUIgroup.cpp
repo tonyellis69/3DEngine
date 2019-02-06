@@ -9,13 +9,16 @@ int CGUIgroup::Count = 1;
 CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 	GenName("Group",Count++);
 	type = group;
-	localPos = glm::i32vec2(x, y); 
-	width = w; height = h;
+	//localPos = glm::i32vec2(x, y); 
+	setPos(x, y);
+	//width = w; height = h;
+	setWidth(w);
+	setHeight(h);
 
 	isDrawn = true;
 	headerHeight = defaultHeaderHeight;
 	headerIndent = defaultHeaderIndent + 5;
-	header = new CGUIlabel2(headerIndent,0,width-headerIndent,headerHeight);
+	header = new CGUIlabel2(headerIndent,0,w-headerIndent,headerHeight);
 	Add(header);
 	SetText(Name);
 }
@@ -24,13 +27,13 @@ CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 void CGUIgroup::SetText(const std::string& TextStr) {
 	header->setText(TextStr);
 //	pDrawFuncs->setFont(header->TextFont);
-	headerWidth = (int)header->getTextWidth();
+	headerWidth = header->getTextWidth();
 }
 
 /** User may want to change header height from default if they change font. */
 void CGUIgroup::setHeaderHeight(int h) {
 	headerHeight = h;
-	header->SetPos(headerIndent,0,width-headerIndent,h);
+	header->setLocalDimensions(headerIndent,0,getWidth()-headerIndent,h);
 }
 
 /** Toggles whether the control draws its header and frame. */

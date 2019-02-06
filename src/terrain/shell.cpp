@@ -2,6 +2,7 @@
 
 #include "terrain2.h"
 #include "..\colour.h"
+#include "superChunk2.h"
 
 #include <iostream>
 
@@ -136,44 +137,102 @@ void CShell::scroll(Tdirection scrollDirection) {
 void CShell::initSuperChunks() {
 	scArray.element(0, 0, 0).setCallbackApp(pTerrain->pCallbackApp);
 	vec3 sampleSpacePosition;
-	for (int x = 0; x < shellSCs; x++) {
-		for (int y = 0; y < shellSCs; y++) {
-			for (int z = 0; z < shellSCs; z++) {
-				scArray.element(x, y, z).isEmpty = true;
-				scArray.element(x, y, z).colour = vec4(col::randHue(),1);
-				scArray.element(x, y, z).origIndex = vec3(x,y,z);
-				//scArray.element(x, y, z).setSampleSize(SCsize / pTerrain->worldToSampleScale);
+	CShellIterator scIter = getIterator();
+	while (!scIter.finished()) {
+		scIter->isEmpty = true;
+		scIter->colour = vec4(col::randHue(), 1);
+		scIter->origIndex = scIter.getIndex();
+		//scArray.element(x, y, z).setSampleSize(SCsize / pTerrain->worldToSampleScale);
 
-				//temp!
-				float scSampleStep = SCsize / pTerrain->worldToSampleScale;
-				float lodScale = scSampleStep / 16;
-			//	std::cerr << "\n#LoD " << this->LoD << " SC sampleStep " << scSampleStep << " LoDscale " << lodScale;
+		//temp!
+		float scSampleStep = SCsize / pTerrain->worldToSampleScale;
+		float lodScale = scSampleStep / 16;
+		//	std::cerr << "\n#LoD " << this->LoD << " SC sampleStep " << scSampleStep << " LoDscale " << lodScale;
 
-				scArray.element(x, y, z).setSampleSize(lodScale);
+		scIter->setSampleSize(lodScale);
 
-				//find worldspace displacement of SC from terrain centre 
-				vec3 scPos = vec3(x, y, z) * SCsize;
-				//////////////////////////////scPos += SCsize * 0.5f; TO DO temporary only
-				scPos -= worldSpaceSize * 0.5f;
-				scPos += worldSpacePos;
-				//convert into a displacement in sample space
-				sampleSpacePosition = scPos / pTerrain->worldToSampleScale;
-				//should end up with around 5 .3 5 fo (0,0,0)
-				sampleSpacePosition = pTerrain->sampleSpacePos + sampleSpacePosition;
-				scArray.element(x, y, z).setSampleSpacePosition(sampleSpacePosition);
-			}
-		}
+		//find worldspace displacement of SC from terrain centre 
+		vec3 scPos = vec3(scIter.getIndex()) * SCsize;
+		//////////////////////////////scPos += SCsize * 0.5f; TO DO temporary only
+		scPos -= worldSpaceSize * 0.5f;
+		scPos += worldSpacePos;
+		//convert into a displacement in sample space
+		sampleSpacePosition = scPos / pTerrain->worldToSampleScale;
+		//should end up with around 5 .3 5 fo (0,0,0)
+		sampleSpacePosition = pTerrain->sampleSpacePos + sampleSpacePosition;
+		scIter->setSampleSpacePosition(sampleSpacePosition);
+		scIter++;
+
 	}
 }
 
 /** Ask all superchunks to check if they are intersected by terrain. */
 void CShell::findSCintersections() {
-	for (int x = 0; x < shellSCs; x++) {
-		for (int y = 0; y < shellSCs; y++) {
-			for (int z = 0; z < shellSCs; z++) {
-				//TO DO: exclude SCs entirely within child shell
-					scArray.element(x, y, z).checkForIntersection();
-			}
-		}
+	CShellIterator it = getIterator();
+	while (!it.finished()) {
+		it->checkForIntersection();
+		it++;
 	}
+}
+
+
+CShellIterator & CShell::getIterator() {
+	return CShellIterator(this);
+}
+
+
+
+CShellIterator::CShellIterator(CShell * pShell) {
+	this->pShell = pShell;
+	index = i32vec3(0);
+	max = i32vec3(pShell->shellSCs);
+	pSC = &pShell->scArray.element(0, 0, 0);
+}
+
+CSuperChunk2* CShellIterator::SC() {
+	return pSC;
+}
+
+CShellIterator & CShellIterator::operator++() {
+	if (pSC != NULL) {
+		index.z++;
+		if (index.z == max.z) {
+			index.z = 0;
+			index.y++;
+			if (index.y == max.y) {
+				index.y = 0;
+				index.x++;
+				if (index.x == max.x) {
+					pSC = NULL;
+					return *this;
+				}
+			}
+
+		}
+		pSC = &pShell->scArray.element(index.x, index.y, index.z);
+	}
+	return *this;
+
+}
+
+CShellIterator CShellIterator::operator++(int) {
+	CShellIterator tmp(*this); 
+	operator++(); 
+	return tmp; 
+}
+
+CSuperChunk2 & CShellIterator::operator*() {
+	return *pSC;
+}
+
+CSuperChunk2 * CShellIterator::operator->() {
+	return pSC;
+}
+
+bool CShellIterator::finished() {
+	return pSC == NULL;
+}
+
+glm::i32vec3 & CShellIterator::getIndex() {
+	return index;
 }

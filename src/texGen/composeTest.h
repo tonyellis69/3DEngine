@@ -13,15 +13,18 @@ public:
 	CTexGen* createCylinderTex();
 	CTexGen* createBillowTex();
 	CTexGen* createVoronoiTex();
-	CTexGen* createTurbulenceTex(CTexGen* source);
-	CTexGen* createColouriseTex(CTexGen* source, ColourGradient* colourGradient);
-	CTexGen* createScaleBiasTex(CTexGen* source);
+	CTexGen* createTurbulenceTex();
+	CTexGen* createColouriseTex();
+	CTexGen* createScaleBiasTex();
 	CTexGen * createSeamlessTex();
-	CTexGen* createScalePointTex(CTexGen* source);
-	CTexGen* createAddTex(CTexGen* source1, CTexGen* source2);
-	CTexGen* createLayerTex(CTexGen* source1, CTexGen* source2);
-	CTexGen* createSelectTex(CTexGen* source1, CTexGen* source2, CTexGen* control);
+	CTexGen* createScalePointTex();
+	CTexGen* createAddTex();
+	CTexGen* createLayerTex();
+	CTexGen* createSelectTex();
 	CTexGen* createGausTex();
+	CTexGen* createRectsTex();
+
+	CTexGen * createBlocksTex();
 
 	void addToStack(CTexGen * texGen);
 	

@@ -2,14 +2,17 @@
 
 using namespace glm;
 
-CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
-	drawBox.setSize(w, h);
+CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
+	//localPos = glm::i32vec2(x, y);
+	//setPos(x, y);
+	//drawBox.setSize(w, h);
+	//setWidth(w);
+//	setHeight(h);
 
 	//TO DO: get rid of width/height!
-	width = drawBox.size.x; height = drawBox.size.y;
-	textureHeight = drawBox.size.y;
-	textureWidth = drawBox.size.x;
+	//width = drawBox.size.x; height = drawBox.size.y;
+	textureHeight = getHeight();
+	textureWidth = getWidth();
 	
 	textData.font = defaultFont;
 	textBuf.setFont(defaultFont);
@@ -85,14 +88,18 @@ void CGUIlabel2::DrawSelf() {
 
 
 /** Set the dimensions and relative position of the control. */
-void CGUIlabel2::SetPos(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y); 
-	width = w; height = h;
+void CGUIlabel2::setLocalDimensions(int x, int y, int w, int h) {
+	setPos(x, y);
+	//width = w; height = h;
+	setWidth(w);
+	setHeight(h);
 
 	drawBox.pos = glm::i32vec2(x, y);
-	drawBox.size = glm::i32vec2(w, h);
+	//drawBox.size = glm::i32vec2(w, h);
 	
 	updateAppearance();
+	//TO DO,see if this can be replaced with update flag
+
 	//textureWidth = drawBox.size.x; //TO DO, any offset adjustment goes here
 	//textureHeight = drawBox.size.y;
 
@@ -103,13 +110,13 @@ void CGUIlabel2::SetPos(int x, int y, int w, int h) {
 void CGUIlabel2::updateAppearance() {
 	CGUIbase::updateAppearance();
 	//assume dimensions may have changed, eg, if this label was set to span
-	textureWidth = drawBox.size.x; //TO DO, any offset adjustment goes here
-	textureHeight = drawBox.size.y;
+	textureWidth = getWidth(); //TO DO, any offset adjustment goes here
+	textureHeight = getHeight();
 	textBuf.setSize(textureWidth, textureHeight);
 	renderText();
 }
 
-float CGUIlabel2::getTextWidth() {
+int CGUIlabel2::getTextWidth() {
 	return lineRenderedWidth;
 }
 
@@ -119,7 +126,7 @@ void CGUIlabel2::calcLineOffset() {
 	if (multiLine)
 		renderOffset.y = 0;
 	else
-		renderOffset.y = (textureHeight - textData.font->lineHeight) / 2.0f;
+		renderOffset.y = (textureHeight - textData.font->lineHeight) / 2;
 
 	if (textAlign == tcentred) {
 		renderOffset.x = (textureWidth - lineRenderedWidth) / 2.0f;
@@ -186,13 +193,13 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 
 
 void CGUIlabel2::resize(int w, int h) {
-	width = w; height = h;
 	if (w < 1) //because bad things happen if we make the texture 0 in height or width
 		w = 1;
 	if (h < 1)
 		h = 1;
-	drawBox.size = glm::i32vec2(w, h);
-	updateAppearance();
+	CGUIbase::resize(w, h);
+	//drawBox.size = glm::i32vec2(w, h);
+	//updateAppearance();
 	renderText();
 }
 

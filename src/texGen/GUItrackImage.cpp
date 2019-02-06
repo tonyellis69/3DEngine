@@ -2,7 +2,6 @@
 
 
 void CGUItrackImage::OnMouseMove(const int mouseX, const int mouseY, int key) {
-	cerr << "\ntrackImageMouseMove! " << mouseX << " " << mouseY;
 	if (callbackObj) {
 		CMessage msg;
 		msg.Msg = uiMsgMouseMove;
@@ -22,7 +21,6 @@ void CGUItrackImage::onMouseOff(const int mouseX, const int mouseY, int key) {
 }
 
 void CGUItrackImage::OnRMouseDown(const int mouseX, const int mouseY, int key) {
-	cerr << "\n!!!!!!!!!right mouse down!!!!!!!!!!!!";
 	if (callbackObj) {
 		CMessage msg;
 		msg.x = mouseX;

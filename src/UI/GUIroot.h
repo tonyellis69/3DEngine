@@ -10,7 +10,7 @@ public:
 	~CGUIroot();
 	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
-	void SetPos(int x, int y, int w, int h);
+	void setLocalDimensions(int x, int y, int w, int h);
 	void CalculateClipbox();
 	void KeyboardMsg(unsigned int Key, long Mod);
 	void CharEntryMsg(unsigned int Key, long Mod);

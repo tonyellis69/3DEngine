@@ -10,12 +10,15 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	if (!h)
 		h = defaultNumericHeight;
 
-	localPos = glm::i32vec2(x, y); width = w; height = h;
+	//localPos = glm::i32vec2(x, y); 
+	setPos(x, y);
+	//width = w; height = h;
 	//drawBox.pos = i32vec2(x, y); 
-	drawBox.size = i32vec2(w, h);
-
+	//drawBox.size = i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	//pDrawFuncs->registerControl(*this);
-	//SetPos(x, y, w, h);
+	//setLocalDimensions(x, y, w, h);
 	
 
 	//create the two buttons.
@@ -31,7 +34,7 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 
 	//create numBox
 	numBox = new CGUInumericTextbox2(h, 0,
-		width - (h * 2), h);
+		getWidth() - (h * 2), h);
 	////////////////numBox->TextAlign = tcentred;
 	
 	Add(numBox);
@@ -128,7 +131,7 @@ void CGUInumeric2::setIncrement(float increment) {
 
 CGUInumericTextbox2::CGUInumericTextbox2(int x, int y, int w, int h) 
 	: CGUItextbox2(x,y,w,h) {
-	SetPos(x, y, w, h);
+	//setLocalDimensions(x, y, w, h);
 }
 
 void CGUInumericTextbox2::OnCharEntry(unsigned int Key, long Mod) {

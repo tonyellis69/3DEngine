@@ -9,10 +9,12 @@ const int defaultSpaceAroundControls = 0;// 20;
 CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 	type = container;
 	borderWidth = 1;
-	localPos = glm::i32vec2(x, y);
-	drawBox.size = i32vec2(w, h);
+	setPos(x, y);
+	//drawBox.size = i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 
-	width = w; height = h;
+//	width = w; height = h;
 	horizontalBarActive = false;
 	createScrollbars();
 	verticalBar->visible = false;
@@ -25,19 +27,19 @@ CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 
 /** Create the scrollbar controls for this container, and make them children. */
 void CGUIsysContainer::createScrollbars() {
-	verticalBar = new CGUIsysScrollbar(vertical,0,1,height-barWidth);
-	verticalBar->Value = height;
+	verticalBar = new CGUIsysScrollbar(vertical,0,1,getHeight()-barWidth);
+	verticalBar->Value = getHeight();
 	verticalBar->hFormat = hRight;
 	verticalBar->id = uiContainerVbarID;
-	verticalBar->setMax(height);
+	verticalBar->setMax(getHeight());
 	verticalBar->setMin(0);
 	CGUIbase::Add(verticalBar);
 
-	horizontalBar = new CGUIsysScrollbar(horizontal,1,height-barWidth,width-barWidth);
+	horizontalBar = new CGUIsysScrollbar(horizontal,1, getHeight()-barWidth,getWidth()-barWidth);
 	horizontalBar->vFormat = vBottom;
 	horizontalBar->Value = 0;
 	horizontalBar->id = uiContainerHbarID;
-	horizontalBar->setMax(width);
+	horizontalBar->setMax(getWidth());
 	horizontalBar->setMin(0);
 	CGUIbase::Add(horizontalBar);
 }
@@ -61,11 +63,11 @@ void CGUIsysContainer::Add(CGUIbase* child) {
 /** Handles a scroll message from the container's scrollbars. */
 void CGUIsysContainer::message(CGUIbase* sender, CMessage& msg) {
 	if (sender->id == uiContainerVbarID) {
-		surface->localPos.y = 0 - (verticalBar->Max - msg.value);
+		surface->setPosY( 0 - (verticalBar->Max - msg.value) );
 		needsUpdate = true;
 	}
 	if (sender->id == uiContainerHbarID) {
-		surface->localPos.x = 0 - msg.value;
+		surface->setPosX(  0 - msg.value);
 		needsUpdate = true;
 	}
 	if (msg.Msg == uiMsgChildResize)
@@ -89,7 +91,6 @@ bool CGUIsysContainer::MouseWheelMsg(const  int mouseX, const  int mouseY, int w
 }
 
 void CGUIsysContainer::DrawSelf( ) {
-	
 	pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
 }
 
@@ -106,34 +107,34 @@ void CGUIsysContainer::updateAppearance() {
 	dictate it. Returns true if the scrollbar is newly activated. */
 bool CGUIsysContainer::verticalBarCheck() {
 	//first, check if scrollbar is even needed. 
-	if (surface->height > surface->viewBox.height) { //surface bigger than viewbox
+	if (surface->getHeight() > surface->viewBox.height) { //surface bigger than viewbox
 		bool newBar = false;
 		//so it is needed. 1st, if it's only just becoming visible now, reset slider to default position
 		if (!verticalBar->visible) {
-			verticalBar->setMax(surface->height - surface->viewBox.height);
+			verticalBar->setMax(surface->getHeight() - surface->viewBox.height);
 			verticalBar->visible = true;
 			verticalBar->Value = verticalBar->Max;
 			newBar = true;
 		}
 		//second, ensure it's the right size and slider size for the current container/surface ratio
-		verticalBar->height = height - barWidth -(2*borderWidth);
+		verticalBar->setHeight( getHeight() - barWidth -(2*borderWidth));
 		//because the ratio of surface to viewbox size may have been resized, we need to preserve the slider's relative position.
 		float diff = (float) verticalBar->Max - verticalBar->Min;
 		float ratio = diff / verticalBar->Value;
 
-		verticalBar->setMax(surface->height - (surface->viewBox.height + borderWidth));
+		verticalBar->setMax(surface->getHeight() - (surface->viewBox.height + borderWidth));
 		verticalBar->Value = (int)(verticalBar->Max / ratio);
-		verticalBar->setSliderSize((float) surface->viewBox.height / surface->height);  
+		verticalBar->setSliderSize((float) surface->viewBox.height / surface->getHeight());  
 		verticalBar->updateSliderAppearance();
 		//adust scrolling of surface accordingly:
-		surface->localPos.y =  surface->viewBox.y - (verticalBar->Max - verticalBar->Value) ;
+		surface->setPosY(surface->viewBox.y - (verticalBar->Max - verticalBar->Value) );
 		
 		return newBar;
 
 	}
 	else {
 		verticalBar->visible = false;
-		surface->localPos.y = surface->viewBox.y;
+		surface->setPosY( surface->viewBox.y);
 		return false;
 	}
 }
@@ -142,30 +143,30 @@ bool CGUIsysContainer::verticalBarCheck() {
 	dictate it. Returns true if the scrollbar is newly activated. */
 bool CGUIsysContainer::horizontalBarCheck() {
 	//first, check if scrollbar is even needed. 
-	if ((surface->width > surface->viewBox.width) && (horizontalBarActive)) { //surface wider than viewbox
+	if ((surface->getWidth() > surface->viewBox.width) && (horizontalBarActive)) { //surface wider than viewbox
 		bool newBar = false;
 		//so it is needed. 1st, if it's only just become visible now, reset slider to default position
 		if (!horizontalBar->visible) {
-			horizontalBar->setMax(surface->width - surface->viewBox.width);
+			horizontalBar->setMax(surface->getWidth() - surface->viewBox.width);
 			horizontalBar->visible = true;
 			horizontalBar->Value = 0;
 			bool newBar = true;
 		}
 		//second, ensure it's the right size and slider size for the current container/surface ratio
-		horizontalBar->width = width - barWidth;
+		horizontalBar->setWidth( getWidth() - barWidth);
 		//because the ratio of surface to viewbox size may have been resized, we need to preserve the slider's relative position.
 		float diff = (float)(horizontalBar->Max - horizontalBar->Min);
 		float ratio = diff / horizontalBar->Value;
 
-		horizontalBar->setMax(surface->width - surface->viewBox.width);
-		horizontalBar->setSliderSize((float) surface->viewBox.width / surface->width);  
+		horizontalBar->setMax(surface->getWidth() - surface->viewBox.width);
+		horizontalBar->setSliderSize((float) surface->viewBox.width / surface->getWidth());  
 		horizontalBar->updateSliderAppearance();
-		surface->localPos.x = surface->viewBox.x - horizontalBar->Value;
+		surface->setPosX(surface->viewBox.x - horizontalBar->Value);
 		return newBar;
 	}
 	else {
 		horizontalBar->visible = false;
-		surface->localPos.x = surface->viewBox.x;
+		surface->setPosX( surface->viewBox.x);
 		return false;
 	}
 }
@@ -210,8 +211,8 @@ int CGUIsysContainer::findControlPanel(CGUIbase* child) {
 
 /** Adjust viewbox to fit its container, accounting for scrollbars, borders, etc.*/ 
 void CGUIsysContainer::fitViewBoxToContainer() {
-	int viewWidth = width-(borderWidth*2);
-	int viewHeight = height-(borderWidth*2);
+	int viewWidth = getWidth()-(borderWidth*2);
+	int viewHeight = getHeight()-(borderWidth*2);
 	if (verticalBar->visible) 
 		viewWidth -= barWidth;
 	if (horizontalBar->visible) 
@@ -291,22 +292,24 @@ void CGUIbaseSurface::encompassChildControls() {
 	for (size_t i = 0; i < Control.size(); i++) {
 		child = Control[i];
 		if (child->anchorBottom == NONE) { //TO DO: may want to disqualify for use of vFormat too
-			if ((child->localPos.y + child->drawBox.size.y + spaceAroundControls) > newHeight)
-				newHeight = child->localPos.y + child->drawBox.size.y + spaceAroundControls;
+			if ((child->getLocalPos().y + child->getHeight() + spaceAroundControls) > newHeight)
+				newHeight = child->getLocalPos().y + child->getHeight() + spaceAroundControls;
 		}
 		if (child->anchorRight == NONE) {//TO DO: and hFormat
-			if ((child->localPos.x + child->drawBox.size.x + spaceAroundControls) > newWidth)
-				newWidth = child->localPos.x + child->drawBox.size.x + spaceAroundControls;
+			if ((child->getLocalPos().x + child->getWidth() + spaceAroundControls) > newWidth)
+				newWidth = child->getLocalPos().x + child->getWidth() + spaceAroundControls;
 		}
 	}
 
-	if ((height != newHeight) || (width != newWidth)) {
+	if ((getHeight() != newHeight) || (getWidth() != newWidth)) {
 		parent->needsUpdate = true;
 		//needsUpdate = true;
 	}
-	height = newHeight;
-	width = newWidth;
-	drawBox.setSize(width, height);
+//	height = newHeight;
+//	width = newWidth;
+//	drawBox.setSize(width, height);
+	setWidth(newWidth);
+	setHeight(newHeight);
 }
 
 

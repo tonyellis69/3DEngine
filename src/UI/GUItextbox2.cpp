@@ -3,9 +3,13 @@
 using namespace glm;
 
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x,y); width = w; height = h;
+	//localPos = glm::i32vec2(x,y);
+	setPos(x, y);
+	//width = w; height = h;
 	//drawBox.pos = i32vec2(x, y); 
-	drawBox.size = i32vec2(w, h);
+	//drawBox.size = i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	renderOffset = i32vec2(2,0);
 	textBuf.setFont(defaultFont);
 	font = defaultFont;
@@ -93,13 +97,13 @@ void CGUItextbox2::calcCursorPosition() {
 	float yLength = font->lineHeight;
 	float xPos = dist;
 
-	cursor.pos = drawBox.pos + glm::i32vec2( xPos, (drawBox.size.y - yLength)/2 );
+	cursor.pos = drawBox.pos + glm::i32vec2( xPos, (getHeight() - yLength)/2 );
 	cursor.size = {1,  yLength };
 }
 
 /** Determine offset due to centering, etc. */
 void CGUItextbox2::calcLineOffset() {
-	renderOffset.y = (drawBox.size.y - font->lineHeight + 4) / 2.0;
+	renderOffset.y = (getHeight() - font->lineHeight + 4) / 2.0;
 	//renderOffset.y = ( font->lineHeight + 4) ;
 }
 
@@ -188,6 +192,6 @@ std::string & CGUItextbox2::getText() {
 
 void CGUItextbox2::updateAppearance() {
 	CGUIbase::updateAppearance();
-	textBuf.setSize(drawBox.size.x, drawBox.size.y);
+	textBuf.setSize(getWidth(), getHeight());
 	renderText();
 }

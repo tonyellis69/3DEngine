@@ -661,3 +661,98 @@ void CGausTex::read(std::ifstream & in) {
 	readObject(size, in);
 	readObject(sigma, in);
 }
+
+void CRectsTex::loadShader() {
+	shader = pRenderer->createShader("texRects");
+	hDepth = shader->getUniformHandle("depth");
+	hVariance = shader->getUniformHandle("variance");
+	hFreq = shader->getUniformHandle("freq");
+	hStyle = shader->getUniformHandle("style");
+	hOctaves = shader->getUniformHandle("octaves");
+	hClusters = shader->getUniformHandle("clusters");
+
+}
+
+CRectsTex::CRectsTex() : CTexGen(texRects) { 
+	name = "Rects"; 
+	variance = 0.15f; depth = 3;
+	frequency = 3; octaves = 4;
+	style = 1; clusters = 0;
+}
+
+
+void CRectsTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	shader->setShaderValue(hDepth, depth);
+	shader->setShaderValue(hVariance, variance);
+	shader->setShaderValue(hOctaves, octaves);
+	shader->setShaderValue(hFreq, frequency);
+	shader->setShaderValue(hStyle, style);
+	shader->setShaderValue(hClusters, clusters);
+
+	pRenderer->renderToTextureQuad(mTarget);
+}
+
+void CRectsTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(depth, out);
+	writeObject(variance, out);
+	writeObject(frequency, out);
+	writeObject(octaves, out);
+	writeObject(style, out);
+	writeObject(clusters, out);
+}
+
+void CRectsTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(depth, in);
+	readObject(variance, in);
+	readObject(frequency, in);
+	readObject(octaves, in);
+	readObject(style, in);
+	readObject(clusters, in);
+}
+
+
+
+CBlocksTex::CBlocksTex() : CTexGen(texBlocks) {
+	name = "Blocks";
+	stages = 2; iterations = 3; density = 1; scale = 2;
+}
+
+void CBlocksTex::loadShader() {
+	shader = pRenderer->createShader("texBlocks");
+	hStages = shader->getUniformHandle("stages");
+	hIterations = shader->getUniformHandle("iterations");
+	hDensity = shader->getUniformHandle("density");
+	hScale = shader->getUniformHandle("scale");
+
+}
+
+void CBlocksTex::render() {
+	loadShader();
+	pRenderer->setShader(shader);
+	shader->setShaderValue(hStages, stages);
+	shader->setShaderValue(hIterations, iterations);
+	shader->setShaderValue(hDensity, density);
+	shader->setShaderValue(hScale, scale);
+	
+	pRenderer->renderToTextureQuad(mTarget);
+}
+
+void CBlocksTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(stages, out);
+	writeObject(iterations, out);
+	writeObject(density, out);
+	writeObject(scale, out);
+}
+
+void CBlocksTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(stages, in);
+	readObject(iterations, in);
+	readObject(density, in);
+	readObject(scale, in);
+}

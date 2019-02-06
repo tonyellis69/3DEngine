@@ -124,4 +124,24 @@ void CTerrain2::setCallbackApp(ITerrainCallback * pApp) {
 	pCallbackApp = pApp;
 }
 
+TShellInnerBounds & CTerrain2::getInnerBounds(unsigned int shellNo) {
+	TShellInnerBounds innerBounds = { i32vec3(0),i32vec3(0) };
+	if (shellNo == 0)
+		return innerBounds;
+
+	//get dimensions of this shell
+	vec3 thisShellBL = shells[shellNo].worldSpacePos - (shells[shellNo].worldSpaceSize * 0.5f);
+	vec3 thisShellTR = shells[shellNo].worldSpacePos + (shells[shellNo].worldSpaceSize * 0.5f);
+	//get dimensions of inner shell
+	vec3 innerShellBL = shells[shellNo-1].worldSpacePos - (shells[shellNo-1].worldSpaceSize * 0.5f);
+	vec3 innerShellTR = shells[shellNo-1].worldSpacePos + (shells[shellNo-1].worldSpaceSize * 0.5f);
+	
+	//find difference in SCs
+	innerBounds.bl = abs(i32vec3((thisShellBL - innerShellBL)));
+	innerBounds.bl  = innerBounds.bl / i32vec3(shells[shellNo].SCsize) + i32vec3(1);
+	innerBounds.tr = i32vec3((thisShellTR - innerShellTR) / shells[shellNo].SCsize) + i32vec3(1);
+	
+	return innerBounds;
+}
+
 

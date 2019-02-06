@@ -9,7 +9,7 @@ CGUIimageGrid::CGUIimageGrid(int x, int y, int _cols, int _rows, int size) {
 	type = imageGrid;
 
 	cols = _cols; rows = _rows; cellSize = size;
-	SetPos(x,y,cols*cellSize,rows*cellSize);
+	setLocalDimensions(x,y,cols*cellSize,rows*cellSize);
 	highlightColour = UIblue;
 	selectColour = UIyellow;
 	resizeGrid();
@@ -55,8 +55,8 @@ void CGUIimageGrid::DrawSelf( ) {
 	//	pDrawFuncs->setIconset(tilesheet);
 	for (int r=0;r<rows;r++) {
 		for (int c=0;c<cols;c++) {
-			cellBounds.x = screenPos.x + (c*cellSize);
-			cellBounds.y = screenPos.y + (r*cellSize);
+			cellBounds.x = getScreenPos().x + (c*cellSize);
+			cellBounds.y = getScreenPos().y + (r*cellSize);
 			if (cell[cellNo] != NONE) {
 				if (tilesheet == noTileset) {
 				//	pDrawFuncs->drawImage(cell[cellNo],cellBounds);
@@ -130,7 +130,7 @@ void CGUIimageGrid::setCellSize(int size) {
 void CGUIimageGrid::resizeGrid() {
 	cellCount = rows * cols;
 	cell.resize(cellCount,-1);
-	SetPos(localPos.x, localPos.y,cols*cellSize,rows*cellSize);
+	setLocalDimensions(getLocalPos().x, getLocalPos().y,cols*cellSize,rows*cellSize);
 }
 
 /** Return the cell number of the first empty cell, if any.*/
@@ -163,8 +163,8 @@ CGUIgridMouse::CGUIgridMouse() {
 
 /** Draws the image being dragged from this image grid, at the current mouse position. */
 void CGUIgridMouse::DrawSelf( ) {
-	imageBounds.x = mouse->screenPos.x;
-	imageBounds.y = mouse->screenPos.y;
+	imageBounds.x = mouse->getScreenPos().x;
+	imageBounds.y = mouse->getScreenPos().y;
 //	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
 //	if (tilesheet == NULL)
 	//	pDrawFuncs->drawImage(dragData,imageBounds);

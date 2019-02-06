@@ -1,8 +1,11 @@
 #include "GUIpaletteBar.h"
 #include "GUIroot.h"
 #include "GUIswatchContainer.h"
+#include "..\colour.h"
 
-
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/color_space.hpp>
+#include <glm/gtx/component_wise.hpp>
 
 CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {
 	type = uiPaletteBar;
@@ -65,8 +68,8 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 		if (Msg == MY_DOUBLECLICK) {
 			if (MouseDown == paletteImage) {
 				MouseDown = NULL;
-				glm::i32vec2 localMouse = getLocalPos(mouseX, mouseY);
-				float unitPos = (localMouse.x - paletteImageStartX) / float(paletteImage->drawBox.size.x);
+				glm::i32vec2 localMouse = calcLocalPos(mouseX, mouseY);
+				float unitPos = (localMouse.x - paletteImageStartX) / float(paletteImage->getWidth());
 				createTab(unitPos * 255.0f);
 			}
 		}
@@ -78,8 +81,8 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 		CGUIbase* topTab = NULL;
 		for (auto ctrl : Control) { //make sure it's the top one if they're stacked
 			if (ctrl->type == uiPaletteTab && IsOnControl(*ctrl, mouseX, mouseY)) {
-				if (ctrl->localPos.x > zPos) {
-					zPos = ctrl->localPos.x;
+				if (ctrl->getLocalPos().x > zPos) {
+					zPos = ctrl->getLocalPos().x;
 					topTab = ctrl;
 				}
 
@@ -106,12 +109,12 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 
 void CGUIpaletteBar::createTab(int tabIndex) {
 	CGUIpaletteTab* tab = addTab(tabIndex);
-	glm::vec4 colour = glm::vec4(colourGradient.getColour(tab->position)); 
-	colourGradient.changeColour(tab->position, glm::i32vec4(colour)); //TO DO: why do I do this?
+	glm::i32vec4 colour = glm::vec4(colourGradient.getColour(tab->position)); 
+	colourGradient.changeColour(tab->position, colour); //TO DO: why do I do this?
 	tab->colour = colour;
-	colour = colour / 255.0f;
-	tab->setBackColour1(colour);
-	tab->setBackColour2(colour);
+	glm::vec4 realColour = glm::vec4(colour) / 255.0f;
+	tab->setBackColour1(realColour);
+	tab->setBackColour2(realColour);
 
 	//ensure tabPosLbl is the last thing we draw
 	auto tabPosPos = std::find(Control.begin(),Control.end(), tabPosLbl);
@@ -119,9 +122,9 @@ void CGUIpaletteBar::createTab(int tabIndex) {
 }
 
 CGUIpaletteTab* CGUIpaletteBar::addTab(int tabIndex) {
-	int paletteImageProportion = paletteImage->drawBox.size.x *  (tabIndex / 255.0f);
-	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->localPos.x - (tabSize.x / 2),
-		paletteImage->localPos.y + barHeight, tabSize.x, tabSize.y);
+	int paletteImageProportion = paletteImage->getWidth() *  (tabIndex / 255.0f);
+	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->getLocalPos().x - (tabSize.x / 2),
+		paletteImage->getLocalPos().y + barHeight, tabSize.x, tabSize.y);
 	Add(tab);
 
 	tab->position = tabIndex;
@@ -139,10 +142,8 @@ void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
 		moveTab((CGUIpaletteTab*)sender, msg.x);
 	}
 	if (msg.Msg == uiMsgSlide && sender == hueSlider) {
-		cerr << "\n" << msg.value;
 		float dHueRotation =   msg.value - oldHueRotation;
 		oldHueRotation = msg.value;
-		cerr << " d " << dHueRotation;
 		colourGradient.rotateTabHues(dHueRotation);
 		for (auto ctrl : Control) {
 			if (ctrl->type == uiPaletteTab) {
@@ -162,7 +163,7 @@ void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
 	//User dropped a swatch onto a tab
 	if (sender->type == uiPaletteTab && msg.Msg == uiMsgUpdate) {
 		CGUIpaletteTab* tab = static_cast<CGUIpaletteTab*>(sender);
-		colourGradient.changeColour(tab->position, glm::i32vec4(tab->colour * 255.0f));
+		colourGradient.changeColour(tab->position, tab->colour );
 		updatePalette();
 	}
 }
@@ -174,7 +175,7 @@ void CGUIpaletteBar::deleteTab(CGUIpaletteTab* tab) {
 }
 
 void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
-	int direction = newPos > tab->localPos.x ? 1 : -1;
+	int direction = newPos > tab->getLocalPos().x ? 1 : -1;
 	int tabOffset = tabSize.x / 2;
 	//ensure tabs can travel to the edge of the palette and no further;
 	if (newPos < paletteImageStartX - tabOffset )
@@ -184,28 +185,25 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 
 	//ensure our tab can't move through another:
 	int ctrlPos; 
-	int lowerPos = min(tab->localPos.x, newPos);
-	int higherPos = max(tab->localPos.x, newPos);
+	int lowerPos = min(tab->getLocalPos().x, newPos);
+	int higherPos = max(tab->getLocalPos().x, newPos);
 	for (auto ctrl : Control) {
 		if (ctrl->type == uiPaletteTab && ctrl != tab) { //for each compared tab...
-			ctrlPos = ctrl->localPos.x;
+			ctrlPos = ctrl->getLocalPos().x;
 			//if it lies between this tab and the proposed new position
 			//make the new position one less than the compared tab
 			if (ctrlPos >= lowerPos && ctrlPos <= higherPos) {
 				newPos = ctrlPos - direction;
 				break;
 			}
-
 		}
 	} 
 
-	float unitPos = float( (newPos + tabOffset) - paletteImageStartX ) / paletteImage->drawBox.size.x;
+	float unitPos = float( (newPos + tabOffset) - paletteImageStartX ) / paletteImage->getWidth();
 	float tabNewPosf = unitPos * 255.0f;
 	int tabNewPos = round(tabNewPosf);
 
-
-
-	tab->setPos(newPos, tab->localPos.y);
+	tab->setPos(newPos, tab->getLocalPos().y);
 	int tabOldPos = tab->position;
 	if (tabOldPos != tabNewPos)
 		tab->position = colourGradient.moveTab(tabOldPos, tabNewPos);
@@ -213,7 +211,7 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 
 	//display position
 	tabPosLbl->setText(std::to_string(tabNewPos));
-	tabPosLbl->setPos(tab->localPos.x + tabSize.x, tab->localPos.y);
+	tabPosLbl->setPos(tab->getLocalPos().x + tabSize.x, tab->getLocalPos().y);
 	tabPosLbl->setVisible(true);
 }
 
@@ -253,22 +251,9 @@ void CGUIpaletteBar::changeTabColour(glm::i32vec4& newColour) {
 	colourChangeTab->colour = newColour;
 }
 
-void CGUIpaletteBar::logPalette() {
-	for (auto tab : colourGradient.getTabs()) {
-		glm::i32vec4 colour = tab.second; 
-		std::cerr << "\ncolourGradient.changeColour(" << tab.first << ", glm::i32vec4(" << colour.r << ", " << colour.g <<
-			", " << colour.b << ", " << colour.a << "));";
-	}
-}
+
 
 void CGUIpaletteBar::loadPalette() {
-	/**
-	//wood
-	colourGradient.changeColour(0, glm::i32vec4(189, 94, 4, 255));
-	colourGradient.changeColour(191, glm::i32vec4(144, 48, 6, 255));
-	colourGradient.changeColour(255, glm::i32vec4(60, 10, 8, 255));
-	*/
-
 	updatePalette();
 	clearTabControls();
 	for (auto tab : colourGradient.getTabs()) {
@@ -293,7 +278,6 @@ void * CGUIpaletteBar::getPixels() {
 }
 
 void CGUIpaletteBar::updatePalette() {
-//	paletteImage->setTextureData(colourGradient.getData());
 	paletteTexture.setData(colourGradient.getData());
 
 	CMessage msg;
@@ -303,7 +287,6 @@ void CGUIpaletteBar::updatePalette() {
 }
 
 void CGUIpaletteBar::addControls() {
-
 	hueSlider = new CGUIsysScrollbar(horizontal, paletteImageStartX, 0, 250);
 	hueSlider->setMin(0); hueSlider->setMax(360);
 	addToRow("hue", { hueSlider });
@@ -341,13 +324,11 @@ void CGUIpaletteBar::setIndicatorPosition(int indexPos) {
 void CGUIpaletteBar::DrawSelf() {
 	if (indicator > -1) {
 		guiRect indicatorRect;
-		int paletteImageProportion = paletteImage->drawBox.size.x * (indicator / 255.0);
-		indicatorRect.pos = { paletteImage->drawBox.pos.x + paletteImageProportion,paletteImage->drawBox.pos.y - 10 };
+		int paletteImageProportion = paletteImage->getWidth() * (indicator / 255.0);
+		indicatorRect.pos = { paletteImage->drawBox.pos.x + paletteImageProportion,paletteImage->getHeight() - 10 };
 		indicatorRect.size = { 2,10 };
 
 		pDrawFuncs->drawRect2(indicatorRect,uiBlack,uiBlack);
-
-
 	}
 }
 
@@ -376,7 +357,7 @@ void CGUIpaletteBar::createTabAtIndicator(float falloff) {
 /** Respond to a swatch being dropped on the gradient bar itself, by creating a new tab.*/
 void CGUIpaletteBar::onDrop(const int mouseX, const int mouseY) {
 	if (IsOnControl(*paletteImage, mouseX, mouseY) && dragDropObj->isDropType(this) ) {
-		int tabIndex = (float(mouseX - paletteImage->drawBox.pos.x) / (paletteImage->drawBox.size.x) ) * 255;
+		int tabIndex = (float(mouseX - paletteImage->drawBox.pos.x) / (paletteImage->getWidth()) ) * 255;
 		CGUIpaletteTab* tab = addTab(tabIndex);
 		colourChangeTab = tab;
 		changeTabColour(static_cast<CGUIdragDropSwatch*>(dragDropObj)->colour);
@@ -420,7 +401,7 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 	if ((MouseDown == this) && (scrollbarHasMouse == this)) {
 		CMessage msg;
 		msg.Msg = WM_MOUSEMOVE;
-		msg.x = mouseX  - lastMouseX + localPos.x; // getScreenCoords(mouseX, mouseY).x - lastMouseX + localPos.x;
+		msg.x = mouseX  - lastMouseX + getLocalPos().x; // getScreenCoords(mouseX, mouseY).x - lastMouseX + localPos.x;
 		lastMouseX = mouseX;// getScreenCoords(mouseX, mouseY).x;
 		parent->message(this, msg);
 
@@ -430,15 +411,37 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 /** Catch an attempt to drop a swatch. */
 void CGUIpaletteTab::onDrop(const int mouseX, const int mouseY) {
 	if (dragDropObj->isDropType(this)) {
-		glm::vec4 swatchColour = glm::vec4(static_cast<CGUIdragDropSwatch*>(dragDropObj)->colour)/255.0f;
-		setBackColour1(swatchColour);
-		setBackColour2(swatchColour);
+		glm::i32vec4 swatchColour = glm::vec4(static_cast<CGUIdragDropSwatch*>(dragDropObj)->colour);
+		glm::vec4 realColour = glm::vec4(swatchColour) / 255.0f;
+		setBackColour1(realColour);
+		setBackColour2(realColour);
 		colour = swatchColour;
 		CMessage msg;
 		msg.Msg = uiMsgUpdate;
 		parent->message(this, msg);
 	}
 	deleteDragDropObj();
+}
+
+/** Catch mousewheeling to adjust brightness (saturation). */
+bool CGUIpaletteTab::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key) {
+	if ( glm::compMin(glm::vec3(colour)) == glm::compMax(glm::vec3(colour)) )
+		return true;
+
+	float increment = float(wheelDelta) * 0.1f;
+	glm::vec3 rgb = col::byteToFloat(colour);
+	glm::vec3 hsv = glm::hsvColor(rgb);
+	hsv.y += increment;
+	hsv.y = glm::clamp(hsv.y,0.01f, 1.0f);
+	rgb = glm::rgbColor(hsv);
+	colour = glm::i32vec4(rgb * 255.0f, colour.a);
+	glm::vec4 realColour = glm::vec4(colour) / 255.0f;
+	setBackColour1(realColour);
+	setBackColour2(realColour);
+	CMessage msg;
+	msg.Msg = uiMsgUpdate;
+	parent->message(this, msg);
+	return true;
 }
 
 

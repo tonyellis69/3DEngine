@@ -22,6 +22,7 @@ public:
 	void updateDisplayImage();
 	void updateGUI();
 	void save();
+	void save2();
 	void restore(std::string& filename);
 	void clear();
 	void fillStackMenu();
@@ -35,6 +36,8 @@ public:
 	void highlightMouseColour(int x, int y);
 	void unhighlightMouseColour();
 	void popupMenuCallback(int choice);
+
+	void trackLayerImage(int layer);
 
 
 	CBaseApp* pApp;
@@ -58,11 +61,12 @@ public:
 	CNullTex nullTexGen;
 	bool shadeSelectionMode;
 
-	CGUIswatchContainer* tmpSwatch;
 
 	CTexGen* trackImage; //<Layer to use as image source.
 
 	CGUIimage* thumbnailImage;
+
+	int fileVersion;
 };
 
 

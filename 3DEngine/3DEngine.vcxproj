@@ -68,6 +68,7 @@
       <AdditionalDependencies>opengl32.lib;soil.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-d.lib</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions> /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

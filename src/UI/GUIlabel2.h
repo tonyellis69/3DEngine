@@ -19,9 +19,9 @@ public:
 	TTextAlign getJustification();
 	void DrawSelf();
 	//void borderOn(bool onOff);
-	void SetPos(int x, int y, int w, int h);
+	void setLocalDimensions(int x, int y, int w, int h);
 	void updateAppearance();
-	float getTextWidth();
+	int getTextWidth();
 	void calcLineOffset();
 
 	void calcLineRenderedWidth();

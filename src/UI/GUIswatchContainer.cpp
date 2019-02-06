@@ -51,7 +51,7 @@ CGUIswatchContainer::~CGUIswatchContainer() {
 
 /** Add a swatch group with the given name and colour swatches. */
 void CGUIswatchContainer::addSwatchGroup(std::string name, std::vector<glm::i32vec4>* colours) {
-	int defaultWidth = surface->drawBox.size.x;// -(indent * 2);
+	int defaultWidth = surface->getWidth();// -(indent * 2);
 	CGUIswatchGroup* newGroup = new CGUIswatchGroup(swatchGap, nextGroupY, defaultWidth, swatchSize + swatchGap );
 	newGroup->anchorLeft = true;
 	newGroup->anchorRight = 5;
@@ -62,7 +62,7 @@ void CGUIswatchContainer::addSwatchGroup(std::string name, std::vector<glm::i32v
 	newGroup->setGUIcallback(this);
 	newGroup->addColours(colours);
 	Add(newGroup);
-	nextGroupY += newGroup->drawBox.size.y;// +groupGap;
+	nextGroupY += newGroup->getHeight();// +groupGap;
 	respaceControls();
 	
 	//fitViewBoxToContainer();
@@ -132,8 +132,8 @@ void CGUIswatchContainer::respaceControls() {
 	int lastY = groupGap;
 	for (auto control : surface->Control) {
 		if (control->type == uiSwatchGroup) {
-			control->setPos(control->localPos.x, lastY);
-			lastY = control->localPos.y + control->drawBox.size.y + groupGap;
+			control->setPos(control->getLocalPos().x, lastY);
+			lastY = control->getLocalPos().y + control->getHeight() + groupGap;
 		}
 	}
 	addButton->setPos(addButtonX, lastY);
@@ -281,7 +281,7 @@ void CGUIswatchGroup::OnClick(const int mouseX, const int mouseY) {
 }
 
 int CGUIswatchGroup::getSwatchIndex(const int mouseX, const int mouseY) {
-	i32vec2 localMouse = getLocalPos(mouseX, mouseY);
+	i32vec2 localMouse = calcLocalPos(mouseX, mouseY);
 	localMouse.y -= nameTextbox->drawBox.size.y + surroundGap;
 	localMouse.x -= swatchGap;
 	if (localMouse.y < 0 || localMouse.x < 0)

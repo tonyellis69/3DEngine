@@ -770,9 +770,9 @@ void CGUIrichText::updateAppearance() {
 	//assume dimensions may have changed, eg, if this control was set to span
 	//TO DO: something's wrong, we come here way too many times
 	//cerr << "\nupdate appearance " << uniqueID;
-	if (textureWidth != drawBox.size.x || textureHeight != drawBox.size.y) {
-		textureWidth = drawBox.size.x;
-		textureHeight = drawBox.size.y;
+	if (textureWidth != getWidth()|| textureHeight != getHeight()) {
+		textureWidth = getWidth();
+		textureHeight = getHeight();
 		textBuf.setSize(textureWidth, textureHeight);
 		renderText();
 	}
@@ -798,19 +798,19 @@ void CGUIrichText::resizeToFit() {
 void CGUIrichText::resizeByRatio() {
 	float ratio = 2;// 1.618;
 	int heightModifier = pDrawFuncs->getFont(textObjs[currentTextObj].style.font)->lineHeight;
-	int newHeight = drawBox.size.y; int newWidth = drawBox.size.x;
+	int newHeight = getHeight(); int newWidth = getWidth();
 	bool previouslyOverrun = false;
 
 	while (overrun || underrun) {
 		if (overrun) {
 			previouslyOverrun = true;
-			newHeight = drawBox.size.y + heightModifier;
+			newHeight = getHeight() + heightModifier;
 		}
 		else {
 			if (previouslyOverrun) {
 				break;
 			}
-			newHeight = drawBox.size.y - underrun;
+			newHeight = getHeight() - underrun;
 		}
 		newWidth = newHeight * ratio;
 
@@ -818,30 +818,30 @@ void CGUIrichText::resizeByRatio() {
 	}
 
 	//tidy any remaining underrun
-	newHeight = drawBox.size.y - underrun;
+	newHeight = getHeight() - underrun;
 	resize(newWidth, newHeight);
 }
 
 void CGUIrichText::resizeByWidth() {
 	int rightBorder = 10;
-	int resizeX = drawBox.size.x;
-	if (drawBox.size.x != longestLine) {
+	int resizeX = getWidth();
+	if (resizeX != longestLine) {
 		resizeX = longestLine + rightBorder;
 	}
-	resize(resizeX, drawBox.size.y);
+	resize(resizeX, getHeight());
 
 	int resizeGuess = overrun;
 	while (overrun) {
-		if (drawBox.size.y + resizeGuess > maxHeight) {
+		if (getHeight() + resizeGuess > maxHeight) {
 			break;
 		}
 		else
-			resize(drawBox.size.x, drawBox.size.y + resizeGuess);
+			resize(getWidth(), getHeight() + resizeGuess);
 		resizeGuess *= 2;
 	}
 
 	if (underrun > 0) {
-		resize(drawBox.size.x, drawBox.size.y - underrun);
+		resize(getWidth(), getHeight() - underrun);
 	}
 }
 
@@ -863,13 +863,15 @@ CGUIrichText::~CGUIrichText() {
 }
 
 void CGUIrichText::resize(int w, int h) {
-	width = w; height = h;
 	if (w < 1) //because bad things happen if we make the texture 0 in height or width
 		w = 1;
 	if (h < 1)
 		h = 1;
-	drawBox.size = glm::i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
+//	drawBox.size = glm::i32vec2(w, h);
 	updateAppearance();
+	//TO DO: see if we can get away with flag here
 	//renderText();
 }
 

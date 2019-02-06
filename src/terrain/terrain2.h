@@ -22,7 +22,7 @@ public:
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
 	void setCallbackApp(ITerrainCallback* pApp);
-
+	TShellInnerBounds& getInnerBounds(unsigned int shellNo);
 	
 	std::vector<CShell> shells;
 

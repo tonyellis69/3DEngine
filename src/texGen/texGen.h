@@ -9,7 +9,7 @@
 
 enum TexGenType { texNoise, texColour, texRidged, texCylinder, texTurbulence,
 	texScaleBias, texAdd, texSeamless, texScalePoint, texBillow, texVoronoi,
-	texSelect, texLayer, texNull, texGaus
+	texSelect, texLayer, texNull, texGaus, texRects, texBlocks
 };
 
 /** A base class for creating texture generators. */
@@ -414,4 +414,74 @@ public:
 
 	unsigned int hSigma;
 	unsigned int hSize;
+};
+
+class CRectsTex : public CTexGen {
+public:
+	CRectsTex();
+	void loadShader();
+	void render();
+
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+	void setDepth(int depth) {this->depth = depth;}
+	void setVariance(float variance) { this->variance = variance; }
+	void setOctaves(int octaves) { this->octaves = octaves; }
+	void setFrequency(float freq) { this->frequency = freq; }
+	void setStyle(int style) { this->style = style; }
+	void setClusters(float clusters) { this->clusters = clusters; }
+
+	int getDepth() { return depth; }
+	float getVariance() { return variance; }
+	int getOctaves() { return octaves; }
+	float getFrequency() { return frequency; }
+	int getStyle() { return style; }
+	float getClusters() { return clusters; }
+
+
+	int depth;
+	float variance;
+	float frequency;
+	int octaves;
+	int style;
+	float clusters;
+
+	unsigned int hDepth;
+	unsigned int hVariance;
+	unsigned int hFreq;
+	unsigned int hOctaves;
+	unsigned int hStyle;
+	unsigned int hClusters;
+
+};
+
+class CBlocksTex : public CTexGen {
+public:
+	CBlocksTex();
+	void loadShader();
+	void render();
+
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+	void setStages(int stages) { this->stages = stages; }
+	void setIterations(int iterations) { this->iterations = iterations; }
+	void setDensity(float density) { this->density = density; }
+	void setScale(float scale) { this->scale = scale; }
+
+	int getStages() { return stages; }
+	int getIterations() { return iterations; }
+	float getDensity() { return density; }
+	float getScale() { return scale; }
+
+	int stages;
+	int iterations;
+	float density;
+	float scale;
+
+	unsigned int hStages;
+	unsigned int hIterations;
+	unsigned int hDensity;
+	unsigned int hScale;
 };

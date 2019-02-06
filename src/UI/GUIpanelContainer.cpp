@@ -11,14 +11,17 @@ CGUIpanelContainer::CGUIpanelContainer(int x, int y, int w, int h) {
 	borderWidth = 1;
 	horizontalBarActive = false;
 	type = panelContainer;
-	localPos = glm::i32vec2(x, y);
-	width = w; height = h;
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
+	//width = w; height = h;
+	setWidth(w);
+	setHeight(h);
 	
 	createScrollbars();
 	verticalBar->visible = false;
 	horizontalBar->visible = false;
 	createSurface();
-	surface->setViewbox(borderWidth,borderWidth, width-(borderWidth*2),height-(borderWidth*2));
+	surface->setViewbox(borderWidth,borderWidth, w-(borderWidth*2),h-(borderWidth*2));
 	surface->spaceAroundControls = 0;
 	fitViewBoxToContainer();
 	adaptToContents();
@@ -81,8 +84,8 @@ void CGUIpanelContainer::assignPanelPositions() {
 	int x = 0; int y = 0;
 
 	for (size_t p=0;p<surface->Control.size();p++) {
-		surface->Control[p]->SetPos(x,y,surface->viewBox.width,surface->Control[p]->height);
-		y += surface->Control[p]->height;
+		surface->Control[p]->setLocalDimensions(x,y,surface->viewBox.width,surface->Control[p]->getHeight());
+		y += surface->Control[p]->getHeight();
 	}
 }
 
@@ -123,7 +126,7 @@ void CGUIstackSurface::assignPanelPositions() {
 	int x = 0; int y = 0;
 
 	for (size_t p=0;p<Control.size();p++) {
-		Control[p]->SetPos(x,y,viewBox.width,Control[p]->height);
-		y += Control[p]->height;
+		Control[p]->setLocalDimensions(x,y,viewBox.width,Control[p]->getHeight());
+		y += Control[p]->getHeight();
 	}
 }

@@ -8,10 +8,12 @@ const int unChecked = 0;
 int CGUIcheckButton::Count = 1;
 CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
 //	pDrawFuncs->registerControl(*this);
-	localPos = glm::i32vec2(x, y);
+	setPos(x, y);
 
 	
-	drawBox.setSize(w, h);
+	//drawBox.setSize(w, h);
+	setWidth(w);
+	setHeight(h);
 	Orientation = lblFirst;
 	Set = false;
 	type = checkButton;

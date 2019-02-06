@@ -4,8 +4,11 @@
 using namespace glm;
 
 CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
-	drawBox.size = i32vec2(w, h);
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
+	//drawBox.size = i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	type = uiDropdownMenu;
 	borderOn(true);
 	setBackColour1(UIalmostWhite);
@@ -53,7 +56,7 @@ void CGUIdropdownMenu::OnClick(const int mouseX, const int mouseY) {
 /** Use this to ensure menu - which is attached to root, is in the right place.*/
 void CGUIdropdownMenu::updateAppearance() {
 	CGUIbase::updateAppearance();
-	menu->setPos(drawBox.pos.x, drawBox.pos.y + drawBox.size.y);
+	menu->setPos(drawBox.pos.x, drawBox.pos.y + getHeight());
 }
 
 void CGUIdropdownMenu::GUIcallback(CGUIbase* sender, CMessage& msg)  {

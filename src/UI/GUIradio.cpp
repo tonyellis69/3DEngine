@@ -3,8 +3,11 @@
 
 int CGUIradio::Count = 1;
 CGUIradio::CGUIradio(int x , int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
-	width = w;height = h;
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
+	//width = w;height = h;
+	setWidth(w);
+	setHeight(h);
 	GenName("Radio",Count++);
 	//SetText(Name);
 	Orientation = lblFirst;
@@ -23,7 +26,7 @@ void CGUIradio::DrawSelf( ) {
 ///////////	pDrawFuncs->setFont(TextFont);
 //	pDrawFuncs->setDrawColours(txtColour, txtColour);
 
-	int w = 0; int reducedWidth = width - iconOffset;
+	int w = 0; int reducedWidth = getWidth() - iconOffset;
 
 	if (MouseOver == this) {
 //		pDrawFuncs->setDrawColours(UIblack, UIblack);
@@ -37,12 +40,12 @@ void CGUIradio::DrawSelf( ) {
 
 	int lblPos, iconPos;
 	if (Orientation == lblFirst) {
-		iconPos =  screenPos.x + reducedWidth + (iconOffset >> 1) ;
-		lblPos = screenPos.x;
+		iconPos = getScreenPos().x + reducedWidth + (iconOffset >> 1) ;
+		lblPos = getScreenPos().x;
 		label->setPos(5, 5);
 	} else {
-		lblPos =  screenPos.x + iconOffset;
-		iconPos = screenPos.x + (iconOffset >> 1);
+		lblPos = getScreenPos().x + iconOffset;
+		iconPos = getScreenPos().x + (iconOffset >> 1);
 		label->setPos(10 + iconOffset, 5);
 	}
  

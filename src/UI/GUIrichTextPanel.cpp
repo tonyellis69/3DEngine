@@ -1,10 +1,13 @@
 #include "GUIrichTextPanel.h"
 
 CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
 	drawBorder = false;
 	//drawBox.pos = glm::i32vec2(x, y);
-	drawBox.size = glm::i32vec2(w, h);
+	//drawBox.size = glm::i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	type = uiRichTextPanel;
 	//pDrawFuncs->registerControl(*this);
 
@@ -99,7 +102,7 @@ unsigned int CGUIrichTextPanel::getRichTextID() {
 void CGUIrichTextPanel::updateAppearance() {
 	CGUIbase::updateAppearance();
 	richText->setPos(inset, inset);
-	richText->resize(drawBox.size.x - (2*inset), drawBox.size.y - (2*inset));
+	richText->resize(getWidth() - (2*inset), getHeight() - (2*inset));
 	//richText->updateAppearance();
 }
 
@@ -125,8 +128,8 @@ void CGUIrichTextPanel::resizeToFit() {
 
 void CGUIrichTextPanel::message(CGUIbase* sender, CMessage& msg) {
 	if (msg.Msg == uiMsgChildResize) {
-		drawBox.size.x = richText->drawBox.size.x + (2 * inset);
-		drawBox.size.y = richText->drawBox.size.y + (2 * inset);
+		drawBox.size.x = richText->getWidth() + (2 * inset);
+		drawBox.size.y = richText->getHeight() + (2 * inset);
 		updateAppearance();
 	}
 

@@ -168,7 +168,7 @@ class IPopupMenu;
 class CGUIbase : public Icallback {
 public:
 	CGUIbase() ;
-	//CGUIbase(int x, int y, int w, int h);
+	CGUIbase(int x, int y, int w, int h);
 	virtual ~CGUIbase(void);
 	bool IsOnControl(const CGUIbase& Control,const  int mouseX, const  int mouseY);
 	virtual void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
@@ -185,8 +185,10 @@ public:
 	virtual void onMouseOff(const  int mouseX, const  int mouseY, int key) {};
 	virtual void onDrag(const  int mouseX, const  int mouseY) {};
 	virtual void onDrop(const  int mouseX, const  int mouseY);
-	void SetPos(int x, int y, int w, int h);
+	void setLocalDimensions(int x, int y, int w, int h);
 	virtual void setPos(int x, int y);
+	virtual void setPosX(int x);
+	virtual void setPosY(int y);
 	virtual void Add(CGUIbase* child);
 	virtual void updateAppearance();
 	virtual void Draw();
@@ -224,9 +226,13 @@ public:
 	void setDefaultFont(CFont* font);
 
 	glm::i32vec2 getScreenCoords(int x, int y);
-	glm::i32vec2 getLocalPos(int x, int y);
+	glm::i32vec2 calcLocalPos(int x, int y);
+	glm::i32vec2& getLocalPos();
 	int getWidth();
 	int getHeight();
+	void setWidth(int w);
+	void setHeight(int h);
+	const glm::i32vec2 getScreenPos();
 	virtual void resize(int w, int h);
 	void setGUIcallback(Icallback* callbackInstance);
 	virtual void GUIcallback(CGUIbase* sender, CMessage& msg);
@@ -245,11 +251,8 @@ public:
 	
 	glm::i32vec2 localPos; ///<Top left corner position relative to parent;
 	
-	int width; ///<Width of control.
-	int height; ///<Height of control.
-	UIshape rect; ///<Width and height of control.
 
-	UIcoord screenPos; ///<Top left in ui screen coordinates.
+	//UIcoord screenPos; ///<Top left in ui screen coordinates.
 
 	UIcolour backColour1; ///<First background colour of this control.
 	UIcolour backColour2; ///<Second background colour of this control.
@@ -267,8 +270,7 @@ public:
 	UIrect Clipbox; ///<A clipping rectangle defining the drawable area of this control.
 	
 	CGUIbase* parent; ///<Points to the parent control of this control.
-	//CGUIbetterBase* parent; ///<Points to the parent control of this control.
-
+	
 	std::string Name; ///<String identifying this control.
 
 	static int Count; ///<Records how many of this control have been created.

@@ -13,7 +13,6 @@ class CGUInoiseCtrl : public CGUIpanel {
 public:
 	CGUInoiseCtrl(int x, int y, int w, int h);
 	void message(CGUIbase * sender, CMessage & msg);
-	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 	glm::vec3 getFullRotation();
 	glm::vec3 getFullPosition();
 	glm::vec3 getScalePt();
@@ -53,5 +52,15 @@ public:
 	CGUInumeric2* gausSizeCtrl;
 	CGUInumeric2* gausSigmaCtrl;
 
-	CGUInumeric2* percentageCtrl;;
+	CGUInumeric2* percentageCtrl;
+
+	CGUInumeric2* rectsDepthCtrl;
+	CGUInumeric2* rectsVarianceCtrl;
+	CGUInumeric2* rectsStyleCtrl;
+	CGUInumeric2* clustersCtrl;
+
+	CGUInumeric2* blocksStagesCtrl;
+	CGUInumeric2* blocksIterationsCtrl;
+	CGUInumeric2* blocksDensityCtrl;
+	CGUInumeric2* blocksScaleCtrl;
 };

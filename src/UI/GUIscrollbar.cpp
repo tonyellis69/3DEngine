@@ -6,11 +6,12 @@ using namespace std;
 CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y, int length) {
 	orientation = axis; 
 	type = scrollbar;
-	localPos = glm::i32vec2(x,y);
+	//localPos = glm::i32vec2(x,y);
+	setPos(x, y);
 	if (orientation == horizontal) {
-		width = length; height = barWidth; }
+		setWidth(length); setHeight(barWidth); }
 	else {
-		height = length; width = barWidth; }
+		setHeight(length); setWidth(barWidth); }
 
 	SliderSize = 30; //some defaults
 	Max = 100; Min = 1; Value = 1;
@@ -20,7 +21,7 @@ CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y
 	id = uiScrollbarID;
 
 	//drawBox.pos = glm::i32vec2(x, y); 
-	drawBox.size = glm::i32vec2(width, height);
+	//drawBox.size = glm::i32vec2(width, height);
 	//pDrawFuncs->registerControl(*this);
 	setBackColour1(UIlightGrey);
 	setBackColour2(UIlightGrey);
@@ -29,9 +30,9 @@ CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y
 /** Make the slider size a proportion of the scrollbar's total length. */
 void CGUIbaseScrollbar::setSliderSize(float ratio) {
 	if (orientation == horizontal) 
-		SliderSize = (int)(width * ratio);
+		SliderSize = (int)(getWidth() * ratio);
 	else 
-		SliderSize = (int)(height * ratio);
+		SliderSize = (int)(getHeight() * ratio);
 	if (SliderSize < 30)
 		SliderSize = 30;
 }
@@ -43,7 +44,7 @@ void CGUIbaseScrollbar::updateAppearance() {
 }
 
 void CGUIbaseScrollbar::updateSliderAppearance() {
-	Travel = (orientation == horizontal) ? width : height;
+	Travel = (orientation == horizontal) ? getWidth() : getHeight();
 	Travel -= SliderSize;
 	float Ratio = (float) (Value - Min) / (Max - Min) ;
 	SliderPos = (int)(Travel * Ratio);
@@ -72,25 +73,25 @@ void CGUIbaseScrollbar::DrawSelf( ) {
 		drawColour = (glm::vec4&)UIdarkGrey;
 	}
 	
-	guiRect drawbox;
+	guiRect sliderBox;
 	//UIcoord sliderScrnPos = screenPos;
 		if (orientation == horizontal) {
 			//sliderScrnPos.x += SliderPos+2; sliderScrnPos.y += 2;
-			drawbox.pos.x = drawBox.pos.x + SliderPos + 2;
-			drawbox.pos.y = drawBox.pos.y +  2;
-			drawbox.size.x = SliderSize - 4;
-			drawbox.size.y = drawBox.size.y - 4;
-			//drawbox = {sliderScrnPos,SliderSize-4,height-4);
+			sliderBox.pos.x = drawBox.pos.x + SliderPos + 2;
+			sliderBox.pos.y = drawBox.pos.y +  2;
+			sliderBox.size.x = SliderSize - 4;
+			sliderBox.size.y = getHeight() - 4;
+			//sliderBox = {sliderScrnPos,SliderSize-4,height-4);
 		}
 		else {
 			//sliderScrnPos.x += 2; sliderScrnPos.y += (height - SliderPos - SliderSize) +2;
-			drawbox.pos.x = drawBox.pos.x + 2;
-			drawbox.pos.y = drawBox.pos.y + (drawBox.size.y - SliderPos - SliderSize) + 2;
+			sliderBox.pos.x = drawBox.pos.x + 2;
+			sliderBox.pos.y = drawBox.pos.y + (getHeight() - SliderPos - SliderSize) + 2;
 			//pDrawFuncs->drawRect(sliderScrnPos,width-4,SliderSize-4);
-			drawbox.size.x = drawBox.size.x - 4;
-			drawbox.size.y = SliderSize - 4;
+			sliderBox.size.x = getWidth() - 4;
+			sliderBox.size.y = SliderSize - 4;
 		}
-		pDrawFuncs->drawRect2(drawbox, drawColour, drawColour);
+		pDrawFuncs->drawRect2(sliderBox, drawColour, drawColour);
 }
 
 
@@ -100,9 +101,9 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 	int mousePos;
 
 	if (orientation == horizontal) 
-		mousePos = getLocalPos(mouseX, mouseY).x; 
+		mousePos = calcLocalPos(mouseX, mouseY).x; 
 	else
-		mousePos = height - getLocalPos(mouseX, mouseY).y;
+		mousePos = getHeight() - calcLocalPos(mouseX, mouseY).y;
 
 	if (mousePos < SliderPos) {
 		SliderPos -= clickIncrement; 
@@ -123,9 +124,9 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 void CGUIbaseScrollbar::OnMouseMove(int mouseX, int mouseY,int key) {
 	if ((MouseDown == this) && ( scrollbarHasMouse  == this)) {//scrollbar dragging appears to be going on
 		if (orientation == horizontal) 
-			SliderPos = getLocalPos(mouseX, mouseY).x - mouseSliderOffset;
+			SliderPos = calcLocalPos(mouseX, mouseY).x - mouseSliderOffset;
 		else {
-			SliderPos = (height - getLocalPos(mouseX, mouseY).y) - mouseSliderOffset;
+			SliderPos = (getHeight() - calcLocalPos(mouseX, mouseY).y) - mouseSliderOffset;
 		}
 		updateValue();
 	}

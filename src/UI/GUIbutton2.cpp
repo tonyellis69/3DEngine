@@ -4,11 +4,14 @@
 
 using namespace glm;
 
-CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
+CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
+	//setPos(x, y);
 	//width = w; height = h;
 	//drawBox.pos = i32vec2(x, y);
-	drawBox.size = i32vec2(w, h);
+	//drawBox.size = i32vec2(w, h);
+	//setWidth(w);
+	//setHeight(h);
+
 
 	type = uiButton;
 

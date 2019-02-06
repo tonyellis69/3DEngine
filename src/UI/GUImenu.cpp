@@ -3,15 +3,19 @@
 using namespace glm;
 
 CGUImenu::CGUImenu(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y); width = w; height = h;
-	drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
+	//width = w; height = h;
+	//drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	itemFont = defaultFont;
 	textColour = UIblack;
 	focusColour = uiLightGrey;
 	type = uiMenu;
 	vItemPad =  4;
 	hItemPad = 1;
-	itemWidth = width;
+	itemWidth = w;
 	maxTextWidth = 0;// itemWidth;
 	itemHeight = itemFont->lineHeight + vItemPad;
 	clear();
@@ -91,11 +95,11 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 
 /** Resize to fit current items. */
 void CGUImenu::resizeToFit() {
-	width = itemWidth + 2 * hItemPad;
+	setWidth(itemWidth + 2 * hItemPad);
 	unsigned int visibleItems = std::max(items.size(), minItemsShown);
 	visibleItems = std::min(visibleItems, maxItemsShown);
-	height = (itemHeight + vItemPad) * visibleItems + vItemPad;
-	drawBox.size = i32vec2(width, height);
+	setHeight( (itemHeight + vItemPad) * visibleItems + vItemPad);
+	//drawBox.size = i32vec2(width, height);
 	for (auto item : items)
 		item->resize(itemWidth, itemHeight);
 	updateAppearance();
@@ -135,11 +139,11 @@ bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta,
 void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	if (items.size() == 0)
 		return;
-	i32vec2 mouse = getLocalPos(mouseX, mouseY);
+	i32vec2 mouse = calcLocalPos(mouseX, mouseY);
 	if (focusItem >=0 && focusStyle == menuHighlightText)
 		items[focusItem]->setTextColour(textColour);
 	setFocusItem(-1);
-	if (mouse.x > 0 && mouse.x < drawBox.size.x && mouse.y > 0 && mouse.y < drawBox.size.y) {
+	if (mouse.x > 0 && mouse.x < getWidth() && mouse.y > 0 && mouse.y < getHeight()) {
 		int slot = mouse.y / (itemHeight + vItemPad);
 		if (slot > nItems - 1)
 			setFocusItem(nItems - 1);

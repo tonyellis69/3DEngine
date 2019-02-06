@@ -3,7 +3,7 @@
 using namespace glm;
 
 CGUIsysIconButton::CGUIsysIconButton(int x, int y){
-	SetPos(x,y,defaultIconButtonSize,defaultIconButtonSize);
+	setLocalDimensions(x,y,defaultIconButtonSize,defaultIconButtonSize);
 	iconset = defaultIconset;
 	icon = 0;
 	type = iconButton;
@@ -11,11 +11,14 @@ CGUIsysIconButton::CGUIsysIconButton(int x, int y){
 }
 
 CGUIsysIconButton::CGUIsysIconButton(int x, int y, int w, int h) {
-	localPos = glm::i32vec2(x, y);
+	//localPos = glm::i32vec2(x, y);
+	setPos(x, y);
 	//drawBox.pos = i32vec2(x, y);
-	drawBox.size = i32vec2(w, h);
+	//drawBox.size = i32vec2(w, h);
+	setWidth(w);
+	setHeight(h);
 	pDrawFuncs->registerControl(*this);
-	//SetPos(x, y, w, h);
+	//setLocalDimensions(x, y, w, h);
 	iconset = defaultIconset;
 	icon = 0;
 	type = iconButton;

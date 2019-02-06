@@ -106,7 +106,7 @@ void CBaseApp::onWinResize( int w, int h) {
 	viewWidth = w; viewHeight = h;
 	Engine.resizeView(0,0,w,h); //We need to change shape of view.
 	drawFuncs->setScreenSize(w, h);
-	GUIroot.SetPos(0,0,w,h); //Resize the base UI control so it's always the size of the view.
+	GUIroot.setLocalDimensions(0,0,w,h); //Resize the base UI control so it's always the size of the view.
 	onResize(w,h); //Call the user's resize handler, in case they want to do something;
 }
 
@@ -186,9 +186,8 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 
 /** Event handler for mouse wheel messages. */
 void CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
-	int x, y;
 //	getMousePos(x, y); //gives negative y for some reason!
-	int delta = yoffset;
+	int delta = int(yoffset);
 	int keyState = 0; //can get key state if ever needed
 	if (GUIroot.IsOnControl(GUIroot,mouseX, mouseY)) //checks that the mouse isn't outside our app altogether
 		GUIroot.MouseWheelMsg(mouseX, mouseY,delta,keyState);

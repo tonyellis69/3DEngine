@@ -11,7 +11,6 @@
 struct colourTab { //wraps the colour slider tabs
 	CGUIpanel* gui;
 	float position;
-
 };
 
 class CGUIpaletteTab;
@@ -32,7 +31,6 @@ public:
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
 	void editTabColour(CGUIpaletteTab* sender);
 	void changeTabColour(glm::i32vec4& newColour);
-	void logPalette();
 	void loadPalette();
 	void clearTabControls();
 	void* getPixels();
@@ -84,10 +82,11 @@ public:
 	void onRMouseUp(const int mouseX, const int mouseY);
 	void OnMouseMove(int mouseX, int mouseY, int key);
 	void onDrop(const  int mouseX, const  int mouseY);
+	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 
 
 	int position;
-	glm::vec4 colour;
+	glm::i32vec4 colour;
 	int lastMouseX;
 };
 

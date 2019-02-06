@@ -5,6 +5,7 @@
 #include "..\direction.h"
 #include "scArray.h"
 
+class CShellIterator;
 class CTerrain2;
 class CShell {
 public:
@@ -17,6 +18,7 @@ public:
 	void scroll(Tdirection direction);
 	void initSuperChunks();
 	void findSCintersections();
+	CShellIterator& getIterator();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -36,4 +38,37 @@ public:
 	int shellNo;
 
 	CSCarry scArray;
+};
+
+
+class CShellIterator  {
+public:
+	CShellIterator(CShell* pShell);
+	CSuperChunk2* SC();
+	CShellIterator& operator++();
+	CShellIterator operator++(int);
+
+	CSuperChunk2& operator*();
+	CSuperChunk2* operator->();
+
+	bool finished();
+
+	glm::i32vec3& getIndex();
+
+//	bool operator==(const CShellIterator& rhs) const { return pSC == rhs.pSC; }
+//	bool operator!=(const CShellIterator& rhs) const { return pSC != rhs.pSC; }
+
+private:
+	CShell* pShell;
+	glm::i32vec3 index; 
+	glm::i32vec3 max;
+	CSuperChunk2* pSC;
+};
+
+/** Stores the inner dimensions of a shell, ie, the innermost superchunk 
+	layers before they are entirely replaced by the shell within, if any.*/
+struct TShellInnerBounds {
+	glm::i32vec3 bl;
+	glm::i32vec3 tr;
+
 };

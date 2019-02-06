@@ -23,6 +23,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	powerCtrl->setValue(0.1f); powerCtrl->setIncrement(0.1f);
 	powerCtrl->setMinMax(0, 32);
 
+	addToRow("octave", { lbl,octaveCtrl });
 	addToRow("octavePower", { lbl, octaveCtrl, lbl2, powerCtrl });
 
 
@@ -202,7 +203,59 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl2->setText("Seam falloff");
 
 	addToRow("seamPercentFalloff", {lbl2, falloffCtrl,lbl, percentageCtrl });
-	
+
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Depth");
+	rectsDepthCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	rectsDepthCtrl->setValue(3); rectsDepthCtrl->setMinMax(1, 10);
+
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Variance");
+	rectsVarianceCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	rectsVarianceCtrl->setValue(0.15f); rectsVarianceCtrl->setMinMax(0, 1);
+	rectsVarianceCtrl->setIncrement(0.01f);
+	addToRow("rectsDepthVariance", { lbl,rectsDepthCtrl,lbl2,rectsVarianceCtrl });
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Style");
+	rectsStyleCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	rectsStyleCtrl->setValue(1); rectsStyleCtrl->setMinMax(0,2);
+
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Clusters");
+	clustersCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	clustersCtrl->setValue(0.0f); rectsVarianceCtrl->setMinMax(0, 1);
+	clustersCtrl->setIncrement(0.01f);
+
+	addToRow("styleClusters", { lbl,rectsStyleCtrl,lbl2, clustersCtrl });
+
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Stages");
+	blocksStagesCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	blocksStagesCtrl->setValue(2); blocksStagesCtrl->setMinMax(1, 10);
+
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Iterations");
+	blocksIterationsCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	blocksIterationsCtrl->setValue(3); blocksIterationsCtrl->setMinMax(1, 10);
+
+	addToRow("stagesIterations", { lbl,blocksStagesCtrl,lbl2,blocksIterationsCtrl });
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Density");
+	blocksDensityCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	blocksDensityCtrl->setValue(1); blocksDensityCtrl->setMinMax(0, 10);
+
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Scale");
+	blocksScaleCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	blocksScaleCtrl->setValue(2); blocksScaleCtrl->setMinMax(1, 10);
+	blocksScaleCtrl->setIncrement(0.5f);
+
+	addToRow("densityScale", { lbl,blocksDensityCtrl,lbl2,blocksScaleCtrl });
+
 }
 
 
@@ -212,15 +265,6 @@ void CGUInoiseCtrl::message(CGUIbase* sender, CMessage& msg) {
 	}
 }
 
-bool CGUInoiseCtrl::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
-	if (CGUIbase::MouseWheelMsg(mouseX, mouseY, wheelDelta, key))
-		return true;
-	//rotate stack
-	CMessage msg;
-	msg.Msg = uiMouseWheel;
-	msg.value = wheelDelta;
-	message(this, msg);
-}
 
 
 glm::vec3 CGUInoiseCtrl::getFullRotation() {
