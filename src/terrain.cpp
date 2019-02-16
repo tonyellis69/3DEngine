@@ -50,7 +50,7 @@ void CTerrain::setSizes(int _chunksPerSChunkEdge, int _cubesPerChunkEdge, float 
 /** Create a series of nested shells made of superchunks. */
 void CTerrain::createShells(float terrainSize, float centreShellSize, int steps) {
 	TShellCalcData calcData;
-	int numShells = calcTotalShells(terrainSize,centreShellSize, steps, calcData);
+	int numShells = calcTotalShells((int)terrainSize,centreShellSize, steps, calcData);
 
 	// we should now have enough info to create the SC shells
 	float LoD1SCsize = LoD1cubeSize * cubesPerChunkEdge * chunksPerSChunkEdge; 

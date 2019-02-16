@@ -153,6 +153,30 @@ CTexGen * ComposeTest::createBlocksTex() {
 	return texGen;
 }
 
+CTexGen * ComposeTest::createCoverTex() {
+	CoverTex* texGen = new CoverTex();
+	addToStack(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
+}
+
+CTexGen * ComposeTest::createCutupTex() {
+	CutupTex* texGen = new CutupTex();
+	texGen->setSource(&nullTexGen);
+	texGen->setSource2(&nullTexGen);
+	addToStack(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
+}
+
+CTexGen * ComposeTest::createTerrainTex() {
+	CTerrainTex* texGen = new CTerrainTex();
+	addToStack(texGen);
+	texGen->setTarget(createTarget());
+	return texGen;
+}
+
+
 void ComposeTest::addToStack(CTexGen* texGen) {
 	//check for unique name
 	string newName = texGen->name;
@@ -280,7 +304,7 @@ void ComposeTest::setCurrentLayer(int layerNo) {
 	stackPosition = layerNo;
 	if (stackPosition < 0)
 		stackPosition = 0;
-	else if (stackPosition >= texGens.size())
+	else if (stackPosition >= (int)texGens.size())
 		stackPosition = texGens.size() - 1;
 
 	currentTexGen = texGens[stackPosition];
@@ -310,3 +334,110 @@ void ComposeTest::deleteTexGen(int stackNo) {
 		setCurrentLayer(stackNo - 1);
 	
 }
+
+void ComposeTest::save(std::string filename) {
+	std::ofstream out(filename, std::ios::binary);
+	out << "t1"; //identifier
+
+	for (auto texGen : texGens) //gives the overall composition of the stack
+		writeObject(texGen->texGenType, out);
+	writeObject(texNull, out);
+
+	auto writeTexIndex = [&](CTexGen* texGen) {
+		if (texGen == NULL) {
+			writeObject((char)-1, out);	return;
+		}
+		for (char x = 0; x < (char)texGens.size(); x++) {
+			if (texGen == texGens[x]) {
+				writeObject(x, out);	return;
+			}
+		}
+
+	};
+
+	for (auto texGen : texGens) { //write index of sources
+		writeTexIndex(texGen->srcTex1);
+		writeTexIndex(texGen->srcTex2);
+		writeTexIndex(texGen->srcTex3);
+		texGen->write(out);
+	}
+	out.close();
+
+}
+
+void ComposeTest::restore(std::string filename) {
+	std::ifstream in(filename, std::ios::binary);
+	if (in.fail() || in.get() != 't') {
+		cerr << "\nUnable to open tex file " << filename;
+		return;
+	}
+
+	fileVersion = int(in.get());
+
+	//find and load all the texgens
+	TexGenType texGenType;
+	while (readObject(texGenType, in)) {
+		if (texGenType == texNull)
+			break;
+		switch (texGenType) {
+		case texColour:		createColouriseTex(); break;
+		case texNoise: createNoiseTex(); break;
+		case texVoronoi: createVoronoiTex(); break;
+		case texBillow: createBillowTex(); break;
+		case texRidged: createRidgedMFTex(); break;
+		case texCylinder: createCylinderTex(); break;
+		case texTurbulence: createTurbulenceTex(); break;
+		case texScaleBias: createScaleBiasTex(); break;
+		case texSeamless:  createSeamlessTex(); break;
+		case texAdd: createAddTex(); break;
+		case texScalePoint: createScalePointTex(); break;
+		case texSelect: createSelectTex(); break;
+		case texLayer: createLayerTex(); break;
+		case texGaus: createGausTex(); break;
+		case texRects: createRectsTex(); break;
+		case texBlocks: createBlocksTex(); break;
+		case texCover: createCoverTex(); break;
+		case texCutup: createCutupTex(); break;
+		case texTerrain: createTerrainTex(); break;
+		}
+	}
+
+	auto getColourGradient = [&]() { ColourGradient gradIn; int tabCount; readObject(tabCount, in);
+	int tab; i32vec4 colour;
+	for (int x = 0; x < tabCount; x++) {
+		readObject(tab, in); readObject(colour, in);
+		gradIn.changeColour(tab, colour);
+	}
+	return gradIn;
+	};
+
+	//read sources and data into texgens
+	char x;
+	for (auto texGen : texGens) {
+		x = in.get();
+		if (x != -1)
+			texGen->setSource(texGens[x]);
+		x = in.get();
+		if (x != -1)
+			texGen->setSource2(texGens[x]);
+		x = in.get();
+		if (x != -1)
+			texGen->setSource3(texGens[x]);
+		if (texGen->texGenType == texColour) {
+			texGen->setPalette(getColourGradient());
+		}
+		else
+			texGen->read(in);
+	}
+	in.close();
+
+	compose();
+	compose(); //ugh. Ensures texgens with forward references are up-to-date
+
+}
+
+/** Return the end-product texture. */
+CRenderTexture& ComposeTest::getComposedTexture() {
+	return *texGens.back()->getTarget();
+}
+

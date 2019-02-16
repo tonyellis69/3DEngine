@@ -66,7 +66,7 @@ public:
 
 	CGUIimage* thumbnailImage;
 
-	int fileVersion;
+
 };
 
 

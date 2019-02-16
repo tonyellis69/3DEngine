@@ -8,12 +8,13 @@ enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 
 
 /** A class for storing vertices organised for drawing. */
+template<class T>
 class CMesh {
 public:
 
 
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> normals;
+	std::vector<T> vertices;
+	std::vector<T> normals;
 	std::vector<unsigned int> indices;
 	TMesh type;
 };

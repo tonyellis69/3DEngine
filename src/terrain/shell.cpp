@@ -59,10 +59,10 @@ void CShell::playerAdvance(Tdirection direction) {
 		//(3) scroll the SCs, then add a layer 
 		Tdirection scrollDir = flipDir(direction);
 		std::cerr << " scrolling.";
+
 		scroll(scrollDir);
 		addToFaceLayer(direction);
 
-	
 		if (shellNo != 0)
 			pTerrain->returnShellAndOuterShells(*this, direction);
 	}
@@ -117,9 +117,10 @@ void CShell::scroll(Tdirection scrollDirection) {
 	i32vec3 rotateVec = dirToVec(inDirection);
 	scArray.rotate(rotateVec);
 
+	//The scrolled-out SCs have lost their chunks and maybe gained new ones, so reset them
+	resampleFace(scrollDirection);
 
 	//we've just lost a SC's worth of chunks in the 'in' direction, so:
-
 	chunkExtent[inDirection] -= SCchunks;
 	faceLayerFull[inDirection] = false;
 
@@ -168,7 +169,8 @@ void CShell::initSuperChunks() {
 
 /** Ask all superchunks to check if they are intersected by terrain. */
 void CShell::findSCintersections() {
-	CShellIterator it = getIterator();
+	//TO DO: only check outer SCs
+	COuterSCIterator it = getOuterSCiterator();
 	while (!it.finished()) {
 		it->checkForIntersection();
 		it++;
@@ -178,6 +180,22 @@ void CShell::findSCintersections() {
 
 CShellIterator & CShell::getIterator() {
 	return CShellIterator(this);
+}
+
+COuterSCIterator & CShell::getOuterSCiterator() {
+	return COuterSCIterator(this);
+}
+
+TShellInnerBounds & CShell::getInnerBounds() {
+	return pTerrain->getInnerBounds(shellNo);
+}
+
+/**	Check if the SCs in this face intersect with terrain (and request the chunks if they do). */
+void CShell::resampleFace(Tdirection face) {
+	//get an iterator to the face
+	//iterate through all the SCs in the face
+	//clear the old intersection data
+	//check for intersections with the terrain
 }
 
 
@@ -235,4 +253,92 @@ bool CShellIterator::finished() {
 
 glm::i32vec3 & CShellIterator::getIndex() {
 	return index;
+}
+
+
+
+COuterSCIterator::COuterSCIterator(CShell * pShell) : CShellIterator(pShell) {
+	innerBounds = pShell->getInnerBounds();
+}
+
+
+COuterSCIterator & COuterSCIterator::operator++() {
+	if (pSC != NULL) {
+		if (index.z == innerBounds.bl.z && ( index.y > innerBounds.bl.y && index.y < innerBounds.tr.y ) 
+			&& (index.x > innerBounds.bl.x && index.x < innerBounds.tr.x) )
+			index.z = innerBounds.tr.z;
+		else
+			index.z++;
+		if (index.z == max.z) {
+			index.z = 0;
+			if (index.y == innerBounds.bl.y && (index.z > innerBounds.bl.z && index.z < innerBounds.tr.z)
+				&& (index.x > innerBounds.bl.x && index.x < innerBounds.tr.x))
+				index.y = innerBounds.tr.y;
+			else
+				index.y++;
+			if (index.y == max.y) {
+				index.y = 0;
+				if (index.x == innerBounds.bl.x && (index.y > innerBounds.bl.y && index.y < innerBounds.tr.y)
+					&& (index.z > innerBounds.bl.z && index.z < innerBounds.tr.z))
+					index.x = innerBounds.tr.x;
+				else
+					index.x++;
+				if (index.x == max.x) {
+					pSC = NULL;
+					return *this;
+				}
+			}
+
+		}
+		pSC = &pShell->scArray.element(index.x, index.y, index.z);
+	}
+	return *this;
+
+}
+
+COuterSCIterator COuterSCIterator::operator++(int) {
+	COuterSCIterator tmp(*this);
+	operator++();
+	return tmp;
+}
+
+
+CFaceIterator::CFaceIterator(CShell * pShell, Tdirection face) : CShellIterator(pShell) {
+	pseudoX = getXaxis(face);
+	pseudoY = getYaxis(face);
+	pseudoZ = getAxis(face);
+
+	if (face == south || face == east || face == up)
+		pseudoZValue = pShell->shellSCs - 1;
+	else
+		pseudoZValue = 0;
+}
+
+CFaceIterator & CFaceIterator::operator++() {
+	i32vec3 element;
+	element[pseudoZ] = pseudoZValue;
+
+	if (pSC != NULL) {
+		index.y++;
+		if (index.y == max.y) {
+			index.y = 0;
+			index.x++;
+			if (index.x == max.x) {
+				pSC = NULL;
+				return *this;
+			}
+		}
+
+		element[pseudoX] = index.x;
+		element[pseudoY] = index.y;
+
+		pSC = &pShell->scArray.element(element.x, element.y, element.z);
+	}
+	return *this;
+}
+
+CFaceIterator CFaceIterator::operator++(int) {
+	CFaceIterator tmp(*this);
+	operator++();
+	return tmp;
 }

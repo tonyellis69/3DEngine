@@ -6,10 +6,12 @@
 
 #include <iostream>
 #include <fstream>
+#include <random>
 
 enum TexGenType { texNoise, texColour, texRidged, texCylinder, texTurbulence,
 	texScaleBias, texAdd, texSeamless, texScalePoint, texBillow, texVoronoi,
-	texSelect, texLayer, texNull, texGaus, texRects, texBlocks
+	texSelect, texLayer, texNull, texGaus, texRects, texBlocks, texCover,
+	texCutup, texTerrain
 };
 
 /** A base class for creating texture generators. */
@@ -484,4 +486,59 @@ public:
 	unsigned int hIterations;
 	unsigned int hDensity;
 	unsigned int hScale;
+};
+
+class CoverTex : public CTexGen {
+public:
+	CoverTex();
+	void loadShader();
+	void render();
+
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+	void setIterations(int iterations) { this->iterations = iterations; }
+	void setScale(float scale) { this->scale = scale; }
+
+	int getIterations() { return iterations; }
+	float getScale() { return scale; }
+
+	int  iterations;
+	float scale;
+
+	unsigned int hIterations;
+	unsigned int hScale;
+};
+
+
+class CutupTex : public CTexGen {
+public:
+	CutupTex();
+	void loadShader();
+	void render();
+
+
+	unsigned int hSource;
+	unsigned int hSource2;
+};
+
+class CTerrainTex : public CTexGen {
+public:
+	CTerrainTex();
+	void loadShader();
+	void render();
+	void uploadGridData();
+	void placeStartEnd();
+	void placeFeatures();
+	void placeBarrier();
+	void plotShortestPath();
+
+	std::vector<float> grid;
+	int gridSize;
+
+	CRenderTexture gridTexture;
+	std::default_random_engine eng;
+
+	glm::i32vec2 startPoint, endPoint;
+	std::vector<glm::i32vec2> features;
 };

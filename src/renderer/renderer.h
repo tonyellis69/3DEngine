@@ -83,6 +83,7 @@ public:
 	void createScreenQuad();
 	void renderToTextureQuad(CBaseTexture & texture);
 	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
+	void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
 	void beginRenderToTexture(CBaseTexture & texture);
 	void endRenderToTexture();
 	void rendertToTextureClear(CBaseTexture& texture, glm::vec4 & colour);

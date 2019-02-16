@@ -14,6 +14,5 @@ namespace shape {
 	void cubePoints(std::vector<glm::vec3>* verts, std::vector<unsigned int>* index);
 	void scale(std::vector<glm::vec3>& verts, glm::vec3& scale);
 
-	CMesh cubeMesh();
-
+	CMesh<glm::vec3> cubeMesh();
 }

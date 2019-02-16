@@ -18,10 +18,13 @@ public:
 	void createRGBA(unsigned char* data, int w, int h);
 	void createGreyscale(unsigned char * data, int w, int h);
 	void clear();
-	void setData(void* pixels);
+	void setPixelData(void* pixels);
+	void setArrayData(void * data);
 	unsigned char* getChequePattern();
+	CRenderTexture& operator=(const CRenderTexture& other);
 
 	unsigned int handle;
-	CRenderer* pRenderer;	
+	CRenderer* pRenderer;
+	bool isData;
 };
 

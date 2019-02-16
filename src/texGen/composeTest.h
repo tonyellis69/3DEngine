@@ -4,7 +4,9 @@
 
 class ComposeTest : public Compositor {
 public:
-	ComposeTest() : currentTexGen(&nullTexGen) {};
+	ComposeTest() : currentTexGen(&nullTexGen) {
+		fileVersion = -1;
+	};
 	~ComposeTest();
 	void initTex();
 	void compose();
@@ -23,8 +25,10 @@ public:
 	CTexGen* createSelectTex();
 	CTexGen* createGausTex();
 	CTexGen* createRectsTex();
-
 	CTexGen * createBlocksTex();
+	CTexGen * createCoverTex();
+	CTexGen * createCutupTex();
+	CTexGen * createTerrainTex();
 
 	void addToStack(CTexGen * texGen);
 	
@@ -56,6 +60,12 @@ public:
 	void addTexGen(CTexGen* texGen);
 	void deleteTexGen(int stackNo);
 
+	void save(std::string filename);
+	void restore(std::string filename);
+
+	CRenderTexture& getComposedTexture();
+
+
 //	int octaves;
 //	float frequency;
 	glm::vec3 angle;
@@ -69,4 +79,6 @@ public:
 
 	int textureSize;
 	CNullTex nullTexGen;
+
+	int fileVersion;
 };

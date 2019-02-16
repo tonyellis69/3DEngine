@@ -50,7 +50,7 @@ void CGUIpaletteBar::setGradientTexture(CBaseTexture & texture) {
 /** Set the colour gradient we're going to use, updating the palette texture and tabs accordingly. */
 void CGUIpaletteBar::setGradient(ColourGradient & gradient) {
 	colourGradient = gradient;
-	paletteTexture.setData(gradient.getData());
+	paletteTexture.setPixelData(gradient.getData());
 	clearTabControls();
 	for (auto tab : colourGradient.getTabs()) {
 		createTab(tab.first);
@@ -278,7 +278,7 @@ void * CGUIpaletteBar::getPixels() {
 }
 
 void CGUIpaletteBar::updatePalette() {
-	paletteTexture.setData(colourGradient.getData());
+	paletteTexture.setPixelData(colourGradient.getData());
 
 	CMessage msg;
 	msg.Msg = uiMsgUpdate;

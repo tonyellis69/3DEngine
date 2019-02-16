@@ -66,7 +66,6 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 	}
 
 	if (inDirection != none) {
-		std::cerr << "\nMovement!";
 		shells[0].playerAdvance(inDirection);
 	}
 
@@ -138,8 +137,9 @@ TShellInnerBounds & CTerrain2::getInnerBounds(unsigned int shellNo) {
 	
 	//find difference in SCs
 	innerBounds.bl = abs(i32vec3((thisShellBL - innerShellBL)));
-	innerBounds.bl  = innerBounds.bl / i32vec3(shells[shellNo].SCsize) + i32vec3(1);
-	innerBounds.tr = i32vec3((thisShellTR - innerShellTR) / shells[shellNo].SCsize) + i32vec3(1);
+	innerBounds.bl = innerBounds.bl / i32vec3(shells[shellNo].SCsize);// +i32vec3(1);
+	innerBounds.tr = i32vec3(shells[shellNo].shellSCs) -
+		i32vec3((thisShellTR - innerShellTR) / shells[shellNo].SCsize) - i32vec3(1);
 	
 	return innerBounds;
 }

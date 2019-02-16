@@ -15,10 +15,10 @@ CRenderTexture::CRenderTexture()  {
 
 	//TO DO: the below will NOT work with textures declared as members of CBaseApp
 	//because engine hasn't initialised renderer yet!
-
+	
 	if (!pRenderer->initialised)
 		return;
-
+	isData = false;
 	 channels = 4; //lazily assume rgba
 	width = 128;
 	height = 128;
@@ -28,8 +28,8 @@ CRenderTexture::CRenderTexture()  {
 
 	glGenTextures(1, &handle);
 	glBindTexture(GL_TEXTURE_2D, handle);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, chequerBoardPixels);
@@ -55,13 +55,14 @@ void CRenderTexture::resize(int w, int h) {
 	channels = 4; //lazily assume rgba
 	width = w;
 	height = h;
+	isData = false;
 	glDeleteTextures(1, &handle);
 	glGenTextures(1, &handle);
 	if (h > 0) {
 		unsigned char* chequerBoardPixels = getChequePattern();
 		glBindTexture(GL_TEXTURE_2D, handle);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, chequerBoardPixels); //GL_FLOAT was GL_UNSIGNED_BYTE
@@ -74,7 +75,7 @@ void CRenderTexture::resize(int w, int h) {
 	int b = 0;
 	for (int p = 0; p < width; p++) {
 		b = p * 4;
-		pixels[b] =  (p / (float)width) * 255;
+		pixels[b] =  (p / /*(float)*/width) * 255;
 		pixels[b + 1] = pixels[b + 2] = pixels[b];  pixels[b + 3] = 255;
 	}
 	glBindTexture(GL_TEXTURE_1D, handle);
@@ -133,7 +134,7 @@ void CRenderTexture::clear() {
 	resize(width, height);
 }
 
-void CRenderTexture::setData(void * pixels) {
+void CRenderTexture::setPixelData(void * pixels) {
 	if (height > 0) {
 		glBindTexture(GL_TEXTURE_2D, handle);
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -141,7 +142,24 @@ void CRenderTexture::setData(void * pixels) {
 	}
 	glBindTexture(GL_TEXTURE_1D, handle);
 	glTexSubImage1D(GL_TEXTURE_1D, 0, 0, width, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+}
 
+/** Turn this texture into an array texture, and store data in it. */
+void CRenderTexture::setArrayData(void * data) {
+	isData = true;
+	if (height > 0) {
+		glBindTexture(GL_TEXTURE_2D, handle);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, width, height, 0, GL_RED,
+			GL_FLOAT, data);
+		return;
+	}
+	glBindTexture(GL_TEXTURE_1D, handle);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage1D(GL_TEXTURE_1D, 0, GL_R32F, width, 0, GL_RED,
+		GL_FLOAT, data);
 }
 
 /** Return pixels for a pattern to fill the current texture.*/
@@ -165,6 +183,38 @@ unsigned char * CRenderTexture::getChequePattern() {
 		}
 	}
 	return pixels;
+}
+
+
+CRenderTexture & CRenderTexture::operator=(const CRenderTexture & other) {
+	if (&other == this)
+		return *this;
+	width = other.width;
+	height = other.height;
+	channels = other.channels;
+
+	GLenum target;
+	if (height > 0) 
+		target = GL_TEXTURE_2D;
+	else 
+		target = GL_TEXTURE_1D;
+	
+	GLuint hTempFrameBuffer;
+	glGenFramebuffers(1, &hTempFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, hTempFrameBuffer);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, other.handle, 0);
+	glBindTexture(target, handle);
+
+	glCopyTexImage2D(target, 0, GL_RGBA, 0, 0, width, height, 0);
+	//TO DO: GL_RGBA is assumed. If want to copy other formats I need to check for them.
+	glBindTexture(target,0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	return *this;
+
+
+
 }
 
 

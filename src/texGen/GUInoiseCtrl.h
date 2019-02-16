@@ -63,4 +63,7 @@ public:
 	CGUInumeric2* blocksIterationsCtrl;
 	CGUInumeric2* blocksDensityCtrl;
 	CGUInumeric2* blocksScaleCtrl;
+
+	CGUInumeric2*	coverIterationsCtrl;
+	CGUInumeric2*	coverScaleCtrl;
 };

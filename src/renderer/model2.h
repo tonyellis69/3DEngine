@@ -12,13 +12,13 @@ class CModel2 : public C3dObject {
 public:
 	CModel2();
 	void setDrawCallout(callbackFunctionPtr cb, void* callee);
-	void loadMesh(CMesh& newMesh);
+	void loadMesh(CMesh<glm::vec3>& newMesh);
 	void bufferMesh();
 	void draw();
 	void scale(glm::vec3& scaleVec);
 	void orientateWorldMatrix();
 
-	CMesh mesh;
+	CMesh<glm::vec3> mesh;
 	CBuf buffer;
 	glm::vec4 colour;
 

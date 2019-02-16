@@ -98,7 +98,7 @@ void ColourGradient::rotateTabHues(float rotation) {
 		vec3 rgb = col::byteToFloat(colour);
 		vec3 hsv = glm::hsvColor(rgb);
 		hsv.x += rotation;
-		hsv.x = fmod(hsv.x, 360);
+		hsv.x = fmod(hsv.x, 360.0f);
 		rgb = glm::rgbColor(hsv);
 		colour = i32vec4(vec3(rgb * 255.0f), colour.a);
 		tab.second = colour;

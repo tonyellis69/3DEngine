@@ -81,8 +81,8 @@ namespace shape {
 	}
 
 	/** Create a cube stored in a CMesh object and return it .*/
-	CMesh cubeMesh() {
-		CMesh mesh;
+	CMesh<glm::vec3> cubeMesh() {
+		CMesh<glm::vec3> mesh;
 		cube(&mesh.vertices, &mesh.normals, &mesh.indices);
 		mesh.type = meshTrisIndexed;
 		return mesh;

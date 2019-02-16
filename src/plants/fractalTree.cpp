@@ -28,7 +28,7 @@ CFractalTree::CFractalTree() {
 void CFractalTree::create() {
 	float distToNextLateral = stage1stemLength / lateralPointsPerStage;
 	taperFactor = taper2 / (maxJoints + 1);
-	float stemDivisor = maxJoints + 1;
+	float stemDivisor = maxJoints + 1.0f;
 	if (leadingBranch) 
 		stemDivisor++; //avoid branches getting too disproportionate.
 	stage1stemLength = stage1stemLength / stemDivisor;

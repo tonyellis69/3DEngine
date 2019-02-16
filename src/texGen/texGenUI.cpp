@@ -16,7 +16,7 @@ void CTexGenUI::init(CBaseApp * app) {
 	shadeSelectionMode = false;
 
 	GUInoiseCtrl->swatchCtrl->assignDataFile(pApp->dataPath + "swatchGroups.txt");
-	fileVersion = -1;
+
 }
 
 /** Create the interface for viewing textures. */
@@ -76,7 +76,7 @@ void CTexGenUI::initGUI() {
 	addTexGenMenu->drawBorder = true;
 	addTexGenMenu->addItem({ "Noise","Colourise","RidgedMF","Cylinder","Turbulence","ScaleBias",
 		"Add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer","Gaus",
-		"Rects", "Blocks" });
+		"Rects", "Blocks", "Cover", "Cutup", "Terrain" });
 	pApp->GUIroot.Add(addTexGenMenu);
 
 
@@ -321,8 +321,22 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 			static_cast<CBlocksTex*>(texCompositor.currentTexGen)->setScale(msg.fValue);
 			texCompositor.compose();
 		}
-
 	}
+
+	if (texCompositor.currentTexGen->texGenType == texCover) {
+		if (sender == GUInoiseCtrl->coverIterationsCtrl) {
+			static_cast<CoverTex*>(texCompositor.currentTexGen)->setIterations(msg.fValue);
+			texCompositor.compose();
+		}
+		if (sender == GUInoiseCtrl->coverScaleCtrl) {
+			static_cast<CoverTex*>(texCompositor.currentTexGen)->setScale(msg.fValue);
+			texCompositor.compose();
+		}
+	}
+
+
+
+
 	updateDisplayImage();
 
 }
@@ -416,217 +430,27 @@ void CTexGenUI::updateGUI() {
 		GUInoiseCtrl->blocksScaleCtrl->setValue(static_cast<CBlocksTex*>(texCompositor.currentTexGen)->getScale());
 	}
 
-}
-/*
-void CTexGenUI::save() {
-	save2();
-	std::ofstream out(pApp->dataPath + fileName->text + ".gen", std::ios::binary);
-
-	auto writeTexIndex = [&](CTexGen* texGen) {
-		int x;
-		for (x = 0; x < texCompositor.texGens.size(); x++) {
-			if (texGen == texCompositor.texGens[x]) {
-				writeObject(x, out);
-				return;
-			}
-		}
-	};
-
-
-	for (auto texGen : texCompositor.texGens) {
-		writeObject(texGen->texGenType, out);
-		if (texGen->srcTex1)
-			writeTexIndex(texGen->srcTex1);
-		if (texGen->srcTex2)
-			writeTexIndex(texGen->srcTex2);
-		if (texGen->srcTex3)
-			writeTexIndex(texGen->srcTex3);
-		texGen->write(out);
-
+	if (texCompositor.currentTexGen->texGenType == texCover) {
+		GUInoiseCtrl->coverIterationsCtrl->setValue(static_cast<CoverTex*>(texCompositor.currentTexGen)->getIterations());
+		GUInoiseCtrl->coverScaleCtrl->setValue(static_cast<CoverTex*>(texCompositor.currentTexGen)->getScale());
 	}
-	out.close();
 
-	fillRestoreMenu();
 }
-*/
+
 void CTexGenUI::save() {
-	std::ofstream out(pApp->dataPath + fileName->text + ".gen", std::ios::binary);
-	out << "t1"; //identifier
-
-	for (auto texGen : texCompositor.texGens) //gives the overall composition of the stack
-		writeObject(texGen->texGenType, out);
-	writeObject(texNull, out);
-
-	auto writeTexIndex = [&](CTexGen* texGen) {
-		if (texGen == NULL) {
-			writeObject((char)-1, out);	return;
-		}
-		for (char x = 0; x < (char)texCompositor.texGens.size(); x++) {
-			if (texGen == texCompositor.texGens[x]) {
-				writeObject(x, out);	return;
-			}
-		}
-
-	};
-
-	for (auto texGen : texCompositor.texGens) { //write index of sources
-		writeTexIndex(texGen->srcTex1);
-		writeTexIndex(texGen->srcTex2);
-		writeTexIndex(texGen->srcTex3);
-		texGen->write(out);
-	}
-	out.close();
-
+	texCompositor.save(pApp->dataPath + fileName->text + ".gen");
 	fillRestoreMenu();
 }
 
 
-#if OLDRESTORE 
-void CTexGenUI::restore(std::string& filename) {
-	clear();
-	int finalColourise = 0;
-	trackImage = NULL;
-
-	std::ifstream in(pApp->dataPath + filename + ".gen", std::ios::binary);
-	TexGenType texGenType;
-
-	struct TPatch { unsigned int idx;  unsigned int srcIdx; };
-	vector<TPatch> patches;
-	auto getSourceByIndex = [&]() { int index; readObject(index, in); 
-		if (index >= texCompositor.texGens.size()) {
-			patches.push_back({ texCompositor.texGens.size() ,(unsigned int)index });
-			return (CTexGen*)&nullTexGen;
-		}
-		return texCompositor.texGens[index];
-	};
-	auto getColourGradient = [&]() { ColourGradient gradIn; int tabCount; readObject(tabCount, in);
-	int tab; i32vec4 colour;
-	for (int x = 0; x < tabCount; x++) {
-		readObject(tab, in); readObject(colour, in);
-		gradIn.changeColour(tab, colour);
-	}
-	return gradIn;
-	};
-
-	CTexGen* src, *src2, *src3;
-	while (readObject(texGenType, in)) {
-		switch (texGenType) {
-		case texColour:		src = getSourceByIndex();
-			texCompositor.createColouriseTex(src, &getColourGradient()); 
-			finalColourise = texCompositor.texGens.size() - 1;
-			break;
-		case texNoise: texCompositor.createNoiseTex(); break;
-		case texVoronoi: texCompositor.createVoronoiTex(); break;
-		case texBillow: texCompositor.createBillowTex(); break;
-		case texRidged: texCompositor.createRidgedMFTex(); break;
-		case texCylinder: texCompositor.createCylinderTex(); break;
-		case texTurbulence: texCompositor.createTurbulenceTex(getSourceByIndex()); break;
-		case texScaleBias: texCompositor.createScaleBiasTex(getSourceByIndex()); break;
-		case texSeamless: src = getSourceByIndex(); texCompositor.createSeamlessTex()->setSource(src); break;
-		case texAdd: texCompositor.createAddTex(getSourceByIndex(), getSourceByIndex()); break;
-		case texScalePoint: texCompositor.createScalePointTex(getSourceByIndex()); break;
-		case texSelect:
-			src = getSourceByIndex(); src2 = getSourceByIndex(); src3 = getSourceByIndex();
-			texCompositor.createSelectTex(src, src2, src3); break;
-		case texLayer: texCompositor.createLayerTex(getSourceByIndex(), getSourceByIndex()); break;
-		case texGaus: src = getSourceByIndex(); texCompositor.createGausTex()->setSource(src); break;
-		case texRects: src = getSourceByIndex(); texCompositor.createRectsTex()->setSource(src); break;
-		}
-
-		texCompositor.texGens.back()->read(in);
-	}
-	in.close();
-
-	texCompositor.compose();
-
-	for (auto patch : patches) {
-		CTexGen* texGen = texCompositor.texGens[patch.idx];
-		if (texGen->srcTex1 == &nullTexGen)
-			texGen->setSource(texCompositor.texGens[patch.srcIdx]);
-		else if (texGen->srcTex2 == &nullTexGen)
-			texGen->setSource2(texCompositor.texGens[patch.srcIdx]);
-		else if (texGen->srcTex3 == &nullTexGen)
-			texGen->setSource3(texCompositor.texGens[patch.srcIdx]);
-		texGen->render();
-	}
-
-	texCompositor.setCurrentLayer(finalColourise);
-	updateDisplayImage();
-
-	fillStackMenu();
-	fileName->setText(filename);
-}
-#else
 
 
 void CTexGenUI::restore(std::string& filename) {
 	clear();
 	trackImage = NULL;
 
-	std::ifstream in(pApp->dataPath + filename + ".gen", std::ios::binary);
-	if (in.fail() || in.get() != 't') {
-		cerr << "\nUnable to open tex file " << filename;
-		return;
-	}
+	texCompositor.restore(pApp->dataPath + filename + ".gen");
 
-	fileVersion = int(in.get());
-
-	//find and load all the texgens
-	TexGenType texGenType;
-	while (readObject(texGenType, in)) {
-		if (texGenType == texNull)
-			break;
-		switch (texGenType) {
-		case texColour:		texCompositor.createColouriseTex(); break;
-		case texNoise: texCompositor.createNoiseTex(); break;
-		case texVoronoi: texCompositor.createVoronoiTex(); break;
-		case texBillow: texCompositor.createBillowTex(); break;
-		case texRidged: texCompositor.createRidgedMFTex(); break;
-		case texCylinder: texCompositor.createCylinderTex(); break;
-		case texTurbulence: texCompositor.createTurbulenceTex(); break;
-		case texScaleBias: texCompositor.createScaleBiasTex(); break;
-		case texSeamless:  texCompositor.createSeamlessTex(); break;
-		case texAdd: texCompositor.createAddTex(); break;
-		case texScalePoint: texCompositor.createScalePointTex(); break;
-		case texSelect: texCompositor.createSelectTex(); break;
-		case texLayer: texCompositor.createLayerTex(); break;
-		case texGaus: texCompositor.createGausTex(); break;
-		case texRects: texCompositor.createRectsTex(); break;
-		case texBlocks: texCompositor.createBlocksTex(); break;
-		}
-	}
-
-	auto getColourGradient = [&]() { ColourGradient gradIn; int tabCount; readObject(tabCount, in);
-	int tab; i32vec4 colour;
-	for (int x = 0; x < tabCount; x++) {
-		readObject(tab, in); readObject(colour, in);
-		gradIn.changeColour(tab, colour);
-	}
-	return gradIn;
-	};
-
-	//read sources and data into texgens
-	char x;
-	for (auto texGen : texCompositor.texGens) {
-		x = in.get(); 
-		if (x != -1)
-			texGen->setSource(texCompositor.texGens[x]);
-		x = in.get(); 
-		if (x != -1)
-			texGen->setSource2(texCompositor.texGens[x]);
-		x = in.get(); 
-		if (x != -1) 
-			texGen->setSource3(texCompositor.texGens[x]);
-		if (texGen->texGenType == texColour) {
-			texGen->setPalette(getColourGradient());
-		}
-		else
-			texGen->read(in);
-	}
-	in.close();
-
-	texCompositor.compose();
-	texCompositor.compose(); //ugh. Ensures texgens with forward references are up-to-date
 	texCompositor.setCurrentLayer(texCompositor.texGens.size()-1);
 	configureGUI(texCompositor.currentTexGen->texGenType);
 	updateGUI();
@@ -634,7 +458,7 @@ void CTexGenUI::restore(std::string& filename) {
 	fillStackMenu();
 	fileName->setText(filename);
 }
-#endif
+
 
 void CTexGenUI::clear() {
 	texCompositor.texGens.clear();
@@ -680,6 +504,9 @@ void CTexGenUI::addTexGen(int itemNo) {
 	case 13: texCompositor.createGausTex(); break;
 	case 14: texCompositor.createRectsTex(); break;
 	case 15: texCompositor.createBlocksTex(); break;
+	case 16: texCompositor.createCoverTex(); break;
+	case 17: texCompositor.createCutupTex(); break;
+	case 18: texCompositor.createTerrainTex(); break;
 	}
 	texCompositor.setCurrentLayer(texCompositor.texGens.size() - 1);
 	configureGUI(texCompositor.currentTexGen->texGenType);
@@ -722,6 +549,8 @@ void CTexGenUI::configureGUI(TexGenType texType) {
 	case texGaus: GUInoiseCtrl->activateRows({ "source1", "gausSizeSigma"}); break;
 	case texRects: GUInoiseCtrl->activateRows({ "rectsDepthVariance","octave","freq","styleClusters" }); break;
 	case texBlocks: GUInoiseCtrl->activateRows({ "stagesIterations","densityScale" }); break;
+	case texCover: GUInoiseCtrl->activateRows({ "iterationsScale" }); break;
+	case texCutup: GUInoiseCtrl->activateRows({ "source1&2" }); break;
 
 	}
 	GUInoiseCtrl->autoArrangeRows(0, 20);

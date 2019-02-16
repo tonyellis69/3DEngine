@@ -256,6 +256,21 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 
 	addToRow("densityScale", { lbl,blocksDensityCtrl,lbl2,blocksScaleCtrl });
 
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Iterations");
+	coverIterationsCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	coverIterationsCtrl->setValue(1); coverIterationsCtrl->setMinMax(1, 200);
+
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Scale");
+	coverScaleCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	coverScaleCtrl->setValue(1); coverScaleCtrl->setMinMax(0.05, 10);
+	coverScaleCtrl->setIncrement(0.1f);
+
+	addToRow("iterationsScale", { lbl,coverIterationsCtrl,lbl2,coverScaleCtrl });
+
+
+
 }
 
 

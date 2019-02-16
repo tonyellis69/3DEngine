@@ -8,7 +8,7 @@ public:
 	virtual void resize(int w, int h) {};
 	virtual void createRGBA(unsigned char* data, int w, int h) {};
 	virtual void createGreyscale(unsigned char* data, int w, int h) {};
-	virtual void setData(void* pixels) {};
+	virtual void setPixelData(void* pixels) {};
 
 
 	int width;

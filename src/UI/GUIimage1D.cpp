@@ -15,7 +15,7 @@ void CGUIimage1D::setTexture(CBaseTexture& imageTexture) {
 }
 
 void CGUIimage1D::setTextureData(void * pixels) {
-	texture->setData(pixels);
+	texture->setPixelData(pixels);
 }
 
 

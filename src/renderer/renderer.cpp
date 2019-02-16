@@ -101,7 +101,7 @@ void CRenderer::init() {
 	glDepthRange(0.0f, 1.0f);
 
 //	initRenderToTextureBufs();
-
+	glEnable(GL_PROGRAM_POINT_SIZE);
 
 	glPrimitiveRestartIndex(65535);
 
@@ -466,6 +466,12 @@ void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
 	endRenderToTexture();
 }
 
+void CRenderer::renderToTexturePoints(CBuf& buffer, CBaseTexture& texture) {
+	beginRenderToTexture(texture);
+	drawBuf(buffer, drawPoints);
+	endRenderToTexture();
+}
+
 
 /**	Prepare to render to the given texture, leaving the actual drawing to the user. */
 //TO DO: see if there's any overhead in deleting/regenerating FBO
@@ -652,7 +658,7 @@ unsigned long CRenderer::getTimerQuery() {
 			&done);
 	}
 	glGetQueryObjectui64v(hTimeQuery, GL_QUERY_RESULT, &timeElapsed);
-	return timeElapsed; 
+	return (unsigned long)timeElapsed; 
 }
 
 
