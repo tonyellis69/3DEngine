@@ -13,6 +13,12 @@ void CSuperChunk2::checkForIntersection() {
 }
 
 void CSuperChunk2::setSampleSpacePosition(glm::vec3 & pos) {
+	if (origIndex == glm::i32vec3(0, 0, 0))
+		std::cerr << "\n x= 0 samplespace pos of " << sampleSpacePos.x << " " << sampleSpacePos.y << " "
+		<< sampleSpacePos.z << " changed to " << pos.x << " " << pos.y << " " << pos.z;
+	if (origIndex == glm::i32vec3(4, 0, 0))
+		std::cerr << "\n x= 4 samplespace pos of " << sampleSpacePos.x << " " << sampleSpacePos.y << " "
+		<< sampleSpacePos.z << " changed to " << pos.x << " " << pos.y << " " << pos.z;
 	sampleSpacePos = pos;
 }
 

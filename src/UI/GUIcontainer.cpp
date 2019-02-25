@@ -173,9 +173,9 @@ bool CGUIsysContainer::horizontalBarCheck() {
 
 /** Return a pointer to the child control with the given id number. */
 CGUIbase* CGUIsysContainer::getChild(int childID) {
-	for (size_t i=0;i<surface->Control.size();i++){
-		if ( surface->Control[i]->id == childID )
-			return surface->Control[i];
+	for (size_t i=0;i<surface->controls.size();i++){
+		if ( surface->controls[i]->id == childID )
+			return surface->controls[i];
 	}
 	return NULL;
 }
@@ -198,8 +198,8 @@ void CGUIsysContainer::vScroll(int scroll) {
 
 /** Returns the index number of the panel holding the given child control. */
 int CGUIsysContainer::findControlPanel(CGUIbase* child) {
-	for (size_t panelNo = 0; panelNo < surface->Control.size();panelNo++) {
-		CGUIpanel* panel = (CGUIpanel*) surface->Control[panelNo];
+	for (size_t panelNo = 0; panelNo < surface->controls.size();panelNo++) {
+		CGUIpanel* panel = (CGUIpanel*) surface->controls[panelNo];
 		if (panel->findControl(child) != NULL)
 			return panelNo;
 	}
@@ -247,7 +247,7 @@ CGUIbaseSurface::CGUIbaseSurface()  {
 }
 
 /** Overload the default clipbox calculation, basing it on the rectangle described by viewBox. */
-void CGUIbaseSurface::CalculateClipbox() {
+void CGUIbaseSurface::recalculateClipbox() {
 	UIrect parentClipbox = parent->Clipbox;
 	
 
@@ -289,8 +289,8 @@ void CGUIbaseSurface::encompassChildControls() {
 	int newWidth = viewBox.width;
 	CGUIbase* child;
 
-	for (size_t i = 0; i < Control.size(); i++) {
-		child = Control[i];
+	for (size_t i = 0; i < controls.size(); i++) {
+		child = controls[i];
 		if (child->anchorBottom == NONE) { //TO DO: may want to disqualify for use of vFormat too
 			if ((child->getLocalPos().y + child->getHeight() + spaceAroundControls) > newHeight)
 				newHeight = child->getLocalPos().y + child->getHeight() + spaceAroundControls;

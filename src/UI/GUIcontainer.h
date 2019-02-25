@@ -49,7 +49,7 @@ public:
 class CGUIbaseSurface :public CGUIbase {
 public:
 	CGUIbaseSurface();
-	void CalculateClipbox();
+	void recalculateClipbox();
 	void encompassChildControls();
 	virtual void addPanel(CGUIpanel* panel) {};
 	virtual void assignPanelPositions() {};

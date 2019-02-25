@@ -147,4 +147,9 @@ public:
 	std::vector<TtextStyle>* styles; ///<List of available styles
 	TtextStyle hotTextStyle;
 	TtextStyle selectedHotTextStyle;
+
+	//TO DO: try to scrap
+	int textureHeight; ///<Height of the texture being drawn to.
+	int textureWidth; ///<Guess.
+
 };

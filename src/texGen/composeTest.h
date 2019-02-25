@@ -65,6 +65,8 @@ public:
 
 	CRenderTexture& getComposedTexture();
 
+	void saveCurrentTexGenPNG(std::string filename);
+
 
 //	int octaves;
 //	float frequency;
@@ -81,4 +83,5 @@ public:
 	CNullTex nullTexGen;
 
 	int fileVersion;
+
 };

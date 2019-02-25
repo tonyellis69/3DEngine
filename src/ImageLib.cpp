@@ -60,8 +60,9 @@ CImageLib::CImageLib()
 /** Load the given image file as a new tile set, having tiles of the given dimensions.*/
 int CImageLib::loadSpriteSheet(const char* Filename, int TileWidth, int TileHeight)
 {
-	int TexWidth, TexHeight;
-	int TextureNo = CreateTextureFromImage(Filename,&TexWidth,&TexHeight,false);  //Turn the tile imagefile into a texture.
+	int TexWidth = NULL; 
+	int TexHeight = NULL;
+	int TextureNo = NULL; //was CreateTextureFromImage(Filename, &TexWidth, &TexHeight, false);  //Turn the tile imagefile into a texture.
 	//TO DO: don't load spritesheet as a CTexture, it's messy
 	//create a new SpriteSheet record
 	TSpriteSheet* Tileset = new TSpriteSheet();
@@ -85,10 +86,10 @@ int CImageLib::loadSpriteSheet(const char* Filename, int TileWidth, int TileHeig
 	return TileSetID-1;
 }
 
-
+#ifdef SCRAP
 /** Load the given image file as a texture, and returns its texture index number. */
  int CImageLib::CreateTextureFromImage(const char* Filename, int* TexWidth, int* TexHeight, bool UsePOT )
-{
+{ 
 	/**
 	\param force_channels 0-image format, 1-luminous, 2-luminous/alpha, 3-RGB, 4-RGBA
 	\param reuse_texture_ID 0-generate a new texture ID, otherwise reuse the texture ID (overwriting the old texture)
@@ -126,6 +127,9 @@ int CImageLib::loadSpriteSheet(const char* Filename, int TileWidth, int TileHeig
 
 	return NoTextures++;
 }
+#endif
+
+
 
 //TO DO: no longer use this, can probably scrap.
 
@@ -143,7 +147,7 @@ TSpriteSheet* CImageLib::GetTileSet(int TileSetID){
 /** Load a single image as a sprite. */
 CSprite* CImageLib::loadSprite(char* Filename) {
 	int imgWidth, imgHeight;
-	int TexNo = CreateTextureFromImage(Filename, &imgWidth, &imgHeight,true);
+	int TexNo = NULL;// was CreateTextureFromImage(Filename, &imgWidth, &imgHeight, true);
 	//TO DO: do the above without creating a CTexture - it's messy
 	//create a new sprite
 	CSprite Sprite; 
@@ -168,7 +172,7 @@ CSprite* CImageLib::loadSprite(char* Filename) {
 	return &SpriteList[SpriteID-1];
 }
 
-
+/*
 unsigned int CImageLib::MakeDefaultTexture(int* TexW, int* TexH) {
 	unsigned char data[3*64*64*3]; int  p = 0;
 	 for(int x = 0; x < 64; x++) 
@@ -185,11 +189,14 @@ unsigned int CImageLib::MakeDefaultTexture(int* TexW, int* TexH) {
 
 	return TexNo;
 }
+*/
 
+/*
 unsigned char* CImageLib::readHeightMap(std::string& filename, int& width, int& height) {
 	int channels;
 	return SOIL_load_image (filename.c_str(),&width,&height,&channels,SOIL_LOAD_L);
 }
+*/
 
 CImageLib::~CImageLib()
 {

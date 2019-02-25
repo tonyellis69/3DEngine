@@ -10,7 +10,6 @@ public:
 	void setText(const std::string& title);
 	void DrawSelf();
 	void OnClick(const  int mouseX, const  int mouseY);
-	void updateAppearance();
 	void GUIcallback(CGUIbase * sender, CMessage & msg);
 	void clear();
 	std::string& getItemName(int itemNo);

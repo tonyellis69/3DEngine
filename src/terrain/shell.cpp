@@ -18,6 +18,7 @@ CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
 	worldSpacePos = vec3(0);
 	minimumChunkExtent = (shellSCs / 2) * SCchunks;
 	playerChunkPos = i32vec3(0);
+	
 
 	scArray.setSize(shellSCs, shellSCs, shellSCs);
 
@@ -57,9 +58,11 @@ void CShell::playerAdvance(Tdirection direction) {
 	}
 	else {
 		//(3) scroll the SCs, then add a layer 
+		//NB Think of scroll direction as the direction of rotation of the conveyor belt of terrain
 		Tdirection scrollDir = flipDir(direction);
 		std::cerr << " scrolling.";
-
+		//TO DO: will step always be LoD1? check
+		pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
 		scroll(scrollDir);
 		addToFaceLayer(direction);
 
@@ -96,7 +99,7 @@ void CShell::fillEntire(int chunkExtent) {
 		this->chunkExtent[direction] = chunkExtent;
 
 	//TO DO: fill SCs with chunks if they intersect terrain:
-	findSCintersections();
+	findAllSCintersections();
 }
 
 /** Extend the terrain by two layers of chunks in the given direction. Two because we have to replace entire
@@ -118,7 +121,7 @@ void CShell::scroll(Tdirection scrollDirection) {
 	scArray.rotate(rotateVec);
 
 	//The scrolled-out SCs have lost their chunks and maybe gained new ones, so reset them
-	resampleFace(scrollDirection);
+	resampleFace(inDirection);
 
 	//we've just lost a SC's worth of chunks in the 'in' direction, so:
 	chunkExtent[inDirection] -= SCchunks;
@@ -137,38 +140,35 @@ void CShell::scroll(Tdirection scrollDirection) {
 /** Any SC setup required when a shell is created. */
 void CShell::initSuperChunks() {
 	scArray.element(0, 0, 0).setCallbackApp(pTerrain->pCallbackApp);
-	vec3 sampleSpacePosition;
+	scSampleStep = SCsize / pTerrain->worldToSampleScale;
 	CShellIterator scIter = getIterator();
 	while (!scIter.finished()) {
 		scIter->isEmpty = true;
 		scIter->colour = vec4(col::randHue(), 1);
 		scIter->origIndex = scIter.getIndex();
-		//scArray.element(x, y, z).setSampleSize(SCsize / pTerrain->worldToSampleScale);
+	
+		scIter->setSampleSize(scSampleStep);
 
-		//temp!
-		float scSampleStep = SCsize / pTerrain->worldToSampleScale;
-		float lodScale = scSampleStep / 16;
-		//	std::cerr << "\n#LoD " << this->LoD << " SC sampleStep " << scSampleStep << " LoDscale " << lodScale;
-
-		scIter->setSampleSize(lodScale);
-
-		//find worldspace displacement of SC from terrain centre 
-		vec3 scPos = vec3(scIter.getIndex()) * SCsize;
-		//////////////////////////////scPos += SCsize * 0.5f; TO DO temporary only
-		scPos -= worldSpaceSize * 0.5f;
-		scPos += worldSpacePos;
-		//convert into a displacement in sample space
-		sampleSpacePosition = scPos / pTerrain->worldToSampleScale;
-		//should end up with around 5 .3 5 fo (0,0,0)
-		sampleSpacePosition = pTerrain->sampleSpacePos + sampleSpacePosition;
+		vec3 sampleSpacePosition = calcSCsampleSpacePosition(scIter.getIndex());
 		scIter->setSampleSpacePosition(sampleSpacePosition);
 		scIter++;
-
 	}
 }
 
+/** Return the point in sample space of the bottom NW corner of the superchunk at this index position. */
+vec3& CShell::calcSCsampleSpacePosition(i32vec3& scIndex) {
+	//find worldspace displacement of SC from terrain centre 
+	vec3 scPos = vec3(scIndex) * SCsize;
+	scPos -= worldSpaceSize * 0.5f;
+	scPos += worldSpacePos;
+	//convert into a displacement in sample space
+	vec3 sampleSpacePosition = scPos / pTerrain->worldToSampleScale;
+	sampleSpacePosition = pTerrain->sampleSpacePos + sampleSpacePosition;
+	return sampleSpacePosition;
+}
+
 /** Ask all superchunks to check if they are intersected by terrain. */
-void CShell::findSCintersections() {
+void CShell::findAllSCintersections() {
 	//TO DO: only check outer SCs
 	COuterSCIterator it = getOuterSCiterator();
 	while (!it.finished()) {
@@ -186,6 +186,10 @@ COuterSCIterator & CShell::getOuterSCiterator() {
 	return COuterSCIterator(this);
 }
 
+CFaceIterator & CShell::getFaceIterator(Tdirection face) {
+	return CFaceIterator(this, face);
+}
+
 TShellInnerBounds & CShell::getInnerBounds() {
 	return pTerrain->getInnerBounds(shellNo);
 }
@@ -193,9 +197,20 @@ TShellInnerBounds & CShell::getInnerBounds() {
 /**	Check if the SCs in this face intersect with terrain (and request the chunks if they do). */
 void CShell::resampleFace(Tdirection face) {
 	//get an iterator to the face
+	//return;
+	CFaceIterator faceIter = getFaceIterator(face);
+
 	//iterate through all the SCs in the face
-	//clear the old intersection data
-	//check for intersections with the terrain
+	while (!faceIter.finished()) {
+		//clear the old intersection data
+		faceIter->isEmpty = true;
+		vec3 sampleSpacePosition = calcSCsampleSpacePosition(faceIter.getIndex());
+		faceIter->setSampleSpacePosition(sampleSpacePosition);
+		faceIter->checkForIntersection();
+
+		faceIter++;
+	}
+
 }
 
 
@@ -312,6 +327,12 @@ CFaceIterator::CFaceIterator(CShell * pShell, Tdirection face) : CShellIterator(
 		pseudoZValue = pShell->shellSCs - 1;
 	else
 		pseudoZValue = 0;
+
+	index[pseudoX] = 0;
+	index[pseudoY] = 0;
+	index[pseudoZ] = pseudoZValue;
+
+	pSC = &pShell->scArray.element(index.x, index.y, index.z);
 }
 
 CFaceIterator & CFaceIterator::operator++() {

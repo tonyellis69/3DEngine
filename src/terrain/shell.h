@@ -15,6 +15,7 @@ struct TShellInnerBounds {
 
 class CShellIterator;
 class COuterSCIterator;
+class CFaceIterator;
 class CTerrain2;
 class CShell {
 public:
@@ -26,9 +27,11 @@ public:
 	void addToFaceLayer(Tdirection direction);
 	void scroll(Tdirection direction);
 	void initSuperChunks();
-	void findSCintersections();
+	glm::vec3 & calcSCsampleSpacePosition(glm::i32vec3& scIndex);
+	void findAllSCintersections();
 	CShellIterator& getIterator();
 	COuterSCIterator& getOuterSCiterator();
+	CFaceIterator& getFaceIterator(Tdirection face);
 	TShellInnerBounds& getInnerBounds();
 	void resampleFace(Tdirection face);
 
@@ -50,6 +53,7 @@ public:
 	unsigned int shellNo;
 
 	CSCarry scArray;
+	float scSampleStep;
 };
 
 

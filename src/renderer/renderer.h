@@ -5,7 +5,10 @@
 #include <string>
 #include <vector>
 
-#include "..\soil.h"
+//#include "..\soil.h"
+
+
+
 
 #include "camera.h"
 #include "modelMulti.h"
@@ -120,6 +123,9 @@ public:
 	void backFaceCulling(bool on);
 	void setVAO(GLuint newVAO);
 
+	CCamera* createCamera(glm::vec3& pos);
+	void setCurrentCamera(CCamera * camera);
+
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
 
@@ -132,6 +138,7 @@ public:
 	CFontManager fontManager;
 
 	CCamera* currentCamera;
+	CCamera* defaultCamera; ///<Initially available camera.
 
 	std::string dataPath;
 
@@ -214,6 +221,9 @@ private:
 	
 	std::vector<CBuf*> bufferList; ///<Kill list of renderer-created buffers.
 
+	std::vector<CCamera*> cameraList; ///<Tracks renderer-created cameras.
+
 };
 
 //CRenderer* CRenderer::instance = 0;
+const rgba rendererTurquiose = { 0.0f,0.7f,0.7f,0.5f };

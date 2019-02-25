@@ -10,7 +10,7 @@
 CBaseApp* CWin::pApp = NULL;
 
 void error_callback(int error, const char* description) {
-	std::cerr << "Error: " << description;
+	std::cerr << "Error here: " << description;
 }
 
 

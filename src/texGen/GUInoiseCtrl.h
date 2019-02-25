@@ -66,4 +66,12 @@ public:
 
 	CGUInumeric2*	coverIterationsCtrl;
 	CGUInumeric2*	coverScaleCtrl;
+
+	CGUInumeric2* terrainGridSizeCtrl;
+	CGUIcheckButton* terrainDetailsCtrl;
+	CGUInumeric2* terrainFeatureCountCtrl;
+	CGUInumeric2* terrainFeatureSizeCtrl;
+
+	CGUInumeric2* seedCtrl;
+
 };

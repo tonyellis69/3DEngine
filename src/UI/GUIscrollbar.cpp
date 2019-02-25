@@ -6,7 +6,6 @@ using namespace std;
 CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y, int length) {
 	orientation = axis; 
 	type = scrollbar;
-	//localPos = glm::i32vec2(x,y);
 	setPos(x, y);
 	if (orientation == horizontal) {
 		setWidth(length); setHeight(barWidth); }
@@ -19,10 +18,7 @@ CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y
 
 	lastMouseDownX = lastMouseDownY = 0;
 	id = uiScrollbarID;
-
-	//drawBox.pos = glm::i32vec2(x, y); 
-	//drawBox.size = glm::i32vec2(width, height);
-	//pDrawFuncs->registerControl(*this);
+;
 	setBackColour1(UIlightGrey);
 	setBackColour2(UIlightGrey);
 }
@@ -57,12 +53,6 @@ void CGUIbaseScrollbar::setValue(int newValue) {
 
 
 void CGUIbaseScrollbar::DrawSelf( ) {
-	//pDrawFuncs->setClip(Clipbox);
-
-	//pDrawFuncs->setDrawColours(UIlightGrey, UIlightGrey);
-	//pDrawFuncs->drawRect(screenPos,width,height);
-
-
 	pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
 
 	glm::vec4 drawColour;
@@ -101,9 +91,9 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 	int mousePos;
 
 	if (orientation == horizontal) 
-		mousePos = calcLocalPos(mouseX, mouseY).x; 
+		mousePos = screenToLocalCoords(mouseX, mouseY).x; 
 	else
-		mousePos = getHeight() - calcLocalPos(mouseX, mouseY).y;
+		mousePos = getHeight() - screenToLocalCoords(mouseX, mouseY).y;
 
 	if (mousePos < SliderPos) {
 		SliderPos -= clickIncrement; 
@@ -124,9 +114,9 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 void CGUIbaseScrollbar::OnMouseMove(int mouseX, int mouseY,int key) {
 	if ((MouseDown == this) && ( scrollbarHasMouse  == this)) {//scrollbar dragging appears to be going on
 		if (orientation == horizontal) 
-			SliderPos = calcLocalPos(mouseX, mouseY).x - mouseSliderOffset;
+			SliderPos = screenToLocalCoords(mouseX, mouseY).x - mouseSliderOffset;
 		else {
-			SliderPos = (getHeight() - calcLocalPos(mouseX, mouseY).y) - mouseSliderOffset;
+			SliderPos = (getHeight() - screenToLocalCoords(mouseX, mouseY).y) - mouseSliderOffset;
 		}
 		updateValue();
 	}

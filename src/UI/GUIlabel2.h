@@ -18,7 +18,7 @@ public:
 	void setLeftAlignIndent(int indent);
 	TTextAlign getJustification();
 	void DrawSelf();
-	//void borderOn(bool onOff);
+	//void setBorderOn(bool onOff);
 	void setLocalDimensions(int x, int y, int w, int h);
 	void updateAppearance();
 	int getTextWidth();
@@ -29,7 +29,6 @@ public:
 	void renderText();
 	int getNextLineStart(int lineStart);
 
-	void resize(int w, int h);
 	std::string& getText();
 
 
@@ -42,9 +41,7 @@ public:
 
 	textRec textData;
 
-	int textureHeight; ///<Height of the texture being drawn to.
-	int textureWidth; ///<Guess.
-
+	
 	int leftAlignIndent; ///<How much left-aligned text is indented.
 
 	};

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 #include <string>
+#include <iomanip>
 
 using namespace glm;
 namespace fs = std::experimental::filesystem;
@@ -22,7 +23,7 @@ void CTexGenUI::init(CBaseApp * app) {
 /** Create the interface for viewing textures. */
 void CTexGenUI::initGUI() {
 	image = new CGUItrackImage(0, 0, 512, 512);
-	image->borderOn(false);
+	image->setBorderOn(false);
 	image->setGUIcallback(this);
 	pApp->GUIroot.Add(image);
 
@@ -79,6 +80,10 @@ void CTexGenUI::initGUI() {
 		"Rects", "Blocks", "Cover", "Cutup", "Terrain" });
 	pApp->GUIroot.Add(addTexGenMenu);
 
+	savePNGbtn = new CGUIbutton2(10, 230, 100, 30);
+	savePNGbtn->setText("Save PNG file");
+	savePNGbtn->setGUIcallback(this);
+	texGenListPanel->Add(savePNGbtn);
 
 
 
@@ -93,6 +98,12 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		if (trackImage)
 			trackImage->render();
 		//return;
+	}
+
+	if (sender == savePNGbtn && msg.Msg == uiClick) {
+		saveCurrentTexGenPNG();
+		//TO DO: some kind of "Done!" dialogue box here
+		return;
 	}
 
 	if (sender == GUInoiseCtrl->octaveCtrl) {
@@ -226,7 +237,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 	}
 
 	if (sender == GUInoiseCtrl->gausSizeCtrl) {
-		texCompositor.currentTexGen->setGausSize(msg.fValue);
+		texCompositor.currentTexGen->setGausSize((int)msg.fValue);
 		texCompositor.compose();
 	}
 	if (sender == GUInoiseCtrl->gausSigmaCtrl) {
@@ -279,7 +290,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 
 	if (texCompositor.currentTexGen->texGenType == texRects) {
 		if (sender == GUInoiseCtrl->rectsDepthCtrl) {
-			static_cast<CRectsTex*>(texCompositor.currentTexGen)->setDepth(msg.fValue);
+			static_cast<CRectsTex*>(texCompositor.currentTexGen)->setDepth((int)msg.fValue);
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->rectsVarianceCtrl) {
@@ -291,11 +302,11 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->octaveCtrl) {
-			static_cast<CRectsTex*>(texCompositor.currentTexGen)->setOctaves(msg.fValue);
+			static_cast<CRectsTex*>(texCompositor.currentTexGen)->setOctaves((int)msg.fValue);
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->rectsStyleCtrl) {
-			static_cast<CRectsTex*>(texCompositor.currentTexGen)->setStyle(msg.fValue);
+			static_cast<CRectsTex*>(texCompositor.currentTexGen)->setStyle((int)msg.fValue);
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->clustersCtrl) {
@@ -306,11 +317,11 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 
 	if (texCompositor.currentTexGen->texGenType == texBlocks) {
 		if (sender == GUInoiseCtrl->blocksStagesCtrl) {
-			static_cast<CBlocksTex*>(texCompositor.currentTexGen)->setStages(msg.fValue);
+			static_cast<CBlocksTex*>(texCompositor.currentTexGen)->setStages((int)msg.fValue);
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->blocksIterationsCtrl) {
-			static_cast<CBlocksTex*>(texCompositor.currentTexGen)->setIterations(msg.fValue);
+			static_cast<CBlocksTex*>(texCompositor.currentTexGen)->setIterations((int)msg.fValue);
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->blocksDensityCtrl) {
@@ -325,7 +336,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 
 	if (texCompositor.currentTexGen->texGenType == texCover) {
 		if (sender == GUInoiseCtrl->coverIterationsCtrl) {
-			static_cast<CoverTex*>(texCompositor.currentTexGen)->setIterations(msg.fValue);
+			static_cast<CoverTex*>(texCompositor.currentTexGen)->setIterations((int)msg.fValue);
 			texCompositor.compose();
 		}
 		if (sender == GUInoiseCtrl->coverScaleCtrl) {
@@ -334,8 +345,29 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		}
 	}
 
+	if (texCompositor.currentTexGen->texGenType == texTerrain) {
+		if (sender == GUInoiseCtrl->terrainGridSizeCtrl) {
+			static_cast<CTerrainTex*>(texCompositor.currentTexGen)->setGridSize((int)msg.fValue);
+			texCompositor.compose();
+		}
+		if (sender == GUInoiseCtrl->terrainDetailsCtrl) {
+			static_cast<CTerrainTex*>(texCompositor.currentTexGen)->setDetails(msg.value);
+			texCompositor.compose();
+		}
+		if (sender == GUInoiseCtrl->terrainFeatureCountCtrl) {
+			static_cast<CTerrainTex*>(texCompositor.currentTexGen)->setFeatureCount((int)msg.fValue);
+			texCompositor.compose();
+		}
+		if (sender == GUInoiseCtrl->terrainFeatureSizeCtrl) {
+			static_cast<CTerrainTex*>(texCompositor.currentTexGen)->setFeatureSize(msg.fValue);
+			texCompositor.compose();
+		}
+		if (sender == GUInoiseCtrl->seedCtrl) {
+			static_cast<CTerrainTex*>(texCompositor.currentTexGen)->setRandomSeed((int)msg.fValue);
+			texCompositor.compose();
+		}
 
-
+	}
 
 	updateDisplayImage();
 
@@ -434,6 +466,16 @@ void CTexGenUI::updateGUI() {
 		GUInoiseCtrl->coverIterationsCtrl->setValue(static_cast<CoverTex*>(texCompositor.currentTexGen)->getIterations());
 		GUInoiseCtrl->coverScaleCtrl->setValue(static_cast<CoverTex*>(texCompositor.currentTexGen)->getScale());
 	}
+
+	if (texCompositor.currentTexGen->texGenType == texTerrain) {
+		GUInoiseCtrl->terrainGridSizeCtrl->setValue(static_cast<CTerrainTex*>(texCompositor.currentTexGen)->getGridSize());
+		GUInoiseCtrl->terrainDetailsCtrl->Set = (static_cast<CTerrainTex*>(texCompositor.currentTexGen)->getDetails());
+		GUInoiseCtrl->terrainFeatureCountCtrl->setValue(static_cast<CTerrainTex*>(texCompositor.currentTexGen)->getFeatureCount());
+		GUInoiseCtrl->terrainFeatureSizeCtrl->setValue(static_cast<CTerrainTex*>(texCompositor.currentTexGen)->getFeatureSize());
+		GUInoiseCtrl->seedCtrl->setValue(static_cast<CTerrainTex*>(texCompositor.currentTexGen)->getRandomSeed());
+	}
+
+
 
 }
 
@@ -551,6 +593,7 @@ void CTexGenUI::configureGUI(TexGenType texType) {
 	case texBlocks: GUInoiseCtrl->activateRows({ "stagesIterations","densityScale" }); break;
 	case texCover: GUInoiseCtrl->activateRows({ "iterationsScale" }); break;
 	case texCutup: GUInoiseCtrl->activateRows({ "source1&2" }); break;
+	case texTerrain: GUInoiseCtrl->activateRows({ "sizeDetails","featuresSize","randomSeed"}); break;
 
 	}
 	GUInoiseCtrl->autoArrangeRows(0, 20);
@@ -652,7 +695,7 @@ void CTexGenUI::trackLayerImage(int layer) {
 		texGenList->setHighlight(layer, false);
 	}
 	else {
-		for (int trackedNo = 0; trackedNo < texCompositor.texGens.size(); trackedNo++)
+		for (unsigned int trackedNo = 0; trackedNo < texCompositor.texGens.size(); trackedNo++)
 			if (trackImage == texCompositor.texGens[trackedNo]) {
 				texGenList->setHighlight(trackedNo, false); 
 				break;
@@ -660,4 +703,34 @@ void CTexGenUI::trackLayerImage(int layer) {
 		trackImage = texCompositor.texGens[layer];
 		texGenList->setHighlight(layer, true);
 	}
+}
+
+/** Save the target image of the current texGen as a PNG file. */
+void CTexGenUI::saveCurrentTexGenPNG() {
+	//determine the filename
+	string requestedFilename = fileName->getText() + ".png";
+	//does it exist?
+	//create list of filenames
+	vector<string> filenames;
+	for (auto& p : fs::directory_iterator(pApp->dataPath)) {
+		if (p.path().extension().string().compare(".png") == 0)
+			filenames.push_back(p.path().filename().string());
+	}
+	
+	string newFilename = requestedFilename;
+	unsigned int insertPos = requestedFilename.find_last_of(".");
+	int uniqueNum = 1;
+	//while we can find filename in this directory...
+	while (find(filenames.begin(), filenames.end(), newFilename) != filenames.end()) {
+		stringstream number;
+		number << std::setw(4) << std::setfill('0');
+		number << uniqueNum;
+		string textNum = "#" + number.str();
+		newFilename = requestedFilename;
+		newFilename.insert(insertPos, textNum);
+		uniqueNum++;
+	}
+
+	texCompositor.saveCurrentTexGenPNG(pApp->dataPath + newFilename);
+
 }

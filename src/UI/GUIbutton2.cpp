@@ -5,17 +5,7 @@
 using namespace glm;
 
 CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
-	//setPos(x, y);
-	//width = w; height = h;
-	//drawBox.pos = i32vec2(x, y);
-	//drawBox.size = i32vec2(w, h);
-	//setWidth(w);
-	//setHeight(h);
-
-
 	type = uiButton;
-
-	//pDrawFuncs->registerControl(*this);
 
 	label = new CGUIlabel2(5, 5, w - 10, h - 10);
 	label->setText("Button");
@@ -54,9 +44,8 @@ void CGUIbutton2::DrawSelf() {
 void CGUIbutton2::OnClick(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
-	//pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
-	if (callbackObj)
+	//if (callbackObj)
 		callbackObj->GUIcallback(this, msg);
 }
 

@@ -130,7 +130,7 @@ void CGUIswatchContainer::openColourPicker(CGUIswatchGroup* group, int swatchNo)
 /** Rearrange controls not to overlap after a swatch group is resized. */
 void CGUIswatchContainer::respaceControls() {
 	int lastY = groupGap;
-	for (auto control : surface->Control) {
+	for (auto control : surface->controls) {
 		if (control->type == uiSwatchGroup) {
 			control->setPos(control->getLocalPos().x, lastY);
 			lastY = control->getLocalPos().y + control->getHeight() + groupGap;
@@ -188,10 +188,10 @@ void CGUIswatchContainer::assignDataFile(std::string filename) {
 
 /** Remove all existing swatch groups and their labels. */
 void CGUIswatchContainer::clearSwatchGroups() {
-	for (auto it = surface->Control.begin(); it != surface->Control.end(); )
+	for (auto it = surface->controls.begin(); it != surface->controls.end(); )
 	{
 		if ((*it)->type == uiSwatchGroup)
-			it = surface->Control.erase(it);
+			it = surface->controls.erase(it);
 		else
 			++it;
 	}
@@ -204,7 +204,7 @@ void CGUIswatchContainer::writeDataFile() {
 		return;
 
 	ofstream outFile(datafileName, ofstream::out);
-	for (auto control : surface->Control) {
+	for (auto control : surface->controls) {
 		//if (control->type == uiTextbox) {
 		//	outFile << std::quoted(static_cast<CGUItextbox2*>(control)->getText()) << "\n";
 		//}
@@ -242,11 +242,11 @@ CGUIswatchGroup::CGUIswatchGroup(int x, int y, int w, int h)
 	nameTextbox = new CGUItextbox2(0, 0, w/2, 18);
 	nameTextbox->anchorLeft = true;
 	nameTextbox->anchorRight = 5;
-	nameTextbox->borderOn(false);
+	nameTextbox->setBorderOn(false);
 	nameTextbox->setBackColour1(uiLightGrey);
 	nameTextbox->setBackColour2(uiLightGrey);
 	Add(nameTextbox);
-	nameTextbox->borderOn(true);
+	nameTextbox->setBorderOn(true);
 }
 
 void CGUIswatchGroup::DrawSelf() {
@@ -281,7 +281,7 @@ void CGUIswatchGroup::OnClick(const int mouseX, const int mouseY) {
 }
 
 int CGUIswatchGroup::getSwatchIndex(const int mouseX, const int mouseY) {
-	i32vec2 localMouse = calcLocalPos(mouseX, mouseY);
+	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 	localMouse.y -= nameTextbox->drawBox.size.y + surroundGap;
 	localMouse.x -= swatchGap;
 	if (localMouse.y < 0 || localMouse.x < 0)

@@ -3,27 +3,17 @@
 using namespace glm;
 
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
-	//localPos = glm::i32vec2(x, y);
-	//setPos(x, y);
-	//drawBox.setSize(w, h);
-	//setWidth(w);
-//	setHeight(h);
-
-	//TO DO: get rid of width/height!
-	//width = drawBox.size.x; height = drawBox.size.y;
-	textureHeight = getHeight();
-	textureWidth = getWidth();
+	
 	
 	textData.font = defaultFont;
 	textBuf.setFont(defaultFont);
-	textBuf.setSize(textureWidth, textureHeight);
+	textBuf.setSize(getWidth(), getHeight());
 
 	type = uiLabel;
 	setTextColour(vec4(0, 0, 0, 1));
 	multiLine = false;
 	drawBorder = false;
 	mousePassthru = true;
-	//pDrawFuncs->registerControl(*this);
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;
@@ -38,13 +28,6 @@ void CGUIlabel2::setText(std::string newText) {
 	textData.text = newText;
 	renderText();
 }
-
-/*
-void CGUIlabel2::setTextColour(float r, float g, float b, float a) {
-	textData.style.colour = glm::vec4(r, g, b, a);
-	textBuf.setTextColour(textData.style.colour);
-	renderText();
-}*/
 
 void CGUIlabel2::setTextColour(UIcolour  colour) {
 	setTextColour(vec4(colour.r, colour.g, colour.b, colour.a));
@@ -85,34 +68,10 @@ void CGUIlabel2::DrawSelf() {
 	}
 }
 
-
-
-/** Set the dimensions and relative position of the control. */
-void CGUIlabel2::setLocalDimensions(int x, int y, int w, int h) {
-	setPos(x, y);
-	//width = w; height = h;
-	setWidth(w);
-	setHeight(h);
-
-	drawBox.pos = glm::i32vec2(x, y);
-	//drawBox.size = glm::i32vec2(w, h);
-	
-	updateAppearance();
-	//TO DO,see if this can be replaced with update flag
-
-	//textureWidth = drawBox.size.x; //TO DO, any offset adjustment goes here
-	//textureHeight = drawBox.size.y;
-
-	textBuf.setSize(textureWidth, textureHeight);
-	renderText();
-}
-
+/** Catch any resizing, to ensure the text buffer is resized. */
 void CGUIlabel2::updateAppearance() {
 	CGUIbase::updateAppearance();
-	//assume dimensions may have changed, eg, if this label was set to span
-	textureWidth = getWidth(); //TO DO, any offset adjustment goes here
-	textureHeight = getHeight();
-	textBuf.setSize(textureWidth, textureHeight);
+	textBuf.setSize(getWidth(), getHeight());
 	renderText();
 }
 
@@ -126,12 +85,12 @@ void CGUIlabel2::calcLineOffset() {
 	if (multiLine)
 		renderOffset.y = 0;
 	else
-		renderOffset.y = (textureHeight - textData.font->lineHeight) / 2;
+		renderOffset.y = (getHeight() - textData.font->lineHeight) / 2;
 
 	if (textAlign == tcentred) {
-		renderOffset.x = (textureWidth - lineRenderedWidth) / 2.0f;
+		renderOffset.x = (getWidth() - lineRenderedWidth) / 2.0f;
 	} else if (textAlign == tright) {
-		renderOffset.x = textureWidth - lineRenderedWidth;
+		renderOffset.x = getWidth() - lineRenderedWidth;
 	}
 	else if (textAlign == tleft) {
 		renderOffset.x = leftAlignIndent;
@@ -176,7 +135,7 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 	int breakDist = textData.text.size(); int dist = 0;
 	//while there are characters, when we reach a word break record it, until we go over the allotted width;
 	int c = lineStart;
-	while (dist < textureWidth) { //TO DO: put c >= text.size() check here?
+	while (dist < getWidth()) { //TO DO: put c >= text.size() check here?
 		if (textData.text[c] == '\n') {
 			return c + 1;
 		}
@@ -192,19 +151,12 @@ int CGUIlabel2::getNextLineStart(int lineStart) {
 }
 
 
-void CGUIlabel2::resize(int w, int h) {
-	if (w < 1) //because bad things happen if we make the texture 0 in height or width
-		w = 1;
-	if (h < 1)
-		h = 1;
-	CGUIbase::resize(w, h);
-	//drawBox.size = glm::i32vec2(w, h);
-	//updateAppearance();
-	renderText();
-}
+
 
 std::string & CGUIlabel2::getText() {
 	return textData.text;
 }
+
+
 
 

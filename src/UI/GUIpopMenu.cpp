@@ -1,7 +1,7 @@
 #include "GUIpopMenu.h"
 
 CGUIpopMenu::CGUIpopMenu(int x, int y, int w, int h) : CGUImenu(x,y,w,h) {
-	borderOn(true);
+	setBorderOn(true);
 }
 
 void CGUIpopMenu::setMenuCallback(IPopupMenu * callback) {

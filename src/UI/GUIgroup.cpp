@@ -9,9 +9,7 @@ int CGUIgroup::Count = 1;
 CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 	GenName("Group",Count++);
 	type = group;
-	//localPos = glm::i32vec2(x, y); 
 	setPos(x, y);
-	//width = w; height = h;
 	setWidth(w);
 	setHeight(h);
 
@@ -26,7 +24,6 @@ CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 /** Set the text of the group's header label. */
 void CGUIgroup::SetText(const std::string& TextStr) {
 	header->setText(TextStr);
-//	pDrawFuncs->setFont(header->TextFont);
 	headerWidth = header->getTextWidth();
 }
 

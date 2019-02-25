@@ -22,7 +22,6 @@ public:
 	void updateDisplayImage();
 	void updateGUI();
 	void save();
-	void save2();
 	void restore(std::string& filename);
 	void clear();
 	void fillStackMenu();
@@ -36,8 +35,8 @@ public:
 	void highlightMouseColour(int x, int y);
 	void unhighlightMouseColour();
 	void popupMenuCallback(int choice);
-
 	void trackLayerImage(int layer);
+	void saveCurrentTexGenPNG();
 
 
 	CBaseApp* pApp;
@@ -66,7 +65,7 @@ public:
 
 	CGUIimage* thumbnailImage;
 
-
+	CGUIbutton2* savePNGbtn;
 };
 
 

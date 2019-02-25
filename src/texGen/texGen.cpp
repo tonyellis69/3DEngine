@@ -815,27 +815,29 @@ void CutupTex::render() {
 	pRenderer->renderToTextureQuad(mTarget);
 }
 
+
 CTerrainTex::CTerrainTex() : CTexGen(texTerrain) {
 	name = "Terrain";
-	gridSize = 100;
-	grid.resize(gridSize * gridSize);
-	gridTexture.resize(gridSize, gridSize);
-	
-//	placeStartEnd();
-//	placeBarrier();
+	setGridSize(100);
+	showDetails = true;
+	featureCount = 4; featureSize = 0.85f;
+	randomSeed = 42;
 }
 
 void CTerrainTex::loadShader() {
 	shader = pRenderer->createShader("texTerrain");
 	hSource = shader->getUniformHandle("source");
+	hShowDetails = shader->getUniformHandle("showDetails");
+	hGridSize = shader->getUniformHandle("gridSize");
 }
 
 void CTerrainTex::render() {
+	eng.seed(randomSeed);
 	loadShader();
 	pRenderer->setShader(shader);
 
 	placeStartEnd();
-	//placeBarrier();
+
 	placeFeatures();
 	plotShortestPath();
 	
@@ -844,8 +846,10 @@ void CTerrainTex::render() {
 	pRenderer->attachTexture(0, gridTexture.handle);
 	shader->setShaderValue(hSource, 0);
 
-	pRenderer->renderToTextureQuad(mTarget);
+	shader->setShaderValue(hShowDetails, showDetails);
+	shader->setShaderValue(hGridSize, gridSize);
 
+	pRenderer->renderToTextureQuad(mTarget);
 }
 
 /** Fill the buffer with verts representing the grid cells. */
@@ -880,13 +884,9 @@ void CTerrainTex::placeStartEnd() {
 
 /** Place cells that either attract or repel the pathfinder. */
 void CTerrainTex::placeFeatures() {
-
 	features.clear();
-//	features.push_back(i32vec2(1,2));
-//	grid[1 + 2 * gridSize] = -1.0f;
-//	return;//
 	std::uniform_int_distribution<> gridWidth{ 0,gridSize-1 };
-	for (int x = 0; x < 3; x++) {
+	for (int x = 0; x < featureCount; x++) {
 			i32vec2 repellor(gridWidth(eng),gridWidth(eng));
 			features.push_back(repellor);
 			grid[repellor.x + repellor.y*gridSize] = -1.0f;
@@ -905,7 +905,7 @@ void CTerrainTex::placeBarrier() {
 void CTerrainTex::plotShortestPath() {
 	std::uniform_real_distribution<float> rnd{ 0,0.1f }; //0.01 for minor swerve
 
-	std::map<int,int> parents;
+	std::map<int, int> parents;
 	parents[startPoint.x + startPoint.y * gridSize] = startPoint.x + startPoint.y * gridSize;
 
 	std::map<int, float> weights;
@@ -917,7 +917,7 @@ void CTerrainTex::plotShortestPath() {
 	std::map<int, float> distSoFar;
 
 	//add the start point to the set
-	openList.emplace( 0.0f,  startPoint.x + startPoint.y * gridSize);
+	openList.emplace(0.0f, startPoint.x + startPoint.y * gridSize);
 	distSoFar[startPoint.x + startPoint.y*gridSize] = 0;
 
 	float greatestDistance = 0;
@@ -929,13 +929,13 @@ void CTerrainTex::plotShortestPath() {
 
 		//remove the node with the smallest distance from the open list and make it current
 		auto it = openList.top();
-		int currentNode =  it.second;
+		int currentNode = it.second;
 		openList.pop();
-		
+
 
 		//is it the end point? break
-		if (currentNode == endPoint.x + endPoint.y * gridSize)
-			;// break;
+		if (!showDetails && currentNode == endPoint.x + endPoint.y * gridSize)
+			 break;
 
 
 
@@ -948,13 +948,13 @@ void CTerrainTex::plotShortestPath() {
 			int neighbourIndex = neighbour.x + neighbour.y * gridSize;
 			if (neighbour.x >= 0 && neighbour.x < gridSize && neighbour.y >= 0 && neighbour.y < gridSize
 				/*&& grid[neighbourIndex] >= 0 */) {
-	
+
 				float repulsion = 0.0f;
 				for (auto feature : features) {
 					//repulsion = 0.0f;
 					float featureDist = glm::distance(vec2(feature), vec2(neighbour)) / gridDiagonal; //max = 1
 					float featureProximity = 1.0f - featureDist; //close = 1
-					if (featureProximity < 0.85f)
+					if (featureProximity < featureSize)
 						featureProximity = 0.0f;
 
 					repulsion = std::max(featureProximity, repulsion);
@@ -963,7 +963,7 @@ void CTerrainTex::plotShortestPath() {
 				//repulsion = 0;
 				//find f, g and h values
 				float distanceToNeighbour = distSoFar[currentNode];//  +repulsion;
-				float heuristic = glm::distance(vec2(endPoint), vec2(neighbour))/ gridDiagonal; //abs(neighbour.x - endPoint.x) + abs(neighbour.y - endPoint.y);// glm::distance(vec2(endPoint), vec2(neighbour));
+				float heuristic = glm::distance(vec2(endPoint), vec2(neighbour)) / gridDiagonal; //abs(neighbour.x - endPoint.x) + abs(neighbour.y - endPoint.y);// glm::distance(vec2(endPoint), vec2(neighbour));
 				//heuristic = 0;
 				heuristic += repulsion;
 				heuristic += rnd(eng);
@@ -972,8 +972,8 @@ void CTerrainTex::plotShortestPath() {
 
 				float newDistance = distanceToNeighbour + heuristic;
 
-				if (distSoFar.find(neighbourIndex)  == distSoFar.end() || distanceToNeighbour < distSoFar[neighbourIndex]) {
-					openList.emplace(newDistance,neighbourIndex);
+				if (distSoFar.find(neighbourIndex) == distSoFar.end() || distanceToNeighbour < distSoFar[neighbourIndex]) {
+					openList.emplace(newDistance, neighbourIndex);
 					distSoFar[neighbourIndex] = distanceToNeighbour;
 					greatestDistance = std::max(greatestDistance, newDistance);
 					parents[neighbourIndex] = currentNode;
@@ -985,31 +985,53 @@ void CTerrainTex::plotShortestPath() {
 
 	}
 
-	//colour tiles
-/*	for (int index = 0; index < gridSize * gridSize; index++) {
-		if (distances[index] < 99999 && grid[index] == 0)
-			grid[index] = (float)distances[index] / (greatestDistance + 1);
+
+	if (showDetails) {
+		for (auto weight : weights) {
+			if (grid[weight.first] == 0)
+				grid[weight.first] = weight.second;
+		}
 	}
-	*/
-
-	/*for (auto distance : distSoFar) {
-		if (grid[distance.first] == 0)
-			grid[distance.first] = distance.second / (greatestDistance + 1);
-	}*/
-
-	for (auto weight : weights) {
-		if (grid[weight.first] == 0)
-			 grid[weight.first] = weight.second;// / (maxWeight + 1);
+	else {
+		std::fill(grid.begin(), grid.end(), 0.0f);
+		grid[startPoint.x + startPoint.y*gridSize] = 1.0;
+		grid[endPoint.x + endPoint.y*gridSize] = 1.0;
 	}
 
-	vector<int> path;
+	
 	int drawNode = parents[endPoint.x + endPoint.y * gridSize];
 	while (drawNode != startPoint.x + startPoint.y * gridSize && drawNode != -1) {
-		grid[drawNode] = 3.0f;// 0.99f;
-		path.push_back(drawNode);
+		if (showDetails)
+			grid[drawNode] = 3.0f;
+		else
+			grid[drawNode] = 1.0f;
 		drawNode = parents[drawNode];
 	}
 
+}
+
+void CTerrainTex::setGridSize(int size) {
+	gridSize = size;
+	grid.resize(gridSize * gridSize);
+	gridTexture.resize(gridSize, gridSize);
+}
+
+void CTerrainTex::write(std::ofstream & out) {
+	CTexGen::write(out);
+	writeObject(gridSize, out);
+	writeObject(showDetails, out);
+	writeObject(featureCount, out);
+	writeObject(featureSize, out);
+	writeObject(randomSeed, out);
+}
+
+void CTerrainTex::read(std::ifstream & in) {
+	CTexGen::read(in);
+	readObject(gridSize, in);
+	readObject(showDetails, in);
+	readObject(featureCount, in);
+	readObject(featureSize, in);
+	readObject(randomSeed, in);
 }
 
 

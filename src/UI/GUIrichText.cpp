@@ -5,10 +5,8 @@
 using namespace glm;
 
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
-
 	styles = NULL;
 	defaultTextStyle = { "default","defaultFont",glm::vec4(0,0,0,1) };
-
 
 	TRichTextRec defaultStyleObj;
 	defaultStyleObj.style = currentTextStyle;
@@ -27,8 +25,6 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	yPixelOffset = 0;
 	smoothScrollStep = 8;
 	setMouseWheelMode(scroll);
-//	setHotTextColour(uiWhite);
-//	setHotTextHighlightColour(uiBlue);
 	hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
 	selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
 
@@ -126,16 +122,7 @@ void CGUIrichText::setTextColour(UIcolour  colour) {
 	setTextColour(colour.r, colour.g, colour.b, colour.a);
 }
 
-/** Normal colour for unselected hot text. */
-/*
-void CGUIrichText::setHotTextColour(const glm::vec4& colour) {
-//	hotTextColour = colour;
-}
 
-void CGUIrichText::setHotTextHighlightColour(const glm::vec4& colour) {
-	//hotTextHighlightColour = colour;
-}
-*/
 
 /** Set the style for any text appended after this. */
 void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
@@ -240,7 +227,7 @@ void CGUIrichText::renderText() {
 		if ( (currentObj.hotMsgId || currentObj.hotObjId) && renderLine[0] != '\n') {
 			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentFont->lineHeight, lineFragment.textObj };
 			hotFrag.text = renderLine;
-			if (offset.y + currentFont->lineHeight > textureHeight)
+			if (offset.y + currentFont->lineHeight > getHeight())
 				hotFrag.overrun =  true;
 			else
 				hotFrag.overrun = false;
@@ -250,18 +237,18 @@ void CGUIrichText::renderText() {
 		if (lineFragment.causesNewLine != no) {
 			offset = glm::i32vec2(0, offset.y + currentFont->lineHeight );
 		}
-		if (offset.y + currentFont->lineHeight > textureHeight) {
-			overrun = offset.y + currentFont->lineHeight - textureHeight; //was true;
+		if (offset.y + currentFont->lineHeight > getHeight()) {
+			overrun = offset.y + currentFont->lineHeight - getHeight(); //was true;
 			if ((currentObj.hotMsgId || currentObj.hotObjId) &&  overrunHotTextObj == -1)
 				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
-			if (offset.y > textureHeight) { //overrun texture, so no sense writing any more
+			if (offset.y > getHeight()) { //overrun texture, so no sense writing any more
 				textBuf.render();
 				return;
 			}
 		}
 
 
-		underrun = textureHeight - (offset.y + currentFont->lineHeight);
+		underrun = getHeight() - (offset.y + currentFont->lineHeight);
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
@@ -317,7 +304,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			breakPointX = renderX;
 			//break; //pretty sure this works without break as long as we go to next clause
 		}
-		if (renderX > textureWidth || renderX + lookAheadCharWidth > textureWidth) {
+		if (renderX > getWidth() || renderX + lookAheadCharWidth > getWidth()) {
 			
 			if (breakPointX > 0) {
 				c = breakPoint;
@@ -768,14 +755,10 @@ void CGUIrichText::appendMarkedUpText(string text) {
 void CGUIrichText::updateAppearance() {
 	CGUIbase::updateAppearance();
 	//assume dimensions may have changed, eg, if this control was set to span
-	//TO DO: something's wrong, we come here way too many times
-	//cerr << "\nupdate appearance " << uniqueID;
-	if (textureWidth != getWidth()|| textureHeight != getHeight()) {
-		textureWidth = getWidth();
-		textureHeight = getHeight();
-		textBuf.setSize(textureWidth, textureHeight);
-		renderText();
-	}
+	//TO DO: something's wrong, we come here a million times in textMode
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	textBuf.setSize(getWidth(), getHeight());
+	renderText();
 
 }
 
@@ -870,7 +853,8 @@ void CGUIrichText::resize(int w, int h) {
 	setWidth(w);
 	setHeight(h);
 //	drawBox.size = glm::i32vec2(w, h);
-	updateAppearance();
+	//updateAppearance();
+	needsUpdate = true;
 	//TO DO: see if we can get away with flag here
 	//renderText();
 }

@@ -7,11 +7,7 @@ const int unChecked = 0;
 
 int CGUIcheckButton::Count = 1;
 CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
-//	pDrawFuncs->registerControl(*this);
 	setPos(x, y);
-
-	
-	//drawBox.setSize(w, h);
 	setWidth(w);
 	setHeight(h);
 	Orientation = lblFirst;
@@ -29,7 +25,7 @@ CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
 	label = new CGUIlabel2(0,0, labelWidth, h);
 	label->setText("check");
 	label->setHorizontalAlignment(tleft);
-	label->borderOn(false);
+	label->setBorderOn(false);
 	Add(label);
 
 }
@@ -65,8 +61,6 @@ void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
 }
 
 void CGUIcheckButton::setText(std::string newText) {
-	//text = newText;
-	//renderText();
 	label->setText(newText);
 }
 

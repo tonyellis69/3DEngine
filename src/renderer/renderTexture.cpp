@@ -1,6 +1,9 @@
 
 #include "glew.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "..\external\stb_image_write.h"
+
 #include "renderer.h"
 #include "renderTexture.h"
 
@@ -105,13 +108,14 @@ glm::uvec4  CRenderTexture::getPixel(int x, int y) {
 }
 
 /** Create an RGBA texture from data. */
+/*
 void CRenderTexture::createRGBA(unsigned char * data, int w, int h) {
 	handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_RGBA, handle, 0);
 	width = w;
 	height = h;
 	channels = 4;
 }
-
+*/
 /** Create a single channel texture from data. */
 void CRenderTexture::createGreyscale(unsigned char * data, int w, int h) {
 	//handle = SOIL_create_OGL_texture(data, w, h, SOIL_LOAD_L, handle, 0);
@@ -212,6 +216,21 @@ CRenderTexture & CRenderTexture::operator=(const CRenderTexture & other) {
 
 
 	return *this;
+
+
+
+}
+
+/** Save this texture as a PNG image file.*/
+void CRenderTexture::savePNG(std::string filepath) {
+	std::vector<unsigned char> data(width * height * channels);
+	glBindTexture(GL_TEXTURE_2D, handle);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	//SOIL_save_image (filepath.c_str(), SOIL_SAVE_TYPE_BMP,width,height,channels,data.data() );
+
+
+
+	stbi_write_png(filepath.c_str(), width, height, channels, data.data(), width * channels);
 
 
 

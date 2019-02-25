@@ -82,17 +82,17 @@ CGUIbase::~CGUIbase(void) {
 	}
 
 	//remove from parent's controls if any
-	auto it = parent->Control.begin();
-	for (; it != parent->Control.end(); it++) {
+	auto it = parent->controls.begin();
+	for (; it != parent->controls.end(); it++) {
 		if (*it == this) {
-			parent->Control.erase(it);
+			parent->controls.erase(it);
 			break;
 		}
 	}
 
-	for (unsigned int i = 0; i < Control.size(); i++)
-		if (Control[i] != NULL)
-			delete Control[i];
+	for (unsigned int i = 0; i < controls.size(); i++)
+		if (controls[i] != NULL)
+			delete controls[i];
 }
 
 
@@ -128,9 +128,9 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		return;
 	
 	//otherwise, recursively test message against this control's child controls
-	for (size_t i = 0; i < Control.size(); i++) {
-		if (IsOnControl(*Control[i], mouseX, mouseY)) {		
-			Control[i]->MouseMsg(Msg, mouseX, mouseY, key);
+	for (size_t i = 0; i < controls.size(); i++) {
+		if (IsOnControl(*controls[i], mouseX, mouseY)) {		
+			controls[i]->MouseMsg(Msg, mouseX, mouseY, key);
 			return;
 		}
 	}
@@ -199,9 +199,9 @@ bool CGUIbase::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 	if ((!visible) || (!enabled))
 		return false;
 
-	for (size_t i=0;i < Control.size();i++)
-		if ( IsOnControl( *Control[i],mouseX, mouseY) ) {
-			if (Control[i]->MouseWheelMsg(mouseX , mouseY ,wheelDelta,key))
+	for (size_t i=0;i < controls.size();i++)
+		if ( IsOnControl( *controls[i],mouseX, mouseY) ) {
+			if (controls[i]->MouseWheelMsg(mouseX , mouseY ,wheelDelta,key))
 				return true;
 		}
 	return false;
@@ -214,22 +214,10 @@ void CGUIbase::onDrop(const int mouseX, const int mouseY) {
 	}
 }
 
-/** Set the dimensions and relative position of the control. */
-/*
+/** Convenience function for setting all dimensions at once. */
 void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
-	xPos = x; yPos = y; width = w; height = h;
-	updateAppearance();
-}
-*/
-void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
-//	localPos = glm::i32vec2(x, y);
 	setPos(x, y);
-	setWidth(w);
-	setHeight(h);
-	//updateAppearance();
-	//TO DO: can I get away with needsUpdate????
-	needsUpdate = true;
-	//looks like it!
+	resize(w, h);
 }
 
 void CGUIbase::setPos(int x, int y) {
@@ -253,88 +241,54 @@ void CGUIbase::setPosY(int y) {
 
 /** Add a child UI element to this UI element. */
 void CGUIbase::Add(CGUIbase* child) {
-	Control.push_back(child);
+	controls.push_back(child);
 	child->parent = this;
-	child->updateAppearance();
+	child->needsUpdate = true;
+	//TO DO: aboves turns out to be redundant - why?
 }
 
-/** Recursively update this control's position, dimensions and clipping, and those of its children. */
-/*
-void CGUIbase::updateAppearance() {
 
+/**	Handle any recent change to this control's size or position to ensure it draws correctly. 
+	Eg recalculate drawbox and clipbox.
+	This method Recursively calls itself on all child controls, which may now also need to update. */
+void CGUIbase::updateAppearance() {
 	needsUpdate = false;
-	//1. Recalculate x,y,w,h if necessary due to justification or spanning
-	if (anchorRight != NONE)
-		width = parent->width - xPos - anchorRight;
-	else {
-		switch (hFormat) {
-		case hCentre : {
-			xPos = (parent->width - width)/2; break;}
-		case hRight : {
-			xPos = parent->width - (width + parent->borderWidth); break; }
-		case hLeft : {
-			xPos = parent->borderWidth; break;}
-		case hSpan : {
-			xPos = 0; width = parent->width; break; }
-		}
-	}
 
-	if (anchorBottom != NONE) 
-		height = parent->height - yPos - anchorBottom;
-	else {
-		switch (vFormat) {
-		case vCentre : {
-			yPos = (parent->height - height)/2; break;}
-		case vTop : {
-			yPos = parent->borderWidth; break; }
-		case vBottom : {
-			yPos = parent->height - height - parent->borderWidth ; break;}
-		case vSpan : {
-			yPos = 0; height = parent->height; break; }
-		}
-	}
+	recalculateDiminsions();
+	recalculateClipbox();
 
-	
-
-	//2. Recalculate clipping
-	CalculateClipbox();
-	//3. Recalculate screen position
-	screenPos.x = parent->screenPos.x + xPos; screenPos.y = parent->screenPos.y + yPos;
-
-
-	//repeat through children
-	for (size_t i=0;i < Control.size();i++)
-		Control[i]->updateAppearance();
+	for (auto child : controls) //because we've potentially repositioned all these
+		child->updateAppearance();
 }
-*/
 
-/** Recursively update this control's position, dimensions and clipping, and those of its children. */
-void CGUIbase::updateAppearance() {
-	glm::i32vec2 oldSize = drawBox.size;
+/** Recalculate position and size according to the current local position and size of this control, its 
+	positional adjustment settings (eg, anchoring), and the position and size of its parent.*/
+void CGUIbase::recalculateDiminsions() {
 	drawBox.pos = parent->drawBox.pos + localPos;
-	needsUpdate = false;
+
+	//TO DO: probably don't need all these right/centre/etc justifications if I go for smart positioning
+	
 	//1. Recalculate x,y,w,h *if necessary* due to justification or spanning
 	if (anchorRight != NONE) {
-		if (anchorLeft) 
-			setWidth( min(getWidth(), parent->getWidth() - (anchorRight + getLocalPos().x)));
+		if (anchorLeft)
+			setWidth(min(getWidth(), parent->getWidth() - (anchorRight + getLocalPos().x)));
 		else
 			setPosX(parent->getWidth() - getWidth() - anchorRight);
 	}
 	else {
 		switch (hFormat) {
 		case hCentre: {
-			setPosX( (parent->getWidth() - getWidth()) / 2); break; }
+			setPosX((parent->getWidth() - getWidth()) / 2); break; }
 		case hRight: {
 			setPosX(parent->getWidth() - (getWidth() + parent->borderWidth)); break; }
 		case hLeft: {
-			setPosX( parent->borderWidth); break; }
+			setPosX(parent->borderWidth); break; }
 		case hSpan: {
 			setPosX(0); setWidth(parent->getWidth()); break; }
 		}
 	}
 
 	if (anchorBottom != NONE)
-		//drawBox.size.y = parent->drawBox.size.y - localPos.y - anchorBottom;
 		if (anchorLeft)
 			setHeight(min(getHeight(), parent->getHeight() - (anchorBottom + getLocalPos().y)));
 		else
@@ -342,7 +296,7 @@ void CGUIbase::updateAppearance() {
 	else {
 		switch (vFormat) {
 		case vCentre: {
-			setPosY( (parent->getHeight() - getHeight()) / 2); break; }
+			setPosY((parent->getHeight() - getHeight()) / 2); break; }
 		case vTop: {
 			setPosY(parent->borderWidth); break; }
 		case vBottom: {
@@ -352,29 +306,6 @@ void CGUIbase::updateAppearance() {
 		}
 	}
 
-	
-
-	//TO DO: looks redundant - may need updateAppearance only
-	if (oldSize != drawBox.size) {
-		//resize(getWidth(), getHeight());
-	}
-
-
-
-	//2. Recalculate clipping
-	CalculateClipbox();
-
-
-	//drawBox.pos = parent->drawBox.pos + localPos;
-
-
-//	pDrawFuncs->updateScreenDimensions(*this);
-
-
-
-	//repeat through children
-	for (size_t i = 0; i < Control.size(); i++)
-		Control[i]->updateAppearance();
 }
 
 
@@ -386,61 +317,26 @@ void CGUIbase::Draw() {
 	if (needsUpdate)
 		updateAppearance();
 	
-	UIrect* parentClipbox = &parent->Clipbox;
+	//declare a box beyond which we do not draw
 	pDrawFuncs->setClip(Clipbox);
 
 	DrawSelf(); 
+
 	//then draw each subcontrol
-	for (size_t i = 0; i < Control.size(); i++) {
-		if (!Control[i]->isModal)
-			Control[i]->Draw();
+	for (auto control : controls) {
+		if (!control->isModal) //modal controls go on top of everything else
+			control->Draw();
 	}
 }
+
 
 /** Fire off the necessary drawing instructions to draw this control. */
 void CGUIbase::DrawSelf() {
 }
 
 
-/** Calculate the drawable area of this control, and clip it to the drawable area of its parent conntrol. */
-/*
-void CGUIbase::CalculateClipbox() {
-
-
-	UIrect parentClipbox = parent->Clipbox;
-	parentClipbox.x += parent->borderWidth;	parentClipbox.y +=parent-> borderWidth;
-	parentClipbox.width -= parent->borderWidth*2; parentClipbox.height -= parent-> borderWidth*2;
-
-	Clipbox.width = width;
-	Clipbox.x = parent->screenPos.x + xPos;
-	if (Clipbox.x <parentClipbox.x) {
-		Clipbox.width -= (parentClipbox.x -Clipbox.x); 
-		Clipbox.x = parentClipbox.x;
-	}
-	
-
-	Clipbox.height = height;
-	Clipbox.y = parent->screenPos.y + yPos;
-	if (Clipbox.y < parentClipbox.y) {
-		Clipbox.height -= (parentClipbox.y -Clipbox.y); 
-		if (Clipbox.height < 0) 
-			Clipbox.height=0;
-		Clipbox.y = parentClipbox.y;
-	}
-
-	if ((Clipbox.x + Clipbox.width) > (parentClipbox.x + parentClipbox.width) ) 
-		Clipbox.width -= (Clipbox.x + Clipbox.width) - (parentClipbox.x + parentClipbox.width);
-
-	if ((Clipbox.y + Clipbox.height) > (parentClipbox.y + parentClipbox.height))
-		Clipbox.height -= (Clipbox.y + Clipbox.height) - (parentClipbox.y + parentClipbox.height);
-}
-
-*/
-
-/** Calculate the drawable area of this control, and clip it to the drawable area of its parent conntrol. */
-void CGUIbase::CalculateClipbox() {
-
-
+/** Calculate the drawable area of this control, and clip it by the drawable area of its parent conntrol. */
+void CGUIbase::recalculateClipbox() {
 	UIrect parentClipbox = parent->Clipbox;
 	parentClipbox.x += parent->borderWidth;	parentClipbox.y += parent->borderWidth;
 	parentClipbox.width -= parent->borderWidth * 2; parentClipbox.height -= parent->borderWidth * 2;
@@ -453,7 +349,7 @@ void CGUIbase::CalculateClipbox() {
 	}
 
 
-	Clipbox.height = getHeight();
+	Clipbox.height = getHeight(); //repeat process for top of drawing area
 	Clipbox.y = parent->drawBox.pos.y + getLocalPos().y;
 	if (Clipbox.y < parentClipbox.y) {
 		Clipbox.height -= (parentClipbox.y - Clipbox.y);
@@ -462,14 +358,12 @@ void CGUIbase::CalculateClipbox() {
 		Clipbox.y = parentClipbox.y;
 	}
 
+	//now width and height
 	if ((Clipbox.x + Clipbox.width) >(parentClipbox.x + parentClipbox.width))
 		Clipbox.width -= (Clipbox.x + Clipbox.width) - (parentClipbox.x + parentClipbox.width);
 
 	if ((Clipbox.y + Clipbox.height) >(parentClipbox.y + parentClipbox.height))
 		Clipbox.height -= (Clipbox.y + Clipbox.height) - (parentClipbox.y + parentClipbox.height);
-
-	//Clipbox.x -= 1; Clipbox.width += 1;
-//	Clipbox.height += 1;
 }
 
 /** Generate a name for this control. */
@@ -490,11 +384,11 @@ void CGUIbase::setDefaultFont(CFont* font) {
 }
 
 /** Convert these local coordinate to absolute screen coordinates. */
-glm::i32vec2 CGUIbase::getScreenCoords(int x, int y) {
+glm::i32vec2 CGUIbase::localToScreenCoords(int x, int y) {
 	return glm::i32vec2(drawBox.pos.x + x, drawBox.pos.y + y);
 }
 
-glm::i32vec2 CGUIbase::calcLocalPos(int x, int y) {
+glm::i32vec2 CGUIbase::screenToLocalCoords(int x, int y) {
 	return glm::i32vec2( x - drawBox.pos.x, y - drawBox.pos.y);
 }
 
@@ -512,12 +406,12 @@ int CGUIbase::getHeight() {
 
 void CGUIbase::setWidth(int w) {
 	drawBox.size.x = w;
-//	width = w;
+	needsUpdate = true;
 }
 
 void CGUIbase::setHeight(int h) {
 	drawBox.size.y = h;
-	//height = h;
+	needsUpdate = true;
 }
 
 const glm::i32vec2 CGUIbase::getScreenPos(){
@@ -525,12 +419,12 @@ const glm::i32vec2 CGUIbase::getScreenPos(){
 }
 
 void CGUIbase::resize(int w, int h) {
+	if (w < 1)
+		w = 1;
+	if (h < 1)
+		h = 1;
 	setWidth(w);
 	setHeight(h);
-	//updateAppearance();
-	//TO DO: can this be replaced with needsUpdate = true?
-	needsUpdate = true;
-	//looks like it, but keep an eye out!
 }
 
 void CGUIbase::setGUIcallback(Icallback * callbackInstance) {
@@ -616,16 +510,15 @@ void CGUIbase::popupMenu(std::initializer_list<std::string> options,  IPopupMenu
 	popupMenu->addItem(options);
 	Add(popupMenu);
 	popupMenu->makeModal();
-
 }
 
 
 
 /** Return a pointer to the child control of this control with the given id number. */
 CGUIbase* CGUIbase::getChild(int childID) {
-	for (size_t i=0;i<Control.size();i++){
-		if ( Control[i]->id == childID )
-			return Control[i];
+	for (auto control : controls){
+		if ( control->id == childID )
+			return control;
 	}
 	return NULL;
 }
@@ -635,8 +528,8 @@ CGUIbase* CGUIbase::findControl(int childID) {
 	CGUIbase* result = NULL;
 	if (id == childID )
 		return this;
-	for (size_t i=0;i<Control.size();i++){
-		result = Control[i]->findControl(childID);
+	for (auto control : controls){
+		result = control->findControl(childID);
 		if (result != NULL) 
 			break;
 	}
@@ -648,8 +541,8 @@ CGUIbase* CGUIbase::findControl(CGUIbase* child) {
 	CGUIbase* result = NULL;
 	if (this == child )
 		return this;
-	for (size_t i=0;i<Control.size();i++){
-		result = Control[i]->findControl(child);
+	for (auto control : controls){
+		result = control->findControl(child);
 		if (result != NULL) 
 			break;
 	}
@@ -658,53 +551,29 @@ CGUIbase* CGUIbase::findControl(CGUIbase* child) {
 
 
 void CGUIbase::OnLMouseUp(const int mouseX, const int mouseY) {
-	//do the default action for mouse up:
-
-	CMessage msg;
-	msg.Msg = uiMsgLMouseUp;
-	msg.x = mouseX; msg.y = mouseY;
-	//	callbackObj->GUIcallback(this, msg2);
-		//TO DO: check if I really want to do this. Errors?
+	
 }
 
 void CGUIbase::onRMouseUp(const int mouseX, const int mouseY) {
-	CMessage msg;
-	msg.Msg = uiMsgRMouseUp;
-	msg.x = mouseX; msg.y = mouseY;
-//	callbackObj->GUIcallback(this, msg);
+
 }
 
 /** Returns the position of this control in the child-list of its parent. */
 int CGUIbase::getControlNo() {
 	int x=0;
-	while (parent->Control[x] != this) {
+	while (parent->controls[x] != this) {
 		x++;
 	}
 	return x;
 }
 
 	
-/** Handle a UI-internal message from another control.*/
-/*
-void CGUIbase::message(CGUIbase* sender, CMessage& msg) {
-	if (sender->type == radioButton) { //several controls can be radio parents, so catch it here
-		//set the other radio buttons to 'off'.
-		for (size_t i=0;i<Control.size();i++)
-			if ( Control[i]->type == radioButton ) {
-				if ( Control[i] != sender) {
-					static_cast<CGUIradio*>(Control[i])->Set = false; 
-				}
-			} 
-	}
-}*/
-
 /** Disable or enable this contol. */
 void CGUIbase::setEnabled(bool onOff) {
 	enabled = onOff;
 }
 
-bool CGUIbase::getEnabled()
-{
+bool CGUIbase::getEnabled() {
 	return enabled;
 }
 
@@ -760,7 +629,7 @@ void CGUIbase::setBorderColour(const glm::vec4& colour) {
 	borderColour = (UIcolour&)colour;
 }
 
-void CGUIbase::borderOn(bool onOff) {
+void CGUIbase::setBorderOn(bool onOff) {
 	drawBorder = onOff;
 }
 

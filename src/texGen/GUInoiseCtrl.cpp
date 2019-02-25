@@ -269,8 +269,36 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 
 	addToRow("iterationsScale", { lbl,coverIterationsCtrl,lbl2,coverScaleCtrl });
 
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Size");
+	terrainGridSizeCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	terrainGridSizeCtrl->setValue(100); terrainGridSizeCtrl->setMinMax(5, 200);
 
+	terrainDetailsCtrl = new CGUIcheckButton(CtrlCol2X + 70, 0, 70, 18);
+	terrainDetailsCtrl->Set = true;
+	terrainDetailsCtrl->setText("Details");
 
+	addToRow("sizeDetails", {lbl, terrainGridSizeCtrl, terrainDetailsCtrl});
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Features");
+	terrainFeatureCountCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	terrainFeatureCountCtrl->setValue(4); terrainFeatureCountCtrl->setMinMax(0, 20);
+
+	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
+	lbl2->setText("Constraint");
+	terrainFeatureSizeCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
+	terrainFeatureSizeCtrl->setValue(0.85f); terrainFeatureSizeCtrl->setMinMax(0.5, 0.99);
+	terrainFeatureSizeCtrl->setIncrement(0.01f);
+
+	addToRow("featuresSize", { lbl,terrainFeatureCountCtrl,lbl2,terrainFeatureSizeCtrl });
+
+	lbl = new CGUIlabel2(20, posStartY + 150, 90, 20);
+	lbl->setText("Seed");
+	seedCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
+	seedCtrl->setValue(42); seedCtrl->setMinMax(INT_MIN, INT_MAX);
+
+	addToRow("randomSeed", { lbl, seedCtrl });
 }
 
 

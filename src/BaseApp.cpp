@@ -45,7 +45,8 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	win.createWindowHidden(800, 600, "Base window");
 	win.setCallbacks();
 	
-	Engine.init();
+	//Engine.init();
+	renderer.init();
 	
 
 	loadSystemFonts();
@@ -104,7 +105,8 @@ void CBaseApp::onWinResize( int w, int h) {
 	if (w == 0 || h == 0)
 		return; //panic!
 	viewWidth = w; viewHeight = h;
-	Engine.resizeView(0,0,w,h); //We need to change shape of view.
+	renderer.set2DView(0, 0, w, h); //We need to change shape of view.
+	renderer.currentCamera->setAspectRatio((float)w, (float)h);
 	drawFuncs->setScreenSize(w, h);
 	GUIroot.setLocalDimensions(0,0,w,h); //Resize the base UI control so it's always the size of the view.
 	onResize(w,h); //Call the user's resize handler, in case they want to do something;

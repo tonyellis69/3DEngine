@@ -1,7 +1,7 @@
 #ifndef TEXTURE_LOADER_LIBRARY
 #define TEXTURE_LOADER_LIBRARY
 
-#include "soil.h"
+//#include "soil.h"
 
 /// Simple wrapper for the SOIL library that includes an extra function. 
 

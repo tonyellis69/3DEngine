@@ -6,7 +6,7 @@ const float disabledAlpha = 0.2f;
 class CGUIengine  {
 public:
 	void setFont(int font);
-	void setDrawColours(const UIcolour& colour1,const UIcolour& colour2 );
+	//void setDrawColours(const UIcolour& colour1,const UIcolour& colour2 );
 	int getTextWidth(char* text) ;
 	void drawIcon(int icon, int x, int y);
 	void drawRect(UIcoord pos, int width, int height);

@@ -3,10 +3,7 @@
 using namespace glm;
 
 CGUImenu::CGUImenu(int x, int y, int w, int h) {
-	//localPos = glm::i32vec2(x, y);
 	setPos(x, y);
-	//width = w; height = h;
-	//drawBox.pos = i32vec2(x, y); drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 	itemFont = defaultFont;
@@ -66,7 +63,7 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 		CGUImenuItem* item = new CGUImenuItem(hItemPad, nextItemPos, itemWidth, itemHeight);
 		item->setMultiLine(false);
 		item->setFont(itemFont);
-		item->borderOn(false);
+		item->setBorderOn(false);
 		item->textAlign = itemTextAlignment;
 		item->setLeftAlignIndent(leftAlignIndent);
 		item->focusColour = focusColour;
@@ -99,10 +96,9 @@ void CGUImenu::resizeToFit() {
 	unsigned int visibleItems = std::max(items.size(), minItemsShown);
 	visibleItems = std::min(visibleItems, maxItemsShown);
 	setHeight( (itemHeight + vItemPad) * visibleItems + vItemPad);
-	//drawBox.size = i32vec2(width, height);
 	for (auto item : items)
 		item->resize(itemWidth, itemHeight);
-	updateAppearance();
+//	updateAppearance();
 	CMessage msg;
 	msg.Msg = uiMsgChildResize;
 	parent->message(this, msg);
@@ -117,20 +113,6 @@ void CGUImenu::onMouseOff(const  int mouseX, const  int mouseY, int key) {
 
 /** User rolling the mouse wheel, so scroll the selection. */
 bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key) {
-	/*items[focusItem]->setTextColour(textColour);
-	int slot = focusItem;
-	if (wheelDelta > 0)
-		slot--;
-	if (wheelDelta < 0)
-		slot++;
-	if (slot >= nItems)
-		slot = 0;
-	if (slot < 0)
-		slot = nItems - 1;
-	setFocusItem(slot);
-	if (focusStyle == menuHighlightText)
-		items[focusItem]->setTextColour(focusColour);
-	return true;*/
 	OnMouseMove(mouseX, mouseY, key); //cheap way to update focus if we scroll
 	return false;// true;
 }
@@ -139,7 +121,7 @@ bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta,
 void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	if (items.size() == 0)
 		return;
-	i32vec2 mouse = calcLocalPos(mouseX, mouseY);
+	i32vec2 mouse = screenToLocalCoords(mouseX, mouseY);
 	if (focusItem >=0 && focusStyle == menuHighlightText)
 		items[focusItem]->setTextColour(textColour);
 	setFocusItem(-1);
@@ -199,9 +181,9 @@ void CGUImenu::clear() {
 	nextItemPos = vItemPad;
 	setFocusItem(-1);
 	items.clear();
-	for (size_t i = 0; i < Control.size(); i++)
-		delete Control[i];
-	Control.clear();
+	for (size_t i = 0; i < controls.size(); i++)
+		delete controls[i];
+	controls.clear();
 }
 
 std::string & CGUImenu::getItemName(int itemNo) {

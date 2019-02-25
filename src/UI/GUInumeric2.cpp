@@ -10,16 +10,9 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	if (!h)
 		h = defaultNumericHeight;
 
-	//localPos = glm::i32vec2(x, y); 
 	setPos(x, y);
-	//width = w; height = h;
-	//drawBox.pos = i32vec2(x, y); 
-	//drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
-	//pDrawFuncs->registerControl(*this);
-	//setLocalDimensions(x, y, w, h);
-	
 
 	//create the two buttons.
 	downButton = new CGUInumericIconButton(0, 0,h,h);
@@ -44,15 +37,9 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	increment = 1;
 	type = uiNumeric;
 
-	//numBox->textBuf.setFont(defaultFont);
-	//numBox->textBuf.setSize(w, h);
-	//numBox->setTextColour(0, 0, 0, 1);
-
 	setValue(0);
 
 	//drawBorder = false;
-
-
 }
 
 /** Directly sets the numeric value of the control. */
@@ -89,7 +76,6 @@ void  CGUInumeric2::message(CGUIbase* sender, CMessage& msg) {
 
 	//CMessage userMsg;
 	msg.fValue = value;
-//	pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
 }
 
@@ -99,7 +85,6 @@ bool CGUInumeric2::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheel
 	if (CGUIbase::MouseWheelMsg(mouseX, mouseY, wheelDelta, key))
 		return true;
 
-	//float direction = (wheelDelta > 0)? 1 : -1;
 	int direction = (wheelDelta > 0) ? 1 : -1;
 	CMessage msg;
 	msg.Msg = uiSpin;
@@ -131,7 +116,6 @@ void CGUInumeric2::setIncrement(float increment) {
 
 CGUInumericTextbox2::CGUInumericTextbox2(int x, int y, int w, int h) 
 	: CGUItextbox2(x,y,w,h) {
-	//setLocalDimensions(x, y, w, h);
 }
 
 void CGUInumericTextbox2::OnCharEntry(unsigned int Key, long Mod) {
@@ -148,17 +132,9 @@ void CGUInumericTextbox2::onKeyPress(unsigned int Key, long Mod) {
 	((CGUInumeric2*)parent)->value = (float)atof(str.c_str());
 }
 
-/** Alert the parent device that Enter has been pressed or keycapture lost, making the current text 'entered'. */
-/*
-void CGUInumericTextbox2::dataEnteredAlert() {
-	CMessage msg;
-	msg.Msg = uiDataEntered;
-	parent->message(*this, msg);
-}*/
 
 /** Overload the usual onclick message, to alert the numeric control instead. */
 void CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
-	//float direction = (id == downButtonID)? -1 : 1;
 	int direction = (id == downButtonID) ? -1 : 1;
 	CMessage msg;
 	msg.value = direction;

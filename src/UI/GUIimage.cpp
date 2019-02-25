@@ -3,19 +3,13 @@
 using namespace glm;
 
 CGUIimage::CGUIimage(int x, int y, int w, int h) {
-	//localPos = glm::i32vec2(x, y);
 	setPos(x, y);
-//	width = w; height = h;
-	//drawBox.pos = i32vec2(x, y); 
-//	drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 
 	type = uiImage;
 
 	texture = NULL;
-
-	//pDrawFuncs->registerControl(*this);
 }
 
 void CGUIimage::DrawSelf() {

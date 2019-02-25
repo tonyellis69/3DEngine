@@ -76,7 +76,7 @@ void CTerrain::createShells(float terrainSize, float centreShellSize, int steps)
 
 
 	for (int shellNo = 0; shellNo < numShells; shellNo++) {
-		float LoDscale = pow(2, numShells - (shellNo + 1));
+		float LoDscale = pow(2.0f, numShells - (shellNo + 1));
 		resize3dArray(*outerArray, i32vec3(calcData.superChunksPerShellEdge[shellNo]));
 		shells[shellNo].nwLayerPos = vec3(calcData.shellSize[shellNo]) * -0.5f;
 		shells[shellNo].cubeSize = LoD1cubeSize  *LoDscale;;

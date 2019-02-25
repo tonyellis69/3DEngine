@@ -3,11 +3,7 @@
 using namespace glm;
 
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
-	//localPos = glm::i32vec2(x,y);
 	setPos(x, y);
-	//width = w; height = h;
-	//drawBox.pos = i32vec2(x, y); 
-	//drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 	renderOffset = i32vec2(2,0);
@@ -22,10 +18,6 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	setText("textbox");
 	setBackColour1(uiWhite);
 	setBackColour2(uiWhite);
-	//drawBorder = false;
-
-//	pDrawFuncs->registerControl(*this);
-	//renderBorder = 2;
 }
 
 void CGUItextbox2::setFont(CFont* newFont) {
@@ -34,7 +26,6 @@ void CGUItextbox2::setFont(CFont* newFont) {
 }
 
 void CGUItextbox2::setText( std::string newText) {
-	//textBuf.setText(newText);
 	text = newText;
 	cursorTextPos = text.size();
 	renderText();
@@ -43,7 +34,6 @@ void CGUItextbox2::setText( std::string newText) {
 void CGUItextbox2::setTextColour(float r, float g, float b, float a) {
 	textColour.r = r; textColour.g = g; textColour.b = b; textColour.a = a;
 	textBuf.setTextColour(textColour);
-	//textBuf.renderText();
 }
 
 void CGUItextbox2::setTextColour(UIcolour  colour) {
@@ -63,7 +53,6 @@ void CGUItextbox2::DrawSelf() {
 
 	if (KeyCapture == this) {
 		//draw cursor
-		//pDrawFuncs->drawCursor(*this, *getCursorPos());
 		pDrawFuncs->drawCursor2(cursor);
 	}
 
@@ -104,7 +93,6 @@ void CGUItextbox2::calcCursorPosition() {
 /** Determine offset due to centering, etc. */
 void CGUItextbox2::calcLineOffset() {
 	renderOffset.y = (getHeight() - font->lineHeight + 4) / 2.0;
-	//renderOffset.y = ( font->lineHeight + 4) ;
 }
 
 
@@ -158,7 +146,6 @@ void CGUItextbox2::insert(std::string inText) {
 void CGUItextbox2::dataEnteredAlert() {
 	CMessage msg;
 	msg.Msg = uiDataEntered;
-	//pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
 }
 
@@ -177,10 +164,7 @@ void CGUItextbox2::message(CGUIbase* sender, CMessage& msg) {
 
 /** Render the text according to current settings. */
 void CGUItextbox2::renderText() {
-	//if (!text.size())
-	//	return;
 	textBuf.clearBuffer();
-	//calcLineRenderedWidth();
 	calcLineOffset();
 	textBuf.renderTextAt(renderOffset.x, renderOffset.y, text);
 	calcCursorPosition();

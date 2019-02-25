@@ -31,117 +31,57 @@ CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 	skyDome = NULL;
 }
 
-/** Low level initialisation. */
-void CEngine::init() {
-	//Renderer.attachWindow(hWnd);
-	Renderer.getGLinfo();
-	//CurrentFont = sysFont = ImageLib.LoadSysFont();
-	//ImageLib.LoadSmallSysFont();
-	//TO DO: get icons.png built in
-	UIicons = loadSpritesheet(dataPath+ "icons.png",32,32);
-
-	Renderer.init();
-	Renderer.clearColour = engineTurquiose;
-	Renderer.setBackColour(Renderer.clearColour);
-
-	defaultCamera = createCamera(glm::vec3(0,2,4));
-	setCurrentCamera(defaultCamera);
 
 
-	
-}
 
 
-/** Resize the view - usually in response to the window being resized. */
-void CEngine::resizeView(int x, int y, int width, int height) {
-	Renderer.set2DView(x,y,width,height);
-//	if (MakingFit) 
-	//	scaleToFit();
-	//ensure any scene layers are up to date.
-	//Scene.Resize((float)Renderer.Width,(float) Renderer.Height);	
-	currentCamera->setAspectRatio((float)width,(float)height);
-}
 
 
-/** Set the texture the renderer will use. */
-void CEngine::setCurrentTexture(int textureNo) {
-	Renderer.setCurrentTexture(getTextureHandle(textureNo));
-}
 
 /** Returns the texture handle of the given texture. */
 /* TO DO: this is a kludge, as the engine shouldn't know about texture handles,
 which are renderer-specific. It just deals in texture indexes.
 Suggests that imageLib should be part of the renderer, to keep things internal.*/
-int CEngine::getTextureHandle(int textureNo) {
-	return ImageLib.textureList[textureNo]->handle;
-}
+//int CEngine::getTextureHandle(int textureNo) {
+//	return ImageLib.textureList[textureNo]->handle;
+//}
 
-/** Sets the in-use tileset to the given tilesheet.*/
-void CEngine::setCurrentTileSheet(TSpriteSheet* Sheet) {
-	CurrentTileSet = Sheet;
-}
+
 
 /** Sets the in-use tileset to the given tilesheet index.*/
-void CEngine::setCurrentTileSheet(int sheet) {
-	CurrentTileSet = ImageLib.GetTileSet(sheet);
-}
+//void CEngine::setCurrentTileSheet(int sheet) {
+//	CurrentTileSet = ImageLib.GetTileSet(sheet);
+//}
 
 /** Load a spriteSheet from file, returning a pointer to it. */
-TSpriteSheet* CEngine::loadSpriteSheet(const string& Filename, int x, int y) {
-	int tilesetNo = ImageLib.loadSpriteSheet(Filename.c_str(),x,y);
-	return CurrentTileSet = ImageLib.GetTileSet(tilesetNo);
-}
+//TSpriteSheet* CEngine::loadSpriteSheet(const string& Filename, int x, int y) {
+//	int tilesetNo = ImageLib.loadSpriteSheet(Filename.c_str(),x,y);
+//	return CurrentTileSet = ImageLib.GetTileSet(tilesetNo);
+//}
 
 /** Load a spriteSheet from file, returning its index number. Useful for external classes, such as the GUI.*/
-int CEngine::loadSpritesheet(const string& Filename, int x, int y) {
-	return ImageLib.loadSpriteSheet(Filename.c_str(),x,y);
-}
+//int CEngine::loadSpritesheet(const string& Filename, int x, int y) {
+//	return ImageLib.loadSpriteSheet(Filename.c_str(),x,y);
+//}
 
-/** Call the renderer to draw the given tile at the given coordinates. */
-void CEngine::drawTile(int TileNo, float x, float y) {
-	setCurrentTexture(CurrentTileSet->textureNo);
-	TRect tile;
-	tile.Map = CurrentTileSet->Tiles[TileNo];
 
-	tile.width = (float)CurrentTileSet->TileWidth;
-	tile.height = (float)CurrentTileSet->TileHeight;
-	tile.originX = (float)CurrentTileSet->TileHalfWidth;
-	tile.originY = (float)CurrentTileSet->TileHalfHeight;
-	p2dR->drawRect(&tile,x,y);	
-}
 
 /** Create a single-image sprite from file. */
-CSprite* CEngine::loadSprite(char* Filename) {
-	CurrentSprite = ImageLib.loadSprite(Filename);
-	return CurrentSprite;
-}
+//CSprite* CEngine::loadSprite(char* Filename) {
+//	CurrentSprite = ImageLib.loadSprite(Filename);
+//	return CurrentSprite;
+//}
 
-/** Draw the given sprite. */
-void CEngine::drawSprite(const CSprite& Sprite) {
-	CurrentSprite = (CSprite*) &Sprite;
-	setCurrentTexture(CurrentSprite->textureNo);
-	p2dR->setDrawColour((rgba&)Sprite.Colour);
-	p2dR->xScale = CurrentSprite->Scale.x;
-	p2dR->yScale = CurrentSprite->Scale.y;
-	if (CurrentSprite->hFlip) { //TO DO: wtf is this?
-		TRect Flip = CurrentSprite->Rect;
-		Flip.Map.s = CurrentSprite->Rect.Map.u;
-		Flip.Map.u = CurrentSprite->Rect.Map.s;
-		p2dR->drawRect(&Flip,CurrentSprite->pos.x,CurrentSprite->pos.y );
-	}
-	else
-		p2dR->drawRect(&CurrentSprite->Rect,CurrentSprite->pos.x,CurrentSprite->pos.y );
-	p2dR->setDrawColour(1,1,1,1);
-	p2dR->setDrawScale(1,1);
-}
+
 
 
 /** Create a texture from an image file, and return its texture index. */
+/*
 int CEngine::loadTexture(const string& Filename) {
 	int TexWidth, TexHeight;
 	return ImageLib.CreateTextureFromImage(Filename.c_str(), &TexWidth, &TexHeight, true);
 }
-
+*/
 
 
 
@@ -187,36 +127,6 @@ void CEngine::scaleToFit() {
 }
 
 
-/** Register a sprite with the engine. The means the engine will automatically draw the sprite,
-	run its update routine, etc, every frame. */
-void CEngine::registerSprite(const CSprite& Sprite) {
-	RegisteredSpriteList.push_back((CSprite*)&Sprite);
-}
-
-/** Draw every sprite on the Registered Sprite list that's currently live. */
-void CEngine::drawRegisteredSprites() {
-	int NoSprites = RegisteredSpriteList.size();
-	for (int i=0;i<NoSprites;++i) {
-		if (RegisteredSpriteList[i]->Live) {
-			drawSprite(*RegisteredSpriteList[i]);
-		}
-	}
-}
-
-/** Call the update method of every sprite on the Registered Sprite list that's currently live. */
-void CEngine::updateRegisteredSprites(const double& dT) {
-	int NoSprites = RegisteredSpriteList.size();
-	for (int i=0;i<NoSprites;++i) {
-		if (RegisteredSpriteList[i]->Live){
-			RegisteredSpriteList[i]->Update(dT);
-		}
-	}
-}
-
-/** Empty the registered sprite list. */
-void CEngine::clearRegisteredSpriteList() {
-		RegisteredSpriteList.clear();
-}
 
 
 /** Draw the various backround layers of the scene, such as tile scenery. */
@@ -365,11 +275,11 @@ unsigned int CEngine::attachShaders() {
 }
 
 /** Creates a new camera at the given position. */
-CCamera* CEngine::createCamera(glm::vec3& pos) {
-	CCamera* camera = new CCamera(pos);
-	cameraList.push_back(camera); 
-	return camera;
-}
+//CCamera* CEngine::createCamera(glm::vec3& pos) {
+	//CCamera* camera = new CCamera(pos);
+	//cameraList.push_back(camera); 
+	//return camera;
+//}
 
 /** Create a cube model. */
 CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
@@ -403,7 +313,7 @@ void CEngine::drawModels() {
 
 void CEngine::drawModelDefaultShader(CModel& model) {
 	Renderer.setShader(Renderer.phongShader);
-	glm::mat4 mvp = currentCamera->clipMatrix * model.worldMatrix;
+	glm::mat4 mvp = Renderer.currentCamera->clipMatrix * model.worldMatrix;
 	Renderer.phongShader->setShaderValue(Renderer.hMVP,mvp);
 
 	glm::mat3 normMatrix(model.worldMatrix); //converting 4m to m3. TO DO: inefficient?
@@ -769,13 +679,13 @@ CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
 }
 
 
-void CEngine::setCurrentCamera(CCamera * camera) {
-	currentCamera = camera;
-	Renderer.currentCamera = camera;
-}
+//void CEngine::setCurrentCamera(CCamera * camera) {
+	//currentCamera = camera;
+//	Renderer.currentCamera = camera;
+//}
 
 CCamera * CEngine::getCurrentCamera() {
-	return currentCamera;
+	return Renderer.currentCamera;
 }
 
 CBasePhysObj * CEngine::addPhysics(C3dObject * model) {
@@ -791,8 +701,8 @@ void CEngine::recompileShaders() {
 
 
 CEngine::~CEngine(void) {
-	for (size_t c=0;c<cameraList.size();c++)
-		delete cameraList[c];
+	//for (size_t c=0;c<cameraList.size();c++)
+	//	delete cameraList[c];
 	for (size_t m = 0; m < modelList.size(); m++)
 		 delete modelList[m];
 	if (skyDome)

@@ -15,7 +15,7 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	paletteImageStartX = upperPadding;
 	paletteImageEndX = w - (2 * upperPadding) + paletteImageStartX;
 	paletteImage = new CGUIimage1D(paletteImageStartX, upperPadding, w - (2 * upperPadding), barHeight);
-	paletteImage->borderOn(false);
+	paletteImage->setBorderOn(false);
 	Add(paletteImage);
 
 	colourPicker = new CGUIcolourPicker(600, 300, 500, 400);
@@ -24,7 +24,7 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	rootUI->Add(colourPicker);
 
 	tabPosLbl = new CGUIlabel2(0, 0, 50, 20);
-	tabPosLbl->borderOn(false);
+	tabPosLbl->setBorderOn(false);
 	tabPosLbl->setVisible(false);
 	Add(tabPosLbl);
 
@@ -68,7 +68,7 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 		if (Msg == MY_DOUBLECLICK) {
 			if (MouseDown == paletteImage) {
 				MouseDown = NULL;
-				glm::i32vec2 localMouse = calcLocalPos(mouseX, mouseY);
+				glm::i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 				float unitPos = (localMouse.x - paletteImageStartX) / float(paletteImage->getWidth());
 				createTab(unitPos * 255.0f);
 			}
@@ -79,7 +79,7 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 	if (Msg == WM_LBUTTONDOWN) {
 		int zPos = -1;
 		CGUIbase* topTab = NULL;
-		for (auto ctrl : Control) { //make sure it's the top one if they're stacked
+		for (auto ctrl : controls) { //make sure it's the top one if they're stacked
 			if (ctrl->type == uiPaletteTab && IsOnControl(*ctrl, mouseX, mouseY)) {
 				if (ctrl->getLocalPos().x > zPos) {
 					zPos = ctrl->getLocalPos().x;
@@ -117,8 +117,8 @@ void CGUIpaletteBar::createTab(int tabIndex) {
 	tab->setBackColour2(realColour);
 
 	//ensure tabPosLbl is the last thing we draw
-	auto tabPosPos = std::find(Control.begin(),Control.end(), tabPosLbl);
-	std::iter_swap(tabPosPos, Control.end() -1);
+	auto tabPosPos = std::find(controls.begin(),controls.end(), tabPosLbl);
+	std::iter_swap(tabPosPos, controls.end() -1);
 }
 
 CGUIpaletteTab* CGUIpaletteBar::addTab(int tabIndex) {
@@ -145,7 +145,7 @@ void CGUIpaletteBar::message(CGUIbase* sender, CMessage& msg) {
 		float dHueRotation =   msg.value - oldHueRotation;
 		oldHueRotation = msg.value;
 		colourGradient.rotateTabHues(dHueRotation);
-		for (auto ctrl : Control) {
+		for (auto ctrl : controls) {
 			if (ctrl->type == uiPaletteTab) {
 				glm::vec4 floatColour = glm::vec4(colourGradient.getColour(((CGUIpaletteTab*)ctrl)->position)) / 255.0f;
 				ctrl->setBackColour1(floatColour);
@@ -187,7 +187,7 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 	int ctrlPos; 
 	int lowerPos = min(tab->getLocalPos().x, newPos);
 	int higherPos = max(tab->getLocalPos().x, newPos);
-	for (auto ctrl : Control) {
+	for (auto ctrl : controls) {
 		if (ctrl->type == uiPaletteTab && ctrl != tab) { //for each compared tab...
 			ctrlPos = ctrl->getLocalPos().x;
 			//if it lies between this tab and the proposed new position
@@ -264,9 +264,9 @@ void CGUIpaletteBar::loadPalette() {
 
 /** Delete tab controls only, not touching the colour gradient.*/
 void CGUIpaletteBar::clearTabControls() {
-	for (auto iter = Control.begin(); iter != Control.end(); ) {
+	for (auto iter = controls.begin(); iter != controls.end(); ) {
 		if ((*iter)->type == uiPaletteTab)
-			iter = Control.erase(iter);
+			iter = controls.erase(iter);
 		else
 			++iter;
 	}
@@ -338,7 +338,7 @@ void CGUIpaletteBar::createTabAtIndicator(float falloff) {
 		int lowerBound = max(0, indicator - int(255 * falloff));
 		int upperBound = min(255,indicator + int(255 * falloff));
 
-		for (auto ctrl : Control) { //ensure upper/lower tabs don't overlap an existing tab
+		for (auto ctrl : controls) { //ensure upper/lower tabs don't overlap an existing tab
 			if (ctrl->type == uiPaletteTab) {
 				int ctrlPos = static_cast<CGUIpaletteTab*>(ctrl)->position;
 				if (ctrlPos >= lowerBound && ctrlPos < indicator)
@@ -388,7 +388,7 @@ void CGUIpaletteTab::OnLMouseDown(const  int mouseX, const  int mouseY, int key)
 
 	scrollbarHasMouse = this;
 	pDrawFuncs->mouseCaptured(true);
-	lastMouseX = mouseX; //getScreenCoords(mouseX, mouseY).x;
+	lastMouseX = mouseX; //localToScreenCoords(mouseX, mouseY).x;
 }
 
 void CGUIpaletteTab::onRMouseUp(const int mouseX, const int mouseY) {
@@ -401,8 +401,8 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 	if ((MouseDown == this) && (scrollbarHasMouse == this)) {
 		CMessage msg;
 		msg.Msg = WM_MOUSEMOVE;
-		msg.x = mouseX  - lastMouseX + getLocalPos().x; // getScreenCoords(mouseX, mouseY).x - lastMouseX + localPos.x;
-		lastMouseX = mouseX;// getScreenCoords(mouseX, mouseY).x;
+		msg.x = mouseX  - lastMouseX + getLocalPos().x; // localToScreenCoords(mouseX, mouseY).x - lastMouseX + localPos.x;
+		lastMouseX = mouseX;// localToScreenCoords(mouseX, mouseY).x;
 		parent->message(this, msg);
 
 	}

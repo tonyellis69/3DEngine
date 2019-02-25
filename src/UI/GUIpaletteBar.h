@@ -74,7 +74,7 @@ public:
 class CGUIpaletteTab : public CGUIpanel {
 public:
 	CGUIpaletteTab(int x, int y, int w, int h) : CGUIpanel(x, y, w, h) {
-		borderOn(false); 
+		setBorderOn(false); 
 		type = uiPaletteTab;
 	};
 	void onDoubleClick(const int mouseX, const int mouseY, int key);

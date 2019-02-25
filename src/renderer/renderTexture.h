@@ -15,13 +15,14 @@ public:
 	~CRenderTexture();
 	void resize(int w, int h);
 	glm::uvec4 getPixel(int x, int y);
-	void createRGBA(unsigned char* data, int w, int h);
+//	void createRGBA(unsigned char* data, int w, int h);
 	void createGreyscale(unsigned char * data, int w, int h);
 	void clear();
 	void setPixelData(void* pixels);
 	void setArrayData(void * data);
 	unsigned char* getChequePattern();
 	CRenderTexture& operator=(const CRenderTexture& other);
+	void savePNG(std::string filepath);
 
 	unsigned int handle;
 	CRenderer* pRenderer;

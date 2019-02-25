@@ -11,14 +11,10 @@ CGUIsysIconButton::CGUIsysIconButton(int x, int y){
 }
 
 CGUIsysIconButton::CGUIsysIconButton(int x, int y, int w, int h) {
-	//localPos = glm::i32vec2(x, y);
 	setPos(x, y);
-	//drawBox.pos = i32vec2(x, y);
-	//drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 	pDrawFuncs->registerControl(*this);
-	//setLocalDimensions(x, y, w, h);
 	iconset = defaultIconset;
 	icon = 0;
 	type = iconButton;

@@ -30,6 +30,9 @@
     <Filter Include="terrain2">
       <UniqueIdentifier>{27ed68a3-1a9e-4120-8c53-13d02f5fcf55}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\external">
+      <UniqueIdentifier>{5ab26ddf-a872-492b-af73-be35d5beb9bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -78,9 +81,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\ImageLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Reader.cpp">
@@ -412,9 +412,6 @@
     <ClInclude Include="..\src\UI\GUIscrollbar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\ImageLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -422,9 +419,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\simplexnoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\SOIL.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\SoundLib.h">
@@ -696,6 +690,12 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIdragDrop.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\stb_image.h">
+      <Filter>Header Files\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\external\stb_image_write.h">
+      <Filter>Header Files\external</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

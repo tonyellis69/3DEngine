@@ -47,6 +47,7 @@ public:
 	virtual void setGausSize(int size) {};
 	virtual void setGausSigma(float sigma) {};
 	virtual void setPercentage(float percentage) {};
+	void setRandomSeed(int seed) { randomSeed = seed; }
 
 	virtual int getOctaves() { return 0; }
 	virtual float getFrequency() { return 0; }
@@ -68,7 +69,7 @@ public:
 	virtual int getGausSize() { return 0; };
 	virtual float getGausSigma() { return 0; }
 	virtual float getpercentageCtrl() { return 0; }
-
+	int getRandomSeed() { return randomSeed; }
 
 	virtual void compose() {};
 
@@ -98,6 +99,7 @@ public:
 	TexGenType texGenType;
 	std::string name;
 	int count;
+	int randomSeed;
 private:
 	void buildMatrix();
 
@@ -533,12 +535,33 @@ public:
 	void placeBarrier();
 	void plotShortestPath();
 
+	void setGridSize(int size);
+	void setDetails(bool onOff) { showDetails = onOff; }
+	void setFeatureCount(int count) { featureCount = count; }
+	void setFeatureSize(float size) { featureSize = size; }
+
+	int getGridSize() { return gridSize; }
+	bool getDetails() { return showDetails; }
+	int getFeatureCount() { return featureCount; }
+	float getFeatureSize() { return featureSize; }
+
+	void write(std::ofstream & out);
+	void read(std::ifstream& in);
+
+
 	std::vector<float> grid;
 	int gridSize;
+	bool showDetails;
+	int featureCount;
+	float featureSize;
+
+	unsigned int hShowDetails;
+	unsigned int hGridSize;
 
 	CRenderTexture gridTexture;
 	std::default_random_engine eng;
 
 	glm::i32vec2 startPoint, endPoint;
 	std::vector<glm::i32vec2> features;
+
 };

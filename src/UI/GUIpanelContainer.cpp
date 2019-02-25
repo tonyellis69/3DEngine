@@ -50,31 +50,31 @@ void CGUIpanelContainer::AddPanel(int size) {
 /** Add controls to the given panel.*/
 void CGUIpanelContainer::Add(unsigned int panel, CGUIbase* child) {
 	//check the panel exists
-	if (panel > (surface->Control.size()-1))
+	if (panel > (surface->controls.size()-1))
 		return; //Error!
 	//add the child control
-	surface->Control[panel]->Add(child);
+	surface->controls[panel]->Add(child);
 }
 
 
 /** Move the given panel into the slot, moving the rest up.*/
 void  CGUIpanelContainer::movePanel(unsigned int panel, unsigned int slot) {
-	if ((panel > surface->Control.size() -1) )// || (slot > surface->Control.size() -1))
+	if ((panel > surface->controls.size() -1) )// || (slot > surface->controls.size() -1))
 		return; //not an existing panel
 	
-	CGUIpanel* panelPtr = (CGUIpanel*)surface->Control[panel];
+	CGUIpanel* panelPtr = (CGUIpanel*)surface->controls[panel];
 	if (panel > slot)
 		panel++;
 	else
 		slot++;
 
-	if (slot >= surface->Control.size()) {
-		surface->Control.push_back(panelPtr);
+	if (slot >= surface->controls.size()) {
+		surface->controls.push_back(panelPtr);
 	} else
-		surface->Control.insert(surface->Control.begin() +slot,panelPtr);
+		surface->controls.insert(surface->controls.begin() +slot,panelPtr);
 	//if (panel > slot)
 	//	panel++;
-	surface->Control.erase(surface->Control.begin() + panel);
+	surface->controls.erase(surface->controls.begin() + panel);
 
 	assignPanelPositions();
 }
@@ -83,25 +83,25 @@ void  CGUIpanelContainer::movePanel(unsigned int panel, unsigned int slot) {
 void CGUIpanelContainer::assignPanelPositions() {
 	int x = 0; int y = 0;
 
-	for (size_t p=0;p<surface->Control.size();p++) {
-		surface->Control[p]->setLocalDimensions(x,y,surface->viewBox.width,surface->Control[p]->getHeight());
-		y += surface->Control[p]->getHeight();
+	for (size_t p=0;p<surface->controls.size();p++) {
+		surface->controls[p]->setLocalDimensions(x,y,surface->viewBox.width,surface->controls[p]->getHeight());
+		y += surface->controls[p]->getHeight();
 	}
 }
 
 /** Delete the given panel and all its controls. */
 void CGUIpanelContainer::deletePanel(unsigned int panel) {
-	if (panel > surface->Control.size() NONE ) //not an existing panel
+	if (panel > surface->controls.size() NONE ) //not an existing panel
 		return;
 
-	CGUIpanel* delPanel = (CGUIpanel*)surface->Control[panel];
-	for (size_t  i=0;i < delPanel->Control.size();i++) {
-		delete delPanel->Control[i];
-		delPanel->Control.erase(delPanel->Control.begin()+i);
+	CGUIpanel* delPanel = (CGUIpanel*)surface->controls[panel];
+	for (size_t  i=0;i < delPanel->controls.size();i++) {
+		delete delPanel->controls[i];
+		delPanel->controls.erase(delPanel->controls.begin()+i);
 
 	}
 	delete delPanel;
-	surface->Control.erase(surface->Control.begin() + panel);
+	surface->controls.erase(surface->controls.begin() + panel);
 	
 	assignPanelPositions();
 	surface->encompassChildControls();
@@ -109,9 +109,9 @@ void CGUIpanelContainer::deletePanel(unsigned int panel) {
 
 /** Returns a pointer to the given panel in this container. */
 CGUIpanel* CGUIpanelContainer::getPanel(unsigned int panelNo) {
-	if (panelNo > surface->Control.size() -1 ) //not an existing panel
+	if (panelNo > surface->controls.size() -1 ) //not an existing panel
 		return NULL;
-	return (CGUIpanel*)surface->Control[panelNo];
+	return (CGUIpanel*)surface->controls[panelNo];
 }
 
 
@@ -125,8 +125,8 @@ void CGUIstackSurface::addPanel(CGUIpanel* panel) {
 void CGUIstackSurface::assignPanelPositions() {
 	int x = 0; int y = 0;
 
-	for (size_t p=0;p<Control.size();p++) {
-		Control[p]->setLocalDimensions(x,y,viewBox.width,Control[p]->getHeight());
-		y += Control[p]->getHeight();
+	for (size_t p=0;p<controls.size();p++) {
+		controls[p]->setLocalDimensions(x,y,viewBox.width,controls[p]->getHeight());
+		y += controls[p]->getHeight();
 	}
 }

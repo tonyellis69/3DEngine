@@ -4,7 +4,7 @@
 #include "GUIimage.h"
 
 
-/** Control for displaying images. Textures and maybe others. */
+/** controls for displaying images. Textures and maybe others. */
 class CGUIimage1D : public CGUIimage {
 public:
 	CGUIimage1D(int x, int y, int w, int h);

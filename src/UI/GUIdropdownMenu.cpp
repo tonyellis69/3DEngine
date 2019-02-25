@@ -4,21 +4,19 @@
 using namespace glm;
 
 CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
-	//localPos = glm::i32vec2(x, y);
 	setPos(x, y);
-	//drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 	type = uiDropdownMenu;
-	borderOn(true);
+	setBorderOn(true);
 	setBackColour1(UIalmostWhite);
 	setBackColour2(UIalmostWhite);
 
 	int labelPad = 4;
 	menuButton = new CGUIlabel2(labelPad, labelPad, w - labelPad*2, h- labelPad*2);
-	menuButton->borderOn(true);
+	menuButton->setBorderOn(true);
 	menuButton->mousePassthru = true;
-	menuButton->borderOn(false);
+	menuButton->setBorderOn(false);
 	Add(menuButton);
 
 	menu = new CGUImenu(0, 0 + h, w, 30);
@@ -49,15 +47,11 @@ void CGUIdropdownMenu::DrawSelf() {
 }
 
 void CGUIdropdownMenu::OnClick(const int mouseX, const int mouseY) {
+	menu->setPos(drawBox.pos.x, drawBox.pos.y + getHeight());
 	menu->setVisible(true);
 	menu->makeModal();
 }
 
-/** Use this to ensure menu - which is attached to root, is in the right place.*/
-void CGUIdropdownMenu::updateAppearance() {
-	CGUIbase::updateAppearance();
-	menu->setPos(drawBox.pos.x, drawBox.pos.y + getHeight());
-}
 
 void CGUIdropdownMenu::GUIcallback(CGUIbase* sender, CMessage& msg)  {
 	if (sender == menu && msg.Msg == uiClickOutside) {
@@ -72,7 +66,6 @@ void CGUIdropdownMenu::GUIcallback(CGUIbase* sender, CMessage& msg)  {
 		menu->setVisible(false);
 		menu->makeUnModal();
 	}
-
 }
 
 void CGUIdropdownMenu::clear() {

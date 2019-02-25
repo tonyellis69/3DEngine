@@ -23,7 +23,8 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 
 void CGUIrichTextPanel::setInset(int newInset) {
 	inset = newInset;
-	updateAppearance();
+	//updateAppearance();
+	needsUpdate = true;
 }
 
 void CGUIrichTextPanel::setFont(CFont * newFont) {

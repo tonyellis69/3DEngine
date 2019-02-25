@@ -441,3 +441,9 @@ CRenderTexture& ComposeTest::getComposedTexture() {
 	return *texGens.back()->getTarget();
 }
 
+/** Save the current texGen's target image as a PNG file.*/
+void ComposeTest::saveCurrentTexGenPNG(std::string filepath) {
+	currentTexGen->getTarget()->savePNG(filepath);
+
+}
+

@@ -82,13 +82,13 @@ void CGUIroot::setLocalDimensions(int x, int y, int w, int h) {
 	setHeight(h);
 	drawBox.pos = glm::i32vec2(x, y);
 	Clipbox.x =x;Clipbox.y =y; Clipbox.width = w; Clipbox.height = h;
-	for (size_t i=0;i < Control.size();i++)
-		Control[i]->updateAppearance();
+	for (size_t i=0;i < controls.size();i++)
+		controls[i]->updateAppearance();
 }
 
 
 /** Override the normal clipping method, as GUIroot has no parent to clip against. */
-void CGUIroot::CalculateClipbox() {
+void CGUIroot::recalculateClipbox() {
 	Clipbox.x = getLocalPos().x; Clipbox.y = getLocalPos().y; Clipbox.width = getWidth(); Clipbox.height = getHeight();
 }
 
@@ -118,9 +118,9 @@ void CGUIroot::Draw() {
 	pDrawFuncs->setClip(Clipbox);
 
 	//then draw each subcontrol
-	for (size_t i = 0; i < Control.size(); i++) {
-		if (!Control[i]->isModal)
-			Control[i]->Draw();
+	for (size_t i = 0; i < controls.size(); i++) {
+		if (!controls[i]->isModal)
+			controls[i]->Draw();
 	}
 
 	//draw modal controls last
@@ -220,9 +220,9 @@ void CGUIroot::setFocus(CGUIbase * control) {
 CGUIroot::~CGUIroot() {
 
 
-	for (unsigned int i = 0; i < Control.size(); i++)
-		if (Control[i] != NULL)
-			delete Control[i];
+	for (unsigned int i = 0; i < controls.size(); i++)
+		if (controls[i] != NULL)
+			delete controls[i];
 	
 	
 	//TO DO: ancient, get rid of

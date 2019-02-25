@@ -2,14 +2,14 @@
 
 
 
-void CGUIengine::setDrawColours(const UIcolour& colour1,const UIcolour& colour2 ) {
-	pEngine->setDrawColour((rgba&)colour1);
-	pEngine->setSecondaryDrawColour((rgba&)colour2);
-}
+//void CGUIengine::setDrawColours(const UIcolour& colour1,const UIcolour& colour2 ) {
+//	pEngine->setDrawColour((rgba&)colour1);
+//	pEngine->setSecondaryDrawColour((rgba&)colour2);
+//}
 
-void CGUIengine::drawIcon(int icon, int x, int y) {
-	pEngine->drawTile(icon,(float)x,pEngine->flipY((float)y));
-}
+//void CGUIengine::drawIcon(int icon, int x, int y) {
+//	pEngine->drawTile(icon,(float)x,pEngine->flipY((float)y));
+//}
 
 
 void CGUIengine::drawRect(UIcoord pos, int width, int height) {
@@ -51,18 +51,18 @@ void CGUIengine::drawLine(int x, int y, int x2, int y2) {
 }
 
 void CGUIengine::setIconset(int iconset) {
-	pEngine->setCurrentTileSheet(iconset);
+//	pEngine->setCurrentTileSheet(iconset);
 }
 
-void CGUIengine::drawTile(int tileNo, UIrect& tileRect) {
-	float UIflip = (float)tileRect.width/2;
-	float y = pEngine->flipY((float)tileRect.y);
-	pEngine->drawTile(tileNo,(float)tileRect.x +UIflip ,  y - UIflip );	
-}
+//void CGUIengine::drawTile(int tileNo, UIrect& tileRect) {
+//	float UIflip = (float)tileRect.width/2;
+//	float y = pEngine->flipY((float)tileRect.y);
+//	pEngine->drawTile(tileNo,(float)tileRect.x +UIflip ,  y - UIflip );	
+//}
 
 
 void CGUIengine::drawImage(int imageNo, UIrect& tileRect) {
-	pEngine->setCurrentTexture(imageNo);
+	//pEngine->setCurrentTexture(imageNo);
 	TRect image;
 	image.originX = tileRect.width/2.0f;
 	image.originY = tileRect.height/2.0f;

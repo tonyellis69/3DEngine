@@ -18,12 +18,13 @@ public:
 	void fillShells();
 	void displaceOuterShells(const CShell& sender, Tdirection moveDirection);
 	void returnShellAndOuterShells(const CShell& sender, Tdirection moveDirection);
-	void findSCintersections();
+	void findAllSCintersections();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
 	void setCallbackApp(ITerrainCallback* pApp);
 	TShellInnerBounds& getInnerBounds(unsigned int shellNo);
-	
+	void scrollSampleSpace(Tdirection scrollDir, float shift);
+
 	std::vector<CShell> shells;
 
 	float LoD1cubeSize; //<In worldspace.

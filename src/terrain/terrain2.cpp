@@ -105,7 +105,7 @@ void CTerrain2::returnShellAndOuterShells(const CShell & sender, Tdirection move
 }
 
 /** Go through all superchunks, asking them to check if they intersect terrain. */
-void CTerrain2::findSCintersections() {
+void CTerrain2::findAllSCintersections() {
 
 }
 
@@ -142,6 +142,16 @@ TShellInnerBounds & CTerrain2::getInnerBounds(unsigned int shellNo) {
 		i32vec3((thisShellTR - innerShellTR) / shells[shellNo].SCsize) - i32vec3(1);
 	
 	return innerBounds;
+}
+
+/** Move the terrain's position in sample space. */
+void CTerrain2::scrollSampleSpace(Tdirection scrollDir, float shift) {
+	std::cerr << "\nsamplespace origin moved from " << sampleSpacePos.x << " " <<
+		sampleSpacePos.y << " " << sampleSpacePos.z << " to ";
+	vec3 vec = dirToVec(flipDir(scrollDir)) * shift;
+	sampleSpacePos += vec;
+	std::cerr << sampleSpacePos.x << " " <<
+		sampleSpacePos.y << " " << sampleSpacePos.z ;
 }
 
 

@@ -10,6 +10,8 @@
 
 #include "../watch.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "..\external/stb_image.h"
 
 using namespace std;
 
@@ -23,6 +25,8 @@ CRenderer::CRenderer() {
 }
 
 CRenderer::~CRenderer() {
+	for (size_t c = 0; c < cameraList.size(); c++)
+			delete cameraList[c];
 	for (size_t b = 0; b<bufferList.size(); b++)
 		delete bufferList[b];
 	_CrtDumpMemoryLeaks();
@@ -83,6 +87,7 @@ void CRenderer::resetMatrix() {
 
 /** Set up standard rendering paramaters. */
 void CRenderer::init() {
+	getGLinfo();
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE);;
@@ -116,6 +121,12 @@ void CRenderer::init() {
 	createInstancedPhongShader();
 	createTextShader();
 	initialised = true;
+
+	clearColour = rendererTurquiose;
+	setBackColour(clearColour);
+
+	defaultCamera = createCamera(glm::vec3(0, 2, 4));
+	setCurrentCamera(defaultCamera);
 }
 
 
@@ -690,10 +701,11 @@ void CRenderer::setDepthTest(bool on) {
 	}
 }
 
+/*
 void CRenderer::createTextureFromImageFile(std::string filename) {
 	int width, height, channels;
 	unsigned char* data = SOIL_load_image(filename.c_str(), &width, &height, &channels, SOIL_LOAD_AUTO); //load it to get the width, height, etc
-}
+}*/
 
 void CRenderer::attachTexture(unsigned int textureUnit, unsigned int hTexture) {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
@@ -878,6 +890,16 @@ void CRenderer::setVAO(GLuint newVAO) {
 		glBindVertexArray(newVAO);
 		currentVAO = newVAO;
 	}
+}
+
+CCamera * CRenderer::createCamera(glm::vec3 & pos) {
+	CCamera* camera = new CCamera(pos);
+	cameraList.push_back(camera);
+	return camera;
+}
+
+void CRenderer::setCurrentCamera(CCamera * camera) {
+	currentCamera = camera;
 }
 
 /** 

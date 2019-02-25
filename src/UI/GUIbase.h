@@ -191,9 +191,10 @@ public:
 	virtual void setPosY(int y);
 	virtual void Add(CGUIbase* child);
 	virtual void updateAppearance();
+	void recalculateDiminsions();
 	virtual void Draw();
 	virtual void DrawSelf();
-	virtual void CalculateClipbox();
+	virtual void recalculateClipbox();
 	virtual void scrollMsg(int deviceID, int newValue) {};
 	CGUIbase* getChild(int childID);
 	CGUIbase* findControl(int childID);
@@ -218,20 +219,20 @@ public:
 	void setBorderColour(const UIcolour & colour);
 	void setBorderColour(const glm::vec4& colour);
 
-	void borderOn(bool onOff);
+	void setBorderOn(bool onOff);
 
 	void GenName(char* NameStr, int Count);
 	void SetName(char* NameStr);
 
 	void setDefaultFont(CFont* font);
 
-	glm::i32vec2 getScreenCoords(int x, int y);
-	glm::i32vec2 calcLocalPos(int x, int y);
+	glm::i32vec2 localToScreenCoords(int x, int y);
+	glm::i32vec2 screenToLocalCoords(int x, int y);
 	glm::i32vec2& getLocalPos();
 	int getWidth();
 	int getHeight();
-	void setWidth(int w);
-	void setHeight(int h);
+	virtual void setWidth(int w);
+	virtual void setHeight(int h);
 	const glm::i32vec2 getScreenPos();
 	virtual void resize(int w, int h);
 	void setGUIcallback(Icallback* callbackInstance);
@@ -260,7 +261,7 @@ public:
 	UIcolour foreColour2; ///<Second foreground colour of this control;
 
 
-	std::vector<CGUIbase*> Control; ///<Child ui elements owned by this element, eg, the buttons on a panel.
+	std::vector<CGUIbase*> controls; ///<Child ui elements owned by this element, eg, the buttons on a panel.
 
 	static CDrawFuncs* pDrawFuncs; ///<Pointer to bundle of external drawing functions.
 	
