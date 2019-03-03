@@ -172,6 +172,12 @@ void CShell::findAllSCintersections() {
 	//TO DO: only check outer SCs
 	COuterSCIterator it = getOuterSCiterator();
 	while (!it.finished()) {
+		if (shellNo == 0)
+			std::cerr << "\n checking SC at " << it.getIndex().x << " " << it.getIndex().y << " "
+			<< it.getIndex().z << " , samplePos"
+			
+			<< it->sampleSpacePos.x << " " << it->sampleSpacePos.y << " "
+			<< it->sampleSpacePos.z << ", coverage " << it->sampleSize;
 		it->checkForIntersection();
 		it++;
 	}
@@ -196,7 +202,6 @@ TShellInnerBounds & CShell::getInnerBounds() {
 
 /**	Check if the SCs in this face intersect with terrain (and request the chunks if they do). */
 void CShell::resampleFace(Tdirection face) {
-	//get an iterator to the face
 	//return;
 	CFaceIterator faceIter = getFaceIterator(face);
 
@@ -206,6 +211,12 @@ void CShell::resampleFace(Tdirection face) {
 		faceIter->isEmpty = true;
 		vec3 sampleSpacePosition = calcSCsampleSpacePosition(faceIter.getIndex());
 		faceIter->setSampleSpacePosition(sampleSpacePosition);
+		if (shellNo == 0)
+			std::cerr << "\n checking SC at " << faceIter.getIndex().x << " " << faceIter.getIndex().y << " "
+			<< faceIter.getIndex().z << " , samplePos"
+			
+			<< faceIter->sampleSpacePos.x << " " << faceIter->sampleSpacePos.y << " "
+			<< faceIter->sampleSpacePos.z << ", coverage " << faceIter->sampleSize;
 		faceIter->checkForIntersection();
 
 		faceIter++;
@@ -328,11 +339,14 @@ CFaceIterator::CFaceIterator(CShell * pShell, Tdirection face) : CShellIterator(
 	else
 		pseudoZValue = 0;
 
-	index[pseudoX] = 0;
-	index[pseudoY] = 0;
-	index[pseudoZ] = pseudoZValue;
+	index = i32vec3(0); //because index is relative
 
-	pSC = &pShell->scArray.element(index.x, index.y, index.z);
+	i32vec3 element;
+	element[pseudoX] = 0;
+	element[pseudoY] = 0;
+	element[pseudoZ] = pseudoZValue;
+
+	pSC = &pShell->scArray.element(element.x, element.y, element.z);
 }
 
 CFaceIterator & CFaceIterator::operator++() {
@@ -362,4 +376,13 @@ CFaceIterator CFaceIterator::operator++(int) {
 	CFaceIterator tmp(*this);
 	operator++();
 	return tmp;
+}
+
+glm::i32vec3  CFaceIterator::getIndex() {
+	i32vec3 element;
+	element[pseudoX] = index.x;
+	element[pseudoY] = index.y;
+	element[pseudoZ] = pseudoZValue;// index.z;
+
+	return element;
 }

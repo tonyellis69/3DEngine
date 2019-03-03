@@ -99,6 +99,7 @@ public:
 	CFaceIterator(CShell* pShell, Tdirection face);
 	CFaceIterator & operator++();
 	CFaceIterator operator++(int);
+	glm::i32vec3 getIndex();
 private:
 	int pseudoX, pseudoY, pseudoZ;
 	int pseudoZValue;

@@ -18,8 +18,9 @@ struct TCharacterPos {
 struct TRichTextRec : textRec {
 	TRichTextRec();
 	std::vector<int> newLines;
-	int hotMsgId;
-	int hotObjId;
+	//int hotMsgId;
+	//int hotObjId;
+	unsigned int hotId;
 };
 
 enum TNewLine {no, wordwrap, newline};
@@ -58,7 +59,7 @@ public:
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setAppendStyleBold(bool isOn);
-	void setAppendStyleHot(bool isOn, int msgId, int objId);
+	void setAppendStyleHot(bool isOn, int msgId, int objId, unsigned int hotId);
 	void setTextColour(UIcolour colour);
 	void setHotTextColour(const glm::vec4& colour);
 	void setHotTextHighlightColour(const glm::vec4& colour);
@@ -69,6 +70,8 @@ public:
 	void appendText(std::string newText);
 	bool scrollDown();
 	void renderText();
+	void makeHotFragment(TLineFragment & lineFragment, glm::i32vec2& offset, std::string& renderLine);
+	void checkOverrun(int yStart, int currentObjNo);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void appendHotText(std::string newText, int msgId, int objId);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
@@ -76,7 +79,7 @@ public:
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void unhighlight(int textObj);
-	void removeHotText(int hotMsgId);
+	//void removeHotText(int hotMsgId);
 	bool scrollUp();
 	int getPrevCharacter(int & textObj, int & pos);
 	TCharacterPos getPrevNewline(int textObj, int pos);
@@ -90,8 +93,8 @@ public:
 	void updateHotTextSelection();
 	void hotTextScroll(int direction);
 	void selectTopHotText();
-	void purgeHotText();
-	void purgeHotText(int msgId, int objId);
+	std::vector<unsigned int> purgeHotText();
+	std::vector<unsigned int> purgeHotText(unsigned int id);
 	void clear();
 	void clearSelection();
 	void appendMarkedUpText(string text);
@@ -102,7 +105,7 @@ public:
 	void resizeByRatio();
 	void resizeByWidth();
 
-	bool isActiveHotText(int hotId);
+	//bool isActiveHotText(int hotId);
 
 	void setResizeMode(TResizeMode mode);
 

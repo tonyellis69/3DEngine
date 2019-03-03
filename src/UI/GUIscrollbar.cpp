@@ -33,7 +33,7 @@ void CGUIbaseScrollbar::setSliderSize(float ratio) {
 		SliderSize = 30;
 }
 
-
+/** If the dimensions of the bar have changed, so has the slider. */
 void CGUIbaseScrollbar::updateAppearance() {
 	CGUIbase::updateAppearance();
 	updateSliderAppearance();
@@ -66,18 +66,15 @@ void CGUIbaseScrollbar::DrawSelf( ) {
 	guiRect sliderBox;
 	//UIcoord sliderScrnPos = screenPos;
 		if (orientation == horizontal) {
-			//sliderScrnPos.x += SliderPos+2; sliderScrnPos.y += 2;
 			sliderBox.pos.x = drawBox.pos.x + SliderPos + 2;
 			sliderBox.pos.y = drawBox.pos.y +  2;
 			sliderBox.size.x = SliderSize - 4;
 			sliderBox.size.y = getHeight() - 4;
-			//sliderBox = {sliderScrnPos,SliderSize-4,height-4);
+
 		}
 		else {
-			//sliderScrnPos.x += 2; sliderScrnPos.y += (height - SliderPos - SliderSize) +2;
 			sliderBox.pos.x = drawBox.pos.x + 2;
 			sliderBox.pos.y = drawBox.pos.y + (getHeight() - SliderPos - SliderSize) + 2;
-			//pDrawFuncs->drawRect(sliderScrnPos,width-4,SliderSize-4);
 			sliderBox.size.x = getWidth() - 4;
 			sliderBox.size.y = SliderSize - 4;
 		}

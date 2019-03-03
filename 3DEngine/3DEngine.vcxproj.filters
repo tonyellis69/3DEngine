@@ -33,6 +33,9 @@
     <Filter Include="Header Files\external">
       <UniqueIdentifier>{5ab26ddf-a872-492b-af73-be35d5beb9bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\utils">
+      <UniqueIdentifier>{fc742f06-bc1e-46d4-a14e-c2059b7adfd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -349,6 +352,9 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIdragDrop.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\idContainer.cpp">
+      <Filter>Header Files\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -696,6 +702,9 @@
     </ClInclude>
     <ClInclude Include="..\src\external\stb_image_write.h">
       <Filter>Header Files\external</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\idContainer.h">
+      <Filter>Header Files\utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

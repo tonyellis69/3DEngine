@@ -43,7 +43,7 @@ public:
 	glm::i32vec2 renderTextAt(int x, int y, std::string textLine);
 	void clearBuffer();
 	void init(bool clearBuffer);
-	glm::i32vec2 addFragment(int x, int y, std::string textLine);
+	int addFragment(int x, int y, std::string textLine);
 	void render();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.

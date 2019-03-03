@@ -121,8 +121,8 @@ void CTextBuffer::init(bool clearBuf) {
 	textQuadsIndex.clear();
 }
 
-/** Add this to the list of text quads to eventually draw. */
-glm::i32vec2 CTextBuffer::addFragment(int x, int y, std::string textLine) {
+/** Add this to the list of text quads to eventually draw. Return the x-coordinate we finish on.  */
+int CTextBuffer::addFragment(int x, int y, std::string textLine) {
 	glm::vec2 blCorner = glm::vec2(x, y);
 
 	int v = textQuads.size();
@@ -136,20 +136,20 @@ glm::i32vec2 CTextBuffer::addFragment(int x, int y, std::string textLine) {
 			//construct quads
 			textQuads[v].v = blCorner; //A
 			textQuads[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
-			textQuads[v + 2].v = blCorner + glm::vec2(0.0f, -glyph->height); //C
-			textQuads[v + 3].v = blCorner + glm::vec2(glyph->width, -glyph->height); //D
-			textQuads[v].tex = glm::vec2(glyph->u, glyph->v);
-			textQuads[v + 1].tex = glm::vec2(glyph->s, glyph->v);
-			textQuads[v + 2].tex = glm::vec2(glyph->u, glyph->t);
-			textQuads[v + 3].tex = glm::vec2(glyph->s, glyph->t);
+			textQuads[v + 2].v = blCorner + glm::vec2(0.0f, glyph->height); //C
+			textQuads[v + 3].v = blCorner + glm::vec2(glyph->width, glyph->height); //D
+			textQuads[v].tex = glm::vec2(glyph->u, glyph->t);
+			textQuads[v + 1].tex = glm::vec2(glyph->s, glyph->t);
+			textQuads[v + 2].tex = glm::vec2(glyph->u, glyph->v);
+			textQuads[v + 3].tex = glm::vec2(glyph->s, glyph->v);
 
-			textQuadsIndex.push_back(v + 2); textQuadsIndex.push_back(v + 3); textQuadsIndex.push_back(v);
-			textQuadsIndex.push_back(v); textQuadsIndex.push_back(v + 3); textQuadsIndex.push_back(v + 1);
+			textQuadsIndex.push_back(v ); textQuadsIndex.push_back(v + 3); textQuadsIndex.push_back(v + 2);
+			textQuadsIndex.push_back(v+1); textQuadsIndex.push_back(v + 3); textQuadsIndex.push_back(v);
 			v += 4;
 			blCorner += glm::vec2(glyph->width, 0);
 		}
 	}
-	return blCorner;
+	return blCorner.x;
 }
 
 /** Render the currently accumulated text quads to our buffer. */

@@ -1,29 +1,30 @@
 #include "GUIrichTextPanel.h"
 
 CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
-	//localPos = glm::i32vec2(x, y);
 	setPos(x, y);
 	drawBorder = false;
-	//drawBox.pos = glm::i32vec2(x, y);
-	//drawBox.size = glm::i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 	type = uiRichTextPanel;
-	//pDrawFuncs->registerControl(*this);
 
 	setBackColour1(oldbackColour1);
 	setBackColour2(oldbackColour2);
 
 	inset = 10;
-	richText = new CGUIrichText(inset, inset, w - inset, h - inset);
+	richText = new CGUIrichText(inset, inset, w - inset*2, h - inset);
 	richText->setMultiLine(true);
+	richText->anchorRight = inset;
+	richText->anchorLeft = inset;
+	richText->anchorBottom = inset;
 	Add(richText);
 
 }
 
 void CGUIrichTextPanel::setInset(int newInset) {
 	inset = newInset;
-	//updateAppearance();
+	richText->anchorRight = inset;
+	richText->anchorLeft = inset;
+	richText->anchorBottom = inset;
 	needsUpdate = true;
 }
 
@@ -43,15 +44,6 @@ void CGUIrichTextPanel::setTextColour(UIcolour colour) {
 	richText->setTextColour(colour);
 }
 
-/*
-void CGUIrichTextPanel::setHotTextColour(const glm::vec4& colour) {
-	richText->setHotTextColour(colour);
-}
-
-void CGUIrichTextPanel::setHotTextHighlightColour(const glm::vec4& colour) {
-	richText->setHotTextHighlightColour(colour);
-}
-*/
 
 void CGUIrichTextPanel::setText(std::string newText) {
 	richText->setText(newText);
@@ -81,8 +73,8 @@ void CGUIrichTextPanel::setTextStyle(std::string styleName) {
 	richText->setTextStyle(styleName);
 }
 
-void CGUIrichTextPanel::purgeHotText(int msgId, int objId){
-	richText->purgeHotText(msgId, objId);
+std::vector<unsigned int> CGUIrichTextPanel::purgeHotText(unsigned int id){
+	return richText->purgeHotText(id);
 }
 
 void CGUIrichTextPanel::update(float dT) {
@@ -97,15 +89,6 @@ unsigned int CGUIrichTextPanel::getRichTextID() {
 	return richText->getID();
 }
 
-/** Hacking this because I want the panel to keep its rich text control central.*/
-//TO DO: should be able to do this automatically with anchorRight and anchorBottom - investigate!
-//Doesn't appear to do anything! Is that because I always spawn a new richtext now rather than resize the old one?
-void CGUIrichTextPanel::updateAppearance() {
-	CGUIbase::updateAppearance();
-	richText->setPos(inset, inset);
-	richText->resize(getWidth() - (2*inset), getHeight() - (2*inset));
-	//richText->updateAppearance();
-}
 
 
 bool CGUIrichTextPanel::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
@@ -115,9 +98,8 @@ bool CGUIrichTextPanel::MouseWheelMsg(const  int mouseX, const  int mouseY, int 
 void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 	if (!IsOnControl((CGUIbase&)*this,mouseX, mouseY)) {
 		CMessage msg;
-		msg.Msg = uiMsgHotTextClick;
+		msg.Msg = uiClickOutside;
 		msg.x = mouseX; msg.y = mouseY;
-		msg.value = -1;
 		pDrawFuncs->handleUImsg(*this->richText, msg);
 
 	}
@@ -129,11 +111,9 @@ void CGUIrichTextPanel::resizeToFit() {
 
 void CGUIrichTextPanel::message(CGUIbase* sender, CMessage& msg) {
 	if (msg.Msg == uiMsgChildResize) {
-		drawBox.size.x = richText->getWidth() + (2 * inset);
-		drawBox.size.y = richText->getHeight() + (2 * inset);
-		updateAppearance();
+		setWidth(richText->getWidth() + (2 * inset));
+		setHeight(richText->getHeight() + (2 * inset));
 	}
-
 }
 
 

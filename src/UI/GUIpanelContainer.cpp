@@ -11,9 +11,7 @@ CGUIpanelContainer::CGUIpanelContainer(int x, int y, int w, int h) {
 	borderWidth = 1;
 	horizontalBarActive = false;
 	type = panelContainer;
-	//localPos = glm::i32vec2(x, y);
 	setPos(x, y);
-	//width = w; height = h;
 	setWidth(w);
 	setHeight(h);
 	
@@ -72,8 +70,7 @@ void  CGUIpanelContainer::movePanel(unsigned int panel, unsigned int slot) {
 		surface->controls.push_back(panelPtr);
 	} else
 		surface->controls.insert(surface->controls.begin() +slot,panelPtr);
-	//if (panel > slot)
-	//	panel++;
+
 	surface->controls.erase(surface->controls.begin() + panel);
 
 	assignPanelPositions();

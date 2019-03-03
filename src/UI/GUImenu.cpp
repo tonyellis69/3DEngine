@@ -90,7 +90,8 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 	resizeToFit();
 }
 
-/** Resize to fit current items. */
+/** Resize to fit current items. The parent is messaged, as it might be a container that now
+	needs scrollbars, etc.*/
 void CGUImenu::resizeToFit() {
 	setWidth(itemWidth + 2 * hItemPad);
 	unsigned int visibleItems = std::max(items.size(), minItemsShown);
@@ -98,7 +99,6 @@ void CGUImenu::resizeToFit() {
 	setHeight( (itemHeight + vItemPad) * visibleItems + vItemPad);
 	for (auto item : items)
 		item->resize(itemWidth, itemHeight);
-//	updateAppearance();
 	CMessage msg;
 	msg.Msg = uiMsgChildResize;
 	parent->message(this, msg);
@@ -117,7 +117,7 @@ bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta,
 	return false;// true;
 }
 
-/** If the mouse moves over a menu item, select it. */
+/** If the mouse moves over a menu item, give it focus. */
 void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	if (items.size() == 0)
 		return;
@@ -168,7 +168,7 @@ void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 	else
 		msg.Msg = uiClickOutside;
 	msg.value = focusItem;
-	//parent->message(this, msg);
+
 	pDrawFuncs->handleUImsg(*this, msg);
 	if (callbackObj) {
 		callbackObj->GUIcallback(this, msg);

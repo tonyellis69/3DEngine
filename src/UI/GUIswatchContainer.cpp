@@ -30,12 +30,7 @@ CGUIswatchContainer::CGUIswatchContainer(int x, int y, int w, int h)
 
 	
 	addSwatchGroup("Swatch group", &defaultSwatches);
-	//addButton->setPos(indent, nextGroupY);
-	//respaceControls();
-//	updateAppearance();
-	//needsUpdate = true;
-	//newGroup->calcRowColumnSize();
-
+	
 
 	colourPicker = new CGUIcolourPicker(0, 0, 500, 400);
 	colourPicker->setGUIcallback(this);
@@ -64,15 +59,7 @@ void CGUIswatchContainer::addSwatchGroup(std::string name, std::vector<glm::i32v
 	Add(newGroup);
 	nextGroupY += newGroup->getHeight();// +groupGap;
 	respaceControls();
-	
-	//fitViewBoxToContainer();
-	//updateAppearance();
-	//needsUpdate = true;
-	/*addButton->setPos(indent, nextGroupY);
-	respaceControls();
-	updateAppearance();
-	needsUpdate = true;
-	newGroup->calcRowColumnSize();*/
+
 }
 
 void CGUIswatchContainer::onDoubleClick(const int mouseX, const int mouseY, int key) {
@@ -171,7 +158,6 @@ void CGUIswatchContainer::assignDataFile(std::string filename) {
 		if (line[0] == '#') {
 			i32vec4 colour(255); size_t i = 0;
 			size_t n = 1;
-			//line = line.substr(1, line.size());
 			while (n < line.size()) {
 				colour[i++] = stoi(line.substr(n,2), nullptr, 16);
 				n += 2;
@@ -205,9 +191,6 @@ void CGUIswatchContainer::writeDataFile() {
 
 	ofstream outFile(datafileName, ofstream::out);
 	for (auto control : surface->controls) {
-		//if (control->type == uiTextbox) {
-		//	outFile << std::quoted(static_cast<CGUItextbox2*>(control)->getText()) << "\n";
-		//}
 		if (control->type == uiSwatchGroup) {
 			outFile << std::quoted(static_cast<CGUIswatchGroup*>(control)->nameTextbox->getText()) << "\n";
 			for (auto colour : static_cast<CGUIswatchGroup*>(control)->swatches) {

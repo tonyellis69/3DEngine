@@ -102,7 +102,6 @@ CGUIbase* CGUIbase::MouseDown;
 CGUIbase* CGUIbase::KeyCapture;
 CGUIbase*  CGUIbase::scrollbarHasMouse;
 CDrawFuncs* CGUIbase::pDrawFuncs;
-CGUImouse* CGUIbase::mouse;
 CGUIbaseEngine* CGUIbase::pGUIeng;
 
 CFont* CGUIbase::defaultFont;
@@ -224,7 +223,6 @@ void CGUIbase::setPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
 	//NB: wait until updateAppearance to update drawBox.pos, as it depends on position of parent control
 	needsUpdate = true;
-
 }
 
 void CGUIbase::setPosX(int x) {
@@ -264,6 +262,8 @@ void CGUIbase::updateAppearance() {
 /** Recalculate position and size according to the current local position and size of this control, its 
 	positional adjustment settings (eg, anchoring), and the position and size of its parent.*/
 void CGUIbase::recalculateDiminsions() {
+	guiRect origDimensions = { drawBox.pos.x,drawBox.pos.y,drawBox.size.x,drawBox.size.y };
+
 	drawBox.pos = parent->drawBox.pos + localPos;
 
 	//TO DO: probably don't need all these right/centre/etc justifications if I go for smart positioning
@@ -305,6 +305,9 @@ void CGUIbase::recalculateDiminsions() {
 			setPosY(0); setHeight(parent->getHeight()); break; }
 		}
 	}
+
+	if (origDimensions.pos == drawBox.pos && origDimensions.size == drawBox.size)
+		needsUpdate = false;
 
 }
 

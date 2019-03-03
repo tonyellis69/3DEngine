@@ -57,9 +57,6 @@ public:
 	void message(CGUIbase* sender, CMessage& msg);
 	void onDoubleClick(const int mouseX, const int mouseY, int key);
 
-
-	void DrawSelf( );
-
 	UIrect viewBox; ///<Rectangle describing the window through which this control is viewed.
 	int spaceAroundControls; ///<Space allowed around outlying controls when calculating dimensions of surface.
 };

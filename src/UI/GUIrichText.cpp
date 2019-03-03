@@ -31,6 +31,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
+	//setBorderOn(true);
 }
 
 void CGUIrichText::DrawSelf() {
@@ -45,7 +46,7 @@ void CGUIrichText::setFont(CFont* newFont) {
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
-		newObj.hotMsgId = 0; //assume we don't want to add to any preceeding hot text.
+		newObj.hotId = 0; //assume we don't want to add to any preceeding hot text.
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -66,8 +67,8 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
-		newObj.hotMsgId = 0; //assume we don't want to add to any preceeding hot text.
-		newObj.hotObjId = 0;
+		newObj.hotId = 0; //assume we don't want to add to any preceeding hot text.
+		//newObj.hotObjId = 0;
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -95,8 +96,11 @@ void CGUIrichText::setAppendStyleBold(bool isOn) {
 
 
 /** Set hot text style for appending text on or off. */
-void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId) {
-	if (textObjs[currentTextObj].hotMsgId == msgId && textObjs[currentTextObj].hotObjId == objId)
+void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId, unsigned int hotId) {
+	//if (textObjs[currentTextObj].hotMsgId == msgId && textObjs[currentTextObj].hotObjId == objId)
+	//	return;
+
+	if (textObjs[currentTextObj].hotId == hotId) 
 		return;
 
 	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text
@@ -106,14 +110,20 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId) {
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
-	textObjs[currentTextObj].hotMsgId = msgId;
-	textObjs[currentTextObj].hotObjId = objId;
+	//textObjs[currentTextObj].hotMsgId = msgId;
+	//textObjs[currentTextObj].hotObjId = objId;
+	textObjs[currentTextObj].hotId = hotId;
 
-	if (msgId || objId)
+/*	if (msgId || objId)
 		//textObjs[currentTextObj].style.colour = hotTextColour;
 		textObjs[currentTextObj].style = hotTextStyle;
 	else
 		//textObjs[currentTextObj].style.colour = currentTextStyle.colour;
+		textObjs[currentTextObj].style = currentTextStyle;
+		*/
+	if (isOn)
+		textObjs[currentTextObj].style = hotTextStyle;
+	else
 		textObjs[currentTextObj].style = currentTextStyle;
 }
 
@@ -207,51 +217,68 @@ void CGUIrichText::renderText() {
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,no,0 };
 	do {
 		lineFragment = getNextLineFragment(lineFragment);
-		if (currObjNo != lineFragment.textObj) {
-			textBuf.render();
+		if (lineFragment.textObj != currObjNo) { //is this line fragment the start of a new text object?
+			textBuf.render();	//yes? Render the last of the old text object before we go any further
 			textBuf.init(false);
 			currObjNo = lineFragment.textObj;
 		}
 		TRichTextRec currentObj = textObjs[lineFragment.textObj];
 		CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
 		scrollHeight = currentFont->lineHeight;
-		if (longestLine < lineFragment.renderEndX)
-			longestLine = lineFragment.renderEndX;
+		longestLine = std::max(longestLine, lineFragment.renderEndX);
 
-		std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
+		string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 		textBuf.setTextColour(currentObj.style.colour);
 		textBuf.setFont(currentFont);
 
-		offset = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
+		offset.x = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
 		
-		if ( (currentObj.hotMsgId || currentObj.hotObjId) && renderLine[0] != '\n') {
-			THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y, offset.x, offset.y + currentFont->lineHeight, lineFragment.textObj };
-			hotFrag.text = renderLine;
-			if (offset.y + currentFont->lineHeight > getHeight())
-				hotFrag.overrun =  true;
-			else
-				hotFrag.overrun = false;
-			hotTextFrags.push_back(hotFrag);
+		if ( currentObj.hotId  && renderLine[0] != '\n') {
+			makeHotFragment(lineFragment, offset, renderLine);
 		}
 
 		if (lineFragment.causesNewLine != no) {
 			offset = glm::i32vec2(0, offset.y + currentFont->lineHeight );
 		}
-		if (offset.y + currentFont->lineHeight > getHeight()) {
-			overrun = offset.y + currentFont->lineHeight - getHeight(); //was true;
-			if ((currentObj.hotMsgId || currentObj.hotObjId) &&  overrunHotTextObj == -1)
-				overrunHotTextObj = currObjNo; //TO DO: check for this in hotTextScroll instead
-			if (offset.y > getHeight()) { //overrun texture, so no sense writing any more
-				textBuf.render();
-				return;
-			}
+
+		checkOverrun(offset.y, currObjNo);
+		if (offset.y > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
+			textBuf.render();
+			return;
 		}
+		
 
 
-		underrun = getHeight() - (offset.y + currentFont->lineHeight);
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
+}
+
+/** Create a record of the position and composition of the given fragment of hot text. This is used to check
+	for mouseovers, drawing it highlighted, etc. */
+void CGUIrichText::makeHotFragment(TLineFragment& lineFragment, i32vec2& offset, std::string& renderLine) {
+	int lineHeight = pDrawFuncs->getFont(textObjs[lineFragment.textObj].style.font)->lineHeight;
+
+	THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y , offset.x, offset.y + lineHeight, lineFragment.textObj };
+	hotFrag.text = renderLine;
+	if (offset.y + lineHeight > getHeight())
+		hotFrag.overrun = true;
+	else
+		hotFrag.overrun = false;
+	hotTextFrags.push_back(hotFrag);
+}
+
+/** Record how much the given line overruns (or underruns) the bottom of the view, if at all. */
+void CGUIrichText::checkOverrun(int lineStartY, int currentObjNo) {
+	TRichTextRec currentObj = textObjs[currentObjNo];
+	int lineHeight = pDrawFuncs->getFont(textObjs[currentObjNo].style.font)->lineHeight;
+
+	if (lineStartY + lineHeight > getHeight()) {
+		overrun = lineStartY + lineHeight - getHeight(); //was true;
+		if ((currentObj.hotId) && overrunHotTextObj == -1)
+			overrunHotTextObj = currentObjNo; //TO DO: check for this in hotTextScroll instead		
+	}
+	underrun = getHeight() - (lineStartY + lineHeight);
 }
 
 
@@ -346,12 +373,13 @@ void CGUIrichText::appendHotText(std::string newText, int msgId, int objId) {
 
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
 		selectedHotObj = -1;
 	for (auto hotTextFrag : hotTextFrags) {
-		if (mouseY > hotTextFrag.renderStartY &&  mouseY < hotTextFrag.renderEndY
-			&& mouseX > hotTextFrag.renderStartX && mouseX < hotTextFrag.renderEndX) {
+		if (localMouse.y > hotTextFrag.renderStartY &&  localMouse.y < hotTextFrag.renderEndY
+			&& localMouse.x > hotTextFrag.renderStartX && localMouse.x < hotTextFrag.renderEndX) {
 			selectedHotObj = hotTextFrag.textObj;
 			if (oldSelectedHotObj != selectedHotObj) {
 				highlight(selectedHotObj);
@@ -381,8 +409,9 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 		CMessage msg;
 		msg.Msg = uiMsgHotTextClick;
 		msg.x = mouseX; msg.y = mouseY;
-		msg.value = textObjs[selectedHotObj].hotMsgId;
-		msg.value2 = textObjs[selectedHotObj].hotObjId;
+		//msg.value = textObjs[selectedHotObj].hotMsgId;
+		//msg.value2 = textObjs[selectedHotObj].hotObjId;
+		msg.value = textObjs[selectedHotObj].hotId;
 		pDrawFuncs->handleUImsg(*this, msg);
 	}
 }
@@ -411,6 +440,7 @@ void CGUIrichText::unhighlight(int textObj) {
 }
 
 /** Remove any hot text objects with this tag. */
+/*
 void CGUIrichText::removeHotText(int hotMsgId) {
 	for (auto it = textObjs.begin(); it != textObjs.end(); ) {
 		if ((*it).hotMsgId == hotMsgId) {
@@ -422,6 +452,7 @@ void CGUIrichText::removeHotText(int hotMsgId) {
 	currentTextObj = textObjs.size() - 1;
 	updateText();
 }
+*/
 
 /** Make the line previous to the current top line the new top line. */
 bool CGUIrichText::scrollUp() {
@@ -636,29 +667,37 @@ void CGUIrichText::selectTopHotText() {
 }
 
 /** Convert all existing hot text objects to standard style. */
-void CGUIrichText::purgeHotText() {
+std::vector<unsigned int> CGUIrichText::purgeHotText() {
+	vector<unsigned int> purgedIds;
 	for (auto &textObj : textObjs) {
-		if (textObj.hotMsgId || textObj.hotObjId) {
-			textObj.hotMsgId = 0;
-			textObj.hotObjId = 0;
+		//if (textObj.hotMsgId || textObj.hotObjId) {
+		if (textObj.hotId != 0) {
+			purgedIds.push_back(textObj.hotId);
+			//textObj.hotMsgId = 0;
+			//textObj.hotObjId = 0;
+			textObj.hotId = 0;
 			textObj.style.colour = currentTextStyle.colour;
 		}
 	}
+	return purgedIds;
 }
 
 /** Convert hot text with the given id to standard style. */
-void CGUIrichText::purgeHotText(int msgId, int objId) {
-	if (msgId == NULL && objId == NULL) {
-		purgeHotText();
-		return;
+std::vector<unsigned int> CGUIrichText::purgeHotText(unsigned int id) {
+	if (id == NULL) {
+		return purgeHotText();
 	}
+	vector<unsigned int> purgedIds;
 	for (auto &textObj : textObjs) {
-		if (textObj.hotMsgId == msgId && textObj.hotObjId == objId) {
-			textObj.hotMsgId = 0;
-			textObj.hotObjId = 0;
+		if (textObj.hotId == id) {
+			purgedIds.push_back(textObj.hotId);
+			//textObj.hotMsgId = 0;
+			//textObj.hotObjId = 0;
+			textObj.hotId = 0;
 			textObj.style.colour = currentTextStyle.colour;
 		}
 	}
+	return purgedIds;
 }
 
 /** Remove all text from the control. */
@@ -694,7 +733,7 @@ void CGUIrichText::appendMarkedUpText(string text) {
 	TStyleChange styleChange;
 	while (remainingTxt.size()) {
 		styleChange = styleNone;
-		int cut = 0; int msgId = 0; int objId = 0;
+		int cut = 0; int msgId = 0; int objId = 0; unsigned int hotId = 0;
 		size_t found = remainingTxt.find('\\');
 		if (found != std::string::npos) {
 			cut = 1;
@@ -710,9 +749,10 @@ void CGUIrichText::appendMarkedUpText(string text) {
 				if (remainingTxt[found + 2] == '{') {
 					size_t end = remainingTxt.find("}", found);
 					std::string id = remainingTxt.substr(found + 3, end - (found + 3));
-					size_t sz;
-					msgId = std::stoi(id,&sz);
-					objId = std::stoi(id.substr(sz+1,std::string::npos));
+					size_t sz,sz2;
+					hotId = std::stoi(id,&sz);
+					///objId = std::stoi(id.substr(sz + 1, std::string::npos),&sz2);
+					//hotId = std::stoi(id.substr(sz+1+sz2+1,std::string::npos));
 					cut = 4 + id.size();
 				}
 				else {
@@ -738,16 +778,11 @@ void CGUIrichText::appendMarkedUpText(string text) {
 		if (styleChange == styleBold)
 			setAppendStyleBold(bold);
 		if (styleChange == styleHot)
-			setAppendStyleHot(hot, msgId, objId);
+			setAppendStyleHot(hot, msgId, objId, hotId);
 		if (styleChange == styleNone)
 			setTextStyle(currentTextStyle);
 		if (styleChange == styleStyle)
 			setTextStyle(styleName);
-
-		if (textObjs.size() > 30) {
-		//	textObjs.erase(textObjs.begin());
-		//	currentTextObj--;
-		}
 
 	}
 }
@@ -755,16 +790,14 @@ void CGUIrichText::appendMarkedUpText(string text) {
 void CGUIrichText::updateAppearance() {
 	CGUIbase::updateAppearance();
 	//assume dimensions may have changed, eg, if this control was set to span
-	//TO DO: something's wrong, we come here a million times in textMode
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	textBuf.setSize(getWidth(), getHeight());
 	renderText();
-
 }
 
 
 
-/** Resize the control vertically if text is overrunning or underrunning. */
+/** Resize the control vertically if text is overrunning or underrunning. Because usually you want
+	a text box to just fit its damn contents. */
 void CGUIrichText::resizeToFit() {
 	if (resizeMode == resizeByRatioMode) {
 		resizeByRatio();
@@ -776,8 +809,12 @@ void CGUIrichText::resizeToFit() {
 		CMessage msg = { uiMsgChildResize,0,0,0,0 };
 		parent->message(this, msg);
 	}
+
+	renderText();
 }
 
+/** Resize width proportionally as we try to resize height to fit text. Stop if it looks like we're caught
+	in a loop. */
 void CGUIrichText::resizeByRatio() {
 	float ratio = 2;// 1.618;
 	int heightModifier = pDrawFuncs->getFont(textObjs[currentTextObj].style.font)->lineHeight;
@@ -787,17 +824,18 @@ void CGUIrichText::resizeByRatio() {
 	while (overrun || underrun) {
 		if (overrun) {
 			previouslyOverrun = true;
-			newHeight = getHeight() + heightModifier;
+			newHeight = getHeight() + heightModifier; //add space for one more line and see where that gets us
 		}
 		else {
-			if (previouslyOverrun) {
+			if (previouslyOverrun) { //if we're now underrunning, get out to avoid loop
 				break;
 			}
-			newHeight = getHeight() - underrun;
+			newHeight = getHeight() - underrun; //we know how line to shrink by
 		}
 		newWidth = newHeight * ratio;
 
 		resize(newWidth, newHeight);
+		renderText(); //updates the overrun/underrun registers. Does the text fit now?
 	}
 
 	//tidy any remaining underrun
@@ -805,37 +843,42 @@ void CGUIrichText::resizeByRatio() {
 	resize(newWidth, newHeight);
 }
 
+/** Adjust width to fit longest visible line, then adjust height as needed. */
 void CGUIrichText::resizeByWidth() {
-	int rightBorder = 10;
-	int resizeX = getWidth();
-	if (resizeX != longestLine) {
-		resizeX = longestLine + rightBorder;
+	int rightBorder = 10; //don't seem to need this anymore 02/02/2019
+	int resizeW = getWidth();
+	if (resizeW != longestLine) {
+		resizeW = longestLine; // +rightBorder;
 	}
-	resize(resizeX, getHeight());
+	setWidth(resizeW);
 
+	//do we need to adjust height too?
 	int resizeGuess = overrun;
 	while (overrun) {
-		if (getHeight() + resizeGuess > maxHeight) {
+		if (getHeight() + resizeGuess > maxHeight) {  //can't resize beyond maxHeight
 			break;
 		}
 		else
-			resize(getWidth(), getHeight() + resizeGuess);
+			setHeight(getHeight() + resizeGuess);
 		resizeGuess *= 2;
+		renderText();
 	}
 
 	if (underrun > 0) {
-		resize(getWidth(), getHeight() - underrun);
+		setHeight(getHeight() - underrun);
 	}
 }
 
 /** Return true if the given id is an active hot text.*/
+/*
 bool CGUIrichText::isActiveHotText(int hotId) {
 	for (auto obj : textObjs) {
-		if (obj.hotMsgId == hotId)
+		//TO DO: check this still works using hotId
+		if (obj.hotId == hotId)
 			return true;
 	}
 	return false;
-}
+}*/
 
 void CGUIrichText::setResizeMode(TResizeMode mode) {
 	resizeMode = mode;
@@ -854,15 +897,16 @@ void CGUIrichText::resize(int w, int h) {
 	setHeight(h);
 //	drawBox.size = glm::i32vec2(w, h);
 	//updateAppearance();
-	needsUpdate = true;
+	//needsUpdate = true;
 	//TO DO: see if we can get away with flag here
 	//renderText();
 }
 
 
 TRichTextRec::TRichTextRec() {
-	hotMsgId = 0;
-	hotObjId = 0;
+	//hotMsgId = 0;
+	//hotObjId = 0;
+	hotId = 0;
 }
 
 

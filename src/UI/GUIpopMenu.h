@@ -10,7 +10,7 @@ public:
 };
 
 
-/** An extension of the basic menu class. */
+/** An extension of the basic menu class useful for context menus etc. */
 class CGUIpopMenu : public CGUImenu {
 public:
 	CGUIpopMenu(int x, int y, int w, int h);

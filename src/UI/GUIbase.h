@@ -8,10 +8,6 @@
 #include "rowObject.h"
 #include "GUIdragDrop.h"
 
-//#include "GUIbetterBase.h"
-
-
-
 #include <iostream> //for cerr
 
 #include "glm\glm.hpp"
@@ -298,8 +294,7 @@ public:
 	bool needsUpdate; ///<If true, control will have updateAppearance run next opportunity.
 
 	static CGUIroot* rootUI; ///<Points to root UI control.
-	static CGUImouse* mouse; ///<Points to the current mouse object.
-
+	
 	bool mousePassthru;
 
 	unsigned int uniqueID; ///<Unique identifier for each control; TO DO: make private

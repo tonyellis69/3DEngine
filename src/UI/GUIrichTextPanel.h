@@ -14,21 +14,18 @@ public:
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
-	void setHotTextColour(const glm::vec4& colour);
-	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	void clear();
 	void setResizeMode(TResizeMode mode);
 	void setTextStyles(std::vector<TtextStyle>* styles);
 	void setTextStyle(std::string styleName);
-	void purgeHotText(int msgId, int objId);
+	std::vector<unsigned int> purgeHotText(unsigned int id);
 	void update(float dT);
 
 	void appendMarkedUpText(string text);
 	unsigned int getRichTextID();
 
-	void updateAppearance();
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 

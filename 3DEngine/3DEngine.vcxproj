@@ -190,6 +190,7 @@
     <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
+    <ClCompile Include="..\src\utils\idContainer.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
     <ClCompile Include="..\src\win\win.cpp" />
@@ -307,6 +308,7 @@
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\userTypes.h" />
+    <ClInclude Include="..\src\utils\idContainer.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
     <ClInclude Include="..\src\win\win.h" />

@@ -163,8 +163,8 @@ CGUIgridMouse::CGUIgridMouse() {
 
 /** Draws the image being dragged from this image grid, at the current mouse position. */
 void CGUIgridMouse::DrawSelf( ) {
-	imageBounds.x = mouse->getScreenPos().x;
-	imageBounds.y = mouse->getScreenPos().y;
+	//imageBounds.x = mouse->getScreenPos().x;
+	//imageBounds.y = mouse->getScreenPos().y;
 //	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
 //	if (tilesheet == NULL)
 	//	pDrawFuncs->drawImage(dragData,imageBounds);

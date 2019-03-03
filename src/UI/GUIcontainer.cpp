@@ -10,11 +10,9 @@ CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 	type = container;
 	borderWidth = 1;
 	setPos(x, y);
-	//drawBox.size = i32vec2(w, h);
 	setWidth(w);
 	setHeight(h);
 
-//	width = w; height = h;
 	horizontalBarActive = false;
 	createScrollbars();
 	verticalBar->visible = false;
@@ -55,7 +53,6 @@ void CGUIsysContainer::createSurface() {
 void CGUIsysContainer::Add(CGUIbase* child) {
 	surface->Add(child);
 	adaptToContents(); //resize surface as required, adding scrollbars
-	//fitViewBoxToContainer();
 	needsUpdate = true;
 }
 
@@ -100,7 +97,6 @@ void CGUIsysContainer::updateAppearance() {
 	// container may have been resized. Surface might now be too big for the viewbox, or viewbox so big bars no longer needed
 	//or, a child control may have grown, necessitating scrollbars.
 	adaptToContents();
-//	fitViewBoxToContainer();
 }
 
 /** Activates the vertical scrollbar or adjusts the existing one, if the container contents
@@ -191,9 +187,6 @@ void CGUIsysContainer::vScroll(int scroll) {
 		verticalBar->SliderPos += scroll;
 		verticalBar->updateValue();
 	}
-
-//	controlPanels->verticalBar->SliderPos = 0;
-//		controlPanels->verticalBar->updateValue();
 }
 
 /** Returns the index number of the panel holding the given child control. */
@@ -229,11 +222,6 @@ void CGUIsysContainer::adaptToContents() {
 	if (horizontalBarCheck()) 
 		verticalBarCheck();
 	
-	//child controls may now be clipped, so an updateAppearance is needed.
-	//needsUpdate = true; //No! Should only set this if we *know* something has changed
-	//moved this to the methods that do the changing
-//	if (needsUpdate)
-//		updateAppearance();
 	fitViewBoxToContainer();
 }
 
@@ -246,11 +234,11 @@ CGUIbaseSurface::CGUIbaseSurface()  {
 	type = surface;
 }
 
-/** Overload the default clipbox calculation, basing it on the rectangle described by viewBox. */
+/** Overload the default clipbox calculation, basing it on the rectangle described by viewBox rather than
+	the dimensions of the parent container itself. */
 void CGUIbaseSurface::recalculateClipbox() {
 	UIrect parentClipbox = parent->Clipbox;
 	
-
 	Clipbox.width = viewBox.width ; 
 	Clipbox.x = parent->drawBox.pos.x + viewBox.x ;
 	if (Clipbox.x <parentClipbox.x) {
@@ -292,22 +280,17 @@ void CGUIbaseSurface::encompassChildControls() {
 	for (size_t i = 0; i < controls.size(); i++) {
 		child = controls[i];
 		if (child->anchorBottom == NONE) { //TO DO: may want to disqualify for use of vFormat too
-			if ((child->getLocalPos().y + child->getHeight() + spaceAroundControls) > newHeight)
-				newHeight = child->getLocalPos().y + child->getHeight() + spaceAroundControls;
+			newHeight = max(newHeight, child->getLocalPos().y + child->getHeight() + spaceAroundControls);
 		}
 		if (child->anchorRight == NONE) {//TO DO: and hFormat
-			if ((child->getLocalPos().x + child->getWidth() + spaceAroundControls) > newWidth)
-				newWidth = child->getLocalPos().x + child->getWidth() + spaceAroundControls;
+			newWidth = max(newWidth, child->getLocalPos().x + child->getWidth() + spaceAroundControls);
 		}
 	}
 
 	if ((getHeight() != newHeight) || (getWidth() != newWidth)) {
 		parent->needsUpdate = true;
-		//needsUpdate = true;
 	}
-//	height = newHeight;
-//	width = newWidth;
-//	drawBox.setSize(width, height);
+
 	setWidth(newWidth);
 	setHeight(newHeight);
 }
@@ -329,12 +312,6 @@ void CGUIbaseSurface::onDoubleClick(const int mouseX, const int mouseY, int key)
 	CMessage msg;
 	msg.Msg = uiMsgDoubleClick;
 	parent->message(this, msg);
-}
-
-
-
-void CGUIbaseSurface::DrawSelf( ) {
-
 }
 
 

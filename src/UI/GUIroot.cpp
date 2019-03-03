@@ -8,7 +8,6 @@ CGUIroot::CGUIroot() {
 	SetName("Root");
 	type = root;
 	rootUI = this;
-	mouse = new CGUImouse(); //create default mouse.
 	id = uiRootID;
 	focusControl = NULL;
 	borderWidth = 0;
@@ -29,10 +28,7 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	}
 
 	if (modalControls.size() > 0 /*&& scrollbarHasMouse == NULL*/) {
-		//modalControl->MouseMsg(Msg,mouseX -modalControl->screenPos.x ,mouseY -modalControl->screenPos.y,key);
-		//TO DO: why did I ever do the above?
 		modalControls.back()->MouseMsg(Msg, mouseX , mouseY , key);
-		//modalControl->MouseMsg(Msg, mouseX , mouseY, key);
 		return;
 	}
 
@@ -80,10 +76,10 @@ void CGUIroot::setLocalDimensions(int x, int y, int w, int h) {
 	setPos(x, y);
 	setWidth(w);
 	setHeight(h);
-	drawBox.pos = glm::i32vec2(x, y);
+	//drawBox.pos = glm::i32vec2(x, y);
 	Clipbox.x =x;Clipbox.y =y; Clipbox.width = w; Clipbox.height = h;
-	for (size_t i=0;i < controls.size();i++)
-		controls[i]->updateAppearance();
+	//for (size_t i=0;i < controls.size();i++)
+	//	controls[i]->updateAppearance();
 }
 
 
@@ -139,8 +135,6 @@ void CGUIroot::Draw() {
 
 /** Ensures the mouse drawing coordinates are always set to where the mouse is. */
 void CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
-	//mouse->screenPos.x = mouseX; 
-	//mouse->screenPos.y = mouseY;
 	mousePos.x = mouseX;
 	mousePos.y = mouseY;
 	CMessage msg;
@@ -223,9 +217,6 @@ CGUIroot::~CGUIroot() {
 	for (unsigned int i = 0; i < controls.size(); i++)
 		if (controls[i] != NULL)
 			delete controls[i];
-	
-	
-	//TO DO: ancient, get rid of
-	delete mouse;
+
 
 }
