@@ -167,6 +167,7 @@
     <ClCompile Include="..\src\UI\GUIdragDrop.cpp" />
     <ClCompile Include="..\src\UI\GUIdropdownMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIimage1D.cpp" />
+    <ClCompile Include="..\src\UI\GUIlabel.cpp" />
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIrichText.cpp" />
@@ -185,12 +186,14 @@
     <ClCompile Include="..\src\UI\GUIrichTextPanel.cpp" />
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
+    <ClCompile Include="..\src\UI\GUIstyleSheet.cpp" />
     <ClCompile Include="..\src\UI\GUIswatchContainer.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
     <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\utils\idContainer.cpp" />
+    <ClCompile Include="..\src\utils\log.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\watch.cpp" />
     <ClCompile Include="..\src\win\win.cpp" />
@@ -302,6 +305,7 @@
     <ClInclude Include="..\src\UI\GUIrichTextPanel.h" />
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
+    <ClInclude Include="..\src\UI\GUIstyleSheet.h" />
     <ClInclude Include="..\src\UI\GUIswatchContainer.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
     <ClInclude Include="..\src\UI\rowObject.h" />
@@ -309,6 +313,7 @@
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\utils\idContainer.h" />
+    <ClInclude Include="..\src\utils\log.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\watch.h" />
     <ClInclude Include="..\src\win\win.h" />

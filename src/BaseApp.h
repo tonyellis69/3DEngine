@@ -15,6 +15,7 @@
 #include "UI\GUIpanelContainer.h"
 #include "UI\GUIimageGrid.h"
 #include "UI\GUIlabel2.h"
+#include "UI\GUIrichText.h"
 #include <stdio.h>
 #include "Reader.h"
 #include "UIengine.h"
@@ -29,12 +30,16 @@
 
 #include "win\win.h"
 
+#include "utils/log.h"
+
+
+
 #include <iostream> //for cerr
 using namespace std;
 
 
 //class CVMapp;
-class CBaseApp : public Icallback {
+class CBaseApp : public Icallback, ILogCallback {
 public:
 	CBaseApp(void);
 	~CBaseApp(void);
@@ -64,11 +69,19 @@ public:
 	
 	void initWatches();
 	void updateWatches();
+	void initLogWindow();
+	void logCallback(std::stringstream& logStream);
+	void logAlertCallback();
 
 	string getExePath();
 
 	virtual void vmMessage(TvmAppMsg) {};
 
+	void initialiseSystemStylesheet();
+
+	CGUIstyleSheet sysStyleSheet;
+
+	CGUIrichText* logWindow; ///<Points to the system log window.
 
 	CEngine Engine;
 	//CWindow Window;
@@ -106,6 +119,7 @@ public:
 	void mouseCaptured(bool capture);
 	string getFilenameDlg(const std::string& title, const char* path);
 	string saveFilenameDlg(const std::string& title, const char* path);
+	void toggleLogWindow();
 	void exit();
 	void showMouse(bool on);
 	void setMousePos(int x, int y);

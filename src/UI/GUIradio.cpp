@@ -4,7 +4,7 @@
 int CGUIradio::Count = 1;
 CGUIradio::CGUIradio(int x , int y, int w, int h) {
 	//localPos = glm::i32vec2(x, y);
-	setPos(x, y);
+	setLocalPos(x, y);
 	//width = w;height = h;
 	setWidth(w);
 	setHeight(h);
@@ -42,11 +42,11 @@ void CGUIradio::DrawSelf( ) {
 	if (Orientation == lblFirst) {
 		iconPos = getScreenPos().x + reducedWidth + (iconOffset >> 1) ;
 		lblPos = getScreenPos().x;
-		label->setPos(5, 5);
+		label->setLocalPos(5, 5);
 	} else {
 		lblPos = getScreenPos().x + iconOffset;
 		iconPos = getScreenPos().x + (iconOffset >> 1);
-		label->setPos(10 + iconOffset, 5);
+		label->setLocalPos(10 + iconOffset, 5);
 	}
  
 	//Write the text at the given point

@@ -18,8 +18,6 @@ struct TCharacterPos {
 struct TRichTextRec : textRec {
 	TRichTextRec();
 	std::vector<int> newLines;
-	//int hotMsgId;
-	//int hotObjId;
 	unsigned int hotId;
 };
 
@@ -89,6 +87,7 @@ public:
 	bool attemptHotTextScroll(int direction);
 	void smoothScroll(int pixels);
 	void updateText();
+	void removeScrolledOffText();
 	void setMouseWheelMode(TMouseWheelMode mode);
 	void updateHotTextSelection();
 	void hotTextScroll(int direction);
@@ -155,4 +154,7 @@ public:
 	int textureHeight; ///<Height of the texture being drawn to.
 	int textureWidth; ///<Guess.
 
+	bool noScrollMode; ///<If true, text above the top line is thrown away.
+
+	int insetX; ///<Little hack to enable left indent if > 0.
 };

@@ -6,13 +6,13 @@
 
 #include "watch.h"
 
+#include "utils/log.h"
+
 using namespace watch;
 
 
 
 CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
-
-
 	homeDir = getExePath();
 #ifdef _DEBUG
 	homeDir += "..\\";
@@ -20,8 +20,9 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	string logpath = homeDir + "ErrorLog.txt";
 	freopen_s(&ErrStream,logpath.c_str(),"w",stderr);
 
-	cerr << "\nBaseApp constructor.";
+	sysLog.setFile(homeDir + "sysLog.txt");
 
+	sysLog << startMsg << "\nBaseApp constructor starting...";
 	
 
 	Engine.dataPath = homeDir + "Data\\";
@@ -50,16 +51,20 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	
 
 	loadSystemFonts();
-	GUIroot.setDefaultFont(smallSysFont);
+	GUIroot.setDefaultFont(smallSysFont); //TO DO: stylesheet will replace this
+	initialiseSystemStylesheet();
+	GUIroot.setStyleSheet(&sysStyleSheet);
 
 	RegisterUIfunctors();
 
 	
 	quitOnEsc = true;
 	initWatches();
+	initLogWindow();
 
 	vm.setApp(this);
 
+	sysLog <<  "BaseApp constructor finished. Yay!\n";
 }
 
 
@@ -82,11 +87,10 @@ void CBaseApp::loadSystemFonts() {
 
 /** Starts the application loop. This will not return until the app is shut down. */
 void CBaseApp::start() {
-	//LastTime = Engine.Time.milliseconds();
 	LastTime = Engine.Time.seconds();
 	onStart();
-	//Window.WinLoop();
 	win.hideWindow(false);
+	//toggleLogWindow();
 	while (!win.windowClosing()) {
 		AppTasks();
 	}
@@ -127,6 +131,12 @@ void CBaseApp::onKeyPress(int key, long mod) {
 		PostQuitMessage(0);
 		return;
 	}	
+	if (key == GLFW_KEY_GRAVE_ACCENT) {
+		toggleLogWindow();
+		return;
+	}
+
+
 	//send the key to the UI
 	GUIroot.KeyboardMsg(key, mod);
 	onKeyDown(key,mod); //Call the user's key handler - useful when we don't want feedback every frame
@@ -239,6 +249,7 @@ void CBaseApp::AppTasks() {
 	//Engine.removeUserScale();
 
 	updateWatches();
+	logWindow->update(dT);
 	DrawUI(); 
 
 
@@ -409,6 +420,35 @@ void CBaseApp::updateWatches() {
 	//May well need to create a more sophisticated control for that, with a more sophisticated buffer.
 }
 
+void CBaseApp::initLogWindow() {
+	logWindow = new CGUIrichText(0, 0, 180, 100);
+	logWindow->anchorRight = 10;
+	logWindow->anchorBottom = 10;
+	logWindow->insetX = 3;
+	logWindow->setVisible(false);
+	logWindow->setBorderOn(true);
+	logWindow->setFont(smallSysFont);
+	liveLog.setCallback(this);
+	//sysLog.setCallback(this);
+
+	GUIroot.Add(logWindow);
+
+
+}
+
+
+/** Sends data from the log stream to a console window. */
+void CBaseApp::logCallback(std::stringstream & logStream) {
+	logWindow->appendText(logStream.str());
+	
+}
+
+/** Handle a log alert. Make some noise! */
+void CBaseApp::logAlertCallback() {
+	logWindow->setVisible(true);
+	//TO DO: consider making  log window bigger, too.
+}
+
 /** Returns the file path of the current program. */
 string CBaseApp::getExePath() {
 	char path[512];
@@ -417,6 +457,15 @@ string CBaseApp::getExePath() {
 	int n  = tmp.find_last_of(('\\'));
 	tmp = tmp.substr( 0, n+1 );
 	return tmp;
+}
+
+/** Stock the built-in stylesheet with default, failsafe fonts and other settings so that
+	the GUI will always work out of the box. */
+void CBaseApp::initialiseSystemStylesheet() {
+	//TO DO: ultimately it might be best to load fonts into font manager here too, 
+	//scrap the systemFont* member. More streamlined, less duplication
+	sysStyleSheet.defaultFont = &renderer.fontManager.getFont("smallSysFont");
+	sysStyleSheet.defaultFontColour = uiBlack;
 }
 
 /** Use the Windows Common Dialog to get a filename. */
@@ -444,6 +493,21 @@ string CBaseApp::saveFilenameDlg(const std::string&  title, const char* path) {
 	ofns.lpstrInitialDir = path;
 	GetSaveFileName(&ofns);
 	return buffer;
+}
+
+/** Toggle visibility of the logWindow. Take the opportunity to put it to the top of the 
+	draw list. TO DO: find a better way of having controls always on top. */
+void CBaseApp::toggleLogWindow() {
+	if (logWindow->getVisible() == false) {
+		auto ctrl = std::find(GUIroot.controls.begin(), GUIroot.controls.end(), logWindow);
+		if (*ctrl != GUIroot.controls.back()) {
+			std::rotate(ctrl, ctrl + 1, GUIroot.controls.end());
+		}
+		logWindow->setVisible(true);
+	}
+	else
+		logWindow->setVisible(false);
+
 }
 
 

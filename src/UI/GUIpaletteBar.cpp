@@ -203,7 +203,7 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 	float tabNewPosf = unitPos * 255.0f;
 	int tabNewPos = round(tabNewPosf);
 
-	tab->setPos(newPos, tab->getLocalPos().y);
+	tab->setLocalPos(newPos, tab->getLocalPos().y);
 	int tabOldPos = tab->position;
 	if (tabOldPos != tabNewPos)
 		tab->position = colourGradient.moveTab(tabOldPos, tabNewPos);
@@ -211,7 +211,7 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 
 	//display position
 	tabPosLbl->setText(std::to_string(tabNewPos));
-	tabPosLbl->setPos(tab->getLocalPos().x + tabSize.x, tab->getLocalPos().y);
+	tabPosLbl->setLocalPos(tab->getLocalPos().x + tabSize.x, tab->getLocalPos().y);
 	tabPosLbl->setVisible(true);
 }
 

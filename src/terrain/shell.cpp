@@ -35,7 +35,7 @@ CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
 /** Respond to the player advancing in the given direction.*/
 void CShell::playerAdvance(Tdirection direction) {
 	//Either: (1) there is sufficient terrain in this direction and no need to supply more,
-	//or (2) there's room for more terrain in the outer SC so add to it, or
+	//or (2) there's room for more terrain in the outer SC so add to sc, or
 	//(3) the SCs need to be scrolled  to provide more space, and then added to.
 	
 	//Also, update the player's position in the shell.
@@ -61,16 +61,17 @@ void CShell::playerAdvance(Tdirection direction) {
 		//NB Think of scroll direction as the direction of rotation of the conveyor belt of terrain
 		Tdirection scrollDir = flipDir(direction);
 		std::cerr << " scrolling.";
-		//TO DO: will step always be LoD1? check
-		pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
-		scroll(scrollDir);
-		addToFaceLayer(direction);
 
 		if (shellNo != 0)
 			pTerrain->returnShellAndOuterShells(*this, direction);
+
+		if (shellNo == 0)
+			pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
+		scroll(scrollDir);
+		addToFaceLayer(direction);
 	}
 
-	//The containing shell has been encroached upon to the tune of one layer of its chunks, so tell it to handle this.
+	//The containing shell has been encroached upon to the tune of one layer of its chunks, so tell sc to handle this.
 	/////////////////////////////////////////////
 	if (shellNo < pTerrain->shells.size()-1)
 		pTerrain->shells[shellNo + 1].advance(direction);
@@ -100,6 +101,7 @@ void CShell::fillEntire(int chunkExtent) {
 
 	//TO DO: fill SCs with chunks if they intersect terrain:
 	findAllSCintersections();
+	findAllSCchunks();
 }
 
 /** Extend the terrain by two layers of chunks in the given direction. Two because we have to replace entire
@@ -147,10 +149,15 @@ void CShell::initSuperChunks() {
 		scIter->colour = vec4(col::randHue(), 1);
 		scIter->origIndex = scIter.getIndex();
 	
+		scIter->SCchunks = SCchunks;
+
 		scIter->setSampleSize(scSampleStep);
 
 		vec3 sampleSpacePosition = calcSCsampleSpacePosition(scIter.getIndex());
 		scIter->setSampleSpacePosition(sampleSpacePosition);
+
+
+
 		scIter++;
 	}
 }
@@ -169,19 +176,29 @@ vec3& CShell::calcSCsampleSpacePosition(i32vec3& scIndex) {
 
 /** Ask all superchunks to check if they are intersected by terrain. */
 void CShell::findAllSCintersections() {
-	//TO DO: only check outer SCs
-	COuterSCIterator it = getOuterSCiterator();
-	while (!it.finished()) {
+	COuterSCIterator sc = getOuterSCiterator();
+	while (!sc.finished()) {
 		if (shellNo == 0)
-			std::cerr << "\n checking SC at " << it.getIndex().x << " " << it.getIndex().y << " "
-			<< it.getIndex().z << " , samplePos"
+			std::cerr << "\n checking SC at " << sc.getIndex().x << " " << sc.getIndex().y << " "
+			<< sc.getIndex().z << " , samplePos"
 			
-			<< it->sampleSpacePos.x << " " << it->sampleSpacePos.y << " "
-			<< it->sampleSpacePos.z << ", coverage " << it->sampleSize;
-		it->checkForIntersection();
-		it++;
+			<< sc->sampleSpacePos.x << " " << sc->sampleSpacePos.y << " "
+			<< sc->sampleSpacePos.z << ", coverage " << sc->sampleSize;
+		sc->checkForIntersection();
+		sc++;
 	}
 }
+
+/** Fill all non-empty superchunks with chunks. */
+void CShell::findAllSCchunks() {
+	COuterSCIterator sc = getOuterSCiterator();
+	while (!sc.finished()) {
+		if (!sc->isEmpty)
+			sc->createAllChunks();
+		sc++;
+	}
+}
+
 
 
 CShellIterator & CShell::getIterator() {

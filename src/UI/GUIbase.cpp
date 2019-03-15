@@ -8,6 +8,7 @@
 #include "GUImouse.h"
 #include "GUIpopMenu.h"
 #include "GUIroot.h"
+#include "GUIlabel.h"
 
 // TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
 
@@ -59,13 +60,15 @@ CGUIbase::CGUIbase()  {
 	anchorLeft = false;
 	anchorTop = false;
 	setGUIcallback(this);
+	if (rootUI)
+		setStyleSheet(rootUI->styleSheet);
 }
 
 CGUIbase::CGUIbase(int x, int y, int w, int h) : CGUIbase(){
 	
 	setWidth(w);
 	setHeight(h);
-	setPos(x, y);
+	setLocalPos(x, y);
 }
 
 /** Delete all children recursively. Hopefully without any complicated memory errors.*/
@@ -93,6 +96,22 @@ CGUIbase::~CGUIbase(void) {
 	for (unsigned int i = 0; i < controls.size(); i++)
 		if (controls[i] != NULL)
 			delete controls[i];
+}
+
+/** Create a child control of the requested type. */
+CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
+	CGUIbase* ctrl;
+	switch (ctrlType) {
+	case uiLabel: ctrl = new CGUIlabel(text); break;
+
+
+	}
+
+	return nullptr;
+}
+
+void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
+	this->styleSheet = styleSheet;
 }
 
 
@@ -215,22 +234,22 @@ void CGUIbase::onDrop(const int mouseX, const int mouseY) {
 
 /** Convenience function for setting all dimensions at once. */
 void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	resize(w, h);
 }
 
-void CGUIbase::setPos(int x, int y) {
+void CGUIbase::setLocalPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
 	//NB: wait until updateAppearance to update drawBox.pos, as it depends on position of parent control
 	needsUpdate = true;
 }
 
 void CGUIbase::setPosX(int x) {
-	setPos(x, localPos.y);
+	setLocalPos(x, localPos.y);
 }
 
 void CGUIbase::setPosY(int y) {
-	setPos(localPos.x, y);
+	setLocalPos(localPos.x, y);
 }
 
 
@@ -306,7 +325,9 @@ void CGUIbase::recalculateDiminsions() {
 		}
 	}
 
-	if (origDimensions.pos == drawBox.pos && origDimensions.size == drawBox.size)
+	drawBox.pos = parent->drawBox.pos + localPos;
+
+	if (origDimensions.pos == drawBox.pos  && origDimensions.size == drawBox.size)
 		needsUpdate = false;
 
 }
@@ -466,7 +487,7 @@ void CGUIbase::autoArrangeRows(int offsetX, int offsetY) {
 	for (auto rowObj : rowObjects) {
 		if (rowObj.isActive) {
 			for (auto control : rowObj.controls) {
-				control->setPos(control->getLocalPos().x + offsetX, rowY);
+				control->setLocalPos(control->getLocalPos().x + offsetX, rowY);
 				control->setVisible(true);
 			}
 			rowY += rowObj.rowHeight;

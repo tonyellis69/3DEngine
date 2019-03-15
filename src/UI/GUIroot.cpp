@@ -4,7 +4,7 @@
 CGUIroot* CGUIbase::rootUI = NULL;
 CDrawFuncs* CGUIdragDrop::pDrawFuncs = NULL;
  
-CGUIroot::CGUIroot() {
+CGUIroot::CGUIroot()  {
 	SetName("Root");
 	type = root;
 	rootUI = this;
@@ -73,7 +73,7 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 
 
 void CGUIroot::setLocalDimensions(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	//drawBox.pos = glm::i32vec2(x, y);
@@ -130,6 +130,8 @@ void CGUIroot::Draw() {
 	if (dragDropObj) {
 		dragDropObj->drawSelf(mousePos.x, mousePos.y);
 	}
+
+
 }
 
 

@@ -9,7 +9,7 @@ const int defaultSpaceAroundControls = 0;// 20;
 CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 	type = container;
 	borderWidth = 1;
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 

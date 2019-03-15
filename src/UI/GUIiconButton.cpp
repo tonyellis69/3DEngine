@@ -11,7 +11,7 @@ CGUIsysIconButton::CGUIsysIconButton(int x, int y){
 }
 
 CGUIsysIconButton::CGUIsysIconButton(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	pDrawFuncs->registerControl(*this);

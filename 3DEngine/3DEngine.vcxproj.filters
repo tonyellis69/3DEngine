@@ -356,6 +356,15 @@
     <ClCompile Include="..\src\utils\idContainer.cpp">
       <Filter>Header Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUIlabel.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIstyleSheet.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils\log.cpp">
+      <Filter>Header Files\utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -704,6 +713,12 @@
       <Filter>Header Files\external</Filter>
     </ClInclude>
     <ClInclude Include="..\src\utils\idContainer.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIstyleSheet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils\log.h">
       <Filter>Header Files\utils</Filter>
     </ClInclude>
   </ItemGroup>

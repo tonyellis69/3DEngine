@@ -4,7 +4,7 @@
 using namespace glm;
 
 CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	type = uiDropdownMenu;
@@ -47,7 +47,7 @@ void CGUIdropdownMenu::DrawSelf() {
 }
 
 void CGUIdropdownMenu::OnClick(const int mouseX, const int mouseY) {
-	menu->setPos(drawBox.pos.x, drawBox.pos.y + getHeight());
+	menu->setLocalPos(drawBox.pos.x, drawBox.pos.y + getHeight());
 	menu->setVisible(true);
 	menu->makeModal();
 }

@@ -3,7 +3,7 @@
 using namespace glm;
 
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	renderOffset = i32vec2(2,0);

@@ -11,7 +11,7 @@ CGUIpanelContainer::CGUIpanelContainer(int x, int y, int w, int h) {
 	borderWidth = 1;
 	horizontalBarActive = false;
 	type = panelContainer;
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	

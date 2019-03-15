@@ -10,7 +10,7 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	if (!h)
 		h = defaultNumericHeight;
 
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 

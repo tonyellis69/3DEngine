@@ -7,7 +7,7 @@ const int unChecked = 0;
 
 int CGUIcheckButton::Count = 1;
 CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	Orientation = lblFirst;

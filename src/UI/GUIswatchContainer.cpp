@@ -119,11 +119,11 @@ void CGUIswatchContainer::respaceControls() {
 	int lastY = groupGap;
 	for (auto control : surface->controls) {
 		if (control->type == uiSwatchGroup) {
-			control->setPos(control->getLocalPos().x, lastY);
+			control->setLocalPos(control->getLocalPos().x, lastY);
 			lastY = control->getLocalPos().y + control->getHeight() + groupGap;
 		}
 	}
-	addButton->setPos(addButtonX, lastY);
+	addButton->setLocalPos(addButtonX, lastY);
 	adaptToContents();
 	needsUpdate = true;
 }

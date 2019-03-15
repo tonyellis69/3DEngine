@@ -9,7 +9,7 @@ int CGUIgroup::Count = 1;
 CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 	GenName("Group",Count++);
 	type = group;
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 

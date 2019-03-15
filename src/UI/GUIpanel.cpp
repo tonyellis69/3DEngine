@@ -2,7 +2,7 @@
 
 CGUIpanel::CGUIpanel(int x, int y, int w, int h) : CGUIbase(x,y,w,h){
 
-	//setPos(x, y);
+	//setLocalPos(x, y);
 	drawBorder = true;
 	setBorderColour(UIdarkGrey);
 

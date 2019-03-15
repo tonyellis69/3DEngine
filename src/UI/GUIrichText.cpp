@@ -2,6 +2,8 @@
 
 #include "glm\glm.hpp"
 
+#include "..\3DEngine\src\utils\log.h"
+
 using namespace glm;
 
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
@@ -31,7 +33,9 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
+	noScrollMode = true; //TO DO for testing purposes!!!!
 	//setBorderOn(true);
+	insetX = 0;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -210,7 +214,7 @@ bool CGUIrichText::scrollDown() {
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
-	overrun = 0; overrunHotTextObj = -1; underrun = 0; longestLine = 0;
+	overrun = 0; overrunHotTextObj = -1; underrun = 0; longestLine = 0; int indent = 0;
 	textBuf.init(true);
 	i32vec2 offset(0, yPixelOffset);
 	int currObjNo = firstVisibleObject;
@@ -231,15 +235,19 @@ void CGUIrichText::renderText() {
 		textBuf.setTextColour(currentObj.style.colour);
 		textBuf.setFont(currentFont);
 
-		offset.x = textBuf.addFragment(lineFragment.renderStartX, offset.y, renderLine);
+		
+		offset.x = textBuf.addFragment(lineFragment.renderStartX+indent, offset.y, renderLine);
 		
 		if ( currentObj.hotId  && renderLine[0] != '\n') {
 			makeHotFragment(lineFragment, offset, renderLine);
 		}
 
 		if (lineFragment.causesNewLine != no) {
-			offset = glm::i32vec2(0, offset.y + currentFont->lineHeight );
+			offset = glm::i32vec2(0, offset.y + currentFont->lineHeight);
+			indent = insetX;
 		}
+		else
+			indent = 0;
 
 		checkOverrun(offset.y, currObjNo);
 		if (offset.y > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
@@ -339,6 +347,12 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 				nextLineFrag.causesNewLine = wordwrap;
 				break;
 			}
+			else { ///////////////////////////////Experimental! not fully tested attempt to handle overlong lines
+				renderX = breakPointX;
+				nextLineFrag.causesNewLine = wordwrap;
+				break;
+
+			}
 
 		}
 
@@ -352,25 +366,6 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	return nextLineFrag;
 }
 
-/** Add clickable text to the end of the existing body copy. */
-/*
-void CGUIrichText::appendHotText(std::string newText, int msgId, int objId) {
-	TRichTextRec newObj = textObjs.back(); //clone existing style for now
-	newObj.text.clear();
-	newObj.style.colour = hotTextColour;
-	newObj.firstLineIndent = 15; //TO DO wtf?
-	newObj.hotMsgId = msgId;
-	newObj.hotObjId = objId;
-	textObjs.push_back(newObj);
-	currentTextObj++;
-
-	textObjs.back().text += newText;
-	updateText();
-	overrunCorrect = true;
-}*/
-
-
-
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
@@ -382,7 +377,7 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 			&& localMouse.x > hotTextFrag.renderStartX && localMouse.x < hotTextFrag.renderEndX) {
 			selectedHotObj = hotTextFrag.textObj;
 			if (oldSelectedHotObj != selectedHotObj) {
-				highlight(selectedHotObj);
+				highlight(selectedHotObj); 
 			}
 			break;
 		}
@@ -392,13 +387,13 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 		unhighlight(oldSelectedHotObj);
 }
 
-/** Highlight the given text object.*/
+/** Highlight the given text object on the text buffer - in this case by redrawing it in the 'selected' colour.*/
 void CGUIrichText::highlight(int textObj) {
-	//textBuf.setTextColour(hotTextHighlightColour);
 	textBuf.setTextColour(selectedHotTextStyle.colour);
 	for (auto hotTextFrag : hotTextFrags) {
 		if (hotTextFrag.textObj == textObj) {
 			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY , hotTextFrag.text);
+
 		}
 	}
 }
@@ -439,20 +434,6 @@ void CGUIrichText::unhighlight(int textObj) {
 	}
 }
 
-/** Remove any hot text objects with this tag. */
-/*
-void CGUIrichText::removeHotText(int hotMsgId) {
-	for (auto it = textObjs.begin(); it != textObjs.end(); ) {
-		if ((*it).hotMsgId == hotMsgId) {
-			it = textObjs.erase(it);
-		}
-		else
-			++it;
-	}
-	currentTextObj = textObjs.size() - 1;
-	updateText();
-}
-*/
 
 /** Make the line previous to the current top line the new top line. */
 bool CGUIrichText::scrollUp() {
@@ -592,6 +573,22 @@ void CGUIrichText::updateText() {
 	renderText();
 	if (!mouseMode)
 		updateHotTextSelection();
+
+	if (noScrollMode && firstVisibleObject > 0)
+		removeScrolledOffText();
+	
+}
+
+/**	Delete text objects and text that has scrolled beyond the top of visibility. */
+void CGUIrichText::removeScrolledOffText() {
+	for (int obj = 0; obj < firstVisibleObject; obj++) {
+		textObjs.erase(textObjs.begin());
+		currentTextObj--;
+	}
+	firstVisibleObject = 0;
+	textObjs[0].text = textObjs[0].text.substr(firstVisibleText, string::npos);
+	firstVisibleText = 0;
+	//renderText();
 }
 
 /** Change between scrolling mode and hot text selection mode. */
@@ -751,8 +748,6 @@ void CGUIrichText::appendMarkedUpText(string text) {
 					std::string id = remainingTxt.substr(found + 3, end - (found + 3));
 					size_t sz,sz2;
 					hotId = std::stoi(id,&sz);
-					///objId = std::stoi(id.substr(sz + 1, std::string::npos),&sz2);
-					//hotId = std::stoi(id.substr(sz+1+sz2+1,std::string::npos));
 					cut = 4 + id.size();
 				}
 				else {

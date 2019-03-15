@@ -4,7 +4,7 @@
 CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	type = dlgCtrl;
 	//localPos = glm::i32vec2(x, y);
-	setPos(x, y);
+	setLocalPos(x, y);
 	//width = w; height = h;
 	setWidth(w);
 	setHeight(h);

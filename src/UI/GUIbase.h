@@ -7,6 +7,7 @@
 #include "..\renderer\buf.h"
 #include "rowObject.h"
 #include "GUIdragDrop.h"
+#include "GUIstyleSheet.h"
 
 #include <iostream> //for cerr
 
@@ -166,6 +167,8 @@ public:
 	CGUIbase() ;
 	CGUIbase(int x, int y, int w, int h);
 	virtual ~CGUIbase(void);
+	CGUIbase* add(UItype ctrlType, std::string text);
+	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
 	bool IsOnControl(const CGUIbase& Control,const  int mouseX, const  int mouseY);
 	virtual void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	virtual void OnMouseMove(const  int mouseX, const  int mouseY, int key) {};
@@ -182,7 +185,7 @@ public:
 	virtual void onDrag(const  int mouseX, const  int mouseY) {};
 	virtual void onDrop(const  int mouseX, const  int mouseY);
 	void setLocalDimensions(int x, int y, int w, int h);
-	virtual void setPos(int x, int y);
+	virtual void setLocalPos(int x, int y);
 	virtual void setPosX(int x);
 	virtual void setPosY(int y);
 	virtual void Add(CGUIbase* child);
@@ -221,6 +224,8 @@ public:
 	void SetName(char* NameStr);
 
 	void setDefaultFont(CFont* font);
+
+	CGUIstyleSheet* styleSheet; ///<The stylesheet used by this control.
 
 	glm::i32vec2 localToScreenCoords(int x, int y);
 	glm::i32vec2 screenToLocalCoords(int x, int y);

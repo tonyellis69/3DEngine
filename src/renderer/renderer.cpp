@@ -10,6 +10,8 @@
 
 #include "../watch.h"
 
+#include "..\utils\log.h"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "..\external/stb_image.h"
 
@@ -36,21 +38,21 @@ void CRenderer::getGLinfo() {
 	cerr << endl;
 	GLenum err = glewInit();
 	if (GLEW_OK != err)	{
-		cerr << "\nglewInit failed, error: %s\n" << glewGetErrorString(err);
+		sysLog << "\nglewInit failed, error: %s\n" << glewGetErrorString(err);
 		return;
 	}
-	cerr << "\nUsing GLEW " << glewGetString(GLEW_VERSION);
-	cerr << "\nOpenGL version: " << glGetString(GL_VERSION);
+	sysLog << "\nUsing GLEW " << glewGetString(GLEW_VERSION);
+	sysLog << "\nOpenGL version: " << glGetString(GL_VERSION);
 
 	if(	(NULL == strstr( (char const*)glGetString( GL_EXTENSIONS ),
 		"GL_ARB_texture_non_power_of_two" ) ) ) {	
-			cerr << "\nNo NPOT";
+		sysLog << "\nNo NPOT";
 	} else {
-		cerr << "\nHas NPOT";
+		sysLog << "\nHas NPOT";
 	}
 
-	cerr << "\nglsl version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
-	cerr << endl;
+	sysLog << "\nglsl version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
+	sysLog << "\n";
 }
 
 
@@ -168,7 +170,7 @@ void CRenderer::popMatrix() {
 void CRenderer::loadShader(shaderType type, std::string shaderFilename) {
 	std::ifstream shaderFile(shaderFilename.c_str());
 	if (!shaderFile.is_open()) {
-		cerr << "\nShader file " << shaderFilename << " not found.";
+		liveLog << alertMsg << "\nShader file " << shaderFilename << " not found.";
 		return;
 	}
 	string path = shaderFilename.substr(0,shaderFilename.find_last_of("\\")+1);
@@ -183,7 +185,7 @@ void CRenderer::loadShader(shaderType type, std::string shaderFilename) {
 			incl = path + incl;
 			std::ifstream inclFile(incl.c_str());
 			if (!inclFile.is_open()) {
-				cerr << "\nInclude file " << incl << " not found.";
+				liveLog << alertMsg << "\nInclude file " << incl << " not found.";
 				return;
 			}
 			shaderData << inclFile.rdbuf();
@@ -215,8 +217,8 @@ void CRenderer::loadShader(shaderType type, std::string shaderFilename) {
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
 		glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
 
-		cerr << "\nCompile failure in " << shaderFilename;
-		cerr << strInfoLog;
+		liveLog << alertMsg << "\nCompile failure in " << shaderFilename;
+		liveLog << strInfoLog;
 		delete[] strInfoLog;
 	}
 	else
@@ -238,7 +240,7 @@ unsigned int CRenderer::linkShaders(unsigned int program) {
 
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
 		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
-		cerr << "\n Linker failure:\n" <<  strInfoLog;
+		liveLog << alertMsg << "\nLinker failure:\n" <<  strInfoLog;
 		delete[] strInfoLog;
 		return NULL;
 	}
@@ -504,7 +506,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, DrawBuffers);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		cerr << "\nError creating framebuffer.";
+		liveLog << alertMsg << "\nError creating framebuffer.";
 		return;
 	}
 	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    

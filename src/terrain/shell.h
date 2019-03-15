@@ -29,6 +29,7 @@ public:
 	void initSuperChunks();
 	glm::vec3 & calcSCsampleSpacePosition(glm::i32vec3& scIndex);
 	void findAllSCintersections();
+	void findAllSCchunks();
 	CShellIterator& getIterator();
 	COuterSCIterator& getOuterSCiterator();
 	CFaceIterator& getFaceIterator(Tdirection face);

@@ -1,7 +1,7 @@
 #include "GUIrichTextPanel.h"
 
 CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	drawBorder = false;
 	setWidth(w);
 	setHeight(h);

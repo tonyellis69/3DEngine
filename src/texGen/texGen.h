@@ -559,7 +559,7 @@ public:
 	unsigned int hGridSize;
 
 	CRenderTexture gridTexture;
-	std::default_random_engine eng;
+	std::mt19937 eng;
 
 	glm::i32vec2 startPoint, endPoint;
 	std::vector<glm::i32vec2> features;

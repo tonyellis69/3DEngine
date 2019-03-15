@@ -3,7 +3,7 @@
 using namespace glm;
 
 CGUImenu::CGUImenu(int x, int y, int w, int h) {
-	setPos(x, y);
+	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
 	itemFont = defaultFont;

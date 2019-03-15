@@ -180,7 +180,7 @@ void CTexGenUI::GUIcallback(CGUIbase * sender, CMessage & msg) {
 	if (sender == texGenList && msg.Msg == uiClick) {
 		if (msg.value == texCompositor.texGens.size()) { //clicked on 'add TexGen'
 			i32vec2 pos = pApp->getMousePos();
-			addTexGenMenu->setPos(pos.x,pos.y);
+			addTexGenMenu->setLocalPos(pos.x,pos.y);
 			addTexGenMenu->setVisible(true);
 			addTexGenMenu->makeModal();
 			return;

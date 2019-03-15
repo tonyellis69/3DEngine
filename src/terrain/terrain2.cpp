@@ -73,9 +73,6 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 
 /** Fill all shells with chunks where they are intersected by the terrain. */
 void CTerrain2::fillShells() {
-	//TO DO: iterate through all shells
-	//for now, just do the LoD1shell
-
 	for (auto& shell : shells) {
 		//how many chunk layers from the shell origin to fill:
 		int chunkExtent = ((shell.shellSCs - 1) / 2) * SCchunks;
@@ -146,12 +143,8 @@ TShellInnerBounds & CTerrain2::getInnerBounds(unsigned int shellNo) {
 
 /** Move the terrain's position in sample space. */
 void CTerrain2::scrollSampleSpace(Tdirection scrollDir, float shift) {
-	std::cerr << "\nsamplespace origin moved from " << sampleSpacePos.x << " " <<
-		sampleSpacePos.y << " " << sampleSpacePos.z << " to ";
 	vec3 vec = dirToVec(flipDir(scrollDir)) * shift;
 	sampleSpacePos += vec;
-	std::cerr << sampleSpacePos.x << " " <<
-		sampleSpacePos.y << " " << sampleSpacePos.z ;
 }
 
 
