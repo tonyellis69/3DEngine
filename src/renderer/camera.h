@@ -27,7 +27,7 @@ public:
 	glm::mat4 clipMatrix; ///<Transforms coordinates in clip space, ready for rasterizing.
 	glm::mat4 perspectiveMatrix; ///<The perspective transform of this camera.
 
-	glm::mat4 camMatrix; ///<Inverse transform of camera position.
+	glm::mat4 camMatrix; ///<Inverse transform of camera positionHint.
 
 
 private:

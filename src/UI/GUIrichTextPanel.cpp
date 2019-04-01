@@ -17,7 +17,8 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 	richText->anchorLeft = inset;
 	richText->anchorBottom = inset;
 	Add(richText);
-
+	dragging = false;
+	draggable = false;
 }
 
 void CGUIrichTextPanel::setInset(int newInset) {
@@ -114,6 +115,31 @@ void CGUIrichTextPanel::message(CGUIbase* sender, CMessage& msg) {
 		setWidth(richText->getWidth() + (2 * inset));
 		setHeight(richText->getHeight() + (2 * inset));
 	}
+	if (sender == richText && msg.Msg == uiMsgDragging && draggable) {
+		if (!dragging) {
+			lastMousePos = glm::i32vec2(msg.x, msg.y);
+			dragging = true;
+		}
+		else {
+			glm::i32vec2 dMouse = glm::i32vec2(msg.x, msg.y) - lastMousePos;
+			lastMousePos = glm::i32vec2(msg.x, msg.y);
+			dMouse += getLocalPos();
+			setLocalPos(dMouse.x,dMouse.y);
+
+		}
+	}
+
+	if (sender == richText && msg.Msg == uiMsgLMouseUp)
+		if (dragging)
+			dragging = false;
+}
+
+void CGUIrichTextPanel::setTempText(bool onOff) {
+	richText->setTempText(onOff);
+}
+
+void CGUIrichTextPanel::suspend(bool isOn) {
+	richText->suspend(isOn);
 }
 
 

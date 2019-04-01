@@ -53,7 +53,7 @@ void ColourGradient::insertColour(unsigned char index, glm::i32vec4& newColour) 
 	
 }
 
-/** Change the colour of the tab at this position. */
+/** Change the colour of the tab at this positionHint. */
 void ColourGradient::changeColour(unsigned char tabPos, glm::i32vec4& newColour) {
 	tabs[tabPos] = newColour;
 }
@@ -72,7 +72,7 @@ glm::i32vec4 ColourGradient::getColour(int index) {
 	return glm::mix(prevTab->second, nextTab->second, ratio);
 }
 
-/** Move a tab somewhere else - if it exists at this index position. */
+/** Move a tab somewhere else - if it exists at this index positionHint. */
 int ColourGradient::moveTab(int oldPos, int newPos) {
 
 	if (tabs.find(newPos) != tabs.end() && newPos != 255 && newPos != 0) {

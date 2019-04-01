@@ -9,13 +9,21 @@ CGUIlabel::CGUIlabel(std::string & text) {
 	//via a pointer to the stylesheet
 	//so we ask for these essentials and set them up before we do anything like try 
 	//to calculate how big 'text' will be.
-	textData.font = styleSheet->defaultFont;
+	setFont(styleSheet->defaultFont);
 	setTextColour(styleSheet->defaultFontColour);
 
 	setText(text);
-	//????????????????? next
+	resizeToFit();
+
+	type = uiLabel;
+	multiLine = false;
+	mousePassthru = true;
+	renderOffset = i32vec2(0, 0);
+	leftAlignIndent = 0;
+	textAlign = tleft;
 }
 
+/*
 CGUIlabel::CGUIlabel(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	
 	
@@ -31,10 +39,9 @@ CGUIlabel::CGUIlabel(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;
-}
+}*/
 
 void CGUIlabel::setFont(CFont* newFont) {
-	textBuf.setFont(newFont);
 	textData.font = newFont;
 }
 
@@ -43,13 +50,13 @@ void CGUIlabel::setText(std::string newText) {
 	renderText();
 }
 
+
 void CGUIlabel::setTextColour(UIcolour  colour) {
 	setTextColour(vec4(colour.r, colour.g, colour.b, colour.a));
 }
 
 void CGUIlabel::setTextColour(vec4  colour) {
 	textData.style.colour = colour;
-	textBuf.setTextColour(textData.style.colour);
 	renderText();
 }
 
@@ -128,6 +135,7 @@ void CGUIlabel::renderText() {
 	textBuf.clearBuffer();
 	calcLineOffset();
 
+	TLineFragDrawRec dataRec;
 	if (multiLine) {
 		int lineStart = 0; int lineYpos = renderOffset.y;
 		int nextLineStart ; 
@@ -135,13 +143,16 @@ void CGUIlabel::renderText() {
 		do {
 			nextLineStart = getNextLineStart(lineStart);
 			renderLine = textData.text.substr(lineStart, nextLineStart - lineStart);
-			textBuf.renderTextAt(renderOffset.x, lineYpos, renderLine);
+			dataRec = { &renderLine,textData.font,textData.style.colour };
+			textBuf.renderTextAt(renderOffset.x, lineYpos, dataRec);
 			lineYpos += textData.font->lineHeight;
 			lineStart = nextLineStart;
 		} while (nextLineStart < textData.text.size());
 	}
-	else
-		textBuf.renderTextAt(renderOffset.x, renderOffset.y, textData.text);
+	else {
+		dataRec = { &textData.text,textData.font,textData.style.colour };
+		textBuf.renderTextAt(renderOffset.x, renderOffset.y, dataRec);
+	}
 }
 
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */
@@ -169,6 +180,20 @@ int CGUIlabel::getNextLineStart(int lineStart) {
 
 std::string & CGUIlabel::getText() {
 	return textData.text;
+}
+
+
+/** Resize this control to fit its text, its preset minimum size or max size. */
+void CGUIlabel::resizeToFit() {
+	//min and max size can both be set by the user to avoid the control spoiling
+	//the aesthetic of their UI, but they start with default values.
+	//Find the font height, then calculate the width needed for the given text
+	i32vec2 newSize;
+	newSize.y = textData.font->lineHeight + 2* styleSheet->labelTextSurround;
+	calcLineRenderedWidth();
+	newSize.x = lineRenderedWidth + 2 * styleSheet->labelTextSurround;
+	newSize = clamp(newSize, resizeMin, resizeMax);
+	resize(newSize.x, newSize.y);
 }
 
 

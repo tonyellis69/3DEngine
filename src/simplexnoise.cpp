@@ -382,7 +382,7 @@ float raw_noise_4d( const float x, const float y, const float z, const float w )
     // Many values of c will never occur, since e.g. x>y>z>w makes x<z, y<w and x<w
     // impossible. Only the 24 indices which have non-zero entries make any sense.
     // We use a thresholding to set the coordinates in turn from the largest magnitude.
-    // The number 3 in the "simplex" array is at the position of the largest coordinate.
+    // The number 3 in the "simplex" array is at the positionHint of the largest coordinate.
     i1 = simplex[c][0]>=3 ? 1 : 0;
     j1 = simplex[c][1]>=3 ? 1 : 0;
     k1 = simplex[c][2]>=3 ? 1 : 0;

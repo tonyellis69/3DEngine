@@ -17,7 +17,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	itemHeight = itemFont->lineHeight + vItemPad;
 	clear();
 	
-	pDrawFuncs->registerControl(*this);
+	//pDrawFuncs->registerControl(*this);
 	itemTextAlignment = tleft;
 	leftAlignIndent = 10;
 	hItemInteriorPadding = 4;

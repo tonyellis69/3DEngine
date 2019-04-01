@@ -36,6 +36,8 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	noScrollMode = true; //TO DO for testing purposes!!!!
 	//setBorderOn(true);
 	insetX = 0;
+	transcriptLog = NULL;
+	suspended = false;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -162,7 +164,14 @@ void CGUIrichText::setTextStyle(std::string styleName) {
 			return;
 		}
 	}
+	if (styleName == "tempOn") {
+		setTempText(true);
+	}
+	if (styleName == "tempOff") {
+		setTempText(false);
+	}
 }
+
 
 /** Provide a pointer to a set of text styles to use */
 void CGUIrichText::setTextStyles(std::vector<TtextStyle>* styleList) {
@@ -186,7 +195,10 @@ void CGUIrichText::setText(std::string newText) {
 
 /** Append newText to the current body of text. */
 void CGUIrichText::appendText(std::string newText) {
-
+	if (transcriptLog)
+		*transcriptLog << newText;
+	if (textObjs.back().tmpText == tempOff)
+		removeTempText();
 	textObjs.back().text += newText;
 	updateText();
 	overrunCorrect = true; //TO DO: why do this here?		
@@ -209,6 +221,7 @@ bool CGUIrichText::scrollDown() {
 		return true;
 }
 
+static int counter = 0;
 
 /** Starting with the top visible object, work through the list, rendering each, until we overrun the
 	bottom of the display area.*/
@@ -216,14 +229,18 @@ void CGUIrichText::renderText() {
 	hotTextFrags.clear();
 	overrun = 0; overrunHotTextObj = -1; underrun = 0; longestLine = 0; int indent = 0;
 	textBuf.init(true);
+	TLineFragDrawRec dataRec;
 	i32vec2 offset(0, yPixelOffset);
 	int currObjNo = firstVisibleObject;
 	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,no,0 };
 	do {
+		
 		lineFragment = getNextLineFragment(lineFragment);
 		if (lineFragment.textObj != currObjNo) { //is this line fragment the start of a new text object?
-			textBuf.render();	//yes? Render the last of the old text object before we go any further
-			textBuf.init(false);
+			if (textBuf.notEmpty()) { //yes? Render the last of the old text object (if any) before we go any further
+				textBuf.render();	
+				textBuf.init(false);
+			}
 			currObjNo = lineFragment.textObj;
 		}
 		TRichTextRec currentObj = textObjs[lineFragment.textObj];
@@ -232,11 +249,9 @@ void CGUIrichText::renderText() {
 		longestLine = std::max(longestLine, lineFragment.renderEndX);
 
 		string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
-		textBuf.setTextColour(currentObj.style.colour);
-		textBuf.setFont(currentFont);
 
-		
-		offset.x = textBuf.addFragment(lineFragment.renderStartX+indent, offset.y, renderLine);
+		dataRec = { &renderLine, currentFont, currentObj.style.colour };
+		offset.x = textBuf.addFragment(lineFragment.renderStartX+indent, offset.y, dataRec);
 		
 		if ( currentObj.hotId  && renderLine[0] != '\n') {
 			makeHotFragment(lineFragment, offset, renderLine);
@@ -249,6 +264,7 @@ void CGUIrichText::renderText() {
 		else
 			indent = 0;
 
+
 		checkOverrun(offset.y, currObjNo);
 		if (offset.y > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
 			textBuf.render();
@@ -260,9 +276,11 @@ void CGUIrichText::renderText() {
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
+	if (counter == 32)
+		int b = 0;
 }
 
-/** Create a record of the position and composition of the given fragment of hot text. This is used to check
+/** Create a record of the positionHint and composition of the given fragment of hot text. This is used to check
 	for mouseovers, drawing it highlighted, etc. */
 void CGUIrichText::makeHotFragment(TLineFragment& lineFragment, i32vec2& offset, std::string& renderLine) {
 	int lineHeight = pDrawFuncs->getFont(textObjs[lineFragment.textObj].style.font)->lineHeight;
@@ -295,6 +313,9 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	TLineFragment nextLineFrag{}; //initialise all to 0
 	int textObj = currentLineFrag.textObj;
 	
+
+
+
 	unsigned int textStartPos = currentLineFrag.textPos + currentLineFrag.textLength;
 	if (textStartPos >= textObjs[textObj].text.size()) {
 		if (textObj + 1 == textObjs.size()) {
@@ -310,11 +331,12 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	TRichTextRec* richTextData = &textObjs[textObj];
 	CFont* currentFont = pDrawFuncs->getFont(richTextData->style.font);
 
-	//catch full stops, etc, in the next object that should wrap this fragment onto the next line
+	//catch unbreakable full stops, etc, in the next object that could wrap this fragment onto the next line
+	//disqualify them, however, if they are preceeded by whitespace
 	int lookAheadCharWidth = 0;
 	if (textObj + 1 < textObjs.size()) {
 		char lookAheadChar = textObjs[textObj + 1].text[0];
-		if (ispunct(lookAheadChar))
+		if (ispunct(lookAheadChar) && !isspace(textObjs[textObj].text.back()) )
 			lookAheadCharWidth = currentFont->table[lookAheadChar]->width;
 	}
 
@@ -347,7 +369,10 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 				nextLineFrag.causesNewLine = wordwrap;
 				break;
 			}
-			else { ///////////////////////////////Experimental! not fully tested attempt to handle overlong lines
+			else if (resizeMode == resizeNone)
+			{ ///////////////////////////////Experimental! not fully tested attempt to handle overlong lines
+				//Problem: prevents the pop-up menus from expanding to fit their contents
+				//solution: have a no-resizing mode
 				renderX = breakPointX;
 				nextLineFrag.causesNewLine = wordwrap;
 				break;
@@ -368,6 +393,8 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+	if (suspended)
+		return;
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
@@ -389,10 +416,12 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 
 /** Highlight the given text object on the text buffer - in this case by redrawing it in the 'selected' colour.*/
 void CGUIrichText::highlight(int textObj) {
-	textBuf.setTextColour(selectedHotTextStyle.colour);
+	CFont* font = pDrawFuncs->getFont(selectedHotTextStyle.font);
+	TLineFragDrawRec dataRec = { NULL, font, selectedHotTextStyle.colour };
 	for (auto hotTextFrag : hotTextFrags) {
 		if (hotTextFrag.textObj == textObj) {
-			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY , hotTextFrag.text);
+			dataRec.text = &hotTextFrag.text;
+			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY , dataRec);
 
 		}
 	}
@@ -400,16 +429,24 @@ void CGUIrichText::highlight(int textObj) {
 
 /** Detect clicks on any menu items. */
 void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
+	if (suspended)
+		return;
 	if (selectedHotObj > -1) {
 		CMessage msg;
 		msg.Msg = uiMsgHotTextClick;
+		//glm::i32vec2 screen = localToScreenCoords(mouseX, mouseY);
 		msg.x = mouseX; msg.y = mouseY;
-		//msg.value = textObjs[selectedHotObj].hotMsgId;
-		//msg.value2 = textObjs[selectedHotObj].hotObjId;
 		msg.value = textObjs[selectedHotObj].hotId;
 		pDrawFuncs->handleUImsg(*this, msg);
 	}
 }
+
+void CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
+	CMessage msg;
+	msg.Msg == uiMsgLMouseUp;
+	parent->message(this, msg);
+}
+
 
 
 /** Check for losing mouse while hot text selected. */
@@ -426,10 +463,14 @@ void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 /** Unhighlight the given text object.*/
 void CGUIrichText::unhighlight(int textObj) {
 	//textBuf.setTextColour(hotTextColour);
-	textBuf.setTextColour(hotTextStyle.colour);
+
+	CFont* font = pDrawFuncs->getFont(hotTextStyle.font);
+	TLineFragDrawRec dataRec = { NULL, font, hotTextStyle.colour };
+
 	for (auto hotTextFrag : hotTextFrags) {
 		if (hotTextFrag.textObj == textObj) {
-			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, hotTextFrag.text);
+			dataRec.text = &hotTextFrag.text;
+			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, dataRec);
 		}
 	}
 }
@@ -471,7 +512,7 @@ bool CGUIrichText::scrollUp() {
 	return true;
 }
 
-/** Return character at position previous to that given, winding back textObj if needed. */
+/** Return character at positionHint previous to that given, winding back textObj if needed. */
 int CGUIrichText::getPrevCharacter(int& textObj, int& pos) {
 	if (pos == 0) {
 		if (textObj == 0)
@@ -575,7 +616,7 @@ void CGUIrichText::updateText() {
 		updateHotTextSelection();
 
 	if (noScrollMode && firstVisibleObject > 0)
-		removeScrolledOffText();
+		 removeScrolledOffText();
 	
 }
 
@@ -897,11 +938,56 @@ void CGUIrichText::resize(int w, int h) {
 	//renderText();
 }
 
+/** Append a textObj marking the start or end of temporary text. */
+void CGUIrichText::setTempText(bool onOff) {
+	//return;
+
+	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
+		TRichTextRec newObj = textObjs[currentTextObj];
+		newObj.text.clear();
+		textObjs.push_back(newObj);
+		currentTextObj++;
+	}
+	if (onOff) {
+		textObjs[currentTextObj].tmpText = tempOn;
+	}
+	else
+		textObjs[currentTextObj].tmpText = tempOff;
+}
+
+/** Remove the most recent block of tempporary text. */
+void CGUIrichText::removeTempText() {
+	//return;
+	for (unsigned int obj = textObjs.size() - 1; obj >= 0; obj--) {
+		if (textObjs[obj].tmpText == tempNone) {
+			textObjs.erase(textObjs.begin() + obj+1, textObjs.end());
+			currentTextObj = textObjs.size() - 1;
+			return;
+		}
+	}
+
+}
+
+/** Flag that normal activity is suspended/unsuspended. */
+void CGUIrichText::suspend(bool isOn) {
+	suspended = isOn;
+}
+
+void CGUIrichText::onDrag(const int mouseX, const int mouseY) {
+	CMessage msg;
+	msg.Msg = uiMsgDragging;
+	msg.x = mouseX;
+	msg.y = mouseY;
+	parent->message(this, msg);
+}
+
+
 
 TRichTextRec::TRichTextRec() {
 	//hotMsgId = 0;
 	//hotObjId = 0;
 	hotId = 0;
+	tmpText = tempNone;
 }
 
 

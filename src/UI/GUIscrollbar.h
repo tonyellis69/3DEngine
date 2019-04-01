@@ -31,8 +31,8 @@ public:
 
 	int SliderPos; ///<Position of the slider long the scrollbrar.
 	int mouseSliderOffset; ///<Position of the mouse within the slider.
-	int lastMouseDownX; ///<Last mouse position when left button went down.
-	int lastMouseDownY; ///<Last mouse position when left button went down.
+	int lastMouseDownX; ///<Last mouse positionHint when left button went down.
+	int lastMouseDownY; ///<Last mouse positionHint when left button went down.
 };
 
 

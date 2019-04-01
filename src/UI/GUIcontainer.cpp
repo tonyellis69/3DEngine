@@ -105,7 +105,7 @@ bool CGUIsysContainer::verticalBarCheck() {
 	//first, check if scrollbar is even needed. 
 	if (surface->getHeight() > surface->viewBox.height) { //surface bigger than viewbox
 		bool newBar = false;
-		//so it is needed. 1st, if it's only just becoming visible now, reset slider to default position
+		//so it is needed. 1st, if it's only just becoming visible now, reset slider to default positionHint
 		if (!verticalBar->visible) {
 			verticalBar->setMax(surface->getHeight() - surface->viewBox.height);
 			verticalBar->visible = true;
@@ -114,7 +114,7 @@ bool CGUIsysContainer::verticalBarCheck() {
 		}
 		//second, ensure it's the right size and slider size for the current container/surface ratio
 		verticalBar->setHeight( getHeight() - barWidth -(2*borderWidth));
-		//because the ratio of surface to viewbox size may have been resized, we need to preserve the slider's relative position.
+		//because the ratio of surface to viewbox size may have been resized, we need to preserve the slider's relative positionHint.
 		float diff = (float) verticalBar->Max - verticalBar->Min;
 		float ratio = diff / verticalBar->Value;
 
@@ -141,7 +141,7 @@ bool CGUIsysContainer::horizontalBarCheck() {
 	//first, check if scrollbar is even needed. 
 	if ((surface->getWidth() > surface->viewBox.width) && (horizontalBarActive)) { //surface wider than viewbox
 		bool newBar = false;
-		//so it is needed. 1st, if it's only just become visible now, reset slider to default position
+		//so it is needed. 1st, if it's only just become visible now, reset slider to default positionHint
 		if (!horizontalBar->visible) {
 			horizontalBar->setMax(surface->getWidth() - surface->viewBox.width);
 			horizontalBar->visible = true;
@@ -150,7 +150,7 @@ bool CGUIsysContainer::horizontalBarCheck() {
 		}
 		//second, ensure it's the right size and slider size for the current container/surface ratio
 		horizontalBar->setWidth( getWidth() - barWidth);
-		//because the ratio of surface to viewbox size may have been resized, we need to preserve the slider's relative position.
+		//because the ratio of surface to viewbox size may have been resized, we need to preserve the slider's relative positionHint.
 		float diff = (float)(horizontalBar->Max - horizontalBar->Min);
 		float ratio = diff / horizontalBar->Value;
 
@@ -297,7 +297,7 @@ void CGUIbaseSurface::encompassChildControls() {
 
 
 
-/** Set the viewbox to the given size and position on the container.*/
+/** Set the viewbox to the given size and positionHint on the container.*/
 void CGUIbaseSurface::setViewbox(int x, int y, int w, int h) {
 	viewBox.x = x; viewBox.y = y; viewBox.width = w;viewBox.height = h;
 }

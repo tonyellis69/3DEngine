@@ -29,7 +29,7 @@ void C2dRenderer::setPosition(float x, float y){
 }
 
 
-/** Draw the given textured rectangle at the position x,y, using the current texture/colour etc. */
+/** Draw the given textured rectangle at the positionHint x,y, using the current texture/colour etc. */
 void C2dRenderer::drawRect(TRect* rect,float x, float y) {
 	glBegin(GL_QUADS);                                 
 	glTexCoord2f(rect->Map.u,rect->Map.v); glVertex3f( x +  (-rect->originX * xScale),  y + (-rect->originY * yScale),0);

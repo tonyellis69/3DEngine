@@ -37,8 +37,8 @@ public:
 	int selected; ///<Identifies the currently selected cell, if any.
 
 private:
-	int mouseCol; ///<X position of the highlit cell.
-	int mouseRow;  ///<Y position of the highlit cell.
+	int mouseCol; ///<X positionHint of the highlit cell.
+	int mouseRow;  ///<Y positionHint of the highlit cell.
 	int cellCount; ///<Number of cells.
 
 }

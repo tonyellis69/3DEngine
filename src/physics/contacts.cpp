@@ -120,7 +120,7 @@ void contact::resolveVelocity(float dT) {
 
 }
 
-/** Adjust the position of the objects in this contact to remove any interpenetration. 
+/** Adjust the positionHint of the objects in this contact to remove any interpenetration. 
 	NB: the penetration member itself is not reset here, but by the calling process. */
 void contact::resolvePenetration(float dT) {
 	// If we don't have any penetration, skip this step.
@@ -162,8 +162,8 @@ void contact::resolvePenetration(float dT) {
 	}
 
 	// Apply the penetration resolution
-//	std::cerr << "\nposition moved from " << collider->position.x << " " << collider->position.y << " "
-//		<< collider->position.z;
+//	std::cerr << "\nposition moved from " << collider->positionHint.x << " " << collider->positionHint.y << " "
+//		<< collider->positionHint.z;
 
 	collider->position = collider->position + colliderMovement ;
 

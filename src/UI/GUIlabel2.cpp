@@ -6,7 +6,6 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	
 	
 	textData.font = defaultFont;
-	textBuf.setFont(defaultFont);
 	textBuf.setSize(getWidth(), getHeight());
 
 	type = uiLabel;
@@ -20,7 +19,6 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 }
 
 void CGUIlabel2::setFont(CFont* newFont) {
-	textBuf.setFont(newFont);
 	textData.font = newFont;
 }
 
@@ -35,7 +33,6 @@ void CGUIlabel2::setTextColour(UIcolour  colour) {
 
 void CGUIlabel2::setTextColour(vec4  colour) {
 	textData.style.colour = colour;
-	textBuf.setTextColour(textData.style.colour);
 	renderText();
 }
 
@@ -114,6 +111,7 @@ void CGUIlabel2::renderText() {
 	textBuf.clearBuffer();
 	calcLineOffset();
 
+	TLineFragDrawRec dataRec;
 	if (multiLine) {
 		int lineStart = 0; int lineYpos = renderOffset.y;
 		int nextLineStart ; 
@@ -121,13 +119,16 @@ void CGUIlabel2::renderText() {
 		do {
 			nextLineStart = getNextLineStart(lineStart);
 			renderLine = textData.text.substr(lineStart, nextLineStart - lineStart);
-			textBuf.renderTextAt(renderOffset.x, lineYpos, renderLine);
+			dataRec = { &renderLine,textData.font,textData.style.colour };
+			textBuf.renderTextAt(renderOffset.x, lineYpos, dataRec);
 			lineYpos += textData.font->lineHeight;
 			lineStart = nextLineStart;
 		} while (nextLineStart < textData.text.size());
 	}
-	else
-		textBuf.renderTextAt(renderOffset.x, renderOffset.y, textData.text);
+	else {
+		dataRec = { &textData.text,textData.font,textData.style.colour };
+		textBuf.renderTextAt(renderOffset.x, renderOffset.y, dataRec);
+	}
 }
 
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */

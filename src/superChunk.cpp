@@ -34,7 +34,7 @@ void CSuperChunk::setSizes(i32vec3& _sizeInChunks,int _cubesPerChunkEdge, float 
 
 }
 
-/** Set the position of the northwest bottom corner of this superChunk in sample space. */
+/** Set the positionHint of the northwest bottom corner of this superChunk in sample space. */
 void CSuperChunk::setSamplePos(vec3& pos) {
 	nwSamplePos = pos;
 }
@@ -58,7 +58,7 @@ void CSuperChunk::createAllChunks() {
 
 
 extern int uniTag = 0;
-/** Return a pointer to a chunk that has been positioned at the given chunk position and initialised for skinning.*/
+/** Return a pointer to a chunk that has been positioned at the given chunk positionHint and initialised for skinning.*/
 Chunk* CSuperChunk::createChunk(i32vec3& gridPosition, Tdirection overlap) {
 	vec3 samplePos = nwSamplePos + vec3(gridPosition) * (chunkSize / terrain->worldUnitsPerSampleUnit);
 	Chunk* newChunk = terrain->getFreeChunk();
@@ -249,7 +249,7 @@ CSuperChunk*& CSuperChunk::adj(const Tdirection dir) {
  }
 
 
-/** Extend the recogised position for outermost chunks in the face direction. */
+/** Extend the recogised positionHint for outermost chunks in the face direction. */
 void CSuperChunk::extendChunkSpace(Tdirection face) {
 	if ((face == north)||(face == west) || (face == down))
 		faceBoundary[face] -= 1;
@@ -259,7 +259,7 @@ void CSuperChunk::extendChunkSpace(Tdirection face) {
 
 extern CSuperChunk* dbgSC;
 
-/** Shrink the recogised position for outermost chunks in the face direction. */
+/** Shrink the recogised positionHint for outermost chunks in the face direction. */
 void CSuperChunk::retractChunkSpace(Tdirection face) {
 
 	if ((face == north)||(face == west) || (face == down))
@@ -268,12 +268,12 @@ void CSuperChunk::retractChunkSpace(Tdirection face) {
 		faceBoundary[face] -= 1;
 }
 
-/** Return the position of the first layer beyond the outer, face layer of chunks in the given direction. */
+/** Return the positionHint of the first layer beyond the outer, face layer of chunks in the given direction. */
 int CSuperChunk::firstEmptyLayer(Tdirection face) {
 	return faceBoundary[face] + getSign(face);
 }
 
-/** Return the position of the outermost layer of chunks in the face direction. */
+/** Return the positionHint of the outermost layer of chunks in the face direction. */
 int CSuperChunk:: outerLayer(Tdirection face) {
 	return faceBoundary[face];
 }

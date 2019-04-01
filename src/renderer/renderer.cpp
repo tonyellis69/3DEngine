@@ -282,7 +282,7 @@ void CRenderer::storeIndexData(unsigned int& hIndex, unsigned short* data,int si
 	
 }
 
-/** Store info on how to use given vertex data, eg, position, colour, etc.*/
+/** Store info on how to use given vertex data, eg, positionHint, colour, etc.*/
 void CRenderer::storeVertexLayout(unsigned int& hVAO, unsigned int bufferObj, unsigned int hIndex, int nAttributes) {
 	//GLuint vaoObject;
 	if ( hVAO == 0)
@@ -422,7 +422,7 @@ void CRenderer::initRenderToTextureBufs() {
 	//create a simple quad that will fill clipspace.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-  //get pointer to position attribute
+  //get pointer to positionHint attribute
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,2, GL_FLOAT, GL_FALSE, 0,(void*) 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

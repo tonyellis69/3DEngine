@@ -161,7 +161,7 @@ CGUIgridMouse::CGUIgridMouse() {
 	tilesheet = NULL;
 }
 
-/** Draws the image being dragged from this image grid, at the current mouse position. */
+/** Draws the image being dragged from this image grid, at the current mouse positionHint. */
 void CGUIgridMouse::DrawSelf( ) {
 	//imageBounds.x = mouse->getScreenPos().x;
 	//imageBounds.y = mouse->getScreenPos().y;

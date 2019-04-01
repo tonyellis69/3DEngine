@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
 #include "glm/glm.hpp"
+
+#include "..\3DEngine\src\direction.h"
 
 class ITerrainCallback {
 public:
@@ -12,13 +15,15 @@ public:
 /** A container for zero or more chunks occupying a cubic volume of space. */
 class CSuperChunk2 {
 public:
-	CSuperChunk2() {};
+	CSuperChunk2()  {};
 	void checkForIntersection();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setSampleSize(float sampleSize);
 	void setCallbackApp(ITerrainCallback* pApp);
 	void createAllChunks();
-	void createChunk(glm::vec3& index);
+	void createChunk(glm::i32vec3& index);
+
+	void addFaceChunks(Tdirection face);
 
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp
@@ -34,5 +39,10 @@ public:
 	float sampleSize;
 	int SCchunks; //<SC size in chunks.
 	float chunkSampleSize; ///<Chunk size in samplespace
+
+	std::vector<glm::i32vec3> chunks; ///<The chunks owned by this superchunk
+	glm::i32vec3 nwChunkStart; ///<Northwest lower Limit to where chunks are placed.
+	glm::i32vec3 seChunkEnd; ///<Southeast upper Limit to where chunks are placed.
+
 };
 

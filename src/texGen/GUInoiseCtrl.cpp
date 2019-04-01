@@ -79,7 +79,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 
 	int saveButtonY = 330;
 
-	//position controls
+	//positionHint controls
 	int posStartY = 150;
 	lbl = new CGUIlabel2(20, posStartY, 80, 20);
 	lbl->setText("Rotation");

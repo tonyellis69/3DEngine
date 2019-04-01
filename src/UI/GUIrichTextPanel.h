@@ -35,6 +35,16 @@ public:
 
 	void message(CGUIbase* sender, CMessage & msg);
 
+	void setTempText(bool onOff);
+
+	void suspend(bool isOn);
+
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
+
+	CLog transcript;
+
+	glm::i32vec2 lastMousePos; ///<For dragging purposes
+	bool dragging; 
+	bool draggable;
 };

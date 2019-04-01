@@ -4,6 +4,8 @@
 #include "..\colour.h"
 #include "superChunk2.h"
 
+#include "..\3DEngine\src\utils\log.h"
+
 #include <iostream>
 
 
@@ -28,7 +30,7 @@ CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
 	//SCs don't have chunks yet, so we can safely say:
 	for (int face = 0; face < 6; face++)
 		faceLayerFull[face] = false;
-
+	
 }
 
 
@@ -38,7 +40,7 @@ void CShell::playerAdvance(Tdirection direction) {
 	//or (2) there's room for more terrain in the outer SC so add to sc, or
 	//(3) the SCs need to be scrolled  to provide more space, and then added to.
 	
-	//Also, update the player's position in the shell.
+	//Also, update the player's positionHint in the shell.
 	i32vec3 travelVector = dirToVec(direction);
 	playerChunkPos += travelVector;
 
@@ -85,7 +87,7 @@ void CShell::advance(Tdirection direction) {
 	playerAdvance(direction);
 }
 
-/** Return the number of chunks of terrain lying in the given direction from the player position. */
+/** Return the number of chunks of terrain lying in the given direction from the player positionHint. */
 int CShell::getPlayerChunkExtent(Tdirection direction) {
 	vec3 directionVector = dirToVec(direction);
 	int totallExtent = chunkExtent[direction];
@@ -94,14 +96,17 @@ int CShell::getPlayerChunkExtent(Tdirection direction) {
 }
 
 /** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
-void CShell::fillEntire(int chunkExtent) {
-	//set shell chunk extent
-	for (int direction = 0; direction < 6; direction++)
-		this->chunkExtent[direction] = chunkExtent;
-
-	//TO DO: fill SCs with chunks if they intersect terrain:
+void CShell::fillEntire() {
 	findAllSCintersections();
 	findAllSCchunks();
+}
+
+/** Set chunks to initially extend as far as the minimum chunk extent in all directions. The extent
+	will change as the terrain advances in a particular direction. */
+void CShell::initChunkExtent() {
+	for (int direction = 0; direction < 6; direction++)
+		this->chunkExtent[direction] = minimumChunkExtent;
+
 }
 
 /** Extend the terrain by two layers of chunks in the given direction. Two because we have to replace entire
@@ -113,6 +118,12 @@ void CShell::addToFaceLayer(Tdirection direction) {
 	int maxChunkExtent = (shellSCs * SCchunks) / 2;
 	if (chunkExtent[direction] >= maxChunkExtent)
 		faceLayerFull[direction] = true;
+
+	//extend SC chunk boundaries accordingly
+	setSCchunkBoundaries();
+
+	//add the new chunks
+	addChunksToFaceSCs( direction);
 }
 
 /** Rotate the SC ordering, moving them one step in the given direction, and moving the outgoing layer
@@ -123,14 +134,14 @@ void CShell::scroll(Tdirection scrollDirection) {
 	scArray.rotate(rotateVec);
 
 	//The scrolled-out SCs have lost their chunks and maybe gained new ones, so reset them
-	resampleFace(inDirection);
+	resampleFaceSCs(inDirection);
 
 	//we've just lost a SC's worth of chunks in the 'in' direction, so:
 	chunkExtent[inDirection] -= SCchunks;
 	faceLayerFull[inDirection] = false;
 
 	i32vec3 scrollVec = dirToVec(scrollDirection);
-	//move player position in shell back by one SC's worth of chunks
+	//move player positionHint in shell back by one SC's worth of chunks
 	playerChunkPos += scrollVec * SCchunks;
 
 	//move enclosing shells back to ensure terrain still lines up
@@ -150,6 +161,8 @@ void CShell::initSuperChunks() {
 		scIter->origIndex = scIter.getIndex();
 	
 		scIter->SCchunks = SCchunks;
+		scIter->nwChunkStart = i32vec3(0);
+		scIter->seChunkEnd = i32vec3(SCchunks);
 
 		scIter->setSampleSize(scSampleStep);
 
@@ -160,9 +173,12 @@ void CShell::initSuperChunks() {
 
 		scIter++;
 	}
+
+	initChunkExtent();
+	setSCchunkBoundaries();
 }
 
-/** Return the point in sample space of the bottom NW corner of the superchunk at this index position. */
+/** Return the point in sample space of the bottom NW corner of the superchunk at this index positionHint. */
 vec3& CShell::calcSCsampleSpacePosition(i32vec3& scIndex) {
 	//find worldspace displacement of SC from terrain centre 
 	vec3 scPos = vec3(scIndex) * SCsize;
@@ -218,7 +234,7 @@ TShellInnerBounds & CShell::getInnerBounds() {
 }
 
 /**	Check if the SCs in this face intersect with terrain (and request the chunks if they do). */
-void CShell::resampleFace(Tdirection face) {
+void CShell::resampleFaceSCs(Tdirection face) {
 	//return;
 	CFaceIterator faceIter = getFaceIterator(face);
 
@@ -231,7 +247,7 @@ void CShell::resampleFace(Tdirection face) {
 		if (shellNo == 0)
 			std::cerr << "\n checking SC at " << faceIter.getIndex().x << " " << faceIter.getIndex().y << " "
 			<< faceIter.getIndex().z << " , samplePos"
-			
+
 			<< faceIter->sampleSpacePos.x << " " << faceIter->sampleSpacePos.y << " "
 			<< faceIter->sampleSpacePos.z << ", coverage " << faceIter->sampleSize;
 		faceIter->checkForIntersection();
@@ -240,6 +256,54 @@ void CShell::resampleFace(Tdirection face) {
 	}
 
 }
+
+/** Set the chunk index boundaries - if any - for each SC, beyond which we don't try to place chunks. For
+	most SCs there are none, but for the inner and outer SCs we want to prevent creating chunks where 
+	the chunks of another shell take over. */ 
+void CShell::setSCchunkBoundaries() {
+	i32vec3 nwChunkExtent = i32vec3(-chunkExtent[west], -chunkExtent[down], -chunkExtent[north]);
+	i32vec3 seChunkExtent = i32vec3(chunkExtent[east], chunkExtent[up], chunkExtent[south]);
+	//TO DO: maybe replace chunkExtent altogether with these
+
+	//(1)Find the origin of the chunk extents' -n - n volume in SC's 0 - n chunk coordinate space
+	i32vec3 chunkExtentVolumeOrig = i32vec3(shellSCs * SCchunks) / 2;
+
+	//use it to find the corners of the volume in SC chunk space
+	i32vec3 nwClip = chunkExtentVolumeOrig + nwChunkExtent;
+	i32vec3 seClip = chunkExtentVolumeOrig + seChunkExtent - i32vec3(1); //because we go 0 - n-1 not 0 - n.
+
+	//(2)For each SC, determine its position in chunk space...
+	CShellIterator scIter = getIterator();
+	while (!scIter.finished()) {
+		i32vec3 scNWchunkSpacePos = scIter.getIndex() * SCchunks; 
+		//...clip that position against this shell's current chunk extents:
+		scIter->nwChunkStart = glm::max(scNWchunkSpacePos, nwClip) % i32vec3(SCchunks);
+
+		i32vec3 scSEchunkSpacePos = scNWchunkSpacePos + i32vec3(SCchunks-1);
+
+		//we want the min of the sc se pos and the se clip vol
+		scIter->seChunkEnd = glm::min(scSEchunkSpacePos, seClip);
+		scIter->seChunkEnd = scIter->seChunkEnd % i32vec3(SCchunks);
+
+		sysLog << "\nSC index " << scIter.getIndex() << " nwChunkStart " << scIter->nwChunkStart << " seChunkEnd " << scIter->seChunkEnd;
+		scIter++;
+	}
+}
+
+/** Iterate through the SCs of this face, and add more chunks where needed. */
+void CShell::addChunksToFaceSCs(Tdirection face) {
+	CFaceIterator faceIter = getFaceIterator(face);
+	while (!faceIter.finished()) {
+		if (faceIter->isEmpty == false) {
+			faceIter->addFaceChunks(face);
+
+		}
+		faceIter++;
+	}
+
+}
+
+
 
 
 

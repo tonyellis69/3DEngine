@@ -7,8 +7,6 @@
 
 CTextBuffer::CTextBuffer() {
 	pRenderer = &CRenderer::getInstance();
-	textData.style.colour = glm::vec4(1, 1, 1, 1);
-	textData.font = NULL;
 }
 
 /** Set the absolute dimensions, in pixels, of the buffer texture.*/
@@ -18,69 +16,19 @@ void CTextBuffer::setSize(int w, int h) {
 	clearBuffer(); //this fixes some corruption that otherwise crops up
 }
 
-void CTextBuffer::setFont(CFont* newFont) {
-	textData.font = newFont;
-}
-
-void CTextBuffer::setTextColour(glm::vec4 & newColour) {
-	textData.style.colour = newColour;
-}
 
 
 
+/** Render the given text fragment immediately, without waiting for more. */
+void CTextBuffer::renderTextAt(int x, int y, TLineFragDrawRec& drawData) {
+	if (!drawData.text->size())
+		return;
 
-/** Draw textLine at the offset x,y on the text buffer. */
-glm::i32vec2 CTextBuffer::renderTextAt(int x, int y, std::string textLine) {
-
-
-	if (!textLine.size())
-		return glm::i32vec2(0);
-//	pRenderer->initTimerQuery();
-	vector<vBuf::T2DtexVert> chars;
-	vector<unsigned int> index;
-	chars.resize(textLine.size() * 4);
-
-	glm::vec2 blCorner = glm::vec2( x, y);
-
-	//return blCorner;
-	
-	int v = 0; 
-	glyph* glyph;
-	unsigned int numChars = textLine.size();
-	for (unsigned int c = 0; c < numChars; c++) { 
-		if (textLine[c] != '\n') 
-		{
-			glyph = textData.font->table[textLine[c]];
-			//construct quads
-			chars[v].v = blCorner; //A
-			chars[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
-			chars[v + 2].v = blCorner + glm::vec2(0.0f, glyph->height); //C
-			chars[v + 3].v = blCorner + glm::vec2(glyph->width, glyph->height); //D
-			//NB this quad gets flipped by the ortho matrix putting the origin top-left
-			chars[v].tex = glm::vec2(glyph->u, glyph->t);
-			chars[v + 1].tex = glm::vec2(glyph->s, glyph->t);
-			chars[v + 2].tex = glm::vec2(glyph->u, glyph->v);
-			chars[v + 3].tex = glm::vec2(glyph->s, glyph->v);
-
-			index.push_back(v);  index.push_back(v + 3); index.push_back(v + 2);
-			index.push_back(v + 1); index.push_back(v + 3);  index.push_back(v);
-			v += 4;
-			blCorner += glm::vec2(glyph->width, 0);
-		}
-	}
+	init(false);
 
 
-
-	
-	CBuf buf;
-	buf.storeVertexes(chars.data(), sizeof(vBuf::T2DtexVert) * chars.size(), chars.size());
-	buf.storeIndex(index.data(), index.size());
-	buf.storeLayout(2, 2, 0, 0);
-	
-
-	writeToTexture2(buf);   
-	
-	return blCorner;
+	addFragment(x, y, drawData);
+	render();
 }
 
 void CTextBuffer::clearBuffer() {
@@ -100,11 +48,11 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
 
 
 
-	glm::vec4 textColour = textData.style.colour;
+	//glm::vec4 textColour = textData.style.colour;
 	//textColour.a = 0.5;
 
 	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, textData.font->texture); //attach texture to textureUnit (0)
+	pRenderer->attachTexture(0, mDrawData->font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
@@ -122,17 +70,21 @@ void CTextBuffer::init(bool clearBuf) {
 }
 
 /** Add this to the list of text quads to eventually draw. Return the x-coordinate we finish on.  */
-int CTextBuffer::addFragment(int x, int y, std::string textLine) {
+int CTextBuffer::addFragment(int x, int y, TLineFragDrawRec& drawData) {
+	textColour = drawData.textColour;
+	this->mDrawData = &drawData;
+
 	glm::vec2 blCorner = glm::vec2(x, y);
 
 	int v = textQuads.size();
 	glyph* glyph;
-	unsigned int numChars = textLine.size();
+	unsigned int numChars = drawData.text->size();
 	textQuads.resize(v + numChars * 4);
+	string text = *drawData.text;
 	for (unsigned int c = 0; c < numChars; c++) { 
-		if (textLine[c] != '\n') 
+		if (text[c]  != '\n')
 		{
-			glyph = textData.font->table[textLine[c]];
+			glyph = drawData.font->table[text[c]];
 			//construct quads
 			textQuads[v].v = blCorner; //A
 			textQuads[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B
@@ -160,4 +112,9 @@ void CTextBuffer::render() {
 	buf.storeLayout(2, 2, 0, 0);
 	writeToTexture2(buf);
 
+}
+
+/** Returns true if buffer contains text yet to be rendered. */
+bool CTextBuffer::notEmpty() {
+	return textQuads.size();
 }

@@ -35,7 +35,7 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 	return shells[shellNo].worldSpaceSize;
 }
 
-/** Respond to the player moving by the given vector from their current position. */
+/** Respond to the player moving by the given vector from their current positionHint. */
 void CTerrain2::playerWalk(glm::vec3 & move) {
 	//if offset > 1 chunk, advance terrain.
 	playerOffset += move;
@@ -78,7 +78,8 @@ void CTerrain2::fillShells() {
 		int chunkExtent = ((shell.shellSCs - 1) / 2) * SCchunks;
 		//TO DO: find the best way to calculate this!
 
-		shell.fillEntire(chunkExtent);
+		shell.initChunkExtent();
+		shell.fillEntire();
 	}
 }
 
@@ -106,7 +107,7 @@ void CTerrain2::findAllSCintersections() {
 
 }
 
-/** Centre the terrain at the give position in sample space. */
+/** Centre the terrain at the give positionHint in sample space. */
 void CTerrain2::setSampleSpacePosition(glm::vec3 & pos) {
 	sampleSpacePos = pos;
 }
@@ -141,7 +142,7 @@ TShellInnerBounds & CTerrain2::getInnerBounds(unsigned int shellNo) {
 	return innerBounds;
 }
 
-/** Move the terrain's position in sample space. */
+/** Move the terrain's positionHint in sample space. */
 void CTerrain2::scrollSampleSpace(Tdirection scrollDir, float shift) {
 	vec3 vec = dirToVec(flipDir(scrollDir)) * shift;
 	sampleSpacePos += vec;

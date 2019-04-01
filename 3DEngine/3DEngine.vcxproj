@@ -161,6 +161,7 @@
     <ClCompile Include="..\src\UIengine.cpp" />
     <ClCompile Include="..\src\UI\font.cpp" />
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
+    <ClCompile Include="..\src\UI\GUIbutton.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp" />
     <ClCompile Include="..\src\UI\GUIcolourPicker.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="..\src\UI\GUIlabel.cpp" />
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
+    <ClCompile Include="..\src\UI\GUIposition.cpp" />
     <ClCompile Include="..\src\UI\GUIrichText.cpp" />
     <ClCompile Include="..\src\UI\GUIcontainer.cpp" />
     <ClCompile Include="..\src\UI\GUIdlg.cpp" />
@@ -278,6 +280,7 @@
     <ClInclude Include="..\src\UIengine.h" />
     <ClInclude Include="..\src\UI\font.h" />
     <ClInclude Include="..\src\UI\GUIbase.h" />
+    <ClInclude Include="..\src\UI\GUIbutton.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
     <ClInclude Include="..\src\UI\GUIcolourPicker.h" />
@@ -287,6 +290,7 @@
     <ClInclude Include="..\src\UI\GUIimage1D.h" />
     <ClInclude Include="..\src\UI\GUIpaletteBar.h" />
     <ClInclude Include="..\src\UI\GUIpopMenu.h" />
+    <ClInclude Include="..\src\UI\GUIposition.h" />
     <ClInclude Include="..\src\UI\GUIrichText.h" />
     <ClInclude Include="..\src\UI\GUIdlg.h" />
     <ClInclude Include="..\src\UI\GUIgroup.h" />

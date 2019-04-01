@@ -214,7 +214,7 @@ void CTerrain::createSuperChunks(T3dArray &scArray, vector<CSuperChunk*>& parent
 
 extern CSuperChunk* dbgSC = NULL;
 
-/** Initialise the given 3d array of superchunks with the correct position, size, lod, etc. */
+/** Initialise the given 3d array of superchunks with the correct positionHint, size, lod, etc. */
 void CTerrain::initSuperChunks(T3dArray &scArray, int layerNo, i32vec3& _sizeInChunks) {
 	float LoDscale = float(1 << (shells[layerNo].LoD-1));
 	int cubesPerSCedge =  chunksPerSChunkEdge * cubesPerChunkEdge;
@@ -429,13 +429,13 @@ void CTerrain::advance(Tdirection dir) {
 
 
 
-/** Call an external function that returns true if the isosurface doesn't intersect the given superChunk position.*/
+/** Call an external function that returns true if the isosurface doesn't intersect the given superChunk positionHint.*/
 /* bool CTerrain::superChunkIsEmpty(CSuperChunk& SC) {
 	return EXTsuperChunkIsEmpty(SC);
 } */
 
 
-/** Call an external function that returns true if the isosurface intersects the given chunk position.*/
+/** Call an external function that returns true if the isosurface intersects the given chunk positionHint.*/
 /*
 bool CTerrain::chunkExists(vec3& samplePos, int LoD) {
 	return EXTchunkExists(samplePos, LoD);
@@ -484,7 +484,7 @@ void CTerrain::freeChunk(Chunk & chunk) {
 	spareChunks.push_back(&chunk);
 }
 
-/** Return the superchunk at the given position. */
+/** Return the superchunk at the given positionHint. */
 CSuperChunk * CTerrain::getSC(const glm::vec3 & pos) {
 	float LoD1chunkSize = cubesPerChunkEdge * LoD1cubeSize;
 	for (int layerNo = shells.size() - 1; layerNo >= 0; layerNo--) {
@@ -502,7 +502,7 @@ CSuperChunk * CTerrain::getSC(const glm::vec3 & pos) {
 	return NULL;
 }
 
-/** Return the chunk, if any, at the given position. */
+/** Return the chunk, if any, at the given positionHint. */
 Chunk * CTerrain::getChunk(const glm::vec3 & pos) {
 	CSuperChunk* sc = getSC(pos);
 	if (!sc)
@@ -528,14 +528,14 @@ void CTerrain::getChunkTris(Chunk & chunk, TChunkVert * buf) {
 
 }
 
-/** Return a pointer to a buffer of chunk triangles for the given position, if any. */
+/** Return a pointer to a buffer of chunk triangles for the given positionHint, if any. */
 void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& noTris) {
 	noTris = 0;
 	CSuperChunk* sc = getSC(pos); //TO TO: temp!
 	if (!sc)
 		return;
 
-	//get chunk at this position
+	//get chunk at this positionHint
 		Chunk* chunk = getChunk(pos);
 	if (!chunk) {
 	
@@ -569,7 +569,7 @@ void CTerrain::getTris(const glm::vec3& pos, TChunkVert* & buf, unsigned int& no
 		freeChunkTriCache = 0;
 }
 
-/** Return the position of the nw bottom corner of the chunk pos is inside. */
+/** Return the positionHint of the nw bottom corner of the chunk pos is inside. */
 glm::vec3 CTerrain::getChunkPos(const glm::vec3 & pos) {
 	CSuperChunk* sc = getSC(pos);
 	if (!sc)
@@ -753,7 +753,7 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 		superChunks[s]->extendChunkSpace(flipDir(scrollDir)); //extend boundary where we've pushed chunks along
 	}
 
-	//we're going to scroll this layer, so return it to its initial position first.
+	//we're going to scroll this layer, so return it to its initial positionHint first.
 	nwLayerPos += scrollStep;
 	nwSampleCorner += vec3(-scrollVec) * chunkSampleStep;
 	for (size_t s=0;s<superChunks.size();s++) {
@@ -761,17 +761,17 @@ void CTerrainLayer::scroll(i32vec3& scrollVec) {
 	}
 }
 
-/** Return the chunk of this layer, if any, at this position. */
+/** Return the chunk of this layer, if any, at this positionHint. */
 Chunk * CTerrainLayer::getChunkAt(glm::vec3 & pos) {
 	CSuperChunk* nearestSC = getNearestSC(pos); 
 
 	return nullptr;
 }
 
-/** Return the nearest superChunk to this position, clamping to the outer sides of the
+/** Return the nearest superChunk to this positionHint, clamping to the outer sides of the
 	layer 'shell'.*/
 CSuperChunk * CTerrainLayer::getNearestSC(glm::vec3 & pos) {
-	//find index for this position
+	//find index for this positionHint
 
 	//return SC for this index
 

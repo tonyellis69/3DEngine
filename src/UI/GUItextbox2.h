@@ -40,7 +40,7 @@ private:
 	glm::i32vec2 renderOffset;///<Due to centering, multiline, etc.
 
 	int cursorTextPos; ///<String index of character cursor precedes.
-	guiRect cursor; ///<Holds cursor position and size.
+	guiRect cursor; ///<Holds cursor positionHint and size.
 
 	//int renderBorder; ///<Clear space around inner edge of text buffer
 };

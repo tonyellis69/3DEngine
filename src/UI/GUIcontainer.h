@@ -44,7 +44,7 @@ public:
 /** The surface is the container's child control upon which all the contained
 	controls are placed. It grows to fit all the contained controls. Its contents
 	are visible within the viewBox - which defines a clipped view of the surface.
-	By adjusting the position of the surface, different controls are brought
+	By adjusting the positionHint of the surface, different controls are brought
 	into view. */
 class CGUIbaseSurface :public CGUIbase {
 public:

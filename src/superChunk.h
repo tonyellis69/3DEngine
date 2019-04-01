@@ -84,7 +84,7 @@ public:
 
 	std::vector<Chunk*> chunkList; ///<Chunks currently owned.
 
-	int faceBoundary[6]; ///<Records the position of the current outermost layer of chunks on each face.
+	int faceBoundary[6]; ///<Records the positionHint of the current outermost layer of chunks on each face.
 
 
 	

@@ -178,7 +178,7 @@ public:
 	GLuint hBillTile;
 	GLuint hBillOffset;
 	GLuint hBillMVP;
-	GLuint hBillCentre; ///<Handle for position of billboard centre.
+	GLuint hBillCentre; ///<Handle for positionHint of billboard centre.
 	GLuint hBillCamWorldMatrix;
 	GLuint hBillboardSize;
 

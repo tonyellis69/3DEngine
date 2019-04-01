@@ -23,7 +23,8 @@ public:
 	void playerAdvance(Tdirection direction);
 	void advance(Tdirection direction);
 	int getPlayerChunkExtent(Tdirection direction);
-	void fillEntire(int chunkExtent);
+	void fillEntire();
+	void initChunkExtent();
 	void addToFaceLayer(Tdirection direction);
 	void scroll(Tdirection direction);
 	void initSuperChunks();
@@ -34,7 +35,9 @@ public:
 	COuterSCIterator& getOuterSCiterator();
 	CFaceIterator& getFaceIterator(Tdirection face);
 	TShellInnerBounds& getInnerBounds();
-	void resampleFace(Tdirection face);
+	void resampleFaceSCs(Tdirection face);
+	void setSCchunkBoundaries();
+	void addChunksToFaceSCs(Tdirection direction);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -45,7 +48,7 @@ public:
 	float worldSpaceSize; 
 	glm::vec3 worldSpacePos;
 	int minimumChunkExtent; //<Terrain must always extend this far from player.
-	glm::i32vec3 playerChunkPos;  //<Player position in chunks, relative to origin
+	glm::i32vec3 playerChunkPos;  //<Player positionHint in chunks, relative to origin
 
 	int chunkExtent[6]; //<How far chunks extend from origin in each direction
 	bool faceLayerFull[6]; //<True if there's no room to add chunks to this face layer of SCs

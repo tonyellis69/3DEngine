@@ -33,18 +33,24 @@ struct textRec {
 	//others to follow
 };
 
+/** Holds the minimum data the textBuffer needs to draw: text, font, text colour. */
+struct TLineFragDrawRec {
+	std::string* text;
+	CFont* font;
+	glm::vec4 textColour;
+};
+
 /** A class that maintains a rectangular buffer of rendered text for displaying. */
 class CTextBuffer {
 public:
 	CTextBuffer();
 	void setSize(int w, int h);
-	void setFont(CFont* newFont);
-	void setTextColour(glm::vec4& newColour);
-	glm::i32vec2 renderTextAt(int x, int y, std::string textLine);
+	void renderTextAt(int x, int y, TLineFragDrawRec& drawData);
 	void clearBuffer();
 	void init(bool clearBuffer);
-	int addFragment(int x, int y, std::string textLine);
+	int addFragment(int x, int y, TLineFragDrawRec& drawData);
 	void render();
+	bool notEmpty();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	
@@ -58,11 +64,12 @@ private:
 
 	glm::i32vec2 size;
 
-	textRec textData;
+	//textRec textData;
 
 	//CBuf buf2;
 	vector<vBuf::T2DtexVert> textQuads;
 	vector<unsigned int> textQuadsIndex;
 
-	
+	TLineFragDrawRec* mDrawData;
+	glm::vec4 textColour;
 };

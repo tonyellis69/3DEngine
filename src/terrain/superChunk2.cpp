@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "..\utils\log.h"
+
 ITerrainCallback* CSuperChunk2::pCallbackApp = NULL;
 
 void CSuperChunk2::checkForIntersection() {
@@ -9,12 +11,6 @@ void CSuperChunk2::checkForIntersection() {
 }
 
 void CSuperChunk2::setSampleSpacePosition(glm::vec3 & pos) {
-	if (origIndex == glm::i32vec3(0, 0, 0))
-		std::cerr << "\n x= 0 samplespace pos of " << sampleSpacePos.x << " " << sampleSpacePos.y << " "
-		<< sampleSpacePos.z << " changed to " << pos.x << " " << pos.y << " " << pos.z;
-	if (origIndex == glm::i32vec3(4, 0, 0))
-		std::cerr << "\n x= 4 samplespace pos of " << sampleSpacePos.x << " " << sampleSpacePos.y << " "
-		<< sampleSpacePos.z << " changed to " << pos.x << " " << pos.y << " " << pos.z;
 	sampleSpacePos = pos;
 }
 
@@ -27,20 +23,16 @@ void CSuperChunk2::setCallbackApp(ITerrainCallback * pApp) {
 	pCallbackApp = pApp;
 }
 
-/** Divide this superchunk into chunk volumes, and create a chunk for each one
-	intersected by terain. */
+/** For each chunk volume within this SC's chunk clipping limits (if any), create a chunk 
+	if the volume is intersected by terain. */
 void CSuperChunk2::createAllChunks() {
-	//find each chunk volume, using the number of chunks and their size or
-	//the size of the SC, 
-	//and thus find the samplespace position to check
-	//send that and the sample area to check to the callout.
 	glm::vec3 chunkSampleSpacePos;
-	for (int x = 0; x < SCchunks; x++) {
-		for (int y = 0; y < SCchunks; y++) {
-			for (int z = 0; z < SCchunks; z++) {
+	for (int x = nwChunkStart.x; x <= seChunkEnd.x; x++) {
+		for (int y = nwChunkStart.y; y <= seChunkEnd.y; y++) {
+			for (int z = nwChunkStart.z; z <= seChunkEnd.z; z++) {
 				chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
 				if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
-					createChunk(glm::vec3(x, y, z));
+					createChunk(glm::i32vec3(x, y, z));
 				}
 
 			}
@@ -50,5 +42,41 @@ void CSuperChunk2::createAllChunks() {
 
 }
 
-void CSuperChunk2::createChunk(glm::vec3 & index) {
+/** Acquire a new chunk at the given index position. */
+void CSuperChunk2::createChunk(glm::i32vec3 & index) {
+	chunks.push_back(index);
+}
+
+/** This SC's chunk clipping limits have been extended by two layers. Iterating within that space,
+	create a chunk where terrain intersects a chunk volume. */
+void CSuperChunk2::addFaceChunks(Tdirection face) {
+	glm::i32vec3 localnwChunkStart = nwChunkStart;
+	glm::i32vec3 localseChunkEnd = seChunkEnd;
+	int axis = getAxis(face);
+
+	if (face == north || face == west || face == down) {
+		localseChunkEnd = localnwChunkStart;
+		localseChunkEnd[axis] += 2;
+	}
+	else {
+		localnwChunkStart = localseChunkEnd;
+		localnwChunkStart[axis] -= 2;
+
+	}
+
+
+	glm::vec3 chunkSampleSpacePos;
+	for (int x = localnwChunkStart.x; x < localseChunkEnd.x; x++) {
+		for (int y = localnwChunkStart.y; y < localseChunkEnd.y; y++) {
+			for (int z = localnwChunkStart.z; z < localseChunkEnd.z; z++) {
+				chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+				if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+					createChunk(glm::i32vec3(x, y, z));
+				}
+
+			}
+		}
+	}
+
+
 }

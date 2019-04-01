@@ -235,7 +235,7 @@ void CEngine::drawLine(float x, float y, float x2, float y2) {
 	enableLineMode(false);
 }
 
-/** Draw the given image at the given position. */
+/** Draw the given image at the given positionHint. */
 void CEngine::drawImage(TRect* rect,float x, float y) {
 	p2dR->drawRect(rect,x,y);
 }
@@ -274,7 +274,7 @@ unsigned int CEngine::attachShaders() {
 	return Renderer.attachShaders();
 }
 
-/** Creates a new camera at the given position. */
+/** Creates a new camera at the given positionHint. */
 //CCamera* CEngine::createCamera(glm::vec3& pos) {
 	//CCamera* camera = new CCamera(pos);
 	//cameraList.push_back(camera); 

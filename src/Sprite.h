@@ -70,7 +70,7 @@ public:
 	float Rotation; ///< Rotation of sprite, in degrees.
 	glm::vec2 Velocity; ///< Velocity of sprite.
 	float Speed; ///<The velocity multiplier. 
-	glm::vec2 pos; ///<Sprite's position, stored as a vector.
+	glm::vec2 pos; ///<Sprite's positionHint, stored as a vector.
 	bool Live; ///<User flag indicating if the sprite is in play.
 	int Counter; ///<General purpose counter.
 	float FloatCounter; ///<Floating point counter

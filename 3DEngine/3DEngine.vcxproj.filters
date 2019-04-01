@@ -356,14 +356,20 @@
     <ClCompile Include="..\src\utils\idContainer.cpp">
       <Filter>Header Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIlabel.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIstyleSheet.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\utils\log.cpp">
       <Filter>Header Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIlabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIposition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\GUIbutton.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -720,6 +726,12 @@
     </ClInclude>
     <ClInclude Include="..\src\utils\log.h">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIposition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIbutton.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

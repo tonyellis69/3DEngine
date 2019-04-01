@@ -3,6 +3,7 @@
 CLog  sysLog;
 CLog liveLog;
 
+
 CLog::CLog() : callbackObj(NULL) {
 	bootTime = system_clock::now();
 	timeOn = false;
@@ -43,5 +44,15 @@ CLog& operator<<(CLog& log, const TLogMsg& in) {
 		log.ss << std::put_time(ptm, "*** %A %B %d, %Y  time: %T ***") << "\n";
 
 	}
+	return log;
+}
+
+CLog& operator<<(CLog& log, const glm::vec3& in) {
+	log.ss << "x " << in.x << " y " << in.y << " z " << in.z;
+	return log;
+}
+
+CLog& operator<<(CLog& log, const glm::i32vec3& in) {
+	log.ss << "x " << in.x << " y " << in.y << " z " << in.z;
 	return log;
 }

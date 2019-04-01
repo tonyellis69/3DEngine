@@ -20,7 +20,7 @@ public:
 /** The basic data structure passed to the renderer for drawing tiles, sprites etc. It says 'this textured quad 
 	has this width and height, and uses this mapping. */
 //TO DO: since mapping is dependent on the texture, it should include a texture identifier too.
-//But if this is for *storing* rect data, it doesn't need to include the position at which it is drawn.
+//But if this is for *storing* rect data, it doesn't need to include the positionHint at which it is drawn.
 //That will tend to be calculated at runtime.
 class TRect  {
 public:

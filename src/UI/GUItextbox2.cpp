@@ -7,7 +7,6 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	setWidth(w);
 	setHeight(h);
 	renderOffset = i32vec2(2,0);
-	textBuf.setFont(defaultFont);
 	font = defaultFont;
 	cursorTextPos = 0;
 
@@ -21,7 +20,6 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 }
 
 void CGUItextbox2::setFont(CFont* newFont) {
-	textBuf.setFont(font);
 	font = newFont;
 }
 
@@ -33,7 +31,6 @@ void CGUItextbox2::setText( std::string newText) {
 
 void CGUItextbox2::setTextColour(float r, float g, float b, float a) {
 	textColour.r = r; textColour.g = g; textColour.b = b; textColour.a = a;
-	textBuf.setTextColour(textColour);
 }
 
 void CGUItextbox2::setTextColour(UIcolour  colour) {
@@ -126,7 +123,7 @@ void CGUItextbox2::moveCursor(int x, int y) {
 	calcCursorPosition();
 }
 
-/** Delete the character at the cursor position. */
+/** Delete the character at the cursor positionHint. */
 void CGUItextbox2::backSpace() {
 	if (cursorTextPos > 0) {
 		text.erase(cursorTextPos - 1, 1);
@@ -135,7 +132,7 @@ void CGUItextbox2::backSpace() {
 	}
 }
 
-/** Insert the given string at the cursor position. */
+/** Insert the given string at the cursor positionHint. */
 void CGUItextbox2::insert(std::string inText) {
 	text.insert(cursorTextPos, inText);
 	cursorTextPos++;
@@ -166,7 +163,8 @@ void CGUItextbox2::message(CGUIbase* sender, CMessage& msg) {
 void CGUItextbox2::renderText() {
 	textBuf.clearBuffer();
 	calcLineOffset();
-	textBuf.renderTextAt(renderOffset.x, renderOffset.y, text);
+	TLineFragDrawRec dataRec = { &text,font,textColour };
+	textBuf.renderTextAt(renderOffset.x, renderOffset.y, dataRec);
 	calcCursorPosition();
 }
 

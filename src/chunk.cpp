@@ -36,7 +36,7 @@ void Chunk::setOverlap(Tdirection overlap) {
 	overlapDir = overlap;
 }
 
-/** Set the position in a space where this chunk starts sampling volumetric data. */
+/** Set the positionHint in a space where this chunk starts sampling volumetric data. */
 void Chunk::setSamplePos(glm::vec3& pos) {
 	samplePos = pos;
 }

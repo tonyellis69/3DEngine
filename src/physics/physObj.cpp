@@ -33,7 +33,7 @@ void CPhysObj::applyVelocity() {
 	pModel->translate(velocity);
 }
 
-/** Integrate the object's position and velocity, over the given time. */
+/** Integrate the object's positionHint and velocity, over the given time. */
 void CPhysObj::integrate(float dT) {
 
 	//apply faux friction
@@ -42,7 +42,7 @@ void CPhysObj::integrate(float dT) {
 		velocity.z *= 0.9f;
 	}
 
-	//update position from velocity
+	//update positionHint from velocity
 	position += velocity * dT;
 
 	//update velocity from acceleration

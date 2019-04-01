@@ -15,12 +15,12 @@ void C3dObject::setPos(glm::vec3& pos) {
 	worldMatrix[3] = glm::vec4(pos,1);
 }
 
-/** Move relative to current position. */
+/** Move relative to current positionHint. */
 void C3dObject::translate(vec3& dir) {
 	worldMatrix[3] += vec4(dir,0); 
 }
 
-/** Return the object's position in world space. */
+/** Return the object's positionHint in world space. */
 glm::vec3 C3dObject::getPos() {
 	return glm::vec3(glm::column(worldMatrix,3));
 }

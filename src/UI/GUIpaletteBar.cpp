@@ -190,8 +190,8 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 	for (auto ctrl : controls) {
 		if (ctrl->type == uiPaletteTab && ctrl != tab) { //for each compared tab...
 			ctrlPos = ctrl->getLocalPos().x;
-			//if it lies between this tab and the proposed new position
-			//make the new position one less than the compared tab
+			//if it lies between this tab and the proposed new positionHint
+			//make the new positionHint one less than the compared tab
 			if (ctrlPos >= lowerPos && ctrlPos <= higherPos) {
 				newPos = ctrlPos - direction;
 				break;
@@ -209,7 +209,7 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 		tab->position = colourGradient.moveTab(tabOldPos, tabNewPos);
 	updatePalette();
 
-	//display position
+	//display positionHint
 	tabPosLbl->setText(std::to_string(tabNewPos));
 	tabPosLbl->setLocalPos(tab->getLocalPos().x + tabSize.x, tab->getLocalPos().y);
 	tabPosLbl->setVisible(true);
@@ -316,7 +316,7 @@ void CGUIpaletteBar::save() {
 
 }
 
-/** Indicate this index position graphically. */
+/** Indicate this index positionHint graphically. */
 void CGUIpaletteBar::setIndicatorPosition(int indexPos) {
 	indicator = indexPos;
 }

@@ -172,7 +172,7 @@ public:
 	float scSize;
 
 	std::vector<CSuperChunk*> faceGroup[6];
-	glm::i32vec3 resetState; ///<Tracks how close layer is to returning to its reset position.
+	glm::i32vec3 resetState; ///<Tracks how close layer is to returning to its reset positionHint.
 	float SCsampleStep;
 	float chunkSampleStep;
 	glm::vec3 nwSampleCorner;

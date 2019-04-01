@@ -8,7 +8,7 @@
 #include "rowObject.h"
 #include "GUIdragDrop.h"
 #include "GUIstyleSheet.h"
-
+#include  "GUIposition.h"
 #include <iostream> //for cerr
 
 #include "glm\glm.hpp"
@@ -86,18 +86,8 @@ const UIcolour UIlightGrey = {0.75f,0.75f,0.75f,1};// {0.86f,0.87f,0.87f,1};
 const UIcolour oldbackColour1 = {0.99f,0.99f, 0.99f,1.0f};
 const UIcolour oldbackColour2 = {0.75f, 0.75f, 0.75f,1.0f};
 
-//NEW colours (abandon the above)
-const glm::vec4 uiWhite = { 1,1,1,1 };
-const glm::vec4 uiBlue = { 0,0,0.7f,1 };
-const glm::vec4 uiBlack = { 0,0,0.0,1 };
-const glm::vec4 uialmostBlack = { 0.1,0.1,0.1,1 };
-//const glm::vec4 uiDarkGrey = { 0.25,0.25,0.25,1 };
-const glm::vec4 uiDarkGrey = { 0.49f,0.49f,0.49f,1 };
-const glm::vec4 uiLightGrey = { 0.75f,0.75f,0.75f,1 };
-const glm::vec4 uiVeryLightGrey = { 0.88f,0.88f,0.88f,1 };
+//NEW colours in stylesheet (abandon the above)
 
-const glm::vec4 uiOldbackColour1 = { 0.99f,0.99f, 0.99f,1.0f };
-const glm::vec4 uiOldbackColour2 = { 0.75f, 0.75f, 0.75f,1.0f };
 
 class CGUIbase;
 
@@ -126,7 +116,7 @@ public:
 //	DelegatePPPP<void,int,int,int,int> drawDottedRect;
 //	DelegatePP<void,float,float> setScale;
 
-	virtual void registerControl(CGUIbase& control) {};
+	//virtual void registerControl(CGUIbase& control) {};
 	virtual void deregisterControl(CGUIbase & control) {};
 	virtual void drawCtrlRect(CGUIbase& control) {};
 	virtual void drawCtrlBorder(CGUIbase& control) {};
@@ -169,6 +159,11 @@ public:
 	virtual ~CGUIbase(void);
 	CGUIbase* add(UItype ctrlType, std::string text);
 	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
+	virtual void resizeToFit() {}
+	virtual void position(CGUIbase* control);
+	glm::i32vec2& getSize();
+	void setLayout(CGUIlayout& layout);
+
 	bool IsOnControl(const CGUIbase& Control,const  int mouseX, const  int mouseY);
 	virtual void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	virtual void OnMouseMove(const  int mouseX, const  int mouseY, int key) {};
@@ -217,6 +212,7 @@ public:
 
 	void setBorderColour(const UIcolour & colour);
 	void setBorderColour(const glm::vec4& colour);
+	void setBorderColourFocusColour(const glm::vec4& colour);
 
 	void setBorderOn(bool onOff);
 
@@ -251,7 +247,7 @@ public:
 	static	CMessage Message; ///<Any UI messages are returned here.
 
 	
-	glm::i32vec2 localPos; ///<Top left corner position relative to parent;
+	glm::i32vec2 localPos; ///<Top left corner positionHint relative to parent;
 	
 
 	//UIcoord screenPos; ///<Top left in ui screen coordinates.
@@ -260,6 +256,8 @@ public:
 	UIcolour backColour2; ///<Second background colour of this control.
 	UIcolour foreColour1; ///<First foreground colour of this control;
 	UIcolour foreColour2; ///<Second foreground colour of this control;
+
+	glm::vec4 borderFocusColour;
 
 
 	std::vector<CGUIbase*> controls; ///<Child ui elements owned by this element, eg, the buttons on a panel.
@@ -322,6 +320,12 @@ public:
 
 	static CGUIdragDrop* dragDropObj;
 
+	glm::i32vec2 resizeMin; ///<Minimum size resizeToFit is allowed to go to.
+	glm::i32vec2 resizeMax; ///<Maximum size resizeToFit is allowed to go to.
+	CGUIposition positionHint; ///<How the control is to be positioned on its parent.
+	CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
+	glm::i32vec2 controlCursor; ///<Keeps track of where the next child control should go.
+
 };
 
 
@@ -350,7 +354,7 @@ enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiClickOutside, uiDataEntered, uiSpin, uiLostKeyboard,
 	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore,
-	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete
+	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete, uiMsgDragging
 };
 
 #define NONE -1

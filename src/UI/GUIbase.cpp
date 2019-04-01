@@ -9,6 +9,7 @@
 #include "GUIpopMenu.h"
 #include "GUIroot.h"
 #include "GUIlabel.h"
+#include "GUIbutton.h"
 
 // TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
 
@@ -60,8 +61,12 @@ CGUIbase::CGUIbase()  {
 	anchorLeft = false;
 	anchorTop = false;
 	setGUIcallback(this);
-	if (rootUI)
+	if (rootUI) {
 		setStyleSheet(rootUI->styleSheet);
+		controlCursor = glm::i32vec2(styleSheet->childSurround);
+
+	}
+	
 }
 
 CGUIbase::CGUIbase(int x, int y, int w, int h) : CGUIbase(){
@@ -103,15 +108,52 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 	CGUIbase* ctrl;
 	switch (ctrlType) {
 	case uiLabel: ctrl = new CGUIlabel(text); break;
-
+	case uiButton: ctrl = new CGUIbutton(text); break;
 
 	}
 
-	return nullptr;
+	//set position arbitarily for now
+	ctrl->setLocalPos(10, 10);
+	Add(ctrl);
+
+	return ctrl;
 }
 
 void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
 	this->styleSheet = styleSheet;
+	resizeMin = styleSheet->resizeMin;
+	resizeMax = styleSheet->resizeMax;
+}
+
+/**	Position the given child control according to its requirements and this control's own
+	situation. */
+void CGUIbase::position(CGUIbase * control) {
+	//control cursor points to the next free control space
+	control->setLocalPos(controlCursor.x, controlCursor.y);
+
+	//determine the local layout space in case control wants to be centred etc
+
+
+
+
+
+	if (control->positionHint.alignment == uiAlignCentred) {
+		glm::i32vec2 childCentre = control->getSize() / 2;
+		glm::i32vec2 parentCentre = getSize() / 2;
+		glm::i32vec2 newPos = parentCentre - childCentre;
+		control->setLocalPos(newPos.x, newPos.y);
+	}
+
+
+}
+
+glm::i32vec2& CGUIbase::getSize() {
+	return drawBox.size;
+}
+
+/** Set the layout style to use for placing subsequent controls. */
+void CGUIbase::setLayout(CGUIlayout & layout) {
+	currentLayoutStyle = layout;
 }
 
 
@@ -146,10 +188,12 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		return;
 	
 	//otherwise, recursively test message against this control's child controls
-	for (size_t i = 0; i < controls.size(); i++) {
+	//for (size_t i = 0; i < controls.size(); i++) {
+	//TO DO: reverse order is a bodge for z order, which I need to implement
+	for (int i = controls.size()-1; i >= 0; i--) {
 		if (IsOnControl(*controls[i], mouseX, mouseY)) {		
 			controls[i]->MouseMsg(Msg, mouseX, mouseY, key);
-			return;
+			return; //TO DO: should only return if MouseMsg returns this message as dealt with!
 		}
 	}
 	//Still here? Message is for this control
@@ -240,7 +284,7 @@ void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
 
 void CGUIbase::setLocalPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
-	//NB: wait until updateAppearance to update drawBox.pos, as it depends on position of parent control
+	//NB: wait until updateAppearance to update drawBox.pos, as it depends on positionHint of parent control
 	needsUpdate = true;
 }
 
@@ -265,7 +309,7 @@ void CGUIbase::Add(CGUIbase* child) {
 }
 
 
-/**	Handle any recent change to this control's size or position to ensure it draws correctly. 
+/**	Handle any recent change to this control's size or positionHint to ensure it draws correctly. 
 	Eg recalculate drawbox and clipbox.
 	This method Recursively calls itself on all child controls, which may now also need to update. */
 void CGUIbase::updateAppearance() {
@@ -278,8 +322,8 @@ void CGUIbase::updateAppearance() {
 		child->updateAppearance();
 }
 
-/** Recalculate position and size according to the current local position and size of this control, its 
-	positional adjustment settings (eg, anchoring), and the position and size of its parent.*/
+/** Recalculate positionHint and size according to the current local positionHint and size of this control, its 
+	positional adjustment settings (eg, anchoring), and the positionHint and size of its parent.*/
 void CGUIbase::recalculateDiminsions() {
 	guiRect origDimensions = { drawBox.pos.x,drawBox.pos.y,drawBox.size.x,drawBox.size.y };
 
@@ -366,7 +410,7 @@ void CGUIbase::recalculateClipbox() {
 	parentClipbox.width -= parent->borderWidth * 2; parentClipbox.height -= parent->borderWidth * 2;
 
 	Clipbox.width = getWidth(); //drawable width of this control
-	Clipbox.x = parent->drawBox.pos.x + getLocalPos().x; //screen x position where drawing of control starts
+	Clipbox.x = parent->drawBox.pos.x + getLocalPos().x; //screen x positionHint where drawing of control starts
 	if (Clipbox.x <parentClipbox.x) { //is it outside the clipbox of the parent control?
 		Clipbox.width -= (parentClipbox.x - Clipbox.x); //clip it to the parent clipbox start
 		Clipbox.x = parentClipbox.x;
@@ -582,7 +626,7 @@ void CGUIbase::onRMouseUp(const int mouseX, const int mouseY) {
 
 }
 
-/** Returns the position of this control in the child-list of its parent. */
+/** Returns the positionHint of this control in the child-list of its parent. */
 int CGUIbase::getControlNo() {
 	int x=0;
 	while (parent->controls[x] != this) {
@@ -651,6 +695,10 @@ void CGUIbase::setBorderColour(const UIcolour& colour) {
 
 void CGUIbase::setBorderColour(const glm::vec4& colour) {
 	borderColour = (UIcolour&)colour;
+}
+
+void CGUIbase::setBorderColourFocusColour(const glm::vec4 & colour) {
+	borderFocusColour = colour;
 }
 
 void CGUIbase::setBorderOn(bool onOff) {

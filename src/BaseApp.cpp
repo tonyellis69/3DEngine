@@ -222,7 +222,7 @@ void CBaseApp::AppTasks() {
 	win.getMousePos(mouseX, mouseY);
 	keyCheck(); //happens every frame, therefore responsive
 
-	//TO DO: mouseCheck, which calls user with last reported mouse position.
+	//TO DO: mouseCheck, which calls user with last reported mouse positionHint.
 	if (!Paused) {
 		//Engine.updateRegisteredSprites(dT);
 		Update();
@@ -429,6 +429,7 @@ void CBaseApp::initLogWindow() {
 	logWindow->setBorderOn(true);
 	logWindow->setFont(smallSysFont);
 	liveLog.setCallback(this);
+	logWindow->resizeMode = resizeNone;
 	//sysLog.setCallback(this);
 
 	GUIroot.Add(logWindow);

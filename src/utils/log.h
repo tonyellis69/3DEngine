@@ -9,6 +9,8 @@
 #include <ctime>
 #include <iomanip> 
 
+#include "glm/glm.hpp"
+
 using namespace std::chrono;
 
 class ILogCallback {
@@ -35,6 +37,8 @@ public:
 template <typename T>
 	friend CLog& operator<<(CLog& log, const T& in);
 	friend CLog& operator<<(CLog& log, const TLogMsg& in);
+	friend CLog& operator<<(CLog& log, const glm::vec3& in);
+	friend CLog& operator<<(CLog& log, const glm::i32vec3& in);
  
 	std::ofstream outFile;
 	ILogCallback * callbackObj;

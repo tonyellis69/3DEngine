@@ -76,7 +76,7 @@ void  CGUIpanelContainer::movePanel(unsigned int panel, unsigned int slot) {
 	assignPanelPositions();
 }
 
-/** Assign each panel a position on the surface based on its position in the surface's list of controls. */
+/** Assign each panel a positionHint on the surface based on its positionHint in the surface's list of controls. */
 void CGUIpanelContainer::assignPanelPositions() {
 	int x = 0; int y = 0;
 
@@ -118,7 +118,7 @@ void CGUIstackSurface::addPanel(CGUIpanel* panel) {
 	assignPanelPositions();
 }
 
-/** Assign each panel a position on the surface based on its position in the surface's list of controls. */
+/** Assign each panel a positionHint on the surface based on its positionHint in the surface's list of controls. */
 void CGUIstackSurface::assignPanelPositions() {
 	int x = 0; int y = 0;
 

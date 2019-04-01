@@ -8,7 +8,7 @@
 class CGUIlabel : public CGUIbase {
 public:
 	CGUIlabel(std::string& text);
-	CGUIlabel(int x, int y, int w, int h);
+	//CGUIlabel(int x, int y, int w, int h);
 	void setFont(CFont* font);
 	void setText(std::string newText);
 	void setTextColour(UIcolour colour);
@@ -28,7 +28,7 @@ public:
 	int getNextLineStart(int lineStart);
 
 	std::string& getText();
-
+	void resizeToFit();
 
 	CTextBuffer textBuf;
 	//std::string text;

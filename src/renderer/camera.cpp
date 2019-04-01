@@ -18,7 +18,7 @@ CCamera::CCamera(glm::vec3& pos) : C3dObject(pos) {
 }
 
 
-/** Aim camera at the given position.*/
+/** Aim camera at the given positionHint.*/
 void CCamera::lookAt(glm::vec3& target) {
 	target = glm::normalize(target);
 
@@ -46,7 +46,7 @@ void CCamera::setPos(glm::vec3& pos)  {
 }
 
 
-/** Create a transformation to clip space based on this camera's position, orientation and perspective.*/
+/** Create a transformation to clip space based on this camera's positionHint, orientation and perspective.*/
 void CCamera::createClipMatrix() {
 	camMatrix = glm::inverse(worldMatrix);
 	clipMatrix = perspectiveMatrix * camMatrix;

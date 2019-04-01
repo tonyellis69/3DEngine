@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GUIlabel2.h"
+#include "..\3DEngine\src\utils\log.h"
 
 enum TMouseWheelMode {scroll,hotText};
 
@@ -14,16 +15,17 @@ struct TCharacterPos {
 	int pos;
 };
 
-
+enum TTempText {tempNone,tempOn,tempOff };
 struct TRichTextRec : textRec {
 	TRichTextRec();
 	std::vector<int> newLines;
 	unsigned int hotId;
+	TTempText tmpText;
 };
 
 enum TNewLine {no, wordwrap, newline};
 enum TOverrunMode {overScrollMode, overResizeMode};
-enum TResizeMode {resizeByRatioMode, resizeByWidthMode };
+enum TResizeMode {resizeByRatioMode, resizeByWidthMode, resizeNone };
 
 /** A partial or complete line of text, with its rendered (x) dimensions. */
 struct TLineFragment {
@@ -36,7 +38,7 @@ struct TLineFragment {
 	bool finalFrag;
 };
 
-/** Records the position of a hot text fragment, for mouseover checks. */
+/** Records the positionHint of a hot text fragment, for mouseover checks. */
 struct THotTextFragment {
 	int renderStartX;
 	int renderStartY;
@@ -75,6 +77,7 @@ public:
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
 	void highlight(int textObj);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	void OnLMouseUp(const int mouseX, const int mouseY, int key);
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void unhighlight(int textObj);
 	//void removeHotText(int hotMsgId);
@@ -107,6 +110,14 @@ public:
 	//bool isActiveHotText(int hotId);
 
 	void setResizeMode(TResizeMode mode);
+
+	void setTempText(bool onOff);
+	void removeTempText();
+	void suspend(bool isOn);
+
+	void onDrag(const  int mouseX, const  int mouseY);
+	//void onDrop(const  int mouseX, const  int mouseY);
+
 
 	~CGUIrichText();
 
@@ -157,4 +168,8 @@ public:
 	bool noScrollMode; ///<If true, text above the top line is thrown away.
 
 	int insetX; ///<Little hack to enable left indent if > 0.
-};
+
+	CLog* transcriptLog; ///<If exists, send prerendered text here. 
+
+	bool suspended; ///<If true, suspend activity such as highlighting.
+	};

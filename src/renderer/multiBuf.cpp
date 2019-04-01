@@ -163,12 +163,12 @@ void CMultiBuf::deleteBlock(unsigned int id) {
 	//childBuf->objCount--;
 
 	//The problem is that we can't delete individual entries in the childbuf lists without invalidating the ids of the rest,
-	//as they're based on position.
+	//as they're based on positionHint.
 	//need to find the block on the block list, then recompile the relevant childbuf lists. One optimisation would be to set
 	//count to zero in the short term, and only recompile at a certain threshold.
 	//wait.we're still invalidating the ids of existing chunks if we recompile the lists.
 	//the id has to relate to the permanent, blocks list. But then how does the blocks list identify the parts of a childBuf
-	//it wants to erase? It will have to hold that childbuf index position and reset those when it recompiles
+	//it wants to erase? It will have to hold that childbuf index positionHint and reset those when it recompiles
 
 	//this will be less of an issue once we start re-using blocks
 

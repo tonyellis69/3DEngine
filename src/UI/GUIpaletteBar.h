@@ -67,7 +67,7 @@ public:
 	CGUIbutton2* saveButton;
 	CGUItextbox2* fileNameBox;
 
-	CGUIlabel2* tabPosLbl; //<Label showing index position of a dragged tab
+	CGUIlabel2* tabPosLbl; //<Label showing index positionHint of a dragged tab
 	int indicator;
 };
 
