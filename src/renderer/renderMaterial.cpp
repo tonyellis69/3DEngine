@@ -24,7 +24,8 @@ void CRenderMaterial::assign() {
 	pRenderer->setShader(shader);
 
 	if (currentShaderType == standardPhong) {
-		shader->setShaderValue(pRenderer->hColour,colour);
+		shader->setShaderValue(pRenderer->hMatDiffuse,colour);
+		shader->setShaderValue(pRenderer->hMatAmbient, colour);
 	}
 	
 	else if (currentShaderType == standardMultiTex) {

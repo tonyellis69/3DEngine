@@ -21,9 +21,6 @@
     <Filter Include="vm">
       <UniqueIdentifier>{0182bb3e-e9c5-4d69-aa75-cd0204fe3489}</UniqueIdentifier>
     </Filter>
-    <Filter Include="win">
-      <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="texGen">
       <UniqueIdentifier>{d613a150-3276-4d6b-a9f8-110f621a3eef}</UniqueIdentifier>
     </Filter>
@@ -35,6 +32,9 @@
     </Filter>
     <Filter Include="Header Files\utils">
       <UniqueIdentifier>{fc742f06-bc1e-46d4-a14e-c2059b7adfd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="texGen\win">
+      <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -273,7 +273,7 @@
       <Filter>vm</Filter>
     </ClCompile>
     <ClCompile Include="..\src\win\win.cpp">
-      <Filter>win</Filter>
+      <Filter>texGen\win</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUImenu.cpp">
       <Filter>Source Files</Filter>
@@ -370,6 +370,9 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIbutton.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\material2.cpp">
+      <Filter>Header Files\renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -632,7 +635,7 @@
       <Filter>vm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\win\win.h">
-      <Filter>win</Filter>
+      <Filter>texGen\win</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUImenu.h">
       <Filter>Header Files</Filter>
@@ -732,6 +735,9 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIbutton.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\material2.h">
+      <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

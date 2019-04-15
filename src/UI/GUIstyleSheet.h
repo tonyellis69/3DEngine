@@ -19,7 +19,8 @@ const glm::vec4 uiOldbackColour2 = { 0.75f, 0.75f, 0.75f,1.0f };
 class CGUIstyleSheet {
 public:
 	CGUIstyleSheet() : resizeMin(40, 10), resizeMax(200, 30),
-		childSurround(10),
+		controlBorder(10),
+		controlSpacing(10),
 		labelTextSurround(2),
 		buttonLabelSurround(4),
 		buttonPresets{ {60,24}, {80,28},
@@ -43,7 +44,8 @@ public:
 
 	std::vector<glm::i32vec2> buttonPresets; ///<Preset sizes for buttons.
 
-	int childSurround; ///<Spacing around child control and parent
+	int controlBorder; ///<Size of border surrounding child control area
+	int controlSpacing; ///<Space between one control and the next.
 	int labelTextSurround; ///<Spacing around label text
 	int buttonLabelSurround; ///<Spacing around a button's label
 

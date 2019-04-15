@@ -45,6 +45,18 @@ void CBuf::storeVertexes(vert3_t & verts, vert3_t & normals) {
 	storeVertexes(normVerts.data(), sizeof(vBuf::T3DnormVert) * nVerts, nVerts);
 }
 
+/**	Merge separate arrays of vertex data into this buf, including texture coordinates. */
+void CBuf::storeVertexes(vert3_t & verts, vert3_t & normals, vert2_t&  texCoords) {
+	std::vector<vBuf::T3DnormTexVert> normTexVerts;
+	int i = 0;
+	for (auto v : verts) {
+		normTexVerts.push_back({ v,normals[i],texCoords[i] });
+		i++;
+	}
+	unsigned int nVerts = normTexVerts.size();
+	storeVertexes(normTexVerts.data(), sizeof(vBuf::T3DnormTexVert) * nVerts, nVerts);
+}
+
 void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
 	unsigned int size; void* indicesPtr; unsigned short* shortBuf = NULL;
 	if (indexType == GL_UNSIGNED_SHORT) {

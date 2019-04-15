@@ -17,5 +17,5 @@ void CPlayerObj::updatePov() {
 void CPlayerObj::setPos(glm::vec3 & pos) {
 	C3dObject::setPos(pos);
 	updatePov();
-	pModel->setPos(getPos());
+	model.setPos(getPos());
 }

@@ -624,6 +624,22 @@ void CTerrain::updateVisibleSClist(glm::mat4& camMatrix) {
 
 /**	Draw all the chunks belonging to superchunks on the 'visible' list this frame. */
 void CTerrain::drawVisibleChunks() {
+	mat4 mvp = pRenderer->currentCamera->clipMatrix * chunkOrigin;
+
+	//draw chunks
+	pRenderer->setShader(pRenderer->phongShader);
+	pRenderer->phongShader->setShaderValue(pRenderer->hMVP, mvp);
+	pRenderer->phongShader->setShaderValue(pRenderer->hModel, mat4(1));
+	pRenderer->phongShader->setShaderValue(pRenderer->hView, pRenderer->currentCamera->camMatrix);
+	pRenderer->phongShader->setShaderValue(pRenderer->hLightPosition, pRenderer->defaultLightPos);
+
+	pRenderer->phongShader->setShaderValue(pRenderer->hLightSpecular, glm::vec4(1));
+	pRenderer->phongShader->setShaderValue(pRenderer->hLightDiffuse, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	pRenderer->phongShader->setShaderValue(pRenderer->hLightAmbient, glm::vec4(0.2f, 0.2f, 0.2f, 1));
+
+	pRenderer->attachTexture(0, pRenderer->texture1x1->handle);
+
+
 	CSuperChunk* sc;
 	int childBuf = -1;
 	int scListSize = visibleSClist.size();
@@ -632,7 +648,10 @@ void CTerrain::drawVisibleChunks() {
 		int clSize = sc->chunkList.size();
 		for (int chunkNo = 0; chunkNo < clSize; chunkNo++) {
 			Chunk* chunk = sc->chunkList[chunkNo];
-			chunkDrawShader->setShaderValue(pRenderer->hColour,chunk->drawDetails.colour);
+			chunkDrawShader->setShaderValue(pRenderer->hMatDiffuse,chunk->drawDetails.colour);
+			chunkDrawShader->setShaderValue(pRenderer->hMatAmbient, chunk->drawDetails.colour);
+			chunkDrawShader->setShaderValue(pRenderer->hMatSpecular, glm::vec4(0.0f, 0.0f, 0.0f, 1));
+			chunkDrawShader->setShaderValue(pRenderer->hMatShininess, 32.0f);
 			if (chunk->drawDetails.childBufNo == -1)
 				continue; //chunk not skinned yet - TO DO: find a better way to do this
 			pRenderer->drawMultiBufChildVerts(drawTris, multiBuf, chunk->drawDetails.childBufNo, chunk->drawDetails.vertStart, chunk->drawDetails.vertCount);

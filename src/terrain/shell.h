@@ -5,13 +5,7 @@
 #include "..\direction.h"
 #include "scArray.h"
 
-/** Stores the inner dimensions of a shell, ie, the innermost superchunk
-	layers before they are entirely replaced by the shell within, if any.*/
-struct TShellInnerBounds {
-	glm::i32vec3 bl;
-	glm::i32vec3 tr;
 
-};
 
 class CShellIterator;
 class COuterSCIterator;
@@ -21,7 +15,7 @@ class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
 	void playerAdvance(Tdirection direction);
-	void advance(Tdirection direction);
+	void handleInnerShellAdvance(Tdirection direction);
 	int getPlayerChunkExtent(Tdirection direction);
 	void fillEntire();
 	void initChunkExtent();
@@ -34,10 +28,14 @@ public:
 	CShellIterator& getIterator();
 	COuterSCIterator& getOuterSCiterator();
 	CFaceIterator& getFaceIterator(Tdirection face);
-	TShellInnerBounds& getInnerBounds();
-	void resampleFaceSCs(Tdirection face);
+	TBoxVolume& getInnerBounds();
+	void reinitialiseFaceSCs(Tdirection face);
 	void setSCchunkBoundaries();
 	void addChunksToFaceSCs(Tdirection direction);
+	void removeEncroachedOnChunks(Tdirection face);
+
+	glm::i32vec3& getNWchunkSpaceExtent();
+	glm::i32vec3& getSEchunkSpaceExtent();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -58,6 +56,8 @@ public:
 
 	CSCarry scArray;
 	float scSampleStep;
+
+	glm::vec4 shellColour; ///!!!!!!!!!!!temp!
 };
 
 
@@ -94,7 +94,7 @@ public:
 	COuterSCIterator & operator++();
 	COuterSCIterator operator++(int);
 private:
-	TShellInnerBounds innerBounds;
+	TBoxVolume innerBounds;
 };
 
 /** An iterator that only returns the outermost layer of SCs in the given direction. */

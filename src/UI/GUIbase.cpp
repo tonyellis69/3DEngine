@@ -63,7 +63,7 @@ CGUIbase::CGUIbase()  {
 	setGUIcallback(this);
 	if (rootUI) {
 		setStyleSheet(rootUI->styleSheet);
-		controlCursor = glm::i32vec2(styleSheet->childSurround);
+		controlCursor.rowCol = glm::i32vec2(styleSheet->controlBorder);
 
 	}
 	
@@ -115,6 +115,11 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 	//set position arbitarily for now
 	ctrl->setLocalPos(10, 10);
 	Add(ctrl);
+	positionLogical(ctrl);
+	glm::i32vec2 maxSize = layoutControlsCoarse();
+	//resize parent if required
+
+	//do fine layou
 
 	return ctrl;
 }
@@ -125,14 +130,48 @@ void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
 	resizeMax = styleSheet->resizeMax;
 }
 
+
+/** Set the given control's abstract position as a child control, as defined by its
+	requirements and by this, its parent control. */
+void CGUIbase::positionLogical(CGUIbase * control) {
+	control->positionHint.rowCol = controlCursor.rowCol;
+	control->positionHint.layoutstyle = controlCursor.currentLayoutStyle;
+	controlCursor.advance();
+}
+
+/** La yout all child controls based on their row/column positions,
+	ignoring alignment etc. */
+glm::i32vec2& CGUIbase::layoutControlsCoarse() {
+	glm::i32vec2 rowCol = glm::i32vec2(0);
+	glm::i32vec2 maxSize = glm::i32vec2(0);
+	glm::i32vec2 currentPos = glm::i32vec2(styleSheet->controlBorder);
+	int currentRowHeight = styleSheet->controlBorder; 
+	for (auto control : controls) {
+		control->setLocalPos(currentPos.x, currentPos.y);
+		currentRowHeight = max(currentRowHeight, currentPos.y + control->getSize().y);
+		if (control->positionHint.rowCol.x < control->positionHint.layoutstyle.cols - 1) {
+			currentPos.x += control->getSize().x;
+			maxSize.x = max(maxSize.x, currentPos.x);
+			currentPos.x += styleSheet->controlSpacing;
+		}
+		else {
+			currentPos = glm::i32vec2(styleSheet->controlBorder, currentRowHeight + styleSheet->controlSpacing);
+		}
+	}
+	maxSize = glm::i32vec2(maxSize.x, currentRowHeight) + glm::i32vec2(styleSheet->controlBorder);
+	return maxSize;
+}
+
+
 /**	Position the given child control according to its requirements and this control's own
 	situation. */
 void CGUIbase::position(CGUIbase * control) {
 	//control cursor points to the next free control space
-	control->setLocalPos(controlCursor.x, controlCursor.y);
+	//control->setLocalPos(controlCursor.pos.x, controlCursor.pos.y);
 
-	//determine the local layout space in case control wants to be centred etc
-
+	//determine the local layout space in case control wants to be centred etc in it
+	//get the layout style from currentLayoutStyle
+	//find the "working space" - the area we have to work within
 
 
 

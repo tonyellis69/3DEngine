@@ -1,6 +1,7 @@
 #pragma once
 #include "renderer\3dobject.h"
 #include "renderer\model.h"
+#include "renderer\model2.h"
 #include "renderer\camera.h"
 
 //TO DO: rather than C3dObject, create a 3d subclass that can carry
@@ -17,6 +18,6 @@ public:
 	float height;
 	glm::vec3 eyeOffset;
 
-	CModel* pModel;
+	CModel2 model;
 	CCamera povCam;
 };

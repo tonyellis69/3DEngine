@@ -159,6 +159,8 @@ public:
 	virtual ~CGUIbase(void);
 	CGUIbase* add(UItype ctrlType, std::string text);
 	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
+	void positionLogical(CGUIbase * control);
+	glm::i32vec2& layoutControlsCoarse();
 	virtual void resizeToFit() {}
 	virtual void position(CGUIbase* control);
 	glm::i32vec2& getSize();
@@ -324,13 +326,28 @@ public:
 	glm::i32vec2 resizeMax; ///<Maximum size resizeToFit is allowed to go to.
 	CGUIposition positionHint; ///<How the control is to be positioned on its parent.
 	CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
-	glm::i32vec2 controlCursor; ///<Keeps track of where the next child control should go.
+
+	typedef struct {
+		void advance() {
+			rowCol.x++;
+			if (rowCol.x >= currentLayoutStyle.cols) {
+				rowCol.x = 0;
+				rowCol.y++;
+			}
+		}
+		CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
+		glm::i32vec2 rowCol;
+	} TControlCursor;
+	TControlCursor controlCursor; ///<Keeps track of where the next child control should go.
 
 };
 
+/** Records/
+class CControlCursor {
+public:
 
-
-
+};
+*/
 
 
 enum TTextAlign {tleft, tcentred, tright};

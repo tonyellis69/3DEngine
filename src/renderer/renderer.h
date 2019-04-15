@@ -7,7 +7,9 @@
 
 //#include "..\soil.h"
 
-
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>         // Output data structure
+#include <assimp/postprocess.h>     // Post processing flags
 
 
 #include "camera.h"
@@ -156,11 +158,18 @@ public:
 
 	//TO DO: phongshader handles, hopefully temp
 	GLuint hNormalModelToCameraMatrix;
-	GLuint hLightDirection;
-	GLuint hLightIntensity;
-	GLuint hAmbientLight;
-	GLuint hColour;
+	GLuint hLightPosition;
+	GLuint hLightSpecular;
+	GLuint hLightDiffuse;
+	GLuint hLightAmbient;
+	GLuint hMatDiffuse;
+	GLuint hMatAmbient;
+	GLuint hMatSpecular;
+	GLuint hMatShininess;
+	GLuint hSample;
 	GLuint hMVP;
+	GLuint hModel;
+	GLuint hView;
 
 	//texture shader, hopefully temp
 	GLuint hTexTexture;
@@ -203,6 +212,12 @@ public:
 
 	bool initialised;
 
+	Assimp::Importer importer;
+
+	glm::vec3 defaultLightPos;
+	glm::vec3 defaultLightDir; //TO DO: scrap. Default light is not a spotlight!
+
+	CRenderTexture* texture1x1; ///<1x1 white texture, useful as a default.
 private:
 
 	GLenum DrawBuffers[1];
@@ -222,6 +237,7 @@ private:
 	std::vector<CBuf*> bufferList; ///<Kill list of renderer-created buffers.
 
 	std::vector<CCamera*> cameraList; ///<Tracks renderer-created cameras.
+
 
 };
 

@@ -45,6 +45,7 @@
     <OutDir>$(SolutionDir)lib\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)-d.lib</TargetName>
+    <IncludePath>D:\projects\assimp-4.0.1\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
@@ -65,7 +66,7 @@
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-d.lib</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions> /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
@@ -124,6 +125,7 @@
     <ClCompile Include="..\src\renderer\fontManager.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
     <ClCompile Include="..\src\renderer\material.cpp" />
+    <ClCompile Include="..\src\renderer\material2.cpp" />
     <ClCompile Include="..\src\renderer\mesh.cpp" />
     <ClCompile Include="..\src\renderer\model.cpp" />
     <ClCompile Include="..\src\renderer\model2 .cpp" />
@@ -242,6 +244,7 @@
     <ClInclude Include="..\src\renderer\fontManager.h" />
     <ClInclude Include="..\src\renderer\light.h" />
     <ClInclude Include="..\src\renderer\material.h" />
+    <ClInclude Include="..\src\renderer\material2.h" />
     <ClInclude Include="..\src\renderer\mesh.h" />
     <ClInclude Include="..\src\renderer\model.h" />
     <ClInclude Include="..\src\renderer\model2.h" />

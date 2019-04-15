@@ -3,6 +3,8 @@
 #include "3dobject.h"
 #include "mesh.h"
 #include "buf.h"
+#include "material2.h"
+#include "renderTexture.h"
 
 class CModel2;
 typedef void(*callbackFunctionPtr)(void*, CModel2*);
@@ -17,11 +19,12 @@ public:
 	void draw();
 	void scale(glm::vec3& scaleVec);
 	void orientateWorldMatrix();
+	void setTexture(CRenderTexture* texture);
 
-	CMesh<glm::vec3> mesh;
-	CBuf buffer;
-	glm::vec4 colour;
+	CMesh<glm::vec3> mesh; ///<Stores the verts locally.
+	CBuf buffer; ///<Stores the verts in graphics memory.
 
+	CMaterial2 material; ///TO DO: should this be a pointer to a material instead?
 	glm::vec3 scaleVec;
 
 private:

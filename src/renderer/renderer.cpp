@@ -129,6 +129,14 @@ void CRenderer::init() {
 
 	defaultCamera = createCamera(glm::vec3(0, 2, 4));
 	setCurrentCamera(defaultCamera);
+
+	//dummyTexture.resize(1, 1);
+	//dummyTexture.setPixelData(&glm::vec4(1));
+	static CRenderTexture dummyTexture;
+	dummyTexture.resize(1, 1);
+	unsigned char one[] = { 0,0,0,0 };
+	dummyTexture.setPixelData(&one);
+	texture1x1 = &dummyTexture;
 }
 
 
@@ -769,30 +777,51 @@ void CRenderer::createStandardPhongShader() {
 
 	setShader(phongShader);
 	hNormalModelToCameraMatrix = phongShader->getUniformHandle("normalModelToCameraMatrix");
-	hLightDirection = phongShader->getUniformHandle("lightDirection");
-	hLightIntensity = phongShader->getUniformHandle("lightIntensity");
-	hAmbientLight = phongShader->getUniformHandle("ambientLight");
-	hColour = phongShader->getUniformHandle("colour");
+	hLightPosition = phongShader->getUniformHandle("light.position");
+	hLightSpecular = phongShader->getUniformHandle("light.specular");
+	hLightDiffuse = phongShader->getUniformHandle("light.diffuse");
+	hLightAmbient = phongShader->getUniformHandle("light.ambient");
+	hMatDiffuse = phongShader->getUniformHandle("material.diffuse");
+	hMatAmbient = phongShader->getUniformHandle("material.ambient");
+	hMatSpecular = phongShader->getUniformHandle("material.specular");
+	hMatShininess = phongShader->getUniformHandle("material.shininess");
+	hSample = phongShader->getUniformHandle("sample");
 	hMVP = phongShader->getUniformHandle("mvpMatrix");
+	hModel = phongShader->getUniformHandle("model");;
+	hView = phongShader->getUniformHandle("view");;
 
-	phongShader->setShaderValue(hLightDirection,glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
-	phongShader->setShaderValue(hLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
-	phongShader->setShaderValue(hAmbientLight, glm::vec4(0.2f, 0.2f, 0.2f, 1));
-	phongShader->setShaderValue(hColour, glm::vec4(1));
-
-	//modify to accept list of feedback vars
+	//some default settings
+	phongShader->setShaderValue(hLightSpecular, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	phongShader->setShaderValue(hLightDiffuse, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	phongShader->setShaderValue(hLightAmbient, glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	phongShader->setShaderValue(hLightPosition, defaultLightPos);
+	phongShader->setShaderValue(hMatShininess, 32.0f);
+	phongShader->setShaderValue(hMatDiffuse, glm::vec4(1));
+	phongShader->setShaderValue(hMatAmbient, glm::vec4(1));
+	phongShader->setShaderValue(hMatSpecular, glm::vec4(0.5f, 0.5f, 0.5f, 1));
 }
 
+//The default phong shader draw. *//
  void CRenderer::phongDrawCallout(void* callee, CModel2* model) {
 	 CRenderer* pThis = &CRenderer::getInstance();
 	 pThis->setShader(pThis->phongShader);
-	 pThis->phongShader->setShaderValue(pThis->hLightDirection, glm::normalize(glm::vec3(0.866f, 0.9f, 0.5f)));
-	 pThis->phongShader->setShaderValue(pThis->hLightIntensity, glm::vec4(0.8f, 0.8f, 0.8f, 1));
-	 pThis->phongShader->setShaderValue(pThis->hAmbientLight, glm::vec4(0.2f, 0.2f, 0.2f, 1));
-	 pThis->phongShader->setShaderValue(pThis->hColour, model->colour);
-	 pThis->phongShader->setShaderValue(pThis->hNormalModelToCameraMatrix, pThis->currentCamera->clipMatrix);
+	 pThis->phongShader->setShaderValue(pThis->hLightPosition, pThis->defaultLightPos);
+	 pThis->phongShader->setShaderValue(pThis->hLightSpecular, glm::vec4(0.8f, 0.8f, 0.8f, 1));
+	 pThis->phongShader->setShaderValue(pThis->hLightDiffuse, glm::vec4(0.5f, 0.5f, 0.5f, 1));
+	 pThis->phongShader->setShaderValue(pThis->hLightAmbient, glm::vec4(0.2f, 0.2f, 0.2f, 1));
+	 pThis->phongShader->setShaderValue(pThis->hMatDiffuse, model->material.diffuse);
+	 pThis->phongShader->setShaderValue(pThis->hMatAmbient, model->material.ambient);
+	pThis-> phongShader->setShaderValue(pThis->hMatSpecular, model->material.specular);
+	 pThis->phongShader->setShaderValue(pThis->hMatShininess, model->material.shininess);
+
+
+	 pThis->attachTexture(0, model->material.texture1->handle);
+	 pThis->phongShader->setShaderValue(pThis->hSample, 0);
 	 pThis->phongShader->setShaderValue(pThis->hMVP, pThis->currentCamera->clipMatrix * model->worldMatrix);
+	 pThis->phongShader->setShaderValue(pThis->hModel, model->worldMatrix);
+	 pThis->phongShader->setShaderValue(pThis->hView, pThis->currentCamera->camMatrix);
 	 pThis->drawBuf(model->buffer, drawTris);
+	 pThis->attachTexture(0, 0);
 }
 
 void CRenderer::createStandardTexShader() {

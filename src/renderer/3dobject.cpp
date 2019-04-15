@@ -15,7 +15,7 @@ void C3dObject::setPos(glm::vec3& pos) {
 	worldMatrix[3] = glm::vec4(pos,1);
 }
 
-/** Move relative to current positionHint. */
+/** Move relative to current position. */
 void C3dObject::translate(vec3& dir) {
 	worldMatrix[3] += vec4(dir,0); 
 }

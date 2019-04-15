@@ -281,32 +281,15 @@ unsigned int CEngine::attachShaders() {
 	//return camera;
 //}
 
-/** Create a cube model. */
-CModel* CEngine::createCube(glm::vec3& pos,glm::vec3& size) {
-	//TO DO: one day, this should move to a separate class: createShape. But this means passing
-	//the model list to some other class too, yet to be created. Something like a scene manager.
-	CModel* cube = createModel();
-	cube->setPos(pos);
 
-	cube->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
-
-	std::vector<glm::vec3> verts, normals; std::vector<unsigned int> index;
-	shape::cube(&verts, &normals, &index);
-	shape::scale(verts, size);
-
-	cube->getBuffer()->storeVertexes(verts, normals);
-	cube->getBuffer()->storeIndex(index.data(), index.size());
-	cube->getBuffer()->storeLayout(3, 3, 0, 0);
-
-	return cube;
-}
 
 /** Draw all the models on the model list. */
 void CEngine::drawModels() {
 	//setStandard3dShader();
 
 	for (size_t m=0;m<modelDrawList.size();m++) {
-		drawModelDefaultShader(*modelDrawList[m]);
+		//drawModelDefaultShader(*modelDrawList[m]);
+		modelDrawList[m]->draw();
 	}
 	Renderer.setShader(0); //for legacy compatibility
 }
@@ -315,6 +298,10 @@ void CEngine::drawModelDefaultShader(CModel& model) {
 	Renderer.setShader(Renderer.phongShader);
 	glm::mat4 mvp = Renderer.currentCamera->clipMatrix * model.worldMatrix;
 	Renderer.phongShader->setShaderValue(Renderer.hMVP,mvp);
+	Renderer.phongShader->setShaderValue(Renderer.hModel, model.worldMatrix);
+	Renderer.phongShader->setShaderValue(Renderer.hView, Renderer.currentCamera->camMatrix);
+	Renderer.phongShader->setShaderValue(Renderer.hLightPosition, Renderer.defaultLightPos);
+
 
 	glm::mat3 normMatrix(model.worldMatrix); //converting 4m to m3. TO DO: inefficient?
 
@@ -341,66 +328,6 @@ unsigned int CEngine::getShaderDataHandle(std::string varName) {
 
 
 
-CModel* CEngine::createCylinder(glm::vec3& pos,float r, float h, int s){
-	float step = 360.0f/s;
-
-	const int noVerts = (s * 4) + 2;
-	const int topDisc = 0; const int botDisc = s;const int top = s*2;
-	const int bot = s*3; const int topCent = s*4; const int botCent = topCent+1;
-	vBuf::T3DnormVert* v = new vBuf::T3DnormVert[noVerts];
-	//rotate through the segments, and create 4 rings of vertices:
-	//top, where all the norms point up, base where they all point down,
-	//and 2 for the body where they point out,
-	//then create indexes 
-	float angle = 0; float rangle = 0;
-	for (int seg=0;seg < s;seg++) {
-		rangle = glm::radians(angle);
-		v[topDisc+seg].v = glm::vec3(sin(rangle)*r,h,cos(rangle)*r);
-		v[topDisc+seg].normal = glm::vec3(0,1,0);
-		v[botDisc+seg].v = glm::vec3(sin(rangle)*r,0,cos(rangle)*r);
-		v[botDisc+seg].normal = glm::vec3(0,-1,0);
-		v[top+seg].v = glm::vec3(sin(rangle)*r,h,cos(rangle)*r);
-		v[top+seg].normal = glm::vec3(sin(rangle),0,cos(rangle));
-		v[bot+seg].v = glm::vec3(sin(rangle)*r,0,cos(rangle)*r);
-		v[bot+seg].normal = glm::vec3(sin(rangle),0,cos(rangle));
-		angle += step;
-	}
-	v[topCent].v = glm::vec3(0,h,0); v[topCent].normal = glm::vec3(0,1,0);
-	v[botCent].v = glm::vec3(0,0,0); v[botCent].normal = glm::vec3(0,-1,0);
-
-
-	const int noTriangles = s*4;
-	unsigned int* index = new unsigned int[noTriangles * 3];
-	int i = 0;
-	const int finalSeg = s-1;
-	for (int seg=0;seg < finalSeg;seg++) {
-		index[i++] = topDisc+seg;index[i++] = topDisc+seg+1;index[i++] = topCent;
-		index[i++] = botDisc+seg;index[i++] = botCent;index[i++] = botDisc+seg+1;
-		index[i++] = bot+seg; index[i++] =  bot+seg+1; index[i++] = top+seg+1;
-		index[i++] = top+seg+1; index[i++] =  top+seg; index[i++] = bot+seg;
-	}
-	
-	index[i++] = topDisc+finalSeg;index[i++] = topDisc;index[i++] = topCent;
-	index[i++] = botDisc+finalSeg;index[i++] = botCent;index[i++] = botDisc;
-	index[i++] = bot+finalSeg; index[i++] =  bot; index[i++] = top;
-	index[i++] = top; index[i++] =  top+finalSeg; index[i++] = bot+finalSeg;
-
-	CModel* cylinder = createModel();
-	cylinder->setPos(pos);
-	cylinder->getMaterial()->setColour(glm::vec4(col::randHue(), 1));
-
-
-
-	cylinder->storeVertexes(v, sizeof(vBuf::T3DnormVert) , noVerts);
-	cylinder->storeIndex(index, i);
-	cylinder->storeLayout(3, 3,0, 0);
-
-	delete[] v;
-	delete[] index;
-//	modelList.push_back(cylinder);
-	modelDrawList.push_back(cylinder);
-	return cylinder;
-}
 
 CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	float ringStep = 360.0f / steps;

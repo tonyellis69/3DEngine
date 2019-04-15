@@ -84,7 +84,7 @@ int CTextBuffer::addFragment(int x, int y, TLineFragDrawRec& drawData) {
 	for (unsigned int c = 0; c < numChars; c++) { 
 		if (text[c]  != '\n')
 		{
-			glyph = drawData.font->table[text[c]];
+			glyph = drawData.font->table[(unsigned char) text[c]];
 			//construct quads
 			textQuads[v].v = blCorner; //A
 			textQuads[v + 1].v = blCorner + glm::vec2(glyph->width, 0.0f); //B

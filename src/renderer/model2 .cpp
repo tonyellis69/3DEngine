@@ -10,7 +10,11 @@ using namespace glm;
 CModel2::CModel2() {
 	CRenderer* pRenderer = &CRenderer::getInstance();
 	setDrawCallout(pRenderer->phongDrawCallout, pRenderer);
-	colour = vec4(col::randHue(),1.0f);
+	material.diffuse = vec4(col::randHue(),1.0f);
+	material.ambient = material.diffuse;
+	material.specular = vec4(1);
+	material.texture1 = pRenderer->texture1x1;
+
 	scaleVec= vec3(1);
 }
 
@@ -28,18 +32,28 @@ void CModel2::loadMesh(CMesh<glm::vec3> & newMesh) {
 
 /** Upload the mesh data to a graphics hardware buffer. */
 void CModel2::bufferMesh() {
-	//TO DO: vary upload with mesh type
-	buffer.storeVertexes(mesh.vertices, mesh.normals);
+	if (mesh.texCoords.empty()) {
+		buffer.storeVertexes(mesh.vertices, mesh.normals);
+		buffer.storeIndex(mesh.indices.data(), mesh.indices.size());
+		buffer.storeLayout(3, 3, 0, 0);
+		return;
+	}
+
+	buffer.storeVertexes(mesh.vertices, mesh.normals,mesh.texCoords);
 	buffer.storeIndex(mesh.indices.data(), mesh.indices.size());
-	buffer.storeLayout(3, 3, 0, 0);
+	buffer.storeLayout(3, 3, 2, 0);
+
 }
 
 void CModel2::draw() {
 	drawCallback(drawCallee, this);
+	//material.draw();
+	//TO DO: do I want material to own the 
 }
 
 void CModel2::scale(glm::vec3 & scaleVec) {
 	this->scaleVec = scaleVec;
+	orientateWorldMatrix();
 }
 
 /** Update world matrix with current orientation. */
@@ -57,5 +71,9 @@ void CModel2::orientateWorldMatrix() {
 	mat4 scaleM = glm::scale(mat4(1), scaleVec);
 	worldMatrix = transM * rotationMatrix * scaleM;
 
+}
+
+void CModel2::setTexture(CRenderTexture * texture) {
+	material.texture1 = texture;
 }
 

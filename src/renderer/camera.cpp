@@ -46,7 +46,7 @@ void CCamera::setPos(glm::vec3& pos)  {
 }
 
 
-/** Create a transformation to clip space based on this camera's positionHint, orientation and perspective.*/
+/** Create a transformation to clip space based on this camera's position, orientation and perspective.*/
 void CCamera::createClipMatrix() {
 	camMatrix = glm::inverse(worldMatrix);
 	clipMatrix = perspectiveMatrix * camMatrix;

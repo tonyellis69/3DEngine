@@ -350,13 +350,14 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
 	for (c = textStartPos; c < richTextData->text.size(); c++) {
-		renderX += currentFont->table[richTextData->text[c]]->width;
+		unsigned char character = (unsigned char)richTextData->text[c];
+		renderX += currentFont->table[character]->width;
 		if (richTextData->text[c] == '\n') {
 			c++;
 			nextLineFrag.causesNewLine = newline;
 			break;
 		}
-		if (isspace(richTextData->text[c]) || richTextData->text[c] == '-') {
+		if (isspace(character) || character == '-') {
 			breakPoint = c + 1;
 			breakPointX = renderX;
 			//break; //pretty sure this works without break as long as we go to next clause

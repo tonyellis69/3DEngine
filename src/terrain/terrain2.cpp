@@ -80,7 +80,18 @@ void CTerrain2::fillShells() {
 
 		shell.initChunkExtent();
 		shell.fillEntire();
+
+		//TO DO: this is adding chunks then removing them again! Find a more 
+		//elegant way to do this!
+		//maybe pass inner shell's getNWchunkSpaceExtent etc result to createAllChunks
+		//via findAllSCchunks
+		if (shell.shellNo > 0) {
+			for (int dir = north; dir <= down; dir++)
+				shell.removeEncroachedOnChunks((Tdirection)dir);
+		}
 	}
+
+
 }
 
 /** Move the enclosing shells of this shell one SC length in the given direction. This is called to keep the outer terrain 
@@ -121,8 +132,9 @@ void CTerrain2::setCallbackApp(ITerrainCallback * pApp) {
 	pCallbackApp = pApp;
 }
 
-TShellInnerBounds & CTerrain2::getInnerBounds(unsigned int shellNo) {
-	TShellInnerBounds innerBounds = { i32vec3(0),i32vec3(0) };
+/** TO DO: pretty sure this only has to be calculated once per shell. */
+TBoxVolume & CTerrain2::getInnerBounds(unsigned int shellNo) {
+	TBoxVolume innerBounds = { i32vec3(0),i32vec3(0) };
 	if (shellNo == 0)
 		return innerBounds;
 

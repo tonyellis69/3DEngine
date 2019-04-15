@@ -13,12 +13,14 @@ typedef struct {
 
 
 using  vert3_t = std::vector<glm::vec3>;
+using  vert2_t = std::vector<glm::vec2>;
 class CBaseBuf {	
 	
 public:
 	CBaseBuf();
 	virtual void storeVertexes(void* verts, unsigned int size, unsigned int nVerts) {};
 	virtual void storeVertexes(vert3_t& verts, vert3_t& normals) {};
+	virtual void storeVertexes(vert3_t& verts, vert3_t& normals, vert2_t& texCoords) {};
 	virtual void storeIndex(unsigned int * indices, unsigned int nIndices) {};
 	virtual void setSize(unsigned int size) {};
 	virtual void reduceReportedSize(unsigned int size) {};

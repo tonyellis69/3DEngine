@@ -36,7 +36,7 @@ CLog& operator<<(CLog& log, const TLogMsg& in) {
 		log.timeOn = true;
 	if (in == timerOffMsg)
 		log.timeOn = false;
-	if (in == alertMsg)
+	if (in == alertMsg && log.callbackObj != NULL)
 		log.callbackObj->logAlertCallback();
 	if (in == startMsg) {
 		time_t tt = system_clock::to_time_t(system_clock::now());

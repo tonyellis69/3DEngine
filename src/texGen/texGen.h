@@ -548,6 +548,10 @@ public:
 	void write(std::ofstream & out);
 	void read(std::ifstream& in);
 
+	glm::vec2 getStartPoint();
+	glm::vec2 getEndPoint();
+
+
 
 	std::vector<float> grid;
 	int gridSize;
@@ -564,4 +568,7 @@ public:
 	glm::i32vec2 startPoint, endPoint;
 	std::vector<glm::i32vec2> features;
 
+	int margin;
+	float startOffset;
+	float endOffset;
 };

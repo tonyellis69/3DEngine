@@ -44,6 +44,12 @@ struct T3DnormVert {
 	glm::vec3 normal;
 };
 
+struct T3DnormTexVert {
+	glm::vec3 v;
+	glm::vec3 normal;
+	glm::vec2 tex;
+};
+
 struct T3DtexVert {
 	glm::vec3 v;
 	glm::vec2 tex;

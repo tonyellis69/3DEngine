@@ -5,6 +5,14 @@
 
 #include "..\3DEngine\src\direction.h"
 
+/** Stores the inner dimensions of a shell, eg, the innermost superchunk
+	layers before they are entirely replaced by the shell within, if any.*/
+struct TBoxVolume {
+	glm::i32vec3 bl;
+	glm::i32vec3 tr;
+
+};
+
 class ITerrainCallback {
 public:
 	virtual bool scIntersectionCheckCallback(glm::vec3& pos, float scSize) { return false; };
@@ -23,7 +31,11 @@ public:
 	void createAllChunks();
 	void createChunk(glm::i32vec3& index);
 
-	void addFaceChunks(Tdirection face);
+	void addFaceChunks(Tdirection face); 
+
+	void clearChunks();
+
+	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
 
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp

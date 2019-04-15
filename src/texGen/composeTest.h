@@ -67,6 +67,8 @@ public:
 
 	void saveCurrentTexGenPNG(std::string filename);
 
+	glm::i32vec2 getStartPoint();
+	glm::i32vec2 getEndPoint();
 
 //	int octaves;
 //	float frequency;

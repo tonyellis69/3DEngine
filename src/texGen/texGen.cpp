@@ -822,6 +822,11 @@ CTerrainTex::CTerrainTex() : CTexGen(texTerrain) {
 	showDetails = true;
 	featureCount = 4; featureSize = 0.85f;
 	randomSeed = 42;
+
+	margin = 2;
+	startOffset = 0.02;
+	endOffset = 0.8;// 0.98;
+
 }
 
 void CTerrainTex::loadShader() {
@@ -875,6 +880,10 @@ void CTerrainTex::placeStartEnd() {
 	endPoint[axis] = (startPoint[axis] +  (gridSize/2)) % gridSize;         //gridWidth(eng);
 	endPoint[1 -axis] = side ? gridSize - 1 : 0;
 
+	//float 
+	endPoint = i32vec2((gridSize-1) *  endOffset);
+	startPoint = i32vec2((gridSize) * startOffset);
+
 	//endPoint = i32vec2(2, 0);
 	//startPoint = i32vec2(2, gridSize-1);
 
@@ -911,7 +920,8 @@ void CTerrainTex::plotShortestPath() {
 	std::map<int, float> weights;
 	float maxWeight = 0;
 
-	//create the open list set
+	//create the 'open list' - nodes whose neighbourhood we want to explore, ordered by 
+	//how easy they are to get to from the start point
 	typedef std::pair<float, int> TNode; //first: cell id, second: cost
 	std::priority_queue<TNode, vector<TNode>, greater<TNode>> openList;
 	std::map<int, float> distSoFar;
@@ -923,58 +933,50 @@ void CTerrainTex::plotShortestPath() {
 	float greatestDistance = 0;
 	float gridDiagonal = length(vec2(gridSize));
 
-	//while the unexplored set isn't empty... 
-
+	//while the set of nodes to explore isn't empty... 
 	while (!openList.empty()) {
-
 		//remove the node with the smallest distance from the open list and make it current
 		auto it = openList.top();
 		int currentNode = it.second;
 		openList.pop();
 
-
 		//is it the end point? break
 		if (!showDetails && currentNode == endPoint.x + endPoint.y * gridSize)
 			 break;
 
-
-
 		//for each neighbour...
 		i32vec2 neighbours[4] = { {0,-1},{1,0},{0,1},{-1,0} };
-		//std::random_shuffle(std::begin(neighbours), std::end(neighbours));
 		for (int n = 0; n < 4; n++) {
 			i32vec2 neighbour = i32vec2(currentNode % gridSize, currentNode / gridSize)
 				+ neighbours[n];
 			int neighbourIndex = neighbour.x + neighbour.y * gridSize;
-			if (neighbour.x >= 0 && neighbour.x < gridSize && neighbour.y >= 0 && neighbour.y < gridSize
-				/*&& grid[neighbourIndex] >= 0 */) {
+			if (neighbour.x >= margin && neighbour.x < gridSize-margin && neighbour.y >= margin && neighbour.y < gridSize-margin) {
 
+				//find the greatest repulsion this neighbour suffers from nearby features, if any
 				float repulsion = 0.0f;
 				for (auto feature : features) {
-					//repulsion = 0.0f;
 					float featureDist = glm::distance(vec2(feature), vec2(neighbour)) / gridDiagonal; //max = 1
 					float featureProximity = 1.0f - featureDist; //close = 1
 					if (featureProximity < featureSize)
-						featureProximity = 0.0f;
-
+						featureProximity = 0.0f; //neighbour is outside feature area of effect
 					repulsion = std::max(featureProximity, repulsion);
 				}
 				repulsion *= 0.25;
-				//repulsion = 0;
-				//find f, g and h values
-				float distanceToNeighbour = distSoFar[currentNode];//  +repulsion;
-				float heuristic = glm::distance(vec2(endPoint), vec2(neighbour)) / gridDiagonal; //abs(neighbour.x - endPoint.x) + abs(neighbour.y - endPoint.y);// glm::distance(vec2(endPoint), vec2(neighbour));
-				//heuristic = 0;
-				heuristic += repulsion;
-				heuristic += rnd(eng);
-				//heuristic *= 0.5;;
 
+				//find the heuristic cost of this neighbour, based on its distance to the endpoint
+				float heuristic = glm::distance(vec2(endPoint), vec2(neighbour)) / gridDiagonal; 
+				heuristic += repulsion; //weighted by nearness to any feature
+				heuristic += rnd(eng); //and a random jiggle
 
-				float newDistance = distanceToNeighbour + heuristic;
+				float distanceToNeighbour = distSoFar[currentNode];
+				float newDistance = distanceToNeighbour + heuristic; //the cost of getting to this neighbour
 
+				//if this neighbour is a new node, or this is a shorter route to it, 
+				//add it to the list of nodes to explore
 				if (distSoFar.find(neighbourIndex) == distSoFar.end() || distanceToNeighbour < distSoFar[neighbourIndex]) {
 					openList.emplace(newDistance, neighbourIndex);
 					distSoFar[neighbourIndex] = distanceToNeighbour;
+
 					greatestDistance = std::max(greatestDistance, newDistance);
 					parents[neighbourIndex] = currentNode;
 					weights[neighbourIndex] = heuristic;
@@ -1033,6 +1035,21 @@ void CTerrainTex::read(std::ifstream & in) {
 	readObject(featureSize, in);
 	readObject(randomSeed, in);
 }
+
+
+/** Return the start point as a fraction of the texture area. */
+glm::vec2 CTerrainTex::getStartPoint() {
+	vec2 halfPixel = vec2( 0.5f / gridSize);
+	return vec2(startOffset) + halfPixel;// vec2(0.005);
+}
+
+/** Return the end point as a fraction of the texture area. */
+glm::vec2 CTerrainTex::getEndPoint() {
+	vec2 halfPixel = vec2(0.5f / gridSize);
+	vec2 dist = vec2(endPoint) / float(gridSize) + halfPixel;
+	return dist - getStartPoint();
+}
+
 
 
 

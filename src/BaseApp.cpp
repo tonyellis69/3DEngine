@@ -20,8 +20,9 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	string logpath = homeDir + "ErrorLog.txt";
 	freopen_s(&ErrStream,logpath.c_str(),"w",stderr);
 
+	logWindow = NULL;
 	sysLog.setFile(homeDir + "sysLog.txt");
-
+	liveLog.setCallback(this);
 	sysLog << startMsg << "\nBaseApp constructor starting...";
 	
 
@@ -428,7 +429,7 @@ void CBaseApp::initLogWindow() {
 	logWindow->setVisible(false);
 	logWindow->setBorderOn(true);
 	logWindow->setFont(smallSysFont);
-	liveLog.setCallback(this);
+
 	logWindow->resizeMode = resizeNone;
 	//sysLog.setCallback(this);
 
@@ -438,15 +439,19 @@ void CBaseApp::initLogWindow() {
 }
 
 
-/** Sends data from the log stream to a console window. */
+/** Sends data from the liveLog stream to a console window. If the window hasn't been
+	created yet, send it to the sysLog (which can write it to a file.) */
 void CBaseApp::logCallback(std::stringstream & logStream) {
-	logWindow->appendText(logStream.str());
-	
+	if (logWindow)
+		logWindow->appendText(logStream.str());
+	else
+		sysLog << logStream.str();
 }
 
 /** Handle a log alert. Make some noise! */
 void CBaseApp::logAlertCallback() {
-	logWindow->setVisible(true);
+	if (logWindow)
+		logWindow->setVisible(true);
 	//TO DO: consider making  log window bigger, too.
 }
 

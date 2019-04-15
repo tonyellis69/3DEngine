@@ -86,7 +86,7 @@ public:
 	unsigned int attachShaders();
 
 	//CCamera* createCamera(glm::vec3& pos);
-	CModel* createCube(glm::vec3& pos, glm::vec3& size);
+	//CModel* createCube(glm::vec3& pos, glm::vec3& size);
 	void drawModels();
 	void drawModelDefaultShader(CModel& model);
 	void drawModel(CModel& model);
@@ -101,7 +101,6 @@ public:
 	}
 
 	void setCurrentShader(int program);
-	CModel* createCylinder( glm::vec3& pos,float r, float h, int s);
 	CModel* createHemisphere(glm::vec3& pos, float radius, int steps);
 	CModel* createPlane(glm::vec3& pos, float width, float height, int steps);
 	//void storeModel(CModel* model, glm::vec3* verts, int noVerts);
@@ -178,7 +177,7 @@ public:
 	
 	CRegisteredSpriteList RegisteredSpriteList;
 	//std::vector<CCamera*> cameraList; ///<Tracks engine-created cameras.
-	std::vector<CModel*> modelDrawList; ///<Models to be draw automatically.
+	std::vector<CModel2*> modelDrawList; ///<Models to be draw automatically.
 	//TO DO: scrap above and use name
 	std::vector<CModel*> modelList;///<Engine-created models to delete at closedowm.
 	

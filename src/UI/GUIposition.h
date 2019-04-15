@@ -21,6 +21,5 @@ public:
 
 	TGUIalign alignment; ///<Whether the control is centred, left-aligned, etc
 	CGUIlayout layoutstyle; ///<Two-column, three etc
-	int columnNo; ///Which column it's in
-	int rowNo; ///<Which row.
+	glm::i32vec2 rowCol;
 };

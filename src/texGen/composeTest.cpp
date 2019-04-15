@@ -431,6 +431,7 @@ void ComposeTest::restore(std::string filename) {
 	}
 	in.close();
 
+	setCurrentLayer(texGens.size() - 1);
 	compose();
 	compose(); //ugh. Ensures texgens with forward references are up-to-date
 
@@ -446,4 +447,8 @@ void ComposeTest::saveCurrentTexGenPNG(std::string filepath) {
 	currentTexGen->getTarget()->savePNG(filepath);
 
 }
+
+
+
+
 
