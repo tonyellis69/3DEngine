@@ -36,6 +36,8 @@ public:
 	void clearChunks();
 
 	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
+	void clearScrolledOutChunks(Tdirection face, int maxChunks);
+	void restoreClippedChunks(TBoxVolume& innerChunkVolume);
 
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp

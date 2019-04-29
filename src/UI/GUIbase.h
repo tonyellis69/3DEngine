@@ -161,6 +161,8 @@ public:
 	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
 	void positionLogical(CGUIbase * control);
 	glm::i32vec2& layoutControlsCoarse();
+	void layoutFine();
+	glm::i32vec2& calcCellSize(glm::i32vec2& rowCol);
 	virtual void resizeToFit() {}
 	virtual void position(CGUIbase* control);
 	glm::i32vec2& getSize();

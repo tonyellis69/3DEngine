@@ -96,17 +96,69 @@ void CSuperChunk2::clearChunks() {
 }
 
 /** Remove any chunks withing the given volume of chunkspace. */
-void CSuperChunk2::clearOverlappedChunks(TBoxVolume & innerChunkVolume) {
-	//for each chunk...
-	//determine its position in chunk space
-	//if it falls within the given volume, remove it.
-
-	for (auto chunk : chunks) {
-
-
-
+void CSuperChunk2::clearOverlappedChunks(TBoxVolume & chunkClippingVolume) {
+	//return;
+	for (auto chunk = chunks.begin(); chunk != chunks.end();) {
+		if (chunk->x >= chunkClippingVolume.bl.x && chunk->y >= chunkClippingVolume.bl.y && chunk->z >= chunkClippingVolume.bl.z
+			&& chunk->x <= chunkClippingVolume.tr.x && chunk->y <= chunkClippingVolume.tr.y && chunk->z <= chunkClippingVolume.tr.z) {
+			chunk = chunks.erase(chunk);
+		}
+		else
+			++chunk;
 	}
+}
+
+/** Remove any chunks beyond the overlap boundary in this direction. */
+void CSuperChunk2::clearScrolledOutChunks(Tdirection face, int overlap) {
+	int axis = getAxis(face);
+	for (auto chunk = chunks.begin(); chunk != chunks.end();) {
+		if (face == north || face == west || face == down) {
+			if ((*chunk)[axis] < SCchunks - overlap)
+				chunk = chunks.erase(chunk);
+			else
+				++chunk;
+		}
+		else {
+			if ((*chunk)[axis] >= overlap)
+				chunk = chunks.erase(chunk);
+			else
+				++chunk;
+
+		}
+	}
+}
+
+/** Add new chunks where required withing the clipping volume. This is used
+	to add chunks on the inner face of a shell, where they've previously been
+	overlapped by the chunks of the inner shell. */
+void CSuperChunk2::restoreClippedChunks(TBoxVolume& chunkVolume) {
+	glm::vec3 chunkSampleSpacePos;
+	for (int x = 0; x < SCchunks; x++) 
+		for (int y = 0; y < SCchunks; y++) 
+			for (int z = 0; z < SCchunks; z++) 
+				if ( glm::any(lessThan(glm::i32vec3(x,y,z), chunkVolume.bl)) || 
+					glm::any(greaterThan(glm::i32vec3(x, y, z), chunkVolume.tr))) {
+					auto found = find(chunks.begin(), chunks.end(), glm::i32vec3(x, y, z));
+					if (found == chunks.end()) {
+						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+							createChunk(glm::i32vec3(x, y, z));
+						}
+					}
+				}
 
 
+/*
+	for (int x = chunkVolume.bl.x; x <= chunkVolume.tr.x; x++) {
+		for (int y = chunkVolume.bl.y; y <= chunkVolume.tr.y; y++) {
+			for (int z = chunkVolume.bl.z; z <= chunkVolume.tr.z; z++) {
+				chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+				if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+					createChunk(glm::i32vec3(x, y, z));
+				}
+			}
+		}
+	}
+*/
 
 }

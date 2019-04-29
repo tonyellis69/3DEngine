@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 /** A class for storing a pointers to one row of GUI controls. */
 class CGUIbase;

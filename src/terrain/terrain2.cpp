@@ -28,6 +28,7 @@ void CTerrain2::addShell(int extent) {
 	shells.back().shellNo = shells.size() -1;
 	shells.back().pTerrain = this;
 	shells.back().initSuperChunks();
+	shells.back().innerBounds = getInnerBounds(shells.back().shellNo);
 }
 
 /** Get the worldspace size of the given shell. */
@@ -133,7 +134,7 @@ void CTerrain2::setCallbackApp(ITerrainCallback * pApp) {
 }
 
 /** TO DO: pretty sure this only has to be calculated once per shell. */
-TBoxVolume & CTerrain2::getInnerBounds(unsigned int shellNo) {
+TBoxVolume CTerrain2::getInnerBounds(unsigned int shellNo) {
 	TBoxVolume innerBounds = { i32vec3(0),i32vec3(0) };
 	if (shellNo == 0)
 		return innerBounds;

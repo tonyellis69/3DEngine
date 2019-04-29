@@ -33,9 +33,13 @@ public:
 	void setSCchunkBoundaries();
 	void addChunksToFaceSCs(Tdirection direction);
 	void removeEncroachedOnChunks(Tdirection face);
+	TBoxVolume& transformToLocalSpace(TBoxVolume& innerShellChunkVolume, glm::i32vec3& offset);
+	void removeScrolledOutChunks(Tdirection face);
+	void addInnerFaceChunks(Tdirection innerFace);
 
-	glm::i32vec3& getNWchunkSpaceExtent();
-	glm::i32vec3& getSEchunkSpaceExtent();
+	TBoxVolume calcInnerFaceSCVolume(Tdirection face);
+
+	TBoxVolume getChunkVolume();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -58,6 +62,8 @@ public:
 	float scSampleStep;
 
 	glm::vec4 shellColour; ///!!!!!!!!!!!temp!
+
+	TBoxVolume innerBounds;
 };
 
 

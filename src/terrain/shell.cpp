@@ -43,10 +43,10 @@ void CShell::playerAdvance(Tdirection direction) {
 	i32vec3 travelVector = dirToVec(direction);
 	playerChunkPos += travelVector;
 
-	std::cerr << "\nAdvance shell " << shellNo << ":";
+	liveLog << "\nAdvance shell " << shellNo << ":";
 	if (getPlayerChunkExtent(direction) >= minimumChunkExtent) {
 		//1) sufficient terrain in direction, so nothing else to do
-		std::cerr << " suffient terrain, returning.";
+		liveLog << " suffient terrain, returning.";
 		return;
 	}
 
@@ -55,13 +55,13 @@ void CShell::playerAdvance(Tdirection direction) {
 	if (!faceLayerFull[direction]) {
 		//(2) add chunks to the face layer SCs in this direction!
 		addToFaceLayer(direction);
-		std::cerr << " adding to face layer.";
+		liveLog << " adding to face layer.";
 	}
 	else {
 		//(3) scroll the SCs, then add a layer 
 		//NB Think of scroll direction as the direction of rotation of the conveyor belt of terrain
 		Tdirection scrollDir = flipDir(direction);
-		std::cerr << " scrolling.";
+		liveLog << " scrolling.";
 
 		if (shellNo != 0)
 			pTerrain->returnShellAndOuterShells(*this, direction);
@@ -70,24 +70,41 @@ void CShell::playerAdvance(Tdirection direction) {
 			pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
 		}
 		scroll(scrollDir);
-		//chunkExtent[direction] += 2; //can't do this because then addToFaceLayer thinks its adding to an existing 2 layers
+
+		//move enclosing shells back to ensure terrain still lines up
+		pTerrain->displaceOuterShells(*this, scrollDir);
+
+
 		setSCchunkBoundaries();
 		addToFaceLayer(direction);
+		removeScrolledOutChunks(scrollDir);
+		if(shellNo < pTerrain->shells.size() - 1) 
+			pTerrain->shells[shellNo + 1].addInnerFaceChunks(scrollDir);
+
+		//if (shellNo < pTerrain->shells.size() - 1) {
+		//	pTerrain->shells[shellNo + 1].handleInnerShellAdvance(direction);
+		//}
+
+
+		//move enclosing shells back to ensure terrain still lines up
+		//pTerrain->displaceOuterShells(*this, scrollDir);
+		//return;
 	}
 
 	//The containing shell has been encroached upon to the tune of one layer of its chunks, so tell sc to handle this.
 	/////////////////////////////////////////////
-	if (shellNo < pTerrain->shells.size()-1)
-		pTerrain->shells[shellNo + 1].handleInnerShellAdvance(direction);
-
+	if (shellNo < pTerrain->shells.size() - 1) {
+		 pTerrain->shells[shellNo + 1].handleInnerShellAdvance(direction);
+	}
 }
 
 /** Respond to the inner shell advancing, by removing encroached-upon chunks and performing an advance of our own. */
 void CShell::handleInnerShellAdvance(Tdirection direction) {
+	playerAdvance(direction);
 	removeEncroachedOnChunks(direction);
 	//as well as removing its encroached-on chunks, this shell has to  introduce more
 	//of its LoD terrain, which may result in a scroll
-	playerAdvance(direction);
+	////////////////////////playerAdvance(direction);
 }
 
 /** Return the number of chunks of terrain lying in the given direction from the player positionHint. */
@@ -138,19 +155,27 @@ void CShell::scroll(Tdirection scrollDirection) {
 
 	//reset the chunk extent in this direction
 	chunkExtent[inDirection] -= SCchunks; // minimumChunkExtent;
-	//setSCchunkBoundaries();
+	//TO DO: can we use initChunkExtent here rather than this 
+	//It's more elegant
+
+	//setSCchunkBoundaries(); //TO DO any reason can't do this here rather than below?
 	faceLayerFull[inDirection] = false;
 
 	//The scrolled-out-and-back-in SCs have lost their chunks and occupy a new area of 
 	//sample space, so resample them
 	reinitialiseFaceSCs(inDirection);
 
+	//The new back face SCs have to partially overlap the outer shell, so we need to 
+	//remove the outer layers of chunks	
+	setSCchunkBoundaries();  //TO DO: see above
+	
+
 	i32vec3 scrollVec = dirToVec(scrollDirection);
 	//move player position in shell back by one SC's worth of chunks
 	playerChunkPos += scrollVec * SCchunks;
 
 	//move enclosing shells back to ensure terrain still lines up
-	pTerrain->displaceOuterShells(*this, scrollDirection);
+	//pTerrain->displaceOuterShells(*this, scrollDirection);
 }
 
 
@@ -231,7 +256,8 @@ CFaceIterator & CShell::getFaceIterator(Tdirection face) {
 
 /** TO DO: pretty sure this only has to be calculated once then cached. Investigate! */
 TBoxVolume & CShell::getInnerBounds() {
-	return pTerrain->getInnerBounds(shellNo);
+	//return pTerrain->getInnerBounds(shellNo);
+	return innerBounds;
 }
 
 /** Empty the superchunks in this face of any chunks, and reinitialise them ready to 
@@ -260,16 +286,17 @@ void CShell::reinitialiseFaceSCs(Tdirection face) {
 	most SCs there are none, but for the inner and outer SCs we want to prevent creating chunks where 
 	the chunks of another shell take over. */ 
 void CShell::setSCchunkBoundaries() {
-	i32vec3 nwChunkExtent = getNWchunkSpaceExtent();
-	i32vec3 seChunkExtent = getSEchunkSpaceExtent();
+	//i32vec3 nwChunkExtent = getNWchunkSpaceExtent();
+	//i32vec3 seChunkExtent = getSEchunkSpaceExtent();
+	TBoxVolume chunkVol = getChunkVolume();
 	//TO DO: maybe replace chunkExtent altogether with these
 
 	//(1)Find the origin of the chunk extents' -n - n volume in SC's 0 - n chunk coordinate space
 	i32vec3 chunkExtentVolumeOrig = i32vec3(shellSCs * SCchunks) / 2;
 
 	//use it to find the corners of the volume in SC chunk space
-	i32vec3 nwClip = chunkExtentVolumeOrig + nwChunkExtent;
-	i32vec3 seClip = chunkExtentVolumeOrig + seChunkExtent - i32vec3(1); //because we go 0 - n-1 not 0 - n.
+	i32vec3 nwClip = chunkExtentVolumeOrig + chunkVol.bl;
+	i32vec3 seClip = chunkExtentVolumeOrig + chunkVol.tr - i32vec3(1); //because we go 0 - n-1 not 0 - n.
 
 	//(2)For each SC, determine its position in chunk space...
 	CShellIterator scIter = getIterator();
@@ -317,59 +344,27 @@ void CShell::addChunksToFaceSCs(Tdirection face) {
 
 /** Find and remove any chunks overlapped by the chunks of the inner shell. */
 void CShell::removeEncroachedOnChunks(Tdirection face) {
-	sysLog << "\n\nRemoving on face " << face;
-	//get inner shell
-	//find the current extent of its chunks
-	//for each SC of this outer shell...
-	//if it's intersected by the inner shell chunk boundary
-	//call its pruneChunks function
-	//TO DO: can optimise this to only iterate through the intersected SCs 
-	//in fact I already have getInnerBounds which can do this
+	sysLog << "\n\nshell " << shellNo << " removing on face " << face;
 
 	CShell* pInnerShell = &pTerrain->shells[shellNo - 1];
-	//find the extent of its chunks in chunkspace.
-	TBoxVolume innerShellChunkExtent;
-	innerShellChunkExtent.bl = pInnerShell->getNWchunkSpaceExtent();
-	innerShellChunkExtent.tr = pInnerShell->getSEchunkSpaceExtent();
-	//TO DO: should really return both as one TBoxVolume
+	TBoxVolume innerShellChunkVolume = pInnerShell->getChunkVolume();
 
-	//for each inner face SC of this shell...
-	TBoxVolume innerBounds = getInnerBounds();
-	i32vec3 innerFaceStart = innerBounds.bl;
-	i32vec3 innerFaceEnd = innerBounds.tr;
+	//convert inner shell chunk extent (expressed -n to +n) to this shell's 0 - n coordinate syste
+	i32vec3 shellOffset = i32vec3((pInnerShell->worldSpacePos - worldSpacePos) / pInnerShell->chunkSize);
+	innerShellChunkVolume = transformToLocalSpace(innerShellChunkVolume,shellOffset);
 
-	int axis = getAxis(face);
-	if (face == north || face == west || face == down) {
-		innerFaceStart[axis] = innerBounds.bl[axis];
-		innerFaceEnd[axis] = innerBounds.bl[axis];
-	}
-	else {
-		innerFaceStart[axis] = innerBounds.tr[axis];
-		innerFaceEnd[axis] = innerBounds.tr[axis];
-	}
-
+	TBoxVolume innerFace = calcInnerFaceSCVolume(face);
 	TBoxVolume chunkClippingVolume;
-
-	//convert inner shell chunk extent to this shell's 0 - 1 coordinate syste
-	i32vec3 SCchunkspaceOrigin = i32vec3(SCchunks * shellSCs);
-	innerShellChunkExtent.bl = SCchunkspaceOrigin + innerShellChunkExtent.bl;
-	innerShellChunkExtent.tr = SCchunkspaceOrigin + innerShellChunkExtent.tr;
-
-
-	for (int x = innerFaceStart.x; x <= innerFaceEnd.x; x++) {
-		for (int y = innerFaceStart.y; y <= innerFaceEnd.y; y++) {
-			for (int z = innerFaceStart.z; z <= innerFaceEnd.z; z++) {
-				//scArray.element(x, y, z).clearChunks();
-
-
-
+	for (int x = innerFace.bl.x; x <= innerFace.tr.x; x++) {
+		for (int y = innerFace.bl.y; y <= innerFace.tr.y; y++) {
+			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
 				//find position of SC's chunks within inner shell's chunkspace
 				i32vec3 SCchunkStart = i32vec3(x, y, z) * SCchunks; // -SCchunkspaceOrigin;
 				SCchunkStart *= 2; //because these chunks are twice the size of the inner chunks
 
 				//clip it to the inner shell's chunk volume
-				chunkClippingVolume.bl = max(innerShellChunkExtent.bl, SCchunkStart);
-				chunkClippingVolume.tr = min(innerShellChunkExtent.tr, (SCchunkStart + i32vec3(SCchunks-1) * 2));
+				chunkClippingVolume.bl = max(innerShellChunkVolume.bl, SCchunkStart);
+				chunkClippingVolume.tr = min(innerShellChunkVolume.tr, (SCchunkStart + i32vec3(SCchunks-1) * 2));
 
 				//convert to chunk indices
 				chunkClippingVolume.bl /= 2;
@@ -385,20 +380,126 @@ void CShell::removeEncroachedOnChunks(Tdirection face) {
 			}
 		}
 	}
+}
 
+/** Transform this chunk volume, with its central axis, to the local chunk space of this shell, where
+	the origin is in the bottom left front corner.*/
+TBoxVolume& CShell::transformToLocalSpace(TBoxVolume& innerShellChunkVolume, i32vec3& offset) {
+	i32vec3 SCchunkspaceOrigin = i32vec3(SCchunks * shellSCs);
+	innerShellChunkVolume.bl = SCchunkspaceOrigin + offset + innerShellChunkVolume.bl;
+	innerShellChunkVolume.tr = SCchunkspaceOrigin + offset + innerShellChunkVolume.tr - i32vec3(1); //because we go 0 - n-1 not 0 - n.;
+	return innerShellChunkVolume;
+}
+
+
+/** Return the volume describing the intersection of the chunks of the given inner face
+	and inner shell.*/
+TBoxVolume CShell::calcInnerFaceSCVolume(Tdirection face) {
+	TBoxVolume innerFace = innerBounds;
+
+	int axis = getAxis(face);
+	if (face == north || face == west || face == down) {
+		innerFace.bl[axis] = innerBounds.bl[axis];
+		innerFace.tr[axis] = innerBounds.bl[axis];
+	}
+	else {
+		innerFace.bl[axis] = innerBounds.tr[axis];
+		innerFace.tr[axis] = innerBounds.tr[axis];
+	}
+	return innerFace;
+}
+
+/** Return the volume of this shell's chunk extent,measured in chunks counting from a central origin. */
+TBoxVolume CShell::getChunkVolume() {
+	TBoxVolume chunkVol;
+	chunkVol.bl = i32vec3(-chunkExtent[west], -chunkExtent[down], -chunkExtent[north]);
+	chunkVol.tr = i32vec3(chunkExtent[east], chunkExtent[up], chunkExtent[south]);
+	return chunkVol;
+}
+
+
+
+
+/** Notify SCs on the outface to remove any chunks that have now scrolled beyond the 
+	chunk extent. */
+void CShell::removeScrolledOutChunks(Tdirection outface) {
+	int overlap = 2;
+	CFaceIterator faceIter = getFaceIterator(outface);
+	while (!faceIter.finished()) {
+		if (faceIter->isEmpty == false) {
+			faceIter->clearScrolledOutChunks(outface, overlap);
+
+		}
+		faceIter++;
+	}
 
 }
 
-/** Return the nw bottom corner of the volume created by the extent of this shell's chunks - 
-	measured in chunks, counting from a central origin. */
-i32vec3& CShell::getNWchunkSpaceExtent() {
-	return i32vec3(-chunkExtent[west], -chunkExtent[down], -chunkExtent[north]);
-}
+/** Add chunks to an inner face, where they had previously been displaced by the chunks of the
+	inner shell, before it scrolled. */
+void CShell::addInnerFaceChunks(Tdirection face) {
+	sysLog << "\nAdd innerFaceChunks called on shell " << shellNo << " face " << face;
+	//calculate how the chunk volume of the inner shell would have overlapped this shell before it 
+	//scrolled. This is the space to fill.
+	//find inner chunk volume
+	if (shellNo == 1) {
+		
+		int b = 0;
 
-/** Return the se top corner of the volume created by the extent of this shell's chunks -
-	measured in chunks, counting from a central origin. */
-glm::i32vec3 & CShell::getSEchunkSpaceExtent() {
-	return i32vec3(chunkExtent[east], chunkExtent[up], chunkExtent[south]);
+	}
+
+	CShell* pInnerShell = &pTerrain->shells[shellNo - 1];
+	TBoxVolume innerShellChunkVolume = pInnerShell->getChunkVolume();
+
+	//displace by previous overlap
+	i32vec3 shellOffset = i32vec3((pInnerShell->worldSpacePos - worldSpacePos) / pInnerShell->chunkSize);
+	innerShellChunkVolume = transformToLocalSpace(innerShellChunkVolume, shellOffset);
+
+	//clip to SCs
+	TBoxVolume innerFace = calcInnerFaceSCVolume(face);
+	TBoxVolume chunkClippingVolume;
+	for (int x = innerFace.bl.x; x <= innerFace.tr.x; x++) {
+		for (int y = innerFace.bl.y; y <= innerFace.tr.y; y++) {
+			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
+				//first, check if we can discard this SC altogether
+				if (scArray.element(x, y, z).isEmpty) { //scrolled-in flanking SCs won't necessarily be empty
+					scArray.element(x, y, z).checkForIntersection();
+					if (scArray.element(x, y, z).isEmpty)
+						continue;
+				}
+
+				//find position of SC's chunks within inner shell's chunkspace
+				i32vec3 SCchunkStart = i32vec3(x, y, z) * SCchunks; // -SCchunkspaceOrigin;
+				SCchunkStart *= 2; //because these chunks are twice the size of the inner chunks
+				i32vec3 SCchunkEnd = SCchunkStart + i32vec3(SCchunks - 1) * 2;
+
+				//clip it to the inner shell's chunk volume
+				chunkClippingVolume.bl = max(innerShellChunkVolume.bl, SCchunkStart);
+				chunkClippingVolume.tr = min(innerShellChunkVolume.tr, SCchunkEnd); 
+
+					//convert to chunk indices
+				chunkClippingVolume.bl /= 2;
+				chunkClippingVolume.bl %= SCchunks;
+
+				chunkClippingVolume.tr /= 2;
+				chunkClippingVolume.tr %= SCchunks;
+
+				//check if the SCs chunks are outside the clipping volume entirely
+				//if so, collapse the axis to ensure chunks are still added
+				if (any(greaterThan(SCchunkStart, innerShellChunkVolume.tr)) ||
+					any(lessThan(SCchunkEnd, innerShellChunkVolume.bl))) {
+					int axis = getAxis(face);
+					chunkClippingVolume.bl[axis] = -1;
+					chunkClippingVolume.tr[axis] = -1;
+				}
+				
+				sysLog << "\nSC " << i32vec3(x, y, z) << " told to add outside " << chunkClippingVolume.bl
+					<< " to " << chunkClippingVolume.tr << " inclusive.";
+				scArray.element(x, y, z).restoreClippedChunks(chunkClippingVolume);
+
+			}
+		}
+	}
 }
 
 

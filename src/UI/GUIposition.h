@@ -1,7 +1,8 @@
 #pragma once
 
 
-enum TGUIalign {uiAlignNone,uiAlignCentred,uiAlignLeft,uiAlignRight};
+enum TGUIhAlign {uiAlignHnone,uiAlignHcentred,uiAlignHleft,uiAlignHright};
+enum TGUIvAlign { uiAlignVnone, uiAlignVcentred, uiAlignVtop, uiAlignVbottom };
 
 
 
@@ -17,9 +18,10 @@ public:
 	parent control. */
 class CGUIposition {
 public:
-	CGUIposition() : alignment(uiAlignNone) {}
+	CGUIposition() : hAlignment(uiAlignHnone), vAlignment(uiAlignVnone) {}
 
-	TGUIalign alignment; ///<Whether the control is centred, left-aligned, etc
+	TGUIhAlign hAlignment; ///<Whether the control is centred, left-aligned, etc
+	TGUIvAlign vAlignment; 
 	CGUIlayout layoutstyle; ///<Two-column, three etc
 	glm::i32vec2 rowCol;
 };

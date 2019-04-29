@@ -109,7 +109,7 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 	switch (ctrlType) {
 	case uiLabel: ctrl = new CGUIlabel(text); break;
 	case uiButton: ctrl = new CGUIbutton(text); break;
-
+	default: return NULL;
 	}
 
 	//set position arbitarily for now
@@ -162,6 +162,44 @@ glm::i32vec2& CGUIbase::layoutControlsCoarse() {
 	return maxSize;
 }
 
+/** Fine- djust the position of all child controls according to alignment etc. */
+void CGUIbase::layoutFine() {
+	glm::i32vec2 cellSize; int vDiff, hDiff;
+	for (auto control : controls) {
+		if (control->positionHint.hAlignment != uiAlignHnone || control->positionHint.vAlignment != uiAlignVnone) {
+			cellSize = calcCellSize(control->positionHint.rowCol);
+			vDiff = (cellSize.y - control->getSize().y) / 2;
+			hDiff = (cellSize.x - control->getSize().x) / 2;
+		}
+		if (control->positionHint.vAlignment == uiAlignVcentred) {
+			control->setPosY(control->getLocalPos().y + vDiff);
+			//TO DO! This will only work the first time. Need to calc top left corner of
+			//cell from first principles: height of previes row + borders
+		}
+
+
+
+		if (control->positionHint.hAlignment == uiAlignHcentred) {
+			control->setPosX(control->getLocalPos().x + hDiff);
+		}
+
+	}
+}
+
+/** Return the width and height of the given cell. */
+glm::i32vec2& CGUIbase::calcCellSize(glm::i32vec2& rowCol) {
+	glm::i32vec2 size;
+	//find the height of the biggest control on this row
+	//find the width of the widest control on this column
+	for (auto control : controls) {
+		if (control->positionHint.rowCol.y == rowCol.y)
+			size.y = max(size.y, control->getSize().y);
+		if (control->positionHint.rowCol.x == rowCol.x)
+			size.x = max(size.x, control->getSize().x);
+	}
+	return size;
+}
+
 
 /**	Position the given child control according to its requirements and this control's own
 	situation. */
@@ -176,7 +214,7 @@ void CGUIbase::position(CGUIbase * control) {
 
 
 
-	if (control->positionHint.alignment == uiAlignCentred) {
+	if (control->positionHint.hAlignment == uiAlignHcentred) {
 		glm::i32vec2 childCentre = control->getSize() / 2;
 		glm::i32vec2 parentCentre = getSize() / 2;
 		glm::i32vec2 newPos = parentCentre - childCentre;

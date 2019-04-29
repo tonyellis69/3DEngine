@@ -22,7 +22,7 @@ public:
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
 	void setCallbackApp(ITerrainCallback* pApp);
-	TBoxVolume& getInnerBounds(unsigned int shellNo);
+	TBoxVolume getInnerBounds(unsigned int shellNo);
 	void scrollSampleSpace(Tdirection scrollDir, float shift);
 
 	std::vector<CShell> shells;

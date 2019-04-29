@@ -15,7 +15,7 @@ CGUIbutton::CGUIbutton(std::string & text) {
 	label = (CGUIlabel*)add(uiLabel, text);
 	label->setBorderOn(false);
 	label->setHorizontalAlignment(tcentred);
-	label->positionHint.alignment = uiAlignCentred;
+	label->positionHint.hAlignment = uiAlignHcentred;
 	fitToPresets = true;
 	resizeToFit();
 }

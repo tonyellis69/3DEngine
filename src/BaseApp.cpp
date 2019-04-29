@@ -422,7 +422,7 @@ void CBaseApp::updateWatches() {
 }
 
 void CBaseApp::initLogWindow() {
-	logWindow = new CGUIrichText(0, 0, 180, 100);
+	logWindow = new CGUIrichText(0, 0, 220, 100);
 	logWindow->anchorRight = 10;
 	logWindow->anchorBottom = 10;
 	logWindow->insetX = 3;
