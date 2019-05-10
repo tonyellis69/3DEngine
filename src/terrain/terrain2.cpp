@@ -75,6 +75,8 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 /** Fill all shells with chunks where they are intersected by the terrain. */
 void CTerrain2::fillShells() {
 	for (auto& shell : shells) {
+		if (shell.shellNo == 1)
+			int b = 0;
 		//how many chunk layers from the shell origin to fill:
 		int chunkExtent = ((shell.shellSCs - 1) / 2) * SCchunks;
 		//TO DO: find the best way to calculate this!
@@ -145,12 +147,22 @@ TBoxVolume CTerrain2::getInnerBounds(unsigned int shellNo) {
 	//get dimensions of inner shell
 	vec3 innerShellBL = shells[shellNo-1].worldSpacePos - (shells[shellNo-1].worldSpaceSize * 0.5f);
 	vec3 innerShellTR = shells[shellNo-1].worldSpacePos + (shells[shellNo-1].worldSpaceSize * 0.5f);
+
+	innerShellBL = shells[shellNo - 1].worldSpacePos - (shells[shellNo - 1].minimumChunkExtent * shells[shellNo - 1].chunkSize);
+	innerShellTR = shells[shellNo - 1].worldSpacePos + (shells[shellNo - 1].minimumChunkExtent * shells[shellNo - 1].chunkSize);
 	
 	//find difference in SCs
 	innerBounds.bl = abs(i32vec3((thisShellBL - innerShellBL)));
-	innerBounds.bl = innerBounds.bl / i32vec3(shells[shellNo].SCsize);// +i32vec3(1);
-	innerBounds.tr = i32vec3(shells[shellNo].shellSCs) -
-		i32vec3((thisShellTR - innerShellTR) / shells[shellNo].SCsize) - i32vec3(1);
+	vec3 diff = (vec3(innerBounds.bl) / vec3(shells[shellNo].SCsize));// +i32vec3(1);
+
+//	if (shells[shellNo].shellSCs % 2 == 0)
+	if (fract(diff) == vec3(0))
+		diff = diff - vec3(1);
+	else
+		diff = floor(diff);
+
+	innerBounds.bl = diff;
+	innerBounds.tr = vec3(shells[shellNo].shellSCs) - diff - vec3(1);
 	
 	return innerBounds;
 }

@@ -19,6 +19,17 @@ public:
 	T getItem(unsigned int id) {
 		return container[id];
 	}
+	T* getItemPtr(unsigned int id) {
+		return &container[id];
+	}
+
+	//TO DO: make this a subclass, keep container pure for reuse!
+	unsigned int getItem(std::string text) {
+		for (auto item : container)
+			if (item.second.hotText == text)
+				return item.first;
+		return 0;
+	}
 
 	std::map<unsigned int, T> container;
 	static unsigned int id;

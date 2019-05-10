@@ -405,6 +405,7 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 			&& localMouse.x > hotTextFrag.renderStartX && localMouse.x < hotTextFrag.renderEndX) {
 			selectedHotObj = hotTextFrag.textObj;
 			if (oldSelectedHotObj != selectedHotObj) {
+				msgHighlight();
 				highlight(selectedHotObj); 
 			}
 			break;
@@ -413,6 +414,18 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	
 	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) 
 		unhighlight(oldSelectedHotObj);
+}
+
+
+/** Message the client that a new hot text is being moused over, in case this is useful.  */
+void CGUIrichText::msgHighlight() {
+	CMessage msg;
+	msg.Msg = uiMsgMouseMove;
+	if (selectedHotObj != -1)
+		msg.value = textObjs[selectedHotObj].hotId;
+	else
+		msg.value = -1;
+	pDrawFuncs->handleUImsg(*this, msg);
 }
 
 /** Highlight the given text object on the text buffer - in this case by redrawing it in the 'selected' colour.*/
@@ -448,6 +461,13 @@ void CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
 	parent->message(this, msg);
 }
 
+void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
+	CMessage msg;
+	msg.Msg = uiMsgRMouseUp;
+	msg.x = mouseX; msg.y = mouseY;
+	pDrawFuncs->handleUImsg(*this, msg);
+}
+
 
 
 /** Check for losing mouse while hot text selected. */
@@ -458,6 +478,7 @@ void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 	if (selectedHotObj >= 0) {
 		unhighlight(selectedHotObj);
 		selectedHotObj = -1;
+		msgHighlight();
 	}
 }
 
@@ -559,6 +580,16 @@ void CGUIrichText::update(float dT) {
 
 bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
 	int direction = wheelDelta > 0 ? 1 : -1;
+
+	if (selectedHotObj != -1 && mouseMode) {
+		CMessage msg;
+		msg.Msg = uiMouseWheel;
+		msg.value = textObjs[selectedHotObj].hotId;
+		msg.value2 = direction;
+		pDrawFuncs->handleUImsg(*this, msg);
+		return true;
+	}
+
 	if (mouseWheelMode == scroll) {
 		if (!attemptHotTextScroll(direction))
 			smoothScroll(direction * scrollHeight);
@@ -737,6 +768,16 @@ std::vector<unsigned int> CGUIrichText::purgeHotText(unsigned int id) {
 		}
 	}
 	return purgedIds;
+}
+
+/** Return a vector full of the hot text ids found in the text of this control. */
+std::vector<unsigned int> CGUIrichText::getHotTextIds() {
+	vector<unsigned int> lostIds;
+	for (auto& textObj : textObjs) {
+		if (textObj.hotId != 0) 
+			lostIds.push_back(textObj.hotId);
+	}
+	return lostIds;
 }
 
 /** Remove all text from the control. */
@@ -959,14 +1000,13 @@ void CGUIrichText::setTempText(bool onOff) {
 /** Remove the most recent block of tempporary text. */
 void CGUIrichText::removeTempText() {
 	//return;
-	for (unsigned int obj = textObjs.size() - 1; obj >= 0; obj--) {
+	for ( int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].tmpText == tempNone) {
 			textObjs.erase(textObjs.begin() + obj+1, textObjs.end());
 			currentTextObj = textObjs.size() - 1;
 			return;
 		}
 	}
-
 }
 
 /** Flag that normal activity is suspended/unsuspended. */
@@ -980,6 +1020,24 @@ void CGUIrichText::onDrag(const int mouseX, const int mouseY) {
 	msg.x = mouseX;
 	msg.y = mouseY;
 	parent->message(this, msg);
+}
+
+/** Remove any temporary text and update the screen. */
+void CGUIrichText::collapseTempText() {
+	removeTempText();
+	updateText();
+}
+
+/** Make the last temporary text permanent, if any. */
+void CGUIrichText::solidifyTempText() {
+	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
+		if (textObjs[obj].tmpText == tempOn) {
+			for (obj = obj; obj < textObjs.size(); obj++) {
+				textObjs[obj].tmpText = tempNone;
+			}
+			return;
+		}
+	}
 }
 
 

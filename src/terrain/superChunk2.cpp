@@ -4,6 +4,8 @@
 
 #include "..\utils\log.h"
 
+using namespace glm;
+
 ITerrainCallback* CSuperChunk2::pCallbackApp = NULL;
 
 void CSuperChunk2::checkForIntersection() {
@@ -95,6 +97,19 @@ void CSuperChunk2::clearChunks() {
 	chunks.clear();
 }
 
+/** Remove any chunks within the proportion of the SC volume defined by this unit volutme. */
+void CSuperChunk2::clearChunks(CBoxVolume& unitVolume) {
+	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
+	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
+	for (auto chunk = chunks.begin(); chunk != chunks.end();) {
+		if (all(greaterThanEqual(*chunk, indexBL)) && all(lessThanEqual(*chunk, indexTR))) {
+			chunk = chunks.erase(chunk);
+		}
+		else
+			++chunk;
+	}
+}
+
 /** Remove any chunks withing the given volume of chunkspace. */
 void CSuperChunk2::clearOverlappedChunks(TBoxVolume & chunkClippingVolume) {
 	//return;
@@ -161,4 +176,23 @@ void CSuperChunk2::restoreClippedChunks(TBoxVolume& chunkVolume) {
 	}
 */
 
+}
+
+/** If clippee is partially or entirely inside this volume, return true
+	and with the proportion of overlap in clipVol, expressed as a unit volume. */
+bool CBoxVolume::isClippedBy(CBoxVolume& clipVol){
+	vec3 SCboundaryFix(1.0f);
+	if (any(lessThan(clipVol.tr, bl + SCboundaryFix)) || any(greaterThan(clipVol.bl, tr - SCboundaryFix)))
+		return false;
+
+	vec3 volSize(clipVol.tr - clipVol.bl);
+
+	vec3 boundaryFix(1);
+	vec3 unitBl = max(clipVol.bl, bl) - clipVol.bl + boundaryFix;
+	vec3 unitTr = min(clipVol.tr, tr) - clipVol.bl - boundaryFix;
+
+	unitBl = unitBl / volSize;
+	unitTr = unitTr / volSize;
+	clipVol.set(unitBl, unitTr);
+	return true;
 }

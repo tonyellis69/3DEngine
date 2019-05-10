@@ -10,7 +10,18 @@
 struct TBoxVolume {
 	glm::i32vec3 bl;
 	glm::i32vec3 tr;
+};
 
+
+class CBoxVolume {
+public:
+	void set(glm::vec3& bl, glm::vec3& tr) {
+		this->bl = bl;
+		this->tr = tr;
+	}
+	bool isClippedBy(CBoxVolume& clippee);
+	glm::vec3 bl;
+	glm::vec3 tr;
 };
 
 class ITerrainCallback {
@@ -34,6 +45,7 @@ public:
 	void addFaceChunks(Tdirection face); 
 
 	void clearChunks();
+	void clearChunks(CBoxVolume& unitVolume);
 
 	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
 	void clearScrolledOutChunks(Tdirection face, int maxChunks);

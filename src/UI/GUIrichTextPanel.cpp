@@ -106,6 +106,11 @@ void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key
 	}
 }
 
+
+
+
+
+
 void CGUIrichTextPanel::resizeToFit() {
 	richText->resizeToFit();
 }
@@ -140,6 +145,14 @@ void CGUIrichTextPanel::setTempText(bool onOff) {
 
 void CGUIrichTextPanel::suspend(bool isOn) {
 	richText->suspend(isOn);
+}
+
+void CGUIrichTextPanel::collapseTempText() {
+	richText->collapseTempText();
+}
+
+void CGUIrichTextPanel::solidifyTempText() {
+	richText->solidifyTempText();
 }
 
 

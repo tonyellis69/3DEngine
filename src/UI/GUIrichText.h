@@ -75,9 +75,13 @@ public:
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void appendHotText(std::string newText, int msgId, int objId);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
+	void msgHighlight();
 	void highlight(int textObj);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void OnLMouseUp(const int mouseX, const int mouseY, int key);
+
+	void onRMouseUp(const int mouseX, const int mouseY);
+
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void unhighlight(int textObj);
 	//void removeHotText(int hotMsgId);
@@ -97,6 +101,7 @@ public:
 	void selectTopHotText();
 	std::vector<unsigned int> purgeHotText();
 	std::vector<unsigned int> purgeHotText(unsigned int id);
+	std::vector<unsigned int> getHotTextIds();
 	void clear();
 	void clearSelection();
 	void appendMarkedUpText(string text);
@@ -117,7 +122,8 @@ public:
 
 	void onDrag(const  int mouseX, const  int mouseY);
 	//void onDrop(const  int mouseX, const  int mouseY);
-
+	void collapseTempText();
+	void solidifyTempText();
 
 	~CGUIrichText();
 

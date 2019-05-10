@@ -4,7 +4,7 @@
 
 #include "baseTexture.h"
 //#include "renderer.h"
-
+#include <string>
 
 class CRenderer;
 class CRenderTexture : public CBaseTexture {

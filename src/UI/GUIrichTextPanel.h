@@ -30,7 +30,7 @@ public:
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 
 	void OnLMouseDown(const int mouseX, const int mouseY, int key);
-
+	
 	void resizeToFit();
 
 	void message(CGUIbase* sender, CMessage & msg);
@@ -38,6 +38,8 @@ public:
 	void setTempText(bool onOff);
 
 	void suspend(bool isOn);
+	void collapseTempText();
+	void solidifyTempText();
 
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
