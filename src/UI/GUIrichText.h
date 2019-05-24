@@ -16,11 +16,15 @@ struct TCharacterPos {
 };
 
 enum TTempText {tempNone,tempOn,tempOff };
+const unsigned int richSuspended = 2;
+const unsigned int richMarked = 4;
+const unsigned int richTemp = 8;
 struct TRichTextRec : textRec {
 	TRichTextRec();
 	std::vector<int> newLines;
 	unsigned int hotId;
-	TTempText tmpText;
+	//TTempText tmpText;
+	unsigned int flags;
 };
 
 enum TNewLine {no, wordwrap, newline};
@@ -59,13 +63,14 @@ public:
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setAppendStyleBold(bool isOn);
-	void setAppendStyleHot(bool isOn, int msgId, int objId, unsigned int hotId);
+	void setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId);
 	void setTextColour(UIcolour colour);
 	void setHotTextColour(const glm::vec4& colour);
 	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
 	void setTextStyle(std::string styleName);
 	void setTextStyles(std::vector<TtextStyle>* styles);
+	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
 	void appendText(std::string newText);
 	bool scrollDown();
@@ -117,6 +122,7 @@ public:
 	void setResizeMode(TResizeMode mode);
 
 	void setTempText(bool onOff);
+	void setMarkedText(bool onOff);
 	void removeTempText();
 	void suspend(bool isOn);
 
@@ -124,6 +130,8 @@ public:
 	//void onDrop(const  int mouseX, const  int mouseY);
 	void collapseTempText();
 	void solidifyTempText();
+	void unhotDuplicates();
+	void removeMarked();
 
 	~CGUIrichText();
 
@@ -131,6 +139,7 @@ public:
 	int underrun;
 	int maxHeight;
 	int longestLine;
+	int shortestSpaceBreak; ///<Only spacebreak after this many pixels.
 
 	std::vector<TRichTextRec> textObjs; ///<The complete text of this control.
 	int currentTextObj;

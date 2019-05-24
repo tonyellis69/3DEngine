@@ -95,6 +95,7 @@ void CSuperChunk2::addFaceChunks(Tdirection face) {
 void CSuperChunk2::clearChunks() {
 	//TO DO: when we have actual chunks, recycle them.
 	chunks.clear();
+	isEmpty = true;
 }
 
 /** Remove any chunks within the proportion of the SC volume defined by this unit volutme. */
@@ -108,6 +109,50 @@ void CSuperChunk2::clearChunks(CBoxVolume& unitVolume) {
 		else
 			++chunk;
 	}
+}
+
+/** Add any chunks that fall within the proportion of the SC defined by this unit volume. */
+void CSuperChunk2::addChunks(CBoxVolume& unitVolume) {
+	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
+	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
+	vec3 chunkSampleSpacePos;
+	for (int x=0; x < SCchunks; x++)
+		for (int y = 0; y < SCchunks; y++)
+			for (int z = 0; z < SCchunks; z++) {
+				i32vec3 chunk(x,y,z);
+				if (std::find(chunks.begin(), chunks.end(), chunk) == chunks.end())
+					if (all(greaterThanEqual(chunk, indexBL)) && all(lessThanEqual(chunk, indexTR))) {
+						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+							createChunk(glm::i32vec3(x, y, z));
+							chunks.push_back(chunk);
+						}
+					}
+			}
+
+}
+
+/** Add any chunks that fall outise the proportion of the SC defined by this unit volume. */
+void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
+	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
+	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
+	vec3 chunkSampleSpacePos;
+	for (int x = 0; x < SCchunks; x++)
+		for (int y = 0; y < SCchunks; y++)
+			for (int z = 0; z < SCchunks; z++) {
+				i32vec3 chunk(x, y, z);
+				if (std::find(chunks.begin(), chunks.end(), chunk) == chunks.end())
+					if (any(lessThan(chunk, indexBL)) || any(greaterThan(chunk, indexTR))
+						|| any (equal(indexBL,indexTR)) 
+						) {
+						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+							createChunk(glm::i32vec3(x, y, z));
+							chunks.push_back(chunk);
+							isEmpty = false;
+						}
+					}
+			}
 }
 
 /** Remove any chunks withing the given volume of chunkspace. */
@@ -187,6 +232,26 @@ bool CBoxVolume::isClippedBy(CBoxVolume& clipVol){
 
 	vec3 volSize(clipVol.tr - clipVol.bl);
 
+	vec3 boundaryFix(1);
+	vec3 unitBl = max(clipVol.bl, bl) - clipVol.bl + boundaryFix;
+	vec3 unitTr = min(clipVol.tr, tr) - clipVol.bl - boundaryFix;
+
+	unitBl = unitBl / volSize;
+	unitTr = unitTr / volSize;
+	clipVol.set(unitBl, unitTr);
+	return true;
+}
+
+/** If clippee is partially or entirely outside this volume, return true
+	and with the proportion of overlap in clipVol, expressed as a unit volume. */
+bool CBoxVolume::doesNotEntirelyEnvelop(CBoxVolume& clipVol) {
+	vec3 SCboundaryFix(1.0f);
+	if (all(lessThan(clipVol.tr, tr + SCboundaryFix)) && all(greaterThan(clipVol.bl, bl - SCboundaryFix)))
+		return false;
+
+	vec3 volSize(clipVol.tr - clipVol.bl);
+
+	//find overlap
 	vec3 boundaryFix(1);
 	vec3 unitBl = max(clipVol.bl, bl) - clipVol.bl + boundaryFix;
 	vec3 unitTr = min(clipVol.tr, tr) - clipVol.bl - boundaryFix;

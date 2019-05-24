@@ -20,6 +20,7 @@ public:
 		this->tr = tr;
 	}
 	bool isClippedBy(CBoxVolume& clippee);
+	bool doesNotEntirelyEnvelop(CBoxVolume& clippee);
 	glm::vec3 bl;
 	glm::vec3 tr;
 };
@@ -46,6 +47,8 @@ public:
 
 	void clearChunks();
 	void clearChunks(CBoxVolume& unitVolume);
+	void addChunks(CBoxVolume& unitVolume);
+	void addChunksOutside(CBoxVolume& unitVolume);
 
 	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
 	void clearScrolledOutChunks(Tdirection face, int maxChunks);

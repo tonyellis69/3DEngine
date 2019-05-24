@@ -204,6 +204,7 @@
     <ClCompile Include="..\src\win\win.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\3DTest\src\worldUI.h" />
     <ClInclude Include="..\..\VMtest\src\daemon.h" />
     <ClInclude Include="..\..\VMtest\src\stack.h" />
     <ClInclude Include="..\..\VMtest\src\var.h" />

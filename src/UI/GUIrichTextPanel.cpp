@@ -64,6 +64,10 @@ void CGUIrichTextPanel::setResizeMode(TResizeMode mode){
 	richText->setResizeMode(mode);
 }
 
+void CGUIrichTextPanel::setShortestSpaceBreak(int lineWidth) {
+	richText->shortestSpaceBreak = lineWidth;
+}
+
 
 
 void CGUIrichTextPanel::setTextStyles(std::vector<TtextStyle>* styles) {
@@ -72,6 +76,10 @@ void CGUIrichTextPanel::setTextStyles(std::vector<TtextStyle>* styles) {
 
 void CGUIrichTextPanel::setTextStyle(std::string styleName) {
 	richText->setTextStyle(styleName);
+}
+
+void CGUIrichTextPanel::setDefaultTextStyle(std::string styleName) {
+	richText->setDefaultTextStyle(styleName);
 }
 
 std::vector<unsigned int> CGUIrichTextPanel::purgeHotText(unsigned int id){
@@ -153,6 +161,14 @@ void CGUIrichTextPanel::collapseTempText() {
 
 void CGUIrichTextPanel::solidifyTempText() {
 	richText->solidifyTempText();
+}
+
+void CGUIrichTextPanel::unhotDuplicates() {
+	richText->unhotDuplicates();
+}
+
+void CGUIrichTextPanel::removeMarked() {
+	richText->removeMarked();
 }
 
 

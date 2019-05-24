@@ -18,8 +18,10 @@ public:
 	void appendText(std::string newText);
 	void clear();
 	void setResizeMode(TResizeMode mode);
+	void setShortestSpaceBreak(int lineWidth);
 	void setTextStyles(std::vector<TtextStyle>* styles);
 	void setTextStyle(std::string styleName);
+	void setDefaultTextStyle(std::string styleName);
 	std::vector<unsigned int> purgeHotText(unsigned int id);
 	void update(float dT);
 
@@ -40,6 +42,8 @@ public:
 	void suspend(bool isOn);
 	void collapseTempText();
 	void solidifyTempText();
+	void unhotDuplicates();
+	void removeMarked();
 
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.

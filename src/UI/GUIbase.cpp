@@ -211,7 +211,8 @@ void CGUIbase::position(CGUIbase * control) {
 	//get the layout style from currentLayoutStyle
 	//find the "working space" - the area we have to work within
 
-
+	if (free)
+		return;
 
 
 	if (control->positionHint.hAlignment == uiAlignHcentred) {

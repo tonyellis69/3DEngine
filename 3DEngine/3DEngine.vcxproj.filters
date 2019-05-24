@@ -739,5 +739,8 @@
     <ClInclude Include="..\src\renderer\material2.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\3DTest\src\worldUI.h">
+      <Filter>vm</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -33,6 +33,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
+	shortestSpaceBreak = 0;
 	noScrollMode = true; //TO DO for testing purposes!!!!
 	//setBorderOn(true);
 	insetX = 0;
@@ -102,10 +103,7 @@ void CGUIrichText::setAppendStyleBold(bool isOn) {
 
 
 /** Set hot text style for appending text on or off. */
-void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId, unsigned int hotId) {
-	//if (textObjs[currentTextObj].hotMsgId == msgId && textObjs[currentTextObj].hotObjId == objId)
-	//	return;
-
+void CGUIrichText::setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId) {
 	if (textObjs[currentTextObj].hotId == hotId) 
 		return;
 
@@ -116,21 +114,21 @@ void CGUIrichText::setAppendStyleHot(bool isOn, int msgId, int objId, unsigned i
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
-	//textObjs[currentTextObj].hotMsgId = msgId;
-	//textObjs[currentTextObj].hotObjId = objId;
 	textObjs[currentTextObj].hotId = hotId;
 
-/*	if (msgId || objId)
-		//textObjs[currentTextObj].style.colour = hotTextColour;
-		textObjs[currentTextObj].style = hotTextStyle;
-	else
-		//textObjs[currentTextObj].style.colour = currentTextStyle.colour;
+	if (isOn) {
+		if (unsuspended)
+			textObjs[currentTextObj].style = hotTextStyle;
+		else {
+			textObjs[currentTextObj].flags |= richSuspended;
+			textObjs[currentTextObj].style = currentTextStyle;
+			//TO DO: make this 'suspendedStyle'
+		}
+	}
+	else {
 		textObjs[currentTextObj].style = currentTextStyle;
-		*/
-	if (isOn)
-		textObjs[currentTextObj].style = hotTextStyle;
-	else
-		textObjs[currentTextObj].style = currentTextStyle;
+		textObjs[currentTextObj].flags &= ~richSuspended;
+	}
 }
 
 
@@ -170,6 +168,13 @@ void CGUIrichText::setTextStyle(std::string styleName) {
 	if (styleName == "tempOff") {
 		setTempText(false);
 	}
+
+	if (styleName == "markOn") {
+		setMarkedText(true);
+	}
+	if (styleName == "markOff") {
+		setMarkedText(false);
+	}
 }
 
 
@@ -187,6 +192,14 @@ void CGUIrichText::setTextStyles(std::vector<TtextStyle>* styleList) {
 	}
 }
 
+void CGUIrichText::setDefaultTextStyle(std::string styleName) {
+	for (auto style : *styles) {
+		if (style.name == styleName)
+			defaultTextStyle = style;
+	}
+}
+
+
 /** Set the text of the current text object.*/
 void CGUIrichText::setText(std::string newText) {
 	firstVisibleText = 0;
@@ -197,8 +210,8 @@ void CGUIrichText::setText(std::string newText) {
 void CGUIrichText::appendText(std::string newText) {
 	if (transcriptLog)
 		*transcriptLog << newText;
-	if (textObjs.back().tmpText == tempOff)
-		removeTempText();
+	//if (textObjs.back().tmpText == tempOff)
+	//	removeTempText();
 	textObjs.back().text += newText;
 	updateText();
 	overrunCorrect = true; //TO DO: why do this here?		
@@ -221,7 +234,7 @@ bool CGUIrichText::scrollDown() {
 		return true;
 }
 
-static int counter = 0;
+
 
 /** Starting with the top visible object, work through the list, rendering each, until we overrun the
 	bottom of the display area.*/
@@ -253,7 +266,7 @@ void CGUIrichText::renderText() {
 		dataRec = { &renderLine, currentFont, currentObj.style.colour };
 		offset.x = textBuf.addFragment(lineFragment.renderStartX+indent, offset.y, dataRec);
 		
-		if ( currentObj.hotId  && renderLine[0] != '\n') {
+		if ( currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
 			makeHotFragment(lineFragment, offset, renderLine);
 		}
 
@@ -276,8 +289,6 @@ void CGUIrichText::renderText() {
 	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
-	if (counter == 32)
-		int b = 0;
 }
 
 /** Create a record of the positionHint and composition of the given fragment of hot text. This is used to check
@@ -357,7 +368,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 			nextLineFrag.causesNewLine = newline;
 			break;
 		}
-		if (isspace(character) || character == '-') {
+		if ((isspace(character) || character == '-') && renderX > shortestSpaceBreak) {
 			breakPoint = c + 1;
 			breakPointX = renderX;
 			//break; //pretty sure this works without break as long as we go to next clause
@@ -412,8 +423,10 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 		}
 	}
 	
-	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) 
+	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
+		msgHighlight();
 		unhighlight(oldSelectedHotObj);
+	}
 }
 
 
@@ -805,7 +818,7 @@ void CGUIrichText::clearSelection() {
 
 void CGUIrichText::appendMarkedUpText(string text) {
 	bool bold = false; bool hot = false;
-	enum TStyleChange { styleNone, styleBold, styleHot, styleStyle };
+	enum TStyleChange { styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle };
 
 	std::string writeTxt = text;
 	std::string remainingTxt = text;
@@ -823,9 +836,13 @@ void CGUIrichText::appendMarkedUpText(string text) {
 				cut = 2;
 			}
 
-			if (remainingTxt[found + 1] == 'h') {
+			if (remainingTxt[found + 1] == 'h' || remainingTxt[found + 1] == 'S') {
 				hot = !hot;
-				styleChange = styleHot;
+				if (remainingTxt[found + 1] == 'h')
+					styleChange = styleHot;
+				else
+					styleChange = styleSuspendedHot;
+
 				if (remainingTxt[found + 2] == '{') {
 					size_t end = remainingTxt.find("}", found);
 					std::string id = remainingTxt.substr(found + 3, end - (found + 3));
@@ -837,6 +854,9 @@ void CGUIrichText::appendMarkedUpText(string text) {
 					cut = 2;
 				}
 			}
+
+
+
 			//other markup checks here
 			if (remainingTxt.substr(found + 1, 6) == "style{") {
 				styleChange = styleStyle;
@@ -856,13 +876,17 @@ void CGUIrichText::appendMarkedUpText(string text) {
 		if (styleChange == styleBold)
 			setAppendStyleBold(bold);
 		if (styleChange == styleHot)
-			setAppendStyleHot(hot, msgId, objId, hotId);
+			setAppendStyleHot(hot, true, hotId);
+		if (styleChange == styleSuspendedHot)
+			setAppendStyleHot(hot, false, hotId);
 		if (styleChange == styleNone)
 			setTextStyle(currentTextStyle);
 		if (styleChange == styleStyle)
 			setTextStyle(styleName);
 
 	}
+
+
 }
 
 void CGUIrichText::updateAppearance() {
@@ -982,31 +1006,43 @@ void CGUIrichText::resize(int w, int h) {
 
 /** Append a textObj marking the start or end of temporary text. */
 void CGUIrichText::setTempText(bool onOff) {
-	//return;
-
-	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
+	//if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
 		textObjs.push_back(newObj);
 		currentTextObj++;
-	}
+//	}
 	if (onOff) {
-		textObjs[currentTextObj].tmpText = tempOn;
+		textObjs[currentTextObj].flags |= richTemp;
 	}
 	else
-		textObjs[currentTextObj].tmpText = tempOff;
+		textObjs[currentTextObj].flags &= ~richTemp;
+}
+
+/** Append a textObj marking the start or end of marked text. */
+void CGUIrichText::setMarkedText(bool onOff) {
+	TRichTextRec newObj = textObjs[currentTextObj];
+	newObj.text.clear();
+	textObjs.push_back(newObj);
+	currentTextObj++;
+	if (onOff) {
+		textObjs[currentTextObj].flags |= richMarked;
+	}
+	else
+		textObjs[currentTextObj].flags &= ~richMarked;
 }
 
 /** Remove the most recent block of tempporary text. */
 void CGUIrichText::removeTempText() {
 	//return;
 	for ( int obj = textObjs.size() - 1; obj >= 0; obj--) {
-		if (textObjs[obj].tmpText == tempNone) {
-			textObjs.erase(textObjs.begin() + obj+1, textObjs.end());
-			currentTextObj = textObjs.size() - 1;
-			return;
+		if (textObjs[obj].flags & richTemp) {
+			textObjs.erase(textObjs.begin() + obj);	
+			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp))
+				break;
 		}
 	}
+	currentTextObj = textObjs.size() - 1;
 }
 
 /** Flag that normal activity is suspended/unsuspended. */
@@ -1028,16 +1064,55 @@ void CGUIrichText::collapseTempText() {
 	updateText();
 }
 
-/** Make the last temporary text permanent, if any. */
+/** Make the last temporary text permanent, if any. This includes making any suspended hot text active. */
 void CGUIrichText::solidifyTempText() {
-	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
-		if (textObjs[obj].tmpText == tempOn) {
-			for (obj = obj; obj < textObjs.size(); obj++) {
-				textObjs[obj].tmpText = tempNone;
+	for (int obj = textObjs.size() - 1; obj > 0; obj--) {
+		if (textObjs[obj].flags & richTemp) {
+			textObjs[obj].flags &= ~richTemp;
+			if (textObjs[obj].flags & richSuspended) {
+				textObjs[obj].flags ^= richSuspended;
+				textObjs[obj].style = hotTextStyle;
 			}
-			return;
+			else {
+				textObjs[obj].style = defaultTextStyle;
+			}
+			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp)) {
+				updateText();
+				break;
+			}
 		}
 	}
+}
+
+/** Run backwards throught the text, removing any duplicate hot texts. */
+void CGUIrichText::unhotDuplicates() {
+	vector<int> hotIds;
+	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
+		int hotId = textObjs[obj].hotId;
+		if (hotId == 0)
+			continue;
+		if (find(hotIds.begin(), hotIds.end(), hotId) != hotIds.end()) {
+			textObjs[obj].hotId = 0;
+			textObjs[obj].style.colour = textObjs[obj-1].style.colour;
+		}
+		else
+			hotIds.push_back(hotId);
+
+	}
+	updateText();
+}
+
+/** Remove the last section of text flagged as marked, if any. */
+void CGUIrichText::removeMarked() {
+	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
+		if (textObjs[obj].flags & richMarked) {
+			textObjs.erase(textObjs.begin() + obj);
+			currentTextObj = textObjs.size() - 1;
+			if (obj == 0 || !(textObjs[obj - 1].flags & richMarked))
+				break;
+		}
+	}
+	
 }
 
 
@@ -1046,7 +1121,8 @@ TRichTextRec::TRichTextRec() {
 	//hotMsgId = 0;
 	//hotObjId = 0;
 	hotId = 0;
-	tmpText = tempNone;
+	//tmpText = tempNone;
+	flags = 0;
 }
 
 

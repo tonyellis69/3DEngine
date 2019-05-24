@@ -28,7 +28,8 @@ void CTerrain2::addShell(int extent) {
 	shells.back().shellNo = shells.size() -1;
 	shells.back().pTerrain = this;
 	shells.back().initSuperChunks();
-	shells.back().innerBounds = getInnerBounds(shells.back().shellNo);
+	//shells.back().innerBounds = getInnerBounds(shells.back().shellNo);
+	shells.back().calculateInnerBounds();
 }
 
 /** Get the worldspace size of the given shell. */
@@ -90,7 +91,7 @@ void CTerrain2::fillShells() {
 		//via findAllSCchunks
 		if (shell.shellNo > 0) {
 			for (int dir = north; dir <= down; dir++)
-				shell.removeEncroachedOnChunks((Tdirection)dir);
+				 shell.removeEncroachedOnChunks((Tdirection)dir);
 		}
 	}
 

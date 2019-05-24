@@ -38,6 +38,8 @@ public:
 	void removeScrolledOutChunks(Tdirection face);
 	void addInnerFaceChunks(Tdirection innerFace);
 
+	void addInnerFaceChunks2(Tdirection face);
+
 	TBoxVolume calcInnerFaceSCVolume(Tdirection face);
 
 	void calculateInnerBounds();
@@ -46,6 +48,8 @@ public:
 
 	TBoxVolume getChunkVolume();
 	CBoxVolume getChunkVolume2();
+
+	void reinitialiseInnerSCs();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.

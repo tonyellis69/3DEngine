@@ -18,8 +18,9 @@ public:
 	parent control. */
 class CGUIposition {
 public:
-	CGUIposition() : hAlignment(uiAlignHnone), vAlignment(uiAlignVnone) {}
+	CGUIposition() : free(true),  hAlignment(uiAlignHnone), vAlignment(uiAlignVnone) {}
 
+	bool free; ///<Control is positioned freely, make no attempt to position it.
 	TGUIhAlign hAlignment; ///<Whether the control is centred, left-aligned, etc
 	TGUIvAlign vAlignment; 
 	CGUIlayout layoutstyle; ///<Two-column, three etc
