@@ -54,7 +54,7 @@ void CShell::playerAdvance(Tdirection direction) {
 	//Is there room for more chunks in the final SC in the given direction?
 	if (!faceLayerFull[direction]) {
 		//(2) add chunks to the face layer SCs in this direction!
-		if (shellNo == 0)
+		if (shellNo == 1)
 			int v = 0;
 		addToFaceLayer(direction);
 		liveLog << " adding to face layer.";
@@ -65,8 +65,6 @@ void CShell::playerAdvance(Tdirection direction) {
 		Tdirection scrollDir = flipDir(direction);
 		liveLog << " scrolling.";
 
-		if (shellNo == 1)
-			int u = 0;
 
 		if (shellNo != 0)
 			pTerrain->returnShellAndOuterShells(*this, direction);
@@ -74,20 +72,21 @@ void CShell::playerAdvance(Tdirection direction) {
 		if (shellNo == 0) {
 			pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
 		}
+
+		if (shellNo == 0)
+			int b = 0;
 		scroll(scrollDir);
 
 		//move enclosing shells back to ensure terrain still lines up
 		pTerrain->displaceOuterShells(*this, scrollDir);
 
-		if (shellNo == 1)
-			int b = 0;
+
 		setSCchunkBoundaries();
 		//calculateInnerBounds();
 		addToFaceLayer(direction);
 		removeScrolledOutChunks(scrollDir);
-		if(shellNo < pTerrain->shells.size() - 1) 
-			pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
-
+		if (shellNo < pTerrain->shells.size() - 1)
+			 pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir); //keep
 	}
 
 	//The containing shell has been encroached upon to the tune of one layer of its chunks, so tell sc to handle this.
@@ -100,11 +99,15 @@ void CShell::playerAdvance(Tdirection direction) {
 /** Respond to the inner shell advancing, by removing encroached-upon chunks and performing an advance of our own. */
 void CShell::handleInnerShellAdvance(Tdirection direction) {
 //w	calculateInnerBounds(); //TO DO: can we get rid of this one???????????
+	
+	//calculateInnerBounds();
+	//removeEncroachedOnChunks2(direction);
+
 	playerAdvance(direction);
 	//removeEncroachedOnChunks(direction);
 
-	calculateInnerBounds();
-	removeEncroachedOnChunks2(direction);
+	//calculateInnerBounds();
+	//removeEncroachedOnChunks2(direction);
 
 }
 
@@ -421,20 +424,32 @@ void CShell::removeEncroachedOnChunks2(Tdirection face) {
 	//1. Find the inner face SC layer
 	TBoxVolume innerFace = innerBounds;
 	int axis = getAxis(face);
-	if (face == north || face == west || face == down) 
-		innerFace.tr[axis] = innerFace.bl[axis];
+//	if (face == north || face == west || face == down) 
+//		innerFace.tr[axis] = innerFace.bl[axis];
+//	else
+	//	innerFace.bl[axis] = innerFace.tr[axis];
+
+
+	//int axis = getAxis(face);
+	if (face == north || face == west || face == down)
+		innerFace.tr[axis] = innerFace.bl[axis] + 1;
 	else
-		innerFace.bl[axis] = innerFace.tr[axis];
+		innerFace.bl[axis] = innerFace.tr[axis] - 1;
+
+
+
+
 
 	CBoxVolume innerChunkVol = pTerrain->shells[shellNo - 1].getChunkVolume2();
 	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f) - worldSpacePos;
+
 	CBoxVolume SCvol;
 	for (int x = innerFace.bl.x; x <= innerFace.tr.x; x++) {
 		for (int y = innerFace.bl.y; y <= innerFace.tr.y; y++) {
 			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
 				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin;
 				SCvol.set(pos, pos + vec3(SCsize));
-				if (shellNo == 1 && x == 3)
+				if (shellNo == 2 && x == 4 && y== 3 && z == 1)
 					int b = 90;
 				if (innerChunkVol.isClippedBy(SCvol)) {
 					scArray.element(x, y, z).clearChunks(SCvol);
@@ -617,14 +632,34 @@ void CShell::addInnerFaceChunks2(Tdirection face) {
 	//add chunks to SCs where clipped
 	if (shellNo == 1)
 		int b = 0;
+
+//	TBoxVolume oldInnerFace = innerBounds;
+	int axis = getAxis(face);
+	//if (face == north || face == west || face == down)
+	//	oldInnerFace.tr[axis] = oldInnerFace.bl[axis];
+	//else
+	//	oldInnerFace.bl[axis] = oldInnerFace.tr[axis];
+
 	calculateInnerBounds();
 	//1. Find the inner face SC layer
 	TBoxVolume innerFace = innerBounds;
-	int axis = getAxis(face);
-	if (face == north || face == west || face == down)
+	//int axis = getAxis(face);
+
+	//Check we don't go beyond our own chunk extent!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CBoxVolume chunkVol = getChunkVolume2();
+
+	if (face == north || face == west || face == down) {
 		innerFace.tr[axis] = innerFace.bl[axis];
-	else
+		innerFace.bl[axis] = innerFace.bl[axis] - 1;
+	}
+	else {
 		innerFace.bl[axis] = innerFace.tr[axis];
+		innerFace.tr[axis] = innerFace.tr[axis] + 1;
+	}
+
+
+//	innerFace.bl = min(innerFace.bl, oldInnerFace.bl);
+//	innerFace.tr = max(innerFace.tr, oldInnerFace.tr);
 
 	CBoxVolume innerChunkVol = pTerrain->shells[shellNo - 1].getChunkVolume2();
 	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f);// -worldSpacePos;
@@ -632,7 +667,7 @@ void CShell::addInnerFaceChunks2(Tdirection face) {
 	for (int x = innerFace.bl.x; x <= innerFace.tr.x; x++) {
 		for (int y = innerFace.bl.y; y <= innerFace.tr.y; y++) {
 			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
-				if (shellNo == 1 && z == 1 && x == 2 && y == 2)
+				if (shellNo == 1 && z == 4 && x == 2 && y == 2)
 					int b = 90;
 
 				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin +worldSpacePos;

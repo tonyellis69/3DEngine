@@ -69,7 +69,17 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 
 	if (inDirection != none) {
 		shells[0].playerAdvance(inDirection);
+		removeChunkOverlaps(inDirection);
 	}
+}
+
+/** Iterate through the shells, removing any chunks now overlapped by chunks of an inner shell. */
+void CTerrain2::removeChunkOverlaps(Tdirection inDirection) {
+	for (unsigned int shell = 1; shell < shells.size(); shell++) {
+		shells[shell].calculateInnerBounds();
+		shells[shell].removeEncroachedOnChunks2(inDirection);
+	}
+
 
 }
 

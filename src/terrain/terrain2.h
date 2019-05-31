@@ -15,6 +15,7 @@ public:
 	void addShell(int extent);
 	float getShellSize(unsigned int shellNo);
 	void playerWalk(glm::vec3& move);
+	void removeChunkOverlaps(Tdirection inDirection);
 	void fillShells();
 	void displaceOuterShells(const CShell& sender, Tdirection moveDirection);
 	void returnShellAndOuterShells(const CShell& sender, Tdirection moveDirection);

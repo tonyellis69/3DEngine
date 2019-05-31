@@ -143,7 +143,7 @@ void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 				i32vec3 chunk(x, y, z);
 				if (std::find(chunks.begin(), chunks.end(), chunk) == chunks.end())
 					if (any(lessThan(chunk, indexBL)) || any(greaterThan(chunk, indexTR))
-						|| any (equal(indexBL,indexTR)) 
+					//	|| any (equal(indexBL,indexTR)) 
 						) {
 						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
 						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
@@ -253,8 +253,21 @@ bool CBoxVolume::doesNotEntirelyEnvelop(CBoxVolume& clipVol) {
 
 	//find overlap
 	vec3 boundaryFix(1);
-	vec3 unitBl = max(clipVol.bl, bl) - clipVol.bl + boundaryFix;
-	vec3 unitTr = min(clipVol.tr, tr) - clipVol.bl - boundaryFix;
+	vec3 unitBl = max(clipVol.bl, bl);
+	vec3 unitTr = min(clipVol.tr, tr);
+
+	unitBl = unitBl - clipVol.bl;
+	unitTr = unitTr - clipVol.bl;
+
+	for (int axis = 0; axis < 3; axis++)
+		if (unitBl[axis] == unitTr[axis]) {
+			unitBl[axis] = volSize[axis];
+			unitTr[axis] = 0;
+		}
+
+
+	unitBl = unitBl + boundaryFix;
+	unitTr = unitTr - boundaryFix;
 
 	unitBl = unitBl / volSize;
 	unitTr = unitTr / volSize;
