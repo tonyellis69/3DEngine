@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 #include "GUIlabel2.h"
 #include "..\3DEngine\src\utils\log.h"
 
@@ -23,8 +25,8 @@ struct TRichTextRec : textRec {
 	TRichTextRec();
 	std::vector<int> newLines;
 	unsigned int hotId;
-	//TTempText tmpText;
 	unsigned int flags;
+	float period;
 };
 
 enum TNewLine {no, wordwrap, newline};
@@ -132,6 +134,7 @@ public:
 	void solidifyTempText();
 	void unhotDuplicates();
 	void removeMarked();
+	void animateHotText(float dT);
 
 	~CGUIrichText();
 
@@ -187,4 +190,7 @@ public:
 	CLog* transcriptLog; ///<If exists, send prerendered text here. 
 
 	bool suspended; ///<If true, suspend activity such as highlighting.
+
+	std::mt19937 randEngine; ///<Random number engine.
+	
 	};

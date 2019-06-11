@@ -1,6 +1,8 @@
 #include "GUIrichText.h"
 
 #include "glm\glm.hpp"
+# define PI           3.14159265358979323846  /* pi */
+
 
 #include "..\3DEngine\src\utils\log.h"
 
@@ -115,6 +117,8 @@ void CGUIrichText::setAppendStyleHot(bool isOn, bool unsuspended, unsigned int h
 		currentTextObj++;
 	}
 	textObjs[currentTextObj].hotId = hotId;
+	std::uniform_real_distribution<> randomRange{ 0,1.0f};
+	textObjs[currentTextObj].period  = randomRange(randEngine);
 
 	if (isOn) {
 		if (unsuspended)
@@ -291,7 +295,7 @@ void CGUIrichText::renderText() {
 	textBuf.render();
 }
 
-/** Create a record of the positionHint and composition of the given fragment of hot text. This is used to check
+/** Create a record of the position and composition of the given fragment of hot text. This is used to check
 	for mouseovers, drawing it highlighted, etc. */
 void CGUIrichText::makeHotFragment(TLineFragment& lineFragment, i32vec2& offset, std::string& renderLine) {
 	int lineHeight = pDrawFuncs->getFont(textObjs[lineFragment.textObj].style.font)->lineHeight;
@@ -324,9 +328,6 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	TLineFragment nextLineFrag{}; //initialise all to 0
 	int textObj = currentLineFrag.textObj;
 	
-
-
-
 	unsigned int textStartPos = currentLineFrag.textPos + currentLineFrag.textLength;
 	if (textStartPos >= textObjs[textObj].text.size()) {
 		if (textObj + 1 == textObjs.size()) {
@@ -588,6 +589,7 @@ void CGUIrichText::update(float dT) {
 			overrunCorrect = overrun;
 		} 
 	}
+	animateHotText(dT);
 }
 
 
@@ -1116,13 +1118,45 @@ void CGUIrichText::removeMarked() {
 }
 
 
+/** Cause any visible hot text to animate. */
+void CGUIrichText::animateHotText(float dT) {
+
+	CFont* font = pDrawFuncs->getFont(selectedHotTextStyle.font);
+	TLineFragDrawRec dataRec = { NULL, font, selectedHotTextStyle.colour };
+
+	int objId = -1;
+	for (auto hotTextFrag : hotTextFrags) {
+		if (selectedHotObj == hotTextFrag.textObj)
+			continue;
+
+
+		if (hotTextFrag.textObj != objId) {
+			objId = hotTextFrag.textObj;
+			textObjs[objId].period += dT * 0.2f;
+			if (textObjs[objId].period > 1)
+				textObjs[objId].period = 0;
+		}
+
+		float transition;
+		transition = std::max(textObjs[objId].period, 0.7f) - 0.7f;
+		transition /= 0.3f;
+
+		transition = sin(transition * PI);
+
+		dataRec.textColour = mix(hotTextStyle.colour, selectedHotTextStyle.colour, transition);
+		dataRec.text = &hotTextFrag.text;
+		textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, dataRec);
+	}
+
+
+}
+
+
 
 TRichTextRec::TRichTextRec() {
-	//hotMsgId = 0;
-	//hotObjId = 0;
 	hotId = 0;
-	//tmpText = tempNone;
 	flags = 0;
+	period = 0;
 }
 
 

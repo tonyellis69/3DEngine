@@ -15,7 +15,6 @@ class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
 	void playerAdvance(Tdirection direction);
-	void handleInnerShellAdvance(Tdirection direction);
 	int getPlayerChunkExtent(Tdirection direction);
 	void fillEntire();
 	void initChunkExtent();
@@ -23,21 +22,15 @@ public:
 	void scroll(Tdirection direction);
 	void initSuperChunks();
 	glm::vec3 & calcSCsampleSpacePosition(glm::i32vec3& scIndex);
-	void findAllSCintersections();
 	void findAllSCchunks();
 	CShellIterator& getIterator();
 	COuterSCIterator& getOuterSCiterator();
 	CFaceIterator& getFaceIterator(Tdirection face);
 	TBoxVolume& getInnerBounds();
 	void reinitialiseFaceSCs(Tdirection face);
-	void setSCchunkBoundaries();
-	void addChunksToFaceSCs(Tdirection direction);
-	void removeEncroachedOnChunks(Tdirection face);
+	void addChunksToFaceSCs2(Tdirection face);
 	void removeEncroachedOnChunks2(Tdirection face);
-	TBoxVolume& transformToLocalSpace(TBoxVolume& innerShellChunkVolume, glm::i32vec3& offset);
 	void removeScrolledOutChunks(Tdirection face);
-	void addInnerFaceChunks(Tdirection innerFace);
-
 	void addInnerFaceChunks2(Tdirection face);
 
 	TBoxVolume calcInnerFaceSCVolume(Tdirection face);
@@ -46,7 +39,6 @@ public:
 
 	glm::i32vec3 getSCat(glm::vec3& pos);
 
-	TBoxVolume getChunkVolume();
 	CBoxVolume getChunkVolume2();
 
 	void reinitialiseInnerSCs();

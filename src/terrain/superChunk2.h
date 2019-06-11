@@ -3,6 +3,7 @@
 #include <vector>
 #include "glm/glm.hpp"
 
+
 #include "..\3DEngine\src\direction.h"
 
 /** Stores the inner dimensions of a shell, eg, the innermost superchunk
@@ -33,6 +34,7 @@ public:
 };
 
 /** A container for zero or more chunks occupying a cubic volume of space. */
+class CTerrain2;
 class CSuperChunk2 {
 public:
 	CSuperChunk2()  {};
@@ -40,10 +42,7 @@ public:
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setSampleSize(float sampleSize);
 	void setCallbackApp(ITerrainCallback* pApp);
-	void createAllChunks();
 	void createChunk(glm::i32vec3& index);
-
-	void addFaceChunks(Tdirection face); 
 
 	void clearChunks();
 	void clearChunks(CBoxVolume& unitVolume);
@@ -53,6 +52,7 @@ public:
 	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
 	void clearScrolledOutChunks(Tdirection face, int maxChunks);
 	void restoreClippedChunks(TBoxVolume& innerChunkVolume);
+	
 
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp
@@ -70,8 +70,8 @@ public:
 	float chunkSampleSize; ///<Chunk size in samplespace
 
 	std::vector<glm::i32vec3> chunks; ///<The chunks owned by this superchunk
-	glm::i32vec3 nwChunkStart; ///<Northwest lower Limit to where chunks are placed.
-	glm::i32vec3 seChunkEnd; ///<Southeast upper Limit to where chunks are placed.
+	std::vector<int> chunks2; ///<Ids of the chunks owned by this superChunk;
 
+	static CTerrain2* pTerrain; ///<Annoyingly necessary pointer to terrain object.
 };
 

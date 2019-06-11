@@ -70,7 +70,7 @@ Tdirection vecToDir(glm::i32vec3& vec) {
 		return south;
 	if (vec.z == -1)
 		return north;
-	return north;
+	return none;
 }
 
 int getSign(Tdirection dir) {

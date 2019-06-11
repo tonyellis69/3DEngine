@@ -1,6 +1,8 @@
 #include "terrain2.h"
 
 #include <iostream>
+#include <numeric>      // std::iota
+
 
 using namespace glm;
 
@@ -17,6 +19,7 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 	shells.back().pTerrain = this;
 	shells.back().shellNo = 0;
 	shells.back().initSuperChunks();
+	initialiseChunks(100);
 }
 
 /** Add an outer shell to the existing shells, its size adjusted by extent. */
@@ -37,11 +40,13 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 	return shells[shellNo].worldSpaceSize;
 }
 
-/** Respond to the player moving by the given vector from their current positionHint. */
+/** Respond to the player moving by the given vector from their current position. */
 void CTerrain2::playerWalk(glm::vec3 & move) {
 	//if offset > 1 chunk, advance terrain.
 	playerOffset += move;
 	Tdirection inDirection = none;
+
+	//are we now more than a chunk width from the terrain centre?
 	if (playerOffset.x > LoD1chunkSize) {
 		inDirection = east;
 		playerOffset.x = mod(playerOffset.x, LoD1chunkSize);
@@ -79,15 +84,11 @@ void CTerrain2::removeChunkOverlaps(Tdirection inDirection) {
 		shells[shell].calculateInnerBounds();
 		shells[shell].removeEncroachedOnChunks2(inDirection);
 	}
-
-
 }
 
 /** Fill all shells with chunks where they are intersected by the terrain. */
 void CTerrain2::fillShells() {
 	for (auto& shell : shells) {
-		if (shell.shellNo == 1)
-			int b = 0;
 		//how many chunk layers from the shell origin to fill:
 		int chunkExtent = ((shell.shellSCs - 1) / 2) * SCchunks;
 		//TO DO: find the best way to calculate this!
@@ -101,11 +102,9 @@ void CTerrain2::fillShells() {
 		//via findAllSCchunks
 		if (shell.shellNo > 0) {
 			for (int dir = north; dir <= down; dir++)
-				 shell.removeEncroachedOnChunks((Tdirection)dir);
+				shell.removeEncroachedOnChunks2((Tdirection)dir);
 		}
 	}
-
-
 }
 
 /** Move the enclosing shells of this shell one SC length in the given direction. This is called to keep the outer terrain 
@@ -127,10 +126,6 @@ void CTerrain2::returnShellAndOuterShells(const CShell & sender, Tdirection move
 	}
 }
 
-/** Go through all superchunks, asking them to check if they intersect terrain. */
-void CTerrain2::findAllSCintersections() {
-
-}
 
 /** Centre the terrain at the give positionHint in sample space. */
 void CTerrain2::setSampleSpacePosition(glm::vec3 & pos) {
@@ -146,42 +141,45 @@ void CTerrain2::setCallbackApp(ITerrainCallback * pApp) {
 	pCallbackApp = pApp;
 }
 
-/** TO DO: pretty sure this only has to be calculated once per shell. */
-TBoxVolume CTerrain2::getInnerBounds(unsigned int shellNo) {
-	TBoxVolume innerBounds = { i32vec3(0),i32vec3(0) };
-	if (shellNo == 0)
-		return innerBounds;
 
-	//get dimensions of this shell
-	vec3 thisShellBL = shells[shellNo].worldSpacePos - (shells[shellNo].worldSpaceSize * 0.5f);
-	vec3 thisShellTR = shells[shellNo].worldSpacePos + (shells[shellNo].worldSpaceSize * 0.5f);
-	//get dimensions of inner shell
-	vec3 innerShellBL = shells[shellNo-1].worldSpacePos - (shells[shellNo-1].worldSpaceSize * 0.5f);
-	vec3 innerShellTR = shells[shellNo-1].worldSpacePos + (shells[shellNo-1].worldSpaceSize * 0.5f);
-
-	innerShellBL = shells[shellNo - 1].worldSpacePos - (shells[shellNo - 1].minimumChunkExtent * shells[shellNo - 1].chunkSize);
-	innerShellTR = shells[shellNo - 1].worldSpacePos + (shells[shellNo - 1].minimumChunkExtent * shells[shellNo - 1].chunkSize);
-	
-	//find difference in SCs
-	innerBounds.bl = abs(i32vec3((thisShellBL - innerShellBL)));
-	vec3 diff = (vec3(innerBounds.bl) / vec3(shells[shellNo].SCsize));// +i32vec3(1);
-
-//	if (shells[shellNo].shellSCs % 2 == 0)
-	if (fract(diff) == vec3(0))
-		diff = diff - vec3(1);
-	else
-		diff = floor(diff);
-
-	innerBounds.bl = diff;
-	innerBounds.tr = vec3(shells[shellNo].shellSCs) - diff - vec3(1);
-	
-	return innerBounds;
-}
-
-/** Move the terrain's positionHint in sample space. */
+/** Move the terrain's position in sample space. */
 void CTerrain2::scrollSampleSpace(Tdirection scrollDir, float shift) {
 	vec3 vec = dirToVec(flipDir(scrollDir)) * shift;
 	sampleSpacePos += vec;
+}
+
+/** Prepare all chunks for use. */
+void CTerrain2::initialiseChunks(int numChunks) {
+	chunks.resize(numChunks);
+	freeChunks.resize(numChunks);
+	inUseChunks.clear();
+	iota(begin(freeChunks), end(freeChunks), 0);
+}
+
+/** Return a chunk initialised with the given index. */
+int CTerrain2::createChunk(glm::i32vec3& index) {
+	int id = getFreeChunk();
+	chunks[id].index = index;
+	return id;
+}
+
+/** Return the id of a free chunk, creating more chunks if necessary. */
+int CTerrain2::getFreeChunk() {
+	int id;
+	if (freeChunks.size() > 0) {
+		id = freeChunks.back();
+		freeChunks.pop_back();
+		inUseChunks.push_back(id);
+		return id;
+	}
+
+	int chunkInc = chunks.size() / 10;
+	freeChunks.resize(chunkInc-1);
+	id = chunks.size();
+	iota(begin(freeChunks), end(freeChunks), id+1);
+	chunks.resize(chunks.size() + chunkInc);
+	inUseChunks.push_back(id);
+	return id;
 }
 
 

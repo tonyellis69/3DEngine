@@ -60,7 +60,8 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 
 	
 	quitOnEsc = true;
-	initWatches();
+	//initWatches();
+	pTimer = &Engine.Time; //last vestige of watch.h - get rid of!
 	initLogWindow();
 
 	vm.setApp(this);
@@ -249,7 +250,6 @@ void CBaseApp::AppTasks() {
 
 	//Engine.removeUserScale();
 
-	updateWatches();
 	logWindow->update(dT);
 	DrawUI(); 
 
@@ -376,50 +376,9 @@ void CBaseApp::exit() {
 }
 
 
-void CBaseApp::initWatches() {
-	wLabel1 = new CGUIlabel2(800,100,400,50);
-	wLabel1->setFont(sysFont);
-	wLabel1->setTextColour(UIwhite);
-	GUIroot.Add(wLabel1);
 
-	wLabel2 = new CGUIlabel2(800,350,400,50);
-	wLabel2->setFont(sysFont);
-	wLabel2->setTextColour(UIwhite);
-	GUIroot.Add(wLabel2);
 
-	wLabel3 = new CGUIlabel2(800,500,400,50);
-	wLabel3->setFont(sysFont);
-	wLabel3->setTextColour(UIwhite);
-	GUIroot.Add(wLabel3);
 
-	consoleLbl = new CGUIlabel2(10,10,100,100);	
-	consoleLbl->setFont(sysFont);
-	consoleLbl->setTextColour(UIwhite);
-	consoleLbl->anchorBottom = 10;
-	consoleLbl->anchorRight = 10;
-	consoleLbl->setMultiLine(true);
-	//GUIroot.Add(consoleLbl); //anchor makes this screen size, so it masks all other controls. Rethink
-
-	pTimer = &Engine.Time;
-}
-
-void CBaseApp::updateWatches() {
-	wLabel1->setText(watch::watch1.str());
-	watch::watch1.str("");
-	wLabel2->setText(watch::watch2.str());
-	watch::watch2.str("");
-	wLabel3->setText(watch::watch3.str());
-	watch::watch3.str("");
-	consoleLbl->setText(watch::con.str());
-//	watch::con.str("");
-	//TO DO: how to handle? messages to the console made every frame will quickly flood it
-	//unless we clear it every frame. But occasional messages will vanish every frame if
-	//we clear it every frame.
-	//For now, treat console as permanent. Look into ways of getting multiline label to only
-	//show the last h lines of text. Maybe the control keeps track of how many lines it 
-	//can fit at its current font and height, and also how many lines are in its buffer.
-	//May well need to create a more sophisticated control for that, with a more sophisticated buffer.
-}
 
 void CBaseApp::initLogWindow() {
 	logWindow = new CGUIrichText(0, 0, 220, 100);
@@ -523,7 +482,6 @@ CBaseApp::~CBaseApp() {
 	fclose(ErrStream);
 	delete drawFuncs;
 	GUIroot.setDrawFuncs(NULL);
-	watch::con.str(""); //Simple fix to ensure console memory freed.
 }
 
 

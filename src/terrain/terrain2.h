@@ -7,7 +7,7 @@
 #include "..\direction.h"
 
 
-
+class Chunk2;
 class CTerrain2 {
 public:
 	CTerrain2() : playerOffset(0) {};
@@ -19,12 +19,13 @@ public:
 	void fillShells();
 	void displaceOuterShells(const CShell& sender, Tdirection moveDirection);
 	void returnShellAndOuterShells(const CShell& sender, Tdirection moveDirection);
-	void findAllSCintersections();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
 	void setCallbackApp(ITerrainCallback* pApp);
-	TBoxVolume getInnerBounds(unsigned int shellNo);
 	void scrollSampleSpace(Tdirection scrollDir, float shift);
+	void initialiseChunks(int numChunks);
+	int createChunk(glm::i32vec3& index);
+	int getFreeChunk();
 
 	std::vector<CShell> shells;
 
@@ -38,4 +39,15 @@ public:
 	glm::vec3 sampleSpacePos; //<Position of terrain in sample space.
 	float worldToSampleScale; ///<Number of world units to one sample unit
 	ITerrainCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
+
+	std::vector<Chunk2> chunks; ///<The complete reservoir of chunks.
+	std::vector<int> freeChunks;
+	std::vector<int> inUseChunks;
+};
+
+/** A handle object representing a cubic, indivisible block of terrain. */
+class Chunk2 {
+public:
+	glm::i32vec3 index; ///<3D position of this chunk within its superChunk.
+
 };

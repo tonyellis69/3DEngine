@@ -67,8 +67,8 @@ public:
 	virtual void onStart() {};
 	void drawSkyDome();
 	
-	void initWatches();
-	void updateWatches();
+	//void initWatches();
+	//void updateWatches();
 	void initLogWindow();
 	void logCallback(std::stringstream& logStream);
 	void logAlertCallback();
@@ -132,10 +132,10 @@ public:
 
 	int viewWidth, viewHeight;
 
-	CGUIlabel2* wLabel1;
-	CGUIlabel2* wLabel2;
-	CGUIlabel2* wLabel3;
-	CGUIlabel2* consoleLbl;
+//	CGUIlabel2* wLabel1;
+//	CGUIlabel2* wLabel2;
+//	CGUIlabel2* wLabel3;
+//	CGUIlabel2* consoleLbl;
 
 
 	unsigned int hTextureShader;
