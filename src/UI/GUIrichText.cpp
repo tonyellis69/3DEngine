@@ -27,7 +27,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	overrunCorrect = false;
 	resizeMode = resizeByWidthMode;
 	yPixelOffset = 0;
-	smoothScrollStep = 8;
+	smoothScrollStep = 2;// 8;
 	setMouseWheelMode(scroll);
 	hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
 	selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
@@ -41,6 +41,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	insetX = 0;
 	transcriptLog = NULL;
 	suspended = false;
+	displacedObj = INT_MAX;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -117,10 +118,12 @@ void CGUIrichText::setAppendStyleHot(bool isOn, bool unsuspended, unsigned int h
 		currentTextObj++;
 	}
 	textObjs[currentTextObj].hotId = hotId;
-	std::uniform_real_distribution<> randomRange{ 0,1.0f};
-	textObjs[currentTextObj].period  = randomRange(randEngine);
+	
 
 	if (isOn) {
+		std::uniform_real_distribution<> randomRange{ 0,1.0f };
+		textObjs[currentTextObj].period = randomRange(randEngine);
+
 		if (unsuspended)
 			textObjs[currentTextObj].style = hotTextStyle;
 		else {
@@ -130,6 +133,7 @@ void CGUIrichText::setAppendStyleHot(bool isOn, bool unsuspended, unsigned int h
 		}
 	}
 	else {
+		textObjs[currentTextObj].period = 0;
 		textObjs[currentTextObj].style = currentTextStyle;
 		textObjs[currentTextObj].flags &= ~richSuspended;
 	}
@@ -151,6 +155,7 @@ void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
 	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
+		newObj.period = 0;
 		textObjs.push_back(newObj);
 		currentTextObj++;
 	}
@@ -178,6 +183,14 @@ void CGUIrichText::setTextStyle(std::string styleName) {
 	}
 	if (styleName == "markOff") {
 		setMarkedText(false);
+	}
+
+
+	if (styleName == "fadeOn") {
+		setFadeText(true);
+	}
+	if (styleName == "fadeOff") {
+		setFadeText(false);
 	}
 }
 
@@ -244,7 +257,10 @@ bool CGUIrichText::scrollDown() {
 	bottom of the display area.*/
 void CGUIrichText::renderText() {
 	hotTextFrags.clear();
+	fadeFrags.clear();
 	overrun = 0; overrunHotTextObj = -1; underrun = 0; longestLine = 0; int indent = 0;
+	markStart = markEnd = -1;
+	bool displaced = false;
 	textBuf.init(true);
 	TLineFragDrawRec dataRec;
 	i32vec2 offset(0, yPixelOffset);
@@ -268,10 +284,27 @@ void CGUIrichText::renderText() {
 		string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 
 		dataRec = { &renderLine, currentFont, currentObj.style.colour };
+		if (!displaced && lineFragment.textObj == displacedObj) {
+			offset.y += gapSize;
+			displaced = true;
+		}
 		offset.x = textBuf.addFragment(lineFragment.renderStartX+indent, offset.y, dataRec);
 		
 		if ( currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
 			makeHotFragment(lineFragment, offset, renderLine);
+		}
+
+		if (currentObj.flags & richFadeIn && currentObj.period < 1 && renderLine[0] != '\n')
+			makeFadeFragment(lineFragment, offset, renderLine);
+
+
+		if (currentObj.flags & richMarked && markStart == -1) {
+			if (lineFragment.textObj > 0 && !(textObjs[lineFragment.textObj - 1].flags & richMarked)) {
+				markStart = offset.y;
+			}
+		}
+		if (!(currentObj.flags & richMarked) && markStart > -1 && markEnd == -1) {
+			markEnd = offset.y;
 		}
 
 		if (lineFragment.causesNewLine != no) {
@@ -280,7 +313,6 @@ void CGUIrichText::renderText() {
 		}
 		else
 			indent = 0;
-
 
 		checkOverrun(offset.y, currObjNo);
 		if (offset.y > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
@@ -302,11 +334,20 @@ void CGUIrichText::makeHotFragment(TLineFragment& lineFragment, i32vec2& offset,
 
 	THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y , offset.x, offset.y + lineHeight, lineFragment.textObj };
 	hotFrag.text = renderLine;
-	if (offset.y + lineHeight > getHeight())
+/*	if (offset.y + lineHeight > getHeight())
 		hotFrag.overrun = true;
 	else
-		hotFrag.overrun = false;
+		hotFrag.overrun = false; */
 	hotTextFrags.push_back(hotFrag);
+}
+
+void CGUIrichText::makeFadeFragment(TLineFragment& lineFragment, glm::i32vec2& offset, std::string& renderLine)
+{
+	int lineHeight = pDrawFuncs->getFont(textObjs[lineFragment.textObj].style.font)->lineHeight;
+
+	THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y , offset.x, offset.y + lineHeight, lineFragment.textObj };
+	hotFrag.text = renderLine;
+	fadeFrags.push_back(hotFrag);
 }
 
 /** Record how much the given line overruns (or underruns) the bottom of the view, if at all. */
@@ -348,7 +389,8 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	int lookAheadCharWidth = 0;
 	if (textObj + 1 < textObjs.size()) {
 		char lookAheadChar = textObjs[textObj + 1].text[0];
-		if (ispunct(lookAheadChar) && !isspace(textObjs[textObj].text.back()) )
+		if (ispunct(lookAheadChar) && textObjs[textObj].text.size() > 0 
+			&& !isspace(textObjs[textObj].text.back())   )
 			lookAheadCharWidth = currentFont->table[lookAheadChar]->width;
 	}
 
@@ -577,6 +619,12 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 
 
 void CGUIrichText::update(float dT) {
+
+	if (displacedObj < INT_MAX) {
+		collapseDisplacement(dT);
+		//return;
+	}
+
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)
 	{
@@ -589,7 +637,11 @@ void CGUIrichText::update(float dT) {
 			overrunCorrect = overrun;
 		} 
 	}
-	animateHotText(dT);
+	if (!hotTextFrags.empty())
+		animateHotText(dT);
+	if (!fadeFrags.empty())
+		animateFadeText(dT);
+	
 }
 
 
@@ -662,8 +714,8 @@ void CGUIrichText::updateText() {
 	if (!mouseMode)
 		updateHotTextSelection();
 
-	if (noScrollMode && firstVisibleObject > 0)
-		 removeScrolledOffText();
+//	if (noScrollMode && firstVisibleObject > 0)
+//		 removeScrolledOffText();
 	
 }
 
@@ -819,6 +871,12 @@ void CGUIrichText::clearSelection() {
 
 
 void CGUIrichText::appendMarkedUpText(string text) {
+	if (displacedObj != INT_MAX) {
+		textQueue += text;
+		return;
+	}
+
+
 	bool bold = false; bool hot = false;
 	enum TStyleChange { styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle };
 
@@ -1008,12 +1066,13 @@ void CGUIrichText::resize(int w, int h) {
 
 /** Append a textObj marking the start or end of temporary text. */
 void CGUIrichText::setTempText(bool onOff) {
-	//if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
+	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
 		TRichTextRec newObj = textObjs[currentTextObj];
 		newObj.text.clear();
+		newObj.period = 0;
 		textObjs.push_back(newObj);
 		currentTextObj++;
-//	}
+	}
 	if (onOff) {
 		textObjs[currentTextObj].flags |= richTemp;
 	}
@@ -1025,6 +1084,7 @@ void CGUIrichText::setTempText(bool onOff) {
 void CGUIrichText::setMarkedText(bool onOff) {
 	TRichTextRec newObj = textObjs[currentTextObj];
 	newObj.text.clear();
+	newObj.period = 0;
 	textObjs.push_back(newObj);
 	currentTextObj++;
 	if (onOff) {
@@ -1032,6 +1092,22 @@ void CGUIrichText::setMarkedText(bool onOff) {
 	}
 	else
 		textObjs[currentTextObj].flags &= ~richMarked;
+}
+
+/** Append a textObj marking the start or end of fade-in text. */
+void CGUIrichText::setFadeText(bool onOff) {
+	if (textObjs[currentTextObj].text.size() > 0) {
+		TRichTextRec newObj = textObjs[currentTextObj];
+		newObj.text.clear();
+		newObj.period = 0;
+		textObjs.push_back(newObj);
+		currentTextObj++;
+	}
+	if (onOff) {
+		textObjs[currentTextObj].flags |= richFadeIn;
+	}
+	else
+		textObjs[currentTextObj].flags &= ~richFadeIn;
 }
 
 /** Remove the most recent block of tempporary text. */
@@ -1106,13 +1182,21 @@ void CGUIrichText::unhotDuplicates() {
 
 /** Remove the last section of text flagged as marked, if any. */
 void CGUIrichText::removeMarked() {
+	int beforeObj = -1; 
 	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].flags & richMarked) {
 			textObjs.erase(textObjs.begin() + obj);
+			beforeObj = obj - 1;
 			currentTextObj = textObjs.size() - 1;
 			if (obj == 0 || !(textObjs[obj - 1].flags & richMarked))
 				break;
 		}
+	}
+
+	if (beforeObj != -1 && beforeObj < currentTextObj) {
+		 displacedObj = beforeObj + 1;
+		 collapsePeriod = 0;
+		 gapSize = markEnd - markStart;
 	}
 	
 }
@@ -1147,8 +1231,50 @@ void CGUIrichText::animateHotText(float dT) {
 		dataRec.text = &hotTextFrag.text;
 		textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, dataRec);
 	}
+}
+
+/** Cause any fading-in text to fade further in. */
+void CGUIrichText::animateFadeText(float dT) {
+	int objId = -1;
+	TLineFragDrawRec dataRec; 
+	CFont* font;
 
 
+	for (auto fadeFrag : fadeFrags) {
+
+		if (fadeFrag.textObj != objId) {
+			objId = fadeFrag.textObj;
+			textObjs[objId].period += dT * 2.5f;
+			if (textObjs[objId].period > 1)
+				textObjs[objId].period = 1;
+		}
+
+
+		dataRec.font = pDrawFuncs->getFont(textObjs[objId].style.font);
+			
+		dataRec.text = &fadeFrag.text;
+		dataRec.textColour = textObjs[objId].style.colour;
+		dataRec.textColour.a = textObjs[objId].period;
+
+		textBuf.renderTextAt(fadeFrag.renderStartX, fadeFrag.renderStartY, dataRec);
+	}
+}
+
+/** If there's currently displaced text (caused by removing marked text), shrink the gap.*/
+void CGUIrichText::collapseDisplacement(float dT) {
+	collapsePeriod += dT;
+	if (collapsePeriod > 0.01f) { //was 0.005f;
+		collapsePeriod = 0;
+		gapSize -= 2;
+		if (gapSize < 0) {
+			gapSize = 0;
+			displacedObj = INT_MAX;
+			appendMarkedUpText(textQueue);
+			textQueue.clear();
+		}
+		renderText();
+	}
+	
 }
 
 

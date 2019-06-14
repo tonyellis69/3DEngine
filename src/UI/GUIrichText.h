@@ -21,12 +21,14 @@ enum TTempText {tempNone,tempOn,tempOff };
 const unsigned int richSuspended = 2;
 const unsigned int richMarked = 4;
 const unsigned int richTemp = 8;
+const unsigned int richFadeIn = 16;
 struct TRichTextRec : textRec {
 	TRichTextRec();
-	std::vector<int> newLines;
+	//std::vector<int> newLines;
 	unsigned int hotId;
 	unsigned int flags;
 	float period;
+
 };
 
 enum TNewLine {no, wordwrap, newline};
@@ -44,7 +46,8 @@ struct TLineFragment {
 	bool finalFrag;
 };
 
-/** Records the positionHint of a hot text fragment, for mouseover checks. */
+/** Records the position of a hot text fragment, for mouseover checks and drawing a 
+	highlighted version. */
 struct THotTextFragment {
 	int renderStartX;
 	int renderStartY;
@@ -52,7 +55,7 @@ struct THotTextFragment {
 	int renderEndY;
 	int textObj;
 	std::string text;
-	bool overrun;
+	//bool overrun;
 };
 
 
@@ -78,6 +81,7 @@ public:
 	bool scrollDown();
 	void renderText();
 	void makeHotFragment(TLineFragment & lineFragment, glm::i32vec2& offset, std::string& renderLine);
+	void makeFadeFragment(TLineFragment& lineFragment, glm::i32vec2& offset, std::string& renderLine);
 	void checkOverrun(int yStart, int currentObjNo);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void appendHotText(std::string newText, int msgId, int objId);
@@ -125,6 +129,7 @@ public:
 
 	void setTempText(bool onOff);
 	void setMarkedText(bool onOff);
+	void setFadeText(bool onOff);
 	void removeTempText();
 	void suspend(bool isOn);
 
@@ -135,6 +140,8 @@ public:
 	void unhotDuplicates();
 	void removeMarked();
 	void animateHotText(float dT);
+	void animateFadeText(float dT);
+	void collapseDisplacement(float dT);
 
 	~CGUIrichText();
 
@@ -150,6 +157,7 @@ public:
 	int firstVisibleText; ///<Position in the top visible object of the first text to display.
 
 	std::vector<THotTextFragment> hotTextFrags; ///<Currently visible hot text fragments
+	std::vector<THotTextFragment> fadeFrags; ///<Currently visible fade-in text fragments
 	int selectedHotObj; ///<Currently selected hot text oject, if any.
 	//std::vector<int> hotTextObjs; ///<Currently visible hot text object
 
@@ -193,4 +201,10 @@ public:
 
 	std::mt19937 randEngine; ///<Random number engine.
 	
-	};
+	int markStart;
+	int markEnd;
+	int gapSize;
+	int displacedObj; ///<First object after a gap caused by removing marked text.
+	float collapsePeriod;
+	std::string textQueue; ///<Stores incoming text if we're in the middle of something.
+};

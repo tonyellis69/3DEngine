@@ -11,7 +11,6 @@
 
 struct TtextStyle {
 	std::string name;
-	//CFont* font;
 	std::string font;
 	glm::vec4 colour;
 	bool operator == (const TtextStyle &style) const {
