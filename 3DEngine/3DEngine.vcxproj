@@ -148,6 +148,7 @@
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
+    <ClCompile Include="..\src\terrain\chunk2.cpp" />
     <ClCompile Include="..\src\terrain\scArray.cpp" />
     <ClCompile Include="..\src\terrain\shell.cpp" />
     <ClCompile Include="..\src\terrain\superChunk2.cpp" />
@@ -193,6 +194,7 @@
     <ClCompile Include="..\src\UI\GUIstyleSheet.cpp" />
     <ClCompile Include="..\src\UI\GUIswatchContainer.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
+    <ClCompile Include="..\src\UI\lineBuffer.cpp" />
     <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
@@ -267,6 +269,7 @@
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
+    <ClInclude Include="..\src\terrain\chunk2.h" />
     <ClInclude Include="..\src\terrain\scArray.h" />
     <ClInclude Include="..\src\terrain\shell.h" />
     <ClInclude Include="..\src\terrain\superChunk2.h" />
@@ -316,6 +319,7 @@
     <ClInclude Include="..\src\UI\GUIstyleSheet.h" />
     <ClInclude Include="..\src\UI\GUIswatchContainer.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
+    <ClInclude Include="..\src\UI\lineBuffer.h" />
     <ClInclude Include="..\src\UI\rowObject.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />

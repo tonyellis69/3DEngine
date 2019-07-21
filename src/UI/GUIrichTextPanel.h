@@ -3,9 +3,10 @@
 #include "GUIpanel.h"
 #include "GUIrichText.h"
 
+
+
 /** A composite control that adds a rich text control to a panel, which
 	can then be modified, added-to, etc. */
-
 class CGUIrichTextPanel : public CGUIpanel {
 public:	
 	CGUIrichTextPanel(int x, int y, int w, int h);
@@ -41,9 +42,17 @@ public:
 
 	void suspend(bool isOn);
 	void collapseTempText();
-	void solidifyTempText();
+	bool solidifyTempText();
 	void unhotDuplicates();
 	void removeMarked();
+
+	bool busy();
+
+	void displayText(std::string text);
+
+	void deliverByClause(float dT);
+
+	void deliverByCharacter(float dT);
 
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
@@ -53,4 +62,11 @@ public:
 	glm::i32vec2 lastMousePos; ///<For dragging purposes
 	bool dragging; 
 	bool draggable;
+
+	TTextDelivery deliveryMode;
+	std::string deliveryBuffer;
+	float clauseInterval;
+	float clauseDelay;
+	float charInterval;
+	float charDelay;
 };

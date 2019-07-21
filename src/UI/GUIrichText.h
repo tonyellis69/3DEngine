@@ -3,6 +3,7 @@
 #include <random>
 
 #include "GUIlabel2.h"
+#include "lineBuffer.h"
 #include "..\3DEngine\src\utils\log.h"
 
 enum TMouseWheelMode {scroll,hotText};
@@ -15,49 +16,40 @@ struct TtextTheme {
 struct TCharacterPos {
 	int textObj;
 	int pos;
+	bool operator==(const TCharacterPos& rhs) { return textObj == rhs.textObj && pos == rhs.pos; }
 };
+
+enum TTextDelivery { noDelivery, byClause, byCharacter };
 
 enum TTempText {tempNone,tempOn,tempOff };
 const unsigned int richSuspended = 2;
 const unsigned int richMarked = 4;
 const unsigned int richTemp = 8;
 const unsigned int richFadeIn = 16;
+const unsigned int richGap = 32;
+
 struct TRichTextRec : textRec {
 	TRichTextRec();
-	//std::vector<int> newLines;
 	unsigned int hotId;
+	int gap;
 	unsigned int flags;
 	float period;
 
 };
 
-enum TNewLine {no, wordwrap, newline};
+
 enum TOverrunMode {overScrollMode, overResizeMode};
 enum TResizeMode {resizeByRatioMode, resizeByWidthMode, resizeNone };
 
-/** A partial or complete line of text, with its rendered (x) dimensions. */
-struct TLineFragment {
-	int textObj;
-	int textPos;
-	int textLength;
-	int renderStartX;
-	int renderEndX;
-	TNewLine causesNewLine;
-	bool finalFrag;
-};
+;
 
-/** Records the position of a hot text fragment, for mouseover checks and drawing a 
-	highlighted version. */
-struct THotTextFragment {
-	int renderStartX;
-	int renderStartY;
-	int renderEndX;
-	int renderEndY;
-	int textObj;
+/** Records the id and other details of a fragment used for special
+	effects, such as hot text. */
+struct TFXfragment {
+	int fragId;
 	std::string text;
-	//bool overrun;
+	int textObj;
 };
-
 
 /** A more versatile multiline text display class. */
 class CGUIrichText : public CGUIlabel2 {
@@ -78,33 +70,35 @@ public:
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
 	void appendText(std::string newText);
-	bool scrollDown();
-	void renderText();
-	void makeHotFragment(TLineFragment & lineFragment, glm::i32vec2& offset, std::string& renderLine);
-	void makeFadeFragment(TLineFragment& lineFragment, glm::i32vec2& offset, std::string& renderLine);
-	void checkOverrun(int yStart, int currentObjNo);
+	void addText(std::string newText);
+	bool scrollDown2(int dist);
+	void createPage();
+	void updateFragmentPositions();
+	void renderLineBuffer();
+	void compileLineFragments(TLineFragment lineFragment);
+	int processNextFragment(TLineFragment& fragment);
+	TLine compileLine(TLineFragment lineFragment);
+	void checkLineOverrun(int yStart);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
-	void appendHotText(std::string newText, int msgId, int objId);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
 	void msgHighlight();
-	void highlight(int textObj);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void OnLMouseUp(const int mouseX, const int mouseY, int key);
 
 	void onRMouseUp(const int mouseX, const int mouseY);
 
 	void onMouseOff(const  int mouseX, const  int mouseY, int key);
-	void unhighlight(int textObj);
-	//void removeHotText(int hotMsgId);
-	bool scrollUp();
-	int getPrevCharacter(int & textObj, int & pos);
+
+
+	TCharacterPos& getPreviousLine(TCharacterPos& startText);
+	bool scrollUp3(int dist);
 	TCharacterPos getPrevNewline(int textObj, int pos);
 	void update(float dT);
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 	bool attemptHotTextScroll(int direction);
-	void smoothScroll(int pixels);
-	void updateText();
+	void smoothScroll2(int pixels);
+	void updatePage();
 	void removeScrolledOffText();
 	void setMouseWheelMode(TMouseWheelMode mode);
 	void updateHotTextSelection();
@@ -136,16 +130,20 @@ public:
 	void onDrag(const  int mouseX, const  int mouseY);
 	//void onDrop(const  int mouseX, const  int mouseY);
 	void collapseTempText();
-	void solidifyTempText();
+	bool solidifyTempText();
 	void unhotDuplicates();
 	void removeMarked();
 	void animateHotText(float dT);
 	void animateFadeText(float dT);
 	void collapseDisplacement(float dT);
 
+	void deliverByCharacter(float dT);
+
+	bool isOverrun();
+
 	~CGUIrichText();
 
-	int overrun;
+	int lineOverrun;
 	int underrun;
 	int maxHeight;
 	int longestLine;
@@ -156,10 +154,7 @@ public:
 	int firstVisibleObject; ///<Index of the first object we need to draw.
 	int firstVisibleText; ///<Position in the top visible object of the first text to display.
 
-	std::vector<THotTextFragment> hotTextFrags; ///<Currently visible hot text fragments
-	std::vector<THotTextFragment> fadeFrags; ///<Currently visible fade-in text fragments
 	int selectedHotObj; ///<Currently selected hot text oject, if any.
-	//std::vector<int> hotTextObjs; ///<Currently visible hot text object
 
 	float updateDt; ///<Elapsed seconds since last call to update().
 
@@ -198,13 +193,26 @@ public:
 	CLog* transcriptLog; ///<If exists, send prerendered text here. 
 
 	bool suspended; ///<If true, suspend activity such as highlighting.
+	
+	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 
 	std::mt19937 randEngine; ///<Random number engine.
+	static std::uniform_real_distribution<> randomPeriod;
 	
 	int markStart;
 	int markEnd;
 	int gapSize;
 	int displacedObj; ///<First object after a gap caused by removing marked text.
 	float collapsePeriod;
-	std::string textQueue; ///<Stores incoming text if we're in the middle of something.
+
+
+	TTextDelivery deliveryMode;
+	std::string deliveryBuffer;
+	float charInterval;
+	float charDelay;
+
+	CLineBuffer lineBuffer; ///<Holds the current line fragments, organised into lines.
+
+	std::vector<TFXfragment> hotFrags; ///<Indexes of fragments that are hot text.
+	std::vector<TFXfragment> fadeFrags2; ///<Currently visible fade-in text fragments
 };

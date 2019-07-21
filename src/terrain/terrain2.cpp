@@ -3,6 +3,7 @@
 #include <iostream>
 #include <numeric>      // std::iota
 
+#include "..\\3DEngine\src\utils\log.h"
 
 using namespace glm;
 
@@ -80,6 +81,7 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 
 /** Iterate through the shells, removing any chunks now overlapped by chunks of an inner shell. */
 void CTerrain2::removeChunkOverlaps(Tdirection inDirection) {
+
 	for (unsigned int shell = 1; shell < shells.size(); shell++) {
 		shells[shell].calculateInnerBounds();
 		shells[shell].removeEncroachedOnChunks2(inDirection);
@@ -91,19 +93,9 @@ void CTerrain2::fillShells() {
 	for (auto& shell : shells) {
 		//how many chunk layers from the shell origin to fill:
 		int chunkExtent = ((shell.shellSCs - 1) / 2) * SCchunks;
-		//TO DO: find the best way to calculate this!
 
 		shell.initChunkExtent();
 		shell.fillEntire();
-
-		//TO DO: this is adding chunks then removing them again! Find a more 
-		//elegant way to do this!
-		//maybe pass inner shell's getNWchunkSpaceExtent etc result to createAllChunks
-		//via findAllSCchunks
-		if (shell.shellNo > 0) {
-			for (int dir = north; dir <= down; dir++)
-				shell.removeEncroachedOnChunks2((Tdirection)dir);
-		}
 	}
 }
 
@@ -152,14 +144,19 @@ void CTerrain2::scrollSampleSpace(Tdirection scrollDir, float shift) {
 void CTerrain2::initialiseChunks(int numChunks) {
 	chunks.resize(numChunks);
 	freeChunks.resize(numChunks);
-	inUseChunks.clear();
+	//inUseChunks.clear();
 	iota(begin(freeChunks), end(freeChunks), 0);
 }
 
 /** Return a chunk initialised with the given index. */
-int CTerrain2::createChunk(glm::i32vec3& index) {
+int CTerrain2::createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos) {
 	int id = getFreeChunk();
 	chunks[id].index = index;
+	chunks[id].cubeSize = pow(LoD1cubeSize, 1 + shellNo);
+	chunks[id].LoD = shells[shellNo].LoD;
+	chunks[id].setSample(sampleCorner, shells[shellNo].scSampleStep);
+	chunks[id].terrainPos = terrainPos;
+	chunksToMesh.push(id);
 	return id;
 }
 
@@ -169,7 +166,7 @@ int CTerrain2::getFreeChunk() {
 	if (freeChunks.size() > 0) {
 		id = freeChunks.back();
 		freeChunks.pop_back();
-		inUseChunks.push_back(id);
+		//inUseChunks.push_back(id);
 		return id;
 	}
 
@@ -178,8 +175,33 @@ int CTerrain2::getFreeChunk() {
 	id = chunks.size();
 	iota(begin(freeChunks), end(freeChunks), id+1);
 	chunks.resize(chunks.size() + chunkInc);
-	inUseChunks.push_back(id);
+	//inUseChunks.push_back(id);
 	return id;
 }
 
+/** Move this chunk  to the free pile. */
+void CTerrain2::removeChunk(int id) {
+	freeChunks.push_back(id);
+}
+
+/** Called every frame, used to maintain terrain in realtime. */
+void CTerrain2::update(float dT) {
+
+	//TO DO: base number on time available, not const value!
+	for (int x = 0; x < 10; x++) { 
+		//are there any chunks in the queue? Mesh the next one.
+		if (!chunksToMesh.empty()) {
+			int id = chunksToMesh.front();
+			chunksToMesh.pop();
+			pCallbackApp->createChunkMesh(chunks[id]);
+		}
+	}
+}
+
+/** Return the NW bottom corner position of this SC in worldspace. */
+glm::vec3& CTerrain2::getSCpos(int shellNo, glm::i32vec3& origIndex) {
+	i32vec3 rotatedIndex = shells[shellNo].getRotatedIndex(origIndex);
+	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
+		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.f);
+}
 

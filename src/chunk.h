@@ -3,10 +3,13 @@
 #include "renderer/model.h"
 #include "direction.h"
 
+#include "terrain/chunk2.h"
+
 extern int uniTag;
 
 class CSuperChunk;
 
+/*
 enum  TChunkStatus { chToSkin, chSkinned, chFree, chRemoveOnAlert };
 
 struct TDrawDetails {
@@ -15,6 +18,7 @@ struct TDrawDetails {
 	unsigned int vertCount;
 	glm::vec4 colour;
 };
+*/
 
 /** A class for regular cubes of terrain geometry. */
 class Chunk  {

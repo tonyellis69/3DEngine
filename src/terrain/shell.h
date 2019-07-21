@@ -23,6 +23,7 @@ public:
 	void initSuperChunks();
 	glm::vec3 & calcSCsampleSpacePosition(glm::i32vec3& scIndex);
 	void findAllSCchunks();
+	void fillAllUnclippedSCs();
 	CShellIterator& getIterator();
 	COuterSCIterator& getOuterSCiterator();
 	CFaceIterator& getFaceIterator(Tdirection face);
@@ -42,6 +43,8 @@ public:
 	CBoxVolume getChunkVolume2();
 
 	void reinitialiseInnerSCs();
+
+	glm::i32vec3& getRotatedIndex(const glm::i32vec3& origIndex);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -66,6 +69,7 @@ public:
 	glm::vec4 shellColour; ///!!!!!!!!!!!temp!
 
 	TBoxVolume innerBounds;
+
 };
 
 

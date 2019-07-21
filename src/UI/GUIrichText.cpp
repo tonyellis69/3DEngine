@@ -8,6 +8,8 @@
 
 using namespace glm;
 
+std::uniform_real_distribution<> CGUIrichText::randomPeriod{ 0,1.0f };
+
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	styles = NULL;
 	defaultTextStyle = { "default","defaultFont",glm::vec4(0,0,0,1) };
@@ -24,10 +26,11 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	selectedHotObj = -1;
 	updateDt = 0;
 	correctOverrunDelay = 0.001f;
-	overrunCorrect = false;
+	overrunCorrect = true;// false;
+	lineOverrun = 0;
 	resizeMode = resizeByWidthMode;
 	yPixelOffset = 0;
-	smoothScrollStep = 2;// 8;
+	smoothScrollStep = 8;// 8;
 	setMouseWheelMode(scroll);
 	hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
 	selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
@@ -41,7 +44,10 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	insetX = 0;
 	transcriptLog = NULL;
 	suspended = false;
+	busy = false;
 	displacedObj = INT_MAX;
+	charInterval = 0;
+	charDelay = 0.01f;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -121,8 +127,8 @@ void CGUIrichText::setAppendStyleHot(bool isOn, bool unsuspended, unsigned int h
 	
 
 	if (isOn) {
-		std::uniform_real_distribution<> randomRange{ 0,1.0f };
-		textObjs[currentTextObj].period = randomRange(randEngine);
+		//std::uniform_real_distribution<> randomRange{ 0,1.0f };
+		textObjs[currentTextObj].period = randomPeriod(randEngine);
 
 		if (unsuspended)
 			textObjs[currentTextObj].style = hotTextStyle;
@@ -223,144 +229,256 @@ void CGUIrichText::setText(std::string newText) {
 	textObjs[currentTextObj].text = newText;
 }
 
-/** Append newText to the current body of text. */
+/** Append newText to the current body of text (and update the page). */
 void CGUIrichText::appendText(std::string newText) {
+	addText(newText);
+	renderLineBuffer();
+
 	if (transcriptLog)
-		*transcriptLog << newText;
-	//if (textObjs.back().tmpText == tempOff)
-	//	removeTempText();
+		*transcriptLog << newText;		
+}
+
+/** Append the given text to the current body of text. */
+void CGUIrichText::addText(std::string newText) {
 	textObjs.back().text += newText;
-	updateText();
-	overrunCorrect = true; //TO DO: why do this here?		
+	compileLineFragments(lineBuffer.finalFrag());
+
+	overrunCorrect = true; 
+	//Important! Here we signal that we want any overrun caused by this adding this text to be corrected.
+	//ie, by scrolling.
 }
 
-/** Make the line after the current top line the new top line. */
-bool CGUIrichText::scrollDown() {
-		textData = textObjs[firstVisibleObject];
-		TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,no,0 };
-		do {
-			lineFragment = getNextLineFragment(lineFragment);
-		} while (!lineFragment.finalFrag && !lineFragment.causesNewLine);
+/** Scroll down by the given amount if possible, returning true if the page needs to be redrawn. */
+bool CGUIrichText::scrollDown2(int dist) {
+	int bottomLineOver = lineBuffer.getYextent() - getHeight();
 
-		firstVisibleObject = lineFragment.textObj;
-		firstVisibleText = lineFragment.textPos + lineFragment.textLength;
-		if (lineFragment.finalFrag)
-			return false;
+	while (abs(dist) > bottomLineOver) {
+		TLine newLine = compileLine(lineBuffer.finalFrag());
+		if (newLine.fragments.empty())
+			break;
+		lineBuffer.lines.push_back(newLine);
+		bottomLineOver += newLine.height;
+	}
 
-		updateText();
-		return true;
+	if (bottomLineOver < 1) //no overmatter, no scroll
+		return false;
+
+	int trim = std::min(abs(dist), bottomLineOver);
+	TLineFragment firstFrag = lineBuffer.trimTop(trim);
+	firstVisibleObject = firstFrag.textObj;
+	firstVisibleText = firstFrag.textPos;
+	updateFragmentPositions();
+	return true;
 }
 
 
 
-/** Starting with the top visible object, work through the list, rendering each, until we overrun the
-	bottom of the display area.*/
-void CGUIrichText::renderText() {
-	hotTextFrags.clear();
-	fadeFrags.clear();
-	overrun = 0; overrunHotTextObj = -1; underrun = 0; longestLine = 0; int indent = 0;
+/** Starting with the top visible object, work through the list, converting each to line fragments and adding them
+	to the lineBuffer, until we run out or overrun the bottom of the display area.*/
+void CGUIrichText::createPage() {
+	lineBuffer.clear();
+	overrunHotTextObj = -1; underrun = 0; longestLine = 0;
 	markStart = markEnd = -1;
-	bool displaced = false;
 	textBuf.init(true);
-	TLineFragDrawRec dataRec;
-	i32vec2 offset(0, yPixelOffset);
-	int currObjNo = firstVisibleObject;
-	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,no,0 };
-	do {
-		
-		lineFragment = getNextLineFragment(lineFragment);
-		if (lineFragment.textObj != currObjNo) { //is this line fragment the start of a new text object?
-			if (textBuf.notEmpty()) { //yes? Render the last of the old text object (if any) before we go any further
-				textBuf.render();	
-				textBuf.init(false);
+
+	compileLineFragments(TLineFragment { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+	renderLineBuffer();
+}
+
+/** Update the position details of each fragment, based on line number, line height, and scroll offset. */
+void CGUIrichText::updateFragmentPositions() {
+	lineBuffer.updateFragmentPositions();
+}
+
+/** Draw all current line fragments to the text display buffer. */
+void CGUIrichText::renderLineBuffer() {
+	lineOverrun = 0;
+	if (lineBuffer.isEmpty())
+		return;
+
+	updateFragmentPositions();//TO DO: temp!!!! only do after a change, not every time we update text buffer
+	hotFrags.clear();
+	fadeFrags2.clear();
+	textBuf.init(true);
+	int currObjNo = lineBuffer.frags[lineBuffer.getLine(0).fragments[0]].textObj;
+	int finalY = 0;
+	for (auto line : lineBuffer.lines) {
+		for (auto fragId: line.fragments) {
+			TLineFragment& frag = lineBuffer.getFragment(fragId);
+			if (frag.textObj != currObjNo) { //is this line fragment the start of a new text object?
+				if (textBuf.notEmpty()) { //yes? Render the last of the old text object (if any) before we go any further
+					textBuf.render();
+					textBuf.init(false);
+				}
+				currObjNo = frag.textObj;
 			}
-			currObjNo = lineFragment.textObj;
-		}
-		TRichTextRec currentObj = textObjs[lineFragment.textObj];
-		CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
-		scrollHeight = currentFont->lineHeight;
-		longestLine = std::max(longestLine, lineFragment.renderEndX);
 
-		string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
+			TRichTextRec currentObj = textObjs[frag.textObj];
+			string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
+			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
+			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
+			textBuf.addFragment(frag.renderStartX, frag.renderStartY, dataRec);
+			finalY = frag.renderStartY + frag.height;
 
-		dataRec = { &renderLine, currentFont, currentObj.style.colour };
-		if (!displaced && lineFragment.textObj == displacedObj) {
-			offset.y += gapSize;
-			displaced = true;
-		}
-		offset.x = textBuf.addFragment(lineFragment.renderStartX+indent, offset.y, dataRec);
-		
-		if ( currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
-			makeHotFragment(lineFragment, offset, renderLine);
-		}
+			//create an index of hot text fragments
+			if (currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
+				hotFrags.push_back({ fragId,renderLine, frag.textObj });
+				//std::uniform_real_distribution<> randomRange{ 0,1.0f };
+				textObjs[currentTextObj].period = randomPeriod(randEngine);
+			}
 
-		if (currentObj.flags & richFadeIn && currentObj.period < 1 && renderLine[0] != '\n')
-			makeFadeFragment(lineFragment, offset, renderLine);
-
-
-		if (currentObj.flags & richMarked && markStart == -1) {
-			if (lineFragment.textObj > 0 && !(textObjs[lineFragment.textObj - 1].flags & richMarked)) {
-				markStart = offset.y;
+			//create an index of fade-in fragments
+			if (currentObj.flags & richFadeIn && currentObj.period < 1 && renderLine[0] != '\n') {
+				//makeFadeFragment(lineFragment, offset, renderLine);
+				fadeFrags2.push_back({ fragId,renderLine, frag.textObj });
+				textObjs[currentTextObj].period = 0;
 			}
 		}
-		if (!(currentObj.flags & richMarked) && markStart > -1 && markEnd == -1) {
-			markEnd = offset.y;
-		}
+	}
+	if (finalY > getHeight()) {
+		lineOverrun = finalY - getHeight();
+	}
 
-		if (lineFragment.causesNewLine != no) {
-			offset = glm::i32vec2(0, offset.y + currentFont->lineHeight);
-			indent = insetX;
-		}
-		else
-			indent = 0;
-
-		checkOverrun(offset.y, currObjNo);
-		if (offset.y > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
-			textBuf.render();
-			return;
-		}
-		
-
-
-	}  while(!lineFragment.finalFrag);
 
 	textBuf.render();
 }
 
-/** Create a record of the position and composition of the given fragment of hot text. This is used to check
-	for mouseovers, drawing it highlighted, etc. */
-void CGUIrichText::makeHotFragment(TLineFragment& lineFragment, i32vec2& offset, std::string& renderLine) {
-	int lineHeight = pDrawFuncs->getFont(textObjs[lineFragment.textObj].style.font)->lineHeight;
+/** Starting with the given line fragment, compile our text objects into line fragments 
+	until we run out or overflow the page. */
+void CGUIrichText::compileLineFragments(TLineFragment lineFragment) {
+	do {
+		int currObjNo = lineFragment.textObj;
+		bool startOnNewLine = false;
+		if (lineFragment.causesNewLine != no) {
+			startOnNewLine = true;
+		}
 
-	THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y , offset.x, offset.y + lineHeight, lineFragment.textObj };
-	hotFrag.text = renderLine;
-/*	if (offset.y + lineHeight > getHeight())
-		hotFrag.overrun = true;
-	else
-		hotFrag.overrun = false; */
-	hotTextFrags.push_back(hotFrag);
+		int fragId = processNextFragment(lineFragment);
+		if (fragId == -1) {
+			checkLineOverrun(lineBuffer.getYextent());
+			return;
+		}
+
+		if (startOnNewLine) {
+			lineBuffer.addLine();
+		}
+
+		lineBuffer.appendFragment(fragId);
+
+		int yExtent = lineBuffer.getYextent();
+		checkLineOverrun(yExtent);
+
+		if (yExtent > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
+			return;
+		}
+
+	} while (!lineFragment.finalFrag);
 }
 
-void CGUIrichText::makeFadeFragment(TLineFragment& lineFragment, glm::i32vec2& offset, std::string& renderLine)
-{
-	int lineHeight = pDrawFuncs->getFont(textObjs[lineFragment.textObj].style.font)->lineHeight;
+/** Return the fragment following the given one, having registered any hot text or other special cases. */
+int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
+	bool displaced = false;
+	int indent = 0;
+	int fragId = -1;
 
-	THotTextFragment hotFrag = { lineFragment.renderStartX, offset.y , offset.x, offset.y + lineHeight, lineFragment.textObj };
-	hotFrag.text = renderLine;
-	fadeFrags.push_back(hotFrag);
+	//start at the given fragment's y position (plus scrolling) and x reset for now
+	i32vec2 offset(0, yPixelOffset + lineFragment.renderStartY); 
+
+	bool startOnNewLine = false;
+	if (lineFragment.causesNewLine != no) {
+		startOnNewLine = true;
+	}
+
+
+	lineFragment = getNextLineFragment(lineFragment);
+	//if there is no more text, lineFragment is now zeroed 
+	//otherwise it has been set to the next fragment
+	//either way we have modified the parameter 
+	//but in the latter case, we create a new frags[] entry before we leave
+	
+
+	if (lineFragment.finalFrag && lineFragment.textLength == 0)
+		return fragId; //final fragment has no text? Go home. (TO DO: but should this happen?)
+	int currObjNo = lineFragment.textObj;
+	TRichTextRec currentObj = textObjs[lineFragment.textObj];
+	CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
+	scrollHeight = currentFont->lineHeight; //TO DO can probably remove - investigate!
+	longestLine = std::max(longestLine, lineFragment.renderEndX);
+
+	string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
+
+	TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
+
+
+	/*if (!displaced && lineFragment.textObj == displacedObj) { //if this fragment's obj has been displaced by a text removal...
+		offset.y += gapSize; //drop our starting y by the extent of the gap
+		displaced = true;
+	}*/
+
+	if (currentObj.flags & richGap) { //ensure fragment is ga[
+		lineFragment.height = currentObj.gap; //TO DO: scrap gapSize store in obj
+	}
+
+	offset.x = lineFragment.renderStartX + indent;
+	for (int c = 0; c < renderLine.size(); c++) { //find the length of the fragment
+		if (renderLine[c] == '\n')
+			continue;
+		offset.x += currentFont->table[renderLine[c]]->width; //get the x-extent of the fragment in offset
+		//TO DO: not very intuitive, needs its own variable
+	}
+
+	if (startOnNewLine) { //TO DO scrap asap!
+		offset.y += currentFont->lineHeight; //ensure starting y is *below* last line if the last frag caused a new line
+	}
+
+
+	//NB!!! we don't even use offset to create this fragment! It's used for making hotFrags etc and thus entirely replaceable
+	lineFragment.renderStartY = offset.y;
+	fragId = lineBuffer.copyFragment(lineFragment);
+	
+	if (currentObj.flags & richMarked && markStart == -1) {
+		if (lineFragment.textObj > 0 && !(textObjs[lineFragment.textObj - 1].flags & richMarked)) {
+			markStart = offset.y;
+		}
+	}
+	if (!(currentObj.flags & richMarked) && markStart > -1 && markEnd == -1) {
+		markEnd = offset.y;
+	}
+
+	if (lineFragment.causesNewLine != no) {
+		offset = glm::i32vec2(0, offset.y + currentFont->lineHeight);
+		indent = insetX;
+	}
+	else {
+		indent = 0;
+	}
+
+
+	return fragId;
 }
+
+/** Create one line of line fragments from our text, starting with the given one. */
+TLine CGUIrichText::compileLine(TLineFragment lineFragment) {
+	TLine line;
+	do {
+		int id = processNextFragment(lineFragment);
+		if (id == -1)
+			break;
+		line.fragments.push_back(id);
+		line.height = std::max(line.height, lineFragment.height);
+	} while (lineFragment.causesNewLine == no);
+
+	return line;
+}
+
 
 /** Record how much the given line overruns (or underruns) the bottom of the view, if at all. */
-void CGUIrichText::checkOverrun(int lineStartY, int currentObjNo) {
-	TRichTextRec currentObj = textObjs[currentObjNo];
-	int lineHeight = pDrawFuncs->getFont(textObjs[currentObjNo].style.font)->lineHeight;
-
-	if (lineStartY + lineHeight > getHeight()) {
-		overrun = lineStartY + lineHeight - getHeight(); //was true;
-		if ((currentObj.hotId) && overrunHotTextObj == -1)
-			overrunHotTextObj = currentObjNo; //TO DO: check for this in hotTextScroll instead		
+void CGUIrichText::checkLineOverrun(int lineEndY) {
+	lineOverrun = 0;
+	if (lineEndY > getHeight()) {
+		lineOverrun = lineEndY - getHeight(); //was true;
 	}
-	underrun = getHeight() - (lineStartY + lineHeight);
+	underrun = getHeight() - lineEndY;
 }
 
 
@@ -383,6 +501,7 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 	TRichTextRec* richTextData = &textObjs[textObj];
 	CFont* currentFont = pDrawFuncs->getFont(richTextData->style.font);
+	nextLineFrag.height = currentFont->lineHeight;
 
 	//catch unbreakable full stops, etc, in the next object that could wrap this fragment onto the next line
 	//disqualify them, however, if they are preceeded by whitespace
@@ -448,19 +567,20 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 
 /** Check for mouse over hot text. */
 void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
-	if (suspended)
+	if (suspended || busy)
 		return;
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
 		selectedHotObj = -1;
-	for (auto hotTextFrag : hotTextFrags) {
-		if (localMouse.y > hotTextFrag.renderStartY &&  localMouse.y < hotTextFrag.renderEndY
-			&& localMouse.x > hotTextFrag.renderStartX && localMouse.x < hotTextFrag.renderEndX) {
-			selectedHotObj = hotTextFrag.textObj;
+	for (auto hotTextFrag : hotFrags) {
+		TLineFragment& hotFrag = lineBuffer.getFragment(hotTextFrag.fragId);
+		if (localMouse.y > hotFrag.renderStartY &&  localMouse.y < hotFrag.renderStartY + hotFrag.height
+			&& localMouse.x > hotFrag.renderStartX && localMouse.x < hotFrag.renderEndX) {
+			selectedHotObj = hotFrag.textObj;
 			if (oldSelectedHotObj != selectedHotObj) {
 				msgHighlight();
-				highlight(selectedHotObj); 
+				//highlight(selectedHotObj); 
 			}
 			break;
 		}
@@ -468,7 +588,7 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	
 	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
 		msgHighlight();
-		unhighlight(oldSelectedHotObj);
+		//unhighlight(oldSelectedHotObj);
 	}
 }
 
@@ -484,27 +604,15 @@ void CGUIrichText::msgHighlight() {
 	pDrawFuncs->handleUImsg(*this, msg);
 }
 
-/** Highlight the given text object on the text buffer - in this case by redrawing it in the 'selected' colour.*/
-void CGUIrichText::highlight(int textObj) {
-	CFont* font = pDrawFuncs->getFont(selectedHotTextStyle.font);
-	TLineFragDrawRec dataRec = { NULL, font, selectedHotTextStyle.colour };
-	for (auto hotTextFrag : hotTextFrags) {
-		if (hotTextFrag.textObj == textObj) {
-			dataRec.text = &hotTextFrag.text;
-			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY , dataRec);
 
-		}
-	}
-}
 
 /** Detect clicks on any menu items. */
 void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
-	if (suspended)
+	if (suspended || busy)
 		return;
 	if (selectedHotObj > -1) {
 		CMessage msg;
 		msg.Msg = uiMsgHotTextClick;
-		//glm::i32vec2 screen = localToScreenCoords(mouseX, mouseY);
 		msg.x = mouseX; msg.y = mouseY;
 		msg.value = textObjs[selectedHotObj].hotId;
 		pDrawFuncs->handleUImsg(*this, msg);
@@ -515,6 +623,9 @@ void CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
 	CMessage msg;
 	msg.Msg == uiMsgLMouseUp;
 	parent->message(this, msg);
+
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!temp
+	renderLineBuffer();
 }
 
 void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
@@ -532,76 +643,67 @@ void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 		return;
 
 	if (selectedHotObj >= 0) {
-		unhighlight(selectedHotObj);
+		//unhighlight(selectedHotObj);
 		selectedHotObj = -1;
 		msgHighlight();
 	}
 }
 
-/** Unhighlight the given text object.*/
-void CGUIrichText::unhighlight(int textObj) {
-	//textBuf.setTextColour(hotTextColour);
 
-	CFont* font = pDrawFuncs->getFont(hotTextStyle.font);
-	TLineFragDrawRec dataRec = { NULL, font, hotTextStyle.colour };
+/** Return the first lineFragment of the previous line, if any. */
+TCharacterPos& CGUIrichText::getPreviousLine(TCharacterPos& startText) {
+	int origStartText = startText.pos;
+	int origStartObject = startText.textObj;
 
-	for (auto hotTextFrag : hotTextFrags) {
-		if (hotTextFrag.textObj == textObj) {
-			dataRec.text = &hotTextFrag.text;
-			textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, dataRec);
-		}
-	}
-}
+	//find previous newline - we can work forward from ther
+	TCharacterPos prevNewline = getPrevNewline(origStartObject, origStartText - 1);//-1 ensures we skip a newline that caused this line
 
+	TCharacterPos lastLineStart = prevNewline;// { origStartObject, origStartText };
 
-/** Make the line previous to the current top line the new top line. */
-bool CGUIrichText::scrollUp() {
-	int origFirstVisibleText = firstVisibleText;
-	int origFirstVisibleObject = firstVisibleObject;
-
-
-	TCharacterPos prevNewline = getPrevNewline(firstVisibleObject, firstVisibleText - 1);//-1 ensures we skip a newline that caused this line
-	firstVisibleText = prevNewline.pos;
-	firstVisibleObject = prevNewline.textObj;
-
-	int lastNewLineObj = firstVisibleObject;
-	int lastNewLinePos = firstVisibleText;
 
 	//any word wraps between here and where we started?
-	TLineFragment lineFragment{ firstVisibleObject,firstVisibleText,0,0,0,no,0 };
-	do {	
+	TLineFragment lineFragment{ prevNewline.textObj,prevNewline.pos,0,0,0,0,0,no,0 };
+	do {
 		if (lineFragment.causesNewLine == wordwrap) {
-			lastNewLinePos = lineFragment.textPos + lineFragment.textLength;
-			lastNewLineObj = lineFragment.textObj;
+			lastLineStart.pos = lineFragment.textPos + lineFragment.textLength;
+			lastLineStart.textObj = lineFragment.textObj;
 		}
 
 		lineFragment = getNextLineFragment(lineFragment); //TO DO should always be next wordwrap
 
-	} while (lineFragment.textObj < origFirstVisibleObject ||
-	  (lineFragment.textObj == origFirstVisibleObject && (lineFragment.textPos + lineFragment.textLength) < (origFirstVisibleText - 1)));
+	} while (lineFragment.textObj < origStartObject ||
+		(lineFragment.textObj == origStartObject && (lineFragment.textPos + lineFragment.textLength) < (origStartText - 1)));
 
-	if (firstVisibleObject == origFirstVisibleObject &&  firstVisibleText == origFirstVisibleText)
-		return false;
+	return lastLineStart;
+}
 
-	firstVisibleObject = lastNewLineObj;
-	firstVisibleText = lastNewLinePos;
+/** Attempt to scroll up by the given distance. Return true if the page now needs to be redrawn. */
+bool CGUIrichText::scrollUp3(int dist) {
+	while (dist > abs(lineBuffer.yOffset)) {  //attempting to scroll beyond current top visible line
+		//can we find a previous line?
+		TCharacterPos currentLine = { firstVisibleObject,firstVisibleText };
+		TCharacterPos prevNewline = getPreviousLine(currentLine);
+		if (prevNewline == currentLine) {
+			break;
+		}
+		//found previous line so make it our new first visible line
+		firstVisibleObject = prevNewline.textObj;
+		firstVisibleText = prevNewline.pos;
+		//insert line in line buffer
+		TLine newFirstLine = compileLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+		lineBuffer.insert(0, newFirstLine);
+		lineBuffer.adjustYoffset(-lineBuffer.getLine(0).height);
+	}
 
-	updateText();
+	if (lineBuffer.yOffset >= 0)
+		return false; //we wer at the top of the text all along!
+
+	lineBuffer.adjustYoffset(dist);
+	updateFragmentPositions();
 	return true;
 }
 
-/** Return character at positionHint previous to that given, winding back textObj if needed. */
-int CGUIrichText::getPrevCharacter(int& textObj, int& pos) {
-	if (pos == 0) {
-		if (textObj == 0)
-			return -1;
-		textObj--;
-		pos = textObjs[textObj].text.size() - 1;
-	}
-	else
-		pos--;
-	return textObjs[textObj].text[pos];
-}
+
 
 TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 	do {
@@ -619,27 +721,26 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 
 
 void CGUIrichText::update(float dT) {
+	//if (!deliveryBuffer.empty())
+		//deliverByCharacter(dT);
 
 	if (displacedObj < INT_MAX) {
-		collapseDisplacement(dT);
-		//return;
+		busy = false;
+		;// collapseDisplacement(dT);
 	}
 
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)
 	{
 		updateDt = 0;
-		if (overrun && overrunCorrect) {
-			//if (overrunMode == overScrollMode)
-				smoothScroll(-smoothScrollStep);
-			//else
-			//	resizeToFit();
-			overrunCorrect = overrun;
+		if (isOverrun() && overrunCorrect) {
+				smoothScroll2(-smoothScrollStep);
+				overrunCorrect = isOverrun();
 		} 
 	}
-	if (!hotTextFrags.empty())
-		animateHotText(dT);
-	if (!fadeFrags.empty())
+	if (!hotFrags.empty())
+		 animateHotText(dT);
+	if (!fadeFrags2.empty())
 		animateFadeText(dT);
 	
 }
@@ -647,7 +748,6 @@ void CGUIrichText::update(float dT) {
 
 bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
 	int direction = wheelDelta > 0 ? 1 : -1;
-
 	if (selectedHotObj != -1 && mouseMode) {
 		CMessage msg;
 		msg.Msg = uiMouseWheel;
@@ -659,7 +759,8 @@ bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheel
 
 	if (mouseWheelMode == scroll) {
 		if (!attemptHotTextScroll(direction))
-			smoothScroll(direction * scrollHeight);
+			//smoothScroll(direction /* * scrollHeight */);
+			smoothScroll2(direction * smoothScrollStep);
 	}
 	else {
 		hotTextScroll(direction);
@@ -669,10 +770,10 @@ bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheel
 
 /** If we're scrolling the right way to convert to a hot text scroll, do so. */
 bool CGUIrichText::attemptHotTextScroll(int direction) {
-	if (selectedHotObj == -1 || hotTextFrags.size() < 2)
+	if (selectedHotObj == -1 || hotFrags.size() < 2)
 		return false;
-	if ( (direction < 0 && selectedHotObj == hotTextFrags[0].textObj) ||
-		(direction > 0 && selectedHotObj == hotTextFrags.back().textObj) ) {
+	if ( (direction < 0 && selectedHotObj == hotFrags[0].textObj) ||
+		(direction > 0 && selectedHotObj == hotFrags.back().textObj) ) {
 		mouseWheelMode = hotText;
 		hotTextScroll(direction);
 		return true;
@@ -680,37 +781,32 @@ bool CGUIrichText::attemptHotTextScroll(int direction) {
 	return false;
 }
 
-void CGUIrichText::smoothScroll(int pixels) {
-	if (pixels < 0) { //we're scrolling down to the bottom of the text
-		if (!overrun) //no more text to expose
-			return;
-		yPixelOffset += pixels;
-		int lines = yPixelOffset / -scrollHeight;
-		for (int line = 0; line < lines; line++) {
-			if (overrun) {
-				yPixelOffset += scrollHeight;
-				scrollDown();
-			}
+
+
+/** Scroll the visible text by the given number of pixels, if possible. */
+void CGUIrichText::smoothScroll2(int dist) {
+	if (dist < 0 && !isOverrun()) //nowhere to scroll down
+		return;
+
+	if (dist < 0) { //scrolling down to the end...
+		if (scrollDown2(dist)) {
+			renderLineBuffer();
 		}
 	}
-	else //we're scrolling up
-	{
-		yPixelOffset += pixels;
-		if (yPixelOffset >= 0) {  //have we dropped below top of screen?	
-			yPixelOffset -= scrollHeight;  //attempt to add a new line to fill the space
-			if (scrollUp()) {
-				return;
+	else if (scrollUp3(dist)) {
+			int finalRow = lineBuffer.getFinalRow();
+			if (lineBuffer.getLineTop(finalRow) > getHeight()) { //bottom line scrolled out?
+				lineBuffer.removeLine(finalRow);
 			}
-			else
-				yPixelOffset = 0;
-		}
+
+			renderLineBuffer();
 	}
-	updateText();
+
 }
 
 
-void CGUIrichText::updateText() {
-	renderText();
+void CGUIrichText::updatePage() {
+	createPage();
 	if (!mouseMode)
 		updateHotTextSelection();
 
@@ -741,7 +837,7 @@ void CGUIrichText::setMouseWheelMode(TMouseWheelMode mode) {
 
 /** Ensure hot text is selected, if it's onscreen, and that we enter hot text scroll mode. */
 void CGUIrichText::updateHotTextSelection() {
-	if (hotTextFrags.size() == 0) { //no hot text
+	if (hotFrags.size() == 0) { //no hot text
 		selectedHotObj = -1;
 		if (mouseWheelMode == hotText) {
 			mouseWheelMode = scroll;
@@ -749,10 +845,10 @@ void CGUIrichText::updateHotTextSelection() {
 	}
 	else { //visible hot text
 		if (selectedHotObj != -1)
-			highlight(selectedHotObj);
+			;// highlight(selectedHotObj);
 		else {
-			selectedHotObj = hotTextFrags[0].textObj;
-			highlight(selectedHotObj);
+			selectedHotObj = hotFrags[0].textObj;
+			//highlight(selectedHotObj);
 		}
 		mouseWheelMode = hotText;
 	}
@@ -762,7 +858,7 @@ void CGUIrichText::updateHotTextSelection() {
 void CGUIrichText::hotTextScroll(int direction) {
 	int nextHotOb = -1;
 	if (direction < 0) { //down/right	
-		for (auto hotTextFrag : hotTextFrags) {
+		for (auto hotTextFrag : hotFrags) {
 			if (hotTextFrag.textObj > selectedHotObj) {
 				nextHotOb = hotTextFrag.textObj;
 				break;
@@ -770,7 +866,7 @@ void CGUIrichText::hotTextScroll(int direction) {
 		}
 	} 
 	else { //up/left
-			for (auto hotTextFrag : hotTextFrags) {
+			for (auto hotTextFrag : hotFrags) {
 				if (hotTextFrag.textObj < selectedHotObj) {
 					nextHotOb = hotTextFrag.textObj;
 				}
@@ -783,22 +879,22 @@ void CGUIrichText::hotTextScroll(int direction) {
 	}
 
 
-	unhighlight(selectedHotObj);
+	//unhighlight(selectedHotObj);
 	selectedHotObj = nextHotOb;
-	highlight(selectedHotObj);
+	//highlight(selectedHotObj);
 	/////////////////////////////////////////
 	//check here if the hot text we've selected is overruning
 	if (overrunHotTextObj == selectedHotObj) {
 		overrunHotTextObj = -1;
-		smoothScroll(-scrollHeight);
+		smoothScroll2(-scrollHeight);
 	}
 }
 
 /** Select the topmost visible hot text. */
 void CGUIrichText::selectTopHotText() {
-	if (hotTextFrags.size() > 0) {
-		selectedHotObj = hotTextFrags[0].textObj;
-		highlight(selectedHotObj);
+	if (hotFrags.size() > 0) {
+		selectedHotObj = hotFrags[0].textObj;
+		//highlight(selectedHotObj);
 		mouseWheelMode = hotText;
 	}
 }
@@ -857,26 +953,20 @@ void CGUIrichText::clear() {
 	currentTextObj = 0;
 	firstVisibleObject = 0;
 	selectedHotObj = -1;
-	updateText();
+	createPage();
 }
 
 /** Unselect any selected hot text. */
 void CGUIrichText::clearSelection() {
 	if (selectedHotObj == -1)
 		return;
-	unhighlight(selectedHotObj);
+	//unhighlight(selectedHotObj);
 	selectedHotObj = -1;
 }
 
 
 
 void CGUIrichText::appendMarkedUpText(string text) {
-	if (displacedObj != INT_MAX) {
-		textQueue += text;
-		return;
-	}
-
-
 	bool bold = false; bool hot = false;
 	enum TStyleChange { styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle };
 
@@ -953,7 +1043,7 @@ void CGUIrichText::updateAppearance() {
 	CGUIbase::updateAppearance();
 	//assume dimensions may have changed, eg, if this control was set to span
 	textBuf.setSize(getWidth(), getHeight());
-	renderText();
+	createPage();
 }
 
 
@@ -972,7 +1062,7 @@ void CGUIrichText::resizeToFit() {
 		parent->message(this, msg);
 	}
 
-	renderText();
+	createPage();
 }
 
 /** Resize width proportionally as we try to resize height to fit text. Stop if it looks like we're caught
@@ -983,8 +1073,9 @@ void CGUIrichText::resizeByRatio() {
 	int newHeight = getHeight(); int newWidth = getWidth();
 	bool previouslyOverrun = false;
 
-	while (overrun || underrun) {
-		if (overrun) {
+
+	while (lineOverrun || underrun) {
+		if (lineOverrun) {
 			previouslyOverrun = true;
 			newHeight = getHeight() + heightModifier; //add space for one more line and see where that gets us
 		}
@@ -997,7 +1088,7 @@ void CGUIrichText::resizeByRatio() {
 		newWidth = newHeight * ratio;
 
 		resize(newWidth, newHeight);
-		renderText(); //updates the overrun/underrun registers. Does the text fit now?
+		createPage(); //updates the lineOverrun/underrun registers. Does the text fit now?
 	}
 
 	//tidy any remaining underrun
@@ -1015,15 +1106,15 @@ void CGUIrichText::resizeByWidth() {
 	setWidth(resizeW);
 
 	//do we need to adjust height too?
-	int resizeGuess = overrun;
-	while (overrun) {
+	int resizeGuess = lineOverrun;
+	while (lineOverrun) {
 		if (getHeight() + resizeGuess > maxHeight) {  //can't resize beyond maxHeight
 			break;
 		}
 		else
 			setHeight(getHeight() + resizeGuess);
 		resizeGuess *= 2;
-		renderText();
+		createPage();
 	}
 
 	if (underrun > 0) {
@@ -1110,9 +1201,8 @@ void CGUIrichText::setFadeText(bool onOff) {
 		textObjs[currentTextObj].flags &= ~richFadeIn;
 }
 
-/** Remove the most recent block of tempporary text. */
+/** Remove the most recent block of text objs flagged as temporary. */
 void CGUIrichText::removeTempText() {
-	//return;
 	for ( int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].flags & richTemp) {
 			textObjs.erase(textObjs.begin() + obj);	
@@ -1139,11 +1229,13 @@ void CGUIrichText::onDrag(const int mouseX, const int mouseY) {
 /** Remove any temporary text and update the screen. */
 void CGUIrichText::collapseTempText() {
 	removeTempText();
-	updateText();
+	createPage();
 }
 
 /** Make the last temporary text permanent, if any. This includes making any suspended hot text active. */
-void CGUIrichText::solidifyTempText() {
+bool CGUIrichText::solidifyTempText() {
+	if (busy)
+		return false;
 	for (int obj = textObjs.size() - 1; obj > 0; obj--) {
 		if (textObjs[obj].flags & richTemp) {
 			textObjs[obj].flags &= ~richTemp;
@@ -1155,11 +1247,12 @@ void CGUIrichText::solidifyTempText() {
 				textObjs[obj].style = defaultTextStyle;
 			}
 			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp)) {
-				updateText();
+				renderLineBuffer();
 				break;
 			}
 		}
 	}
+	return true;
 }
 
 /** Run backwards throught the text, removing any duplicate hot texts. */
@@ -1177,7 +1270,8 @@ void CGUIrichText::unhotDuplicates() {
 			hotIds.push_back(hotId);
 
 	}
-	updateText();
+	//updatePage();
+	renderLineBuffer();
 }
 
 /** Remove the last section of text flagged as marked, if any. */
@@ -1194,9 +1288,18 @@ void CGUIrichText::removeMarked() {
 	}
 
 	if (beforeObj != -1 && beforeObj < currentTextObj) {
+		busy = true;
 		 displacedObj = beforeObj + 1;
 		 collapsePeriod = 0;
 		 gapSize = markEnd - markStart;
+
+		 TRichTextRec gapObj = textObjs[beforeObj];
+		 gapObj.text = "\n" + to_string(markEnd - markStart);
+		 gapObj.flags |= richGap;
+		 gapObj.gap = markEnd - markStart;
+		 textObjs.insert(textObjs.begin() + displacedObj, gapObj);
+		 currentTextObj++;
+		 createPage();
 	}
 	
 }
@@ -1209,27 +1312,25 @@ void CGUIrichText::animateHotText(float dT) {
 	TLineFragDrawRec dataRec = { NULL, font, selectedHotTextStyle.colour };
 
 	int objId = -1;
-	for (auto hotTextFrag : hotTextFrags) {
-		if (selectedHotObj == hotTextFrag.textObj)
-			continue;
-
-
+	for (auto hotTextFrag : hotFrags) {
+		TLineFragment& frag = lineBuffer.getFragment(hotTextFrag.fragId);
 		if (hotTextFrag.textObj != objId) {
 			objId = hotTextFrag.textObj;
 			textObjs[objId].period += dT * 0.2f;
 			if (textObjs[objId].period > 1)
-				textObjs[objId].period = 0;
+				textObjs[objId].period = 0; // -= floor(textObjs[objId].period);
 		}
 
-		float transition;
-		transition = std::max(textObjs[objId].period, 0.7f) - 0.7f;
-		transition /= 0.3f;
-
-		transition = sin(transition * PI);
+		float transition = 1;
+		if (selectedHotObj != hotTextFrag.textObj) {
+			transition = std::max(textObjs[objId].period, 0.8f) - 0.8f;
+			transition /= 0.2f;
+			transition = sin(transition * PI);
+		}
 
 		dataRec.textColour = mix(hotTextStyle.colour, selectedHotTextStyle.colour, transition);
 		dataRec.text = &hotTextFrag.text;
-		textBuf.renderTextAt(hotTextFrag.renderStartX, hotTextFrag.renderStartY, dataRec);
+		textBuf.renderTextAt(frag.renderStartX, frag.renderStartY, dataRec);
 	}
 }
 
@@ -1239,12 +1340,11 @@ void CGUIrichText::animateFadeText(float dT) {
 	TLineFragDrawRec dataRec; 
 	CFont* font;
 
-
-	for (auto fadeFrag : fadeFrags) {
-
+	for (auto fadeFrag : fadeFrags2) {
+		TLineFragment& frag = lineBuffer.getFragment(fadeFrag.fragId);
 		if (fadeFrag.textObj != objId) {
 			objId = fadeFrag.textObj;
-			textObjs[objId].period += dT * 2.5f;
+			textObjs[objId].period += dT * 1.5f;
 			if (textObjs[objId].period > 1)
 				textObjs[objId].period = 1;
 		}
@@ -1255,13 +1355,13 @@ void CGUIrichText::animateFadeText(float dT) {
 		dataRec.text = &fadeFrag.text;
 		dataRec.textColour = textObjs[objId].style.colour;
 		dataRec.textColour.a = textObjs[objId].period;
-
-		textBuf.renderTextAt(fadeFrag.renderStartX, fadeFrag.renderStartY, dataRec);
+		textBuf.renderTextAt(frag.renderStartX, frag.renderStartY, dataRec);
 	}
 }
 
 /** If there's currently displaced text (caused by removing marked text), shrink the gap.*/
 void CGUIrichText::collapseDisplacement(float dT) {
+	busy = true;
 	collapsePeriod += dT;
 	if (collapsePeriod > 0.01f) { //was 0.005f;
 		collapsePeriod = 0;
@@ -1269,20 +1369,53 @@ void CGUIrichText::collapseDisplacement(float dT) {
 		if (gapSize < 0) {
 			gapSize = 0;
 			displacedObj = INT_MAX;
-			appendMarkedUpText(textQueue);
-			textQueue.clear();
+			busy = false;
 		}
-		renderText();
+		createPage();
+		//TO DO: this should require rerendering the lineBuffer, and possibly updating frag positions,
+		//not a complete recompile of all fragments
 	}
 	
 }
 
+/** Break the text in deliveryBuffer into characters and send them individually to the rich text control. */
+void CGUIrichText::deliverByCharacter(float dT) {
+	string text;
+	charInterval += dT;
+	if (charInterval < charDelay)
+		return;
+
+
+	text = deliveryBuffer.substr(0, 1);
+	charInterval = 0;
+	
+	deliveryBuffer = deliveryBuffer.substr(text.size(), string::npos);
+
+	//appendMarkedUpText(text);
+	textObjs.back().text += text;
+	renderLineBuffer();
+}
+
+/** Returns true if there's any text beyond the bottom of the page. */
+bool CGUIrichText::isOverrun() {
+	if (lineOverrun > 0)
+		return true;
+	TLineFragment finalFrag = lineBuffer.finalFrag();
+	if (textObjs.size() > finalFrag.textObj + 1)
+		return true;
+	if (textObjs.size() == (finalFrag.textObj + 1) &&
+		textObjs.back().text.size() > (finalFrag.textPos + finalFrag.textLength)) {
+		return true;
+	}
+	return false;
+}
 
 
 TRichTextRec::TRichTextRec() {
 	hotId = 0;
 	flags = 0;
 	period = 0;
+	gap = 0;
 }
 
 

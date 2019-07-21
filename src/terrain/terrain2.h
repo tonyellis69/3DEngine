@@ -1,13 +1,15 @@
 #pragma once
 
 #include <vector>
+#include<queue>
 
 #include "..\terrain\shell.h"
-
 #include "..\direction.h"
+#include "chunk2.h"
 
 
-class Chunk2;
+
+
 class CTerrain2 {
 public:
 	CTerrain2() : playerOffset(0) {};
@@ -24,8 +26,13 @@ public:
 	void setCallbackApp(ITerrainCallback* pApp);
 	void scrollSampleSpace(Tdirection scrollDir, float shift);
 	void initialiseChunks(int numChunks);
-	int createChunk(glm::i32vec3& index);
+	int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos);
 	int getFreeChunk();
+	void removeChunk(int id);
+
+	void update(float dT);
+
+	glm::vec3& getSCpos(int shellNo, glm::i32vec3& origIndex);
 
 	std::vector<CShell> shells;
 
@@ -42,12 +49,7 @@ public:
 
 	std::vector<Chunk2> chunks; ///<The complete reservoir of chunks.
 	std::vector<int> freeChunks;
-	std::vector<int> inUseChunks;
-};
-
-/** A handle object representing a cubic, indivisible block of terrain. */
-class Chunk2 {
-public:
-	glm::i32vec3 index; ///<3D position of this chunk within its superChunk.
+	std::queue<int> chunksToMesh;
 
 };
+

@@ -19,6 +19,12 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 	Add(richText);
 	dragging = false;
 	draggable = false;
+
+	deliveryMode = noDelivery;
+	clauseInterval = 0;
+	clauseDelay = 0.2f;
+	charInterval = 0;
+	charDelay = 0.01f;
 }
 
 void CGUIrichTextPanel::setInset(int newInset) {
@@ -87,6 +93,12 @@ std::vector<unsigned int> CGUIrichTextPanel::purgeHotText(unsigned int id){
 }
 
 void CGUIrichTextPanel::update(float dT) {
+	if (!deliveryBuffer.empty() && !richText->busy) {
+		switch (deliveryMode) {
+		case byClause: deliverByClause(dT); break;
+		case byCharacter: deliverByCharacter(dT); break;
+		}
+	}
 	richText->update(dT);
 }
 
@@ -159,8 +171,8 @@ void CGUIrichTextPanel::collapseTempText() {
 	richText->collapseTempText();
 }
 
-void CGUIrichTextPanel::solidifyTempText() {
-	richText->solidifyTempText();
+bool CGUIrichTextPanel::solidifyTempText() {
+	return richText->solidifyTempText();
 }
 
 void CGUIrichTextPanel::unhotDuplicates() {
@@ -169,6 +181,68 @@ void CGUIrichTextPanel::unhotDuplicates() {
 
 void CGUIrichTextPanel::removeMarked() {
 	richText->removeMarked();
+}
+
+bool CGUIrichTextPanel::busy() {
+	return richText->busy;
+}
+
+/** Pass the given text on to the rich text control, either immediately or via a buffer,
+	depending on delivery style.*/
+void CGUIrichTextPanel::displayText(std::string text) {
+	richText->appendMarkedUpText(text);
+	return;
+
+	if (deliveryMode == noDelivery) {
+		richText->appendMarkedUpText(text); 
+		return;
+	}
+	deliveryBuffer += text;
+}
+
+/** Break the text in deliveryBuffer into clauses and send them individually to the rich text control to
+	display. */
+void CGUIrichTextPanel::deliverByClause(float dT) {
+	string text;
+	clauseInterval += dT;
+	if (clauseInterval > clauseDelay) {
+		clauseInterval = 0;
+		//find next clause
+		unsigned int found = deliveryBuffer.find_first_of(",.");
+		if (found != string::npos) {
+			found++;
+		}
+		else
+			found = deliveryBuffer.size();
+		text = deliveryBuffer.substr(0, found);
+		deliveryBuffer = deliveryBuffer.substr(found, string::npos);
+		richText->appendMarkedUpText(text);
+	}
+}
+
+/** Break the text in deliveryBuffer into characters and send them individually to the rich text control. */
+void CGUIrichTextPanel::deliverByCharacter(float dT) {
+	string text;
+	charInterval += dT;
+	if (charInterval < charDelay)
+		return;
+
+	if (deliveryBuffer[0] == '\\') {
+		if (deliveryBuffer.substr(1, 6) == "style{" || deliveryBuffer.substr(1, 2) == "h{") {
+			unsigned int found = deliveryBuffer.find_first_of("}");
+			text = deliveryBuffer.substr(0,found+1);
+			//deliveryBuffer = deliveryBuffer.substr(found + 1, string::npos);
+		}
+		else if (deliveryBuffer[1] == 'h')
+			text = deliveryBuffer.substr(0, 2);
+	}
+	else {
+		text = deliveryBuffer.substr(0, 1);
+		charInterval = 0;
+	}
+	deliveryBuffer = deliveryBuffer.substr(text.size(), string::npos);
+	richText->appendMarkedUpText(text);
+
 }
 
 

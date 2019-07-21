@@ -374,6 +374,12 @@
     <ClCompile Include="..\src\renderer\material2.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\lineBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\terrain\chunk2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -738,6 +744,12 @@
     </ClInclude>
     <ClInclude Include="..\..\3DTest\src\worldUI.h">
       <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\terrain\chunk2.h">
+      <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\lineBuffer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

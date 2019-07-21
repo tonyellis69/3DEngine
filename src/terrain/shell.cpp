@@ -74,16 +74,23 @@ void CShell::playerAdvance(Tdirection direction) {
 		//move enclosing shells back to ensure terrain still lines up
 		pTerrain->displaceOuterShells(*this, scrollDir);
 
+		//now that we've scrolled, return to the default layout of one final double-layer of chunks
 		addToFaceLayer(direction);
+
 		removeScrolledOutChunks(scrollDir);
-		if (shellNo < pTerrain->shells.size() - 1)
-			 pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir); 
+		//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
+		//needs to add some to cover that area of terrain
+		if (shellNo < pTerrain->shells.size() - 1) {
+			pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
+		}
 	}
 
 	//The containing shell also needs to respond to the player advancing across the terrain:
 	if (shellNo < pTerrain->shells.size() - 1) {
 		 pTerrain->shells[shellNo + 1].playerAdvance(direction);
 	}
+
+
 }
 
 /** Return the number of chunks of terrain lying in the given direction from the player positionHint. */
@@ -97,8 +104,10 @@ int CShell::getPlayerChunkExtent(Tdirection direction) {
 /** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
 void CShell::fillEntire() {
 	calculateInnerBounds();
-	findAllSCchunks();
+	//findAllSCchunks();
+	fillAllUnclippedSCs();
 }
+
 
 /** Set chunks to initially extend as far as the minimum chunk extent in all directions. The extent
 	will change as the terrain advances in a particular direction. */
@@ -167,6 +176,9 @@ void CShell::initSuperChunks() {
 
 		scIter->pTerrain = pTerrain;
 
+		scIter->shellNo = shellNo;
+
+
 		scIter++;
 	}
 
@@ -204,6 +216,46 @@ void CShell::findAllSCchunks() {
 			}
 
 
+		}
+		sc++;
+	}
+}
+
+/** Fill SCs with chunks where they are intersected by terrain within this shell's chunk extent,
+	but not where they are overlapped by the chunk extent of the inner shell, if any. */
+void CShell::fillAllUnclippedSCs() {
+	COuterSCIterator sc = getOuterSCiterator();
+	CBoxVolume chunkVol = getChunkVolume2();
+	CBoxVolume innerVol;
+	CBoxVolume SCvol;
+	CBoxVolume innerTest;
+	while (!sc.finished()) {
+		vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f);
+		
+	//	if (shellNo == 2 && sc.getIndex() == i32vec3(2, 3, 2))
+	//		int b = 0;
+
+		vec3 pos = vec3(sc.getIndex()) * SCsize - shellOrigin;
+		SCvol.set(pos, pos + vec3(SCsize));
+		innerTest = SCvol;
+		if (chunkVol.isClippedBy(SCvol)) { //SC is within our chunk extent
+			if (shellNo > 0) {
+				
+				innerVol = pTerrain->shells[shellNo - 1].getChunkVolume2();
+				if (!innerVol.doesNotEntirelyEnvelop(innerTest)) {
+					sc++;
+					continue;
+				}
+				//still here? SC is in our zone of interest
+				sc->checkForIntersection();
+				if (!sc->isEmpty)
+					sc->addChunksBetween(SCvol, innerTest);
+			}
+			else {
+				sc->checkForIntersection();
+				if (!sc->isEmpty)
+					sc->addChunks(SCvol);
+			}
 		}
 		sc++;
 	}
@@ -364,6 +416,11 @@ void CShell::reinitialiseInnerSCs() {
 	}
 }
 
+/** Convert the given index to its rotated equivalent. */
+glm::i32vec3& CShell::getRotatedIndex(const glm::i32vec3& origIndex) {
+	return scArray.getRotatedIndex(origIndex);
+}
+
 
 /** Notify SCs on the outface to remove any chunks that have now scrolled beyond the 
 	chunk extent. */
@@ -373,7 +430,6 @@ void CShell::removeScrolledOutChunks(Tdirection outface) {
 	while (!faceIter.finished()) {
 		if (faceIter->isEmpty == false) {
 			faceIter->clearScrolledOutChunks(outface, overlap);
-
 		}
 		faceIter++;
 	}
@@ -407,9 +463,6 @@ void CShell::addInnerFaceChunks2(Tdirection face) {
 	for (int x = innerFace.bl.x; x <= innerFace.tr.x; x++) {
 		for (int y = innerFace.bl.y; y <= innerFace.tr.y; y++) {
 			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
-				if (shellNo == 1 && z == 5 && x == 1 && y == 3)
-					int b = 90;
-
 				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin +worldSpacePos;
 				SCvol.set(pos, pos + vec3(SCsize));
 

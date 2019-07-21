@@ -29,17 +29,19 @@ void CSuperChunk2::setCallbackApp(ITerrainCallback * pApp) {
 
 /** Acquire a new chunk at the given index position. */
 void CSuperChunk2::createChunk(glm::i32vec3 & index) {
-	chunks.push_back(index); /////OLD remove
-
-	chunks2.push_back( pTerrain->createChunk(index) );
-
+	vec3 sampleCorner = sampleSpacePos + vec3(index) * chunkSampleSize;
+	vec3 terrainPos = pTerrain->getSCpos(shellNo, origIndex) +
+		vec3(index) * pTerrain->shells[shellNo].chunkSize;
+	
+	chunks2.push_back( pTerrain->createChunk(index, sampleCorner, shellNo, terrainPos) );
 }
 
 
 /** Remove all th chunks of this superchunk.*/
 void CSuperChunk2::clearChunks() {
-	//TO DO: when we have actual chunks, recycle them.
-	chunks.clear();
+	for (auto id : chunks2)
+		pTerrain->removeChunk(id);
+	chunks2.clear();
 	isEmpty = true;
 }
 
@@ -47,12 +49,15 @@ void CSuperChunk2::clearChunks() {
 void CSuperChunk2::clearChunks(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
-	for (auto chunk = chunks.begin(); chunk != chunks.end();) {
-		if (all(greaterThanEqual(*chunk, indexBL)) && all(lessThanEqual(*chunk, indexTR))) {
-			chunk = chunks.erase(chunk);
+
+	for (auto id = chunks2.begin(); id != chunks2.end();) {
+		i32vec3* chunkIndex = &pTerrain->chunks[*id].index;
+		if (all(greaterThanEqual(*chunkIndex, indexBL)) && all(lessThanEqual(*chunkIndex, indexTR))) {
+			pTerrain->removeChunk(*id);
+			id = chunks2.erase(id);
 		}
 		else
-			++chunk;
+			++id;
 	}
 }
 
@@ -61,23 +66,33 @@ void CSuperChunk2::addChunks(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
 	vec3 chunkSampleSpacePos;
-	for (int x=0; x < SCchunks; x++)
+	for (int x = 0; x < SCchunks; x++)
 		for (int y = 0; y < SCchunks; y++)
 			for (int z = 0; z < SCchunks; z++) {
-				i32vec3 chunk(x,y,z);
-				if (std::find(chunks.begin(), chunks.end(), chunk) == chunks.end())
-					if (all(greaterThanEqual(chunk, indexBL)) && all(lessThanEqual(chunk, indexTR))) {
-						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
-							createChunk(glm::i32vec3(x, y, z));
-							chunks.push_back(chunk);
-						}
-					}
-			}
+				i32vec3 chunk(x, y, z);
+				if (all(greaterThanEqual(chunk, indexBL)) && all(lessThanEqual(chunk, indexTR))) {
+					if (chunkExists(chunk))
+						continue;
 
+					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+					if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+						createChunk(chunk);
+					}
+				}
+			}
 }
 
-/** Add any chunks that fall outise the proportion of the SC defined by this unit volume. */
+/** Returns true if this SC has a chunk at this index position. */
+bool CSuperChunk2::chunkExists(glm::i32vec3& index) {
+	for (auto localChunk : chunks2) {
+		if (pTerrain->chunks[localChunk].index == index) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/** Add any chunks that fall outside the proportion of the SC defined by this unit volume. */
 void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
@@ -86,87 +101,74 @@ void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 		for (int y = 0; y < SCchunks; y++)
 			for (int z = 0; z < SCchunks; z++) {
 				i32vec3 chunk(x, y, z);
-				if (std::find(chunks.begin(), chunks.end(), chunk) == chunks.end())
-					if (any(lessThan(chunk, indexBL)) || any(greaterThan(chunk, indexTR))
-					//	|| any (equal(indexBL,indexTR)) 
-						) {
-						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
-							createChunk(glm::i32vec3(x, y, z));
-							chunks.push_back(chunk);
-							isEmpty = false;
-						}
+				if (any(lessThan(chunk, indexBL)) || any(greaterThan(chunk, indexTR))) {
+					if (chunkExists(chunk))
+						continue;
+
+					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+					if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+						createChunk(chunk);
+						isEmpty = false;
 					}
+				}
 			}
 }
 
-/** Remove any chunks withing the given volume of chunkspace. */
-void CSuperChunk2::clearOverlappedChunks(TBoxVolume & chunkClippingVolume) {
-	//return;
-	for (auto chunk = chunks.begin(); chunk != chunks.end();) {
-		if (chunk->x >= chunkClippingVolume.bl.x && chunk->y >= chunkClippingVolume.bl.y && chunk->z >= chunkClippingVolume.bl.z
-			&& chunk->x <= chunkClippingVolume.tr.x && chunk->y <= chunkClippingVolume.tr.y && chunk->z <= chunkClippingVolume.tr.z) {
-			chunk = chunks.erase(chunk);
-		}
-		else
-			++chunk;
-	}
+/** Add chunks that fall within the proportion of the SC defined by outerUnitVoluCGlobalFuncDeclNodeme that do not also 
+	fall within innerUnitVolume. */
+void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& innerUnitVolume) {
+	i32vec3 outerBL = outerUnitVolume.bl *= vec3(SCchunks);
+	i32vec3 outerTR = outerUnitVolume.tr *= vec3(SCchunks);
+	i32vec3 innerBL = innerUnitVolume.bl *= vec3(SCchunks);
+	i32vec3 innerTR = innerUnitVolume.tr *= vec3(SCchunks);
+	vec3 chunkSampleSpacePos;
+	for (int x = 0; x < SCchunks; x++)
+		for (int y = 0; y < SCchunks; y++)
+			for (int z = 0; z < SCchunks; z++) {	
+				i32vec3 chunk(x, y, z);
+				//does this chunk fall within the inner volume? Then we can bail
+				if (all(greaterThanEqual(chunk, innerBL)) && all(lessThanEqual(chunk, innerTR)))
+					continue;
+
+				if (all(greaterThanEqual(chunk, outerBL)) && all(lessThanEqual(chunk, outerTR))) {
+					if (chunkExists(chunk))
+						continue;
+
+					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
+					if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+						createChunk(chunk);
+					}
+				}
+			}
 }
+
+
 
 /** Remove any chunks beyond the overlap boundary in this direction. */
 void CSuperChunk2::clearScrolledOutChunks(Tdirection face, int overlap) {
 	int axis = getAxis(face);
-	for (auto chunk = chunks.begin(); chunk != chunks.end();) {
+
+	for (auto id = chunks2.begin(); id != chunks2.end();) {
+		i32vec3* chunkIndex = &pTerrain->chunks[*id].index;
 		if (face == north || face == west || face == down) {
-			if ((*chunk)[axis] < SCchunks - overlap)
-				chunk = chunks.erase(chunk);
+			if ((*chunkIndex)[axis] < SCchunks - overlap) {
+				pTerrain->removeChunk(*id);
+				id = chunks2.erase(id);
+			}
 			else
-				++chunk;
+				++id;
 		}
 		else {
-			if ((*chunk)[axis] >= overlap)
-				chunk = chunks.erase(chunk);
-			else
-				++chunk;
-
-		}
-	}
-}
-
-/** Add new chunks where required withing the clipping volume. This is used
-	to add chunks on the inner face of a shell, where they've previously been
-	overlapped by the chunks of the inner shell. */
-void CSuperChunk2::restoreClippedChunks(TBoxVolume& chunkVolume) {
-	glm::vec3 chunkSampleSpacePos;
-	for (int x = 0; x < SCchunks; x++) 
-		for (int y = 0; y < SCchunks; y++) 
-			for (int z = 0; z < SCchunks; z++) 
-				if ( glm::any(lessThan(glm::i32vec3(x,y,z), chunkVolume.bl)) || 
-					glm::any(greaterThan(glm::i32vec3(x, y, z), chunkVolume.tr))) {
-					auto found = find(chunks.begin(), chunks.end(), glm::i32vec3(x, y, z));
-					if (found == chunks.end()) {
-						chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-						if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
-							createChunk(glm::i32vec3(x, y, z));
-						}
-					}
-				}
-
-
-/*
-	for (int x = chunkVolume.bl.x; x <= chunkVolume.tr.x; x++) {
-		for (int y = chunkVolume.bl.y; y <= chunkVolume.tr.y; y++) {
-			for (int z = chunkVolume.bl.z; z <= chunkVolume.tr.z; z++) {
-				chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-				if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
-					createChunk(glm::i32vec3(x, y, z));
-				}
+			if ((*chunkIndex)[axis] >= overlap) {
+				pTerrain->removeChunk(*id);
+				id = chunks2.erase(id);
 			}
+			else
+				++id;
 		}
 	}
-*/
-
 }
+
 
 /** If clippee is partially or entirely inside this volume, return true
 	and with the proportion of overlap in clipVol, expressed as a unit volume. */
@@ -186,6 +188,8 @@ bool CBoxVolume::isClippedBy(CBoxVolume& clipVol){
 	clipVol.set(unitBl, unitTr);
 	return true;
 }
+
+
 
 /** If clippee is partially or entirely outside this volume, return true
 	and with the proportion of overlap in clipVol, expressed as a unit volume. */
