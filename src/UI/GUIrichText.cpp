@@ -45,7 +45,6 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	transcriptLog = NULL;
 	suspended = false;
 	busy = false;
-	displacedObj = INT_MAX;
 	charInterval = 0;
 	charDelay = 0.01f;
 }
@@ -278,7 +277,6 @@ bool CGUIrichText::scrollDown2(int dist) {
 void CGUIrichText::createPage() {
 	lineBuffer.clear();
 	overrunHotTextObj = -1; underrun = 0; longestLine = 0;
-	markStart = markEnd = -1;
 	textBuf.init(true);
 
 	compileLineFragments(TLineFragment { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
@@ -299,9 +297,10 @@ void CGUIrichText::renderLineBuffer() {
 	updateFragmentPositions();//TO DO: temp!!!! only do after a change, not every time we update text buffer
 	hotFrags.clear();
 	fadeFrags2.clear();
+	gapObj = -1; 
 	textBuf.init(true);
 	int currObjNo = lineBuffer.frags[lineBuffer.getLine(0).fragments[0]].textObj;
-	int finalY = 0;
+	int finalY = 0; int lineNo = 0;
 	for (auto line : lineBuffer.lines) {
 		for (auto fragId: line.fragments) {
 			TLineFragment& frag = lineBuffer.getFragment(fragId);
@@ -323,17 +322,23 @@ void CGUIrichText::renderLineBuffer() {
 			//create an index of hot text fragments
 			if (currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
 				hotFrags.push_back({ fragId,renderLine, frag.textObj });
-				//std::uniform_real_distribution<> randomRange{ 0,1.0f };
 				textObjs[currentTextObj].period = randomPeriod(randEngine);
 			}
 
 			//create an index of fade-in fragments
 			if (currentObj.flags & richFadeIn && currentObj.period < 1 && renderLine[0] != '\n') {
-				//makeFadeFragment(lineFragment, offset, renderLine);
 				fadeFrags2.push_back({ fragId,renderLine, frag.textObj });
 				textObjs[currentTextObj].period = 0;
 			}
+
+			//track gaps - lazily assuming there's only one for now
+			if (currentObj.flags & richGap) {
+				gapObj = frag.textObj;
+				currentObj.lineRef = lineNo;
+			}
 		}
+		lineNo++;
+
 	}
 	if (finalY > getHeight()) {
 		lineOverrun = finalY - getHeight();
@@ -415,8 +420,9 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 		displaced = true;
 	}*/
 
-	if (currentObj.flags & richGap) { //ensure fragment is ga[
-		lineFragment.height = currentObj.gap; //TO DO: scrap gapSize store in obj
+	if (currentObj.flags & richGap) { 
+		lineFragment.height = currentObj.gap; 
+		lineFragment.causesNewLine = newline;
 	}
 
 	offset.x = lineFragment.renderStartX + indent;
@@ -436,15 +442,6 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 	lineFragment.renderStartY = offset.y;
 	fragId = lineBuffer.copyFragment(lineFragment);
 	
-	if (currentObj.flags & richMarked && markStart == -1) {
-		if (lineFragment.textObj > 0 && !(textObjs[lineFragment.textObj - 1].flags & richMarked)) {
-			markStart = offset.y;
-		}
-	}
-	if (!(currentObj.flags & richMarked) && markStart > -1 && markEnd == -1) {
-		markEnd = offset.y;
-	}
-
 	if (lineFragment.causesNewLine != no) {
 		offset = glm::i32vec2(0, offset.y + currentFont->lineHeight);
 		indent = insetX;
@@ -724,10 +721,8 @@ void CGUIrichText::update(float dT) {
 	//if (!deliveryBuffer.empty())
 		//deliverByCharacter(dT);
 
-	if (displacedObj < INT_MAX) {
-		busy = false;
-		;// collapseDisplacement(dT);
-	}
+	if (gapObj != -1)
+		collapseGap(dT);
 
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)
@@ -1276,10 +1271,12 @@ void CGUIrichText::unhotDuplicates() {
 
 /** Remove the last section of text flagged as marked, if any. */
 void CGUIrichText::removeMarked() {
-	int beforeObj = -1; 
-	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
+	int beforeObj = -1; int  afterObj = -1;
+	for ( int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].flags & richMarked) {
 			textObjs.erase(textObjs.begin() + obj);
+			if (afterObj == -1)
+				afterObj = obj + 1;
 			beforeObj = obj - 1;
 			currentTextObj = textObjs.size() - 1;
 			if (obj == 0 || !(textObjs[obj - 1].flags & richMarked))
@@ -1287,19 +1284,21 @@ void CGUIrichText::removeMarked() {
 		}
 	}
 
-	if (beforeObj != -1 && beforeObj < currentTextObj) {
+	if (beforeObj != -1 /*&& beforeObj < currentTextObj*/) {
 		busy = true;
-		 displacedObj = beforeObj + 1;
-		 collapsePeriod = 0;
-		 gapSize = markEnd - markStart;
 
+		 TFragPos lastBeforeFrag = lineBuffer.getLastFrag(beforeObj);
+		 TFragPos firstAfterFrag = lineBuffer.getFirstFrag(afterObj);
+		
 		 TRichTextRec gapObj = textObjs[beforeObj];
-		 gapObj.text = "\n" + to_string(markEnd - markStart);
+		 gapObj.gap = lineBuffer.getFragment(firstAfterFrag.fragId).renderStartY -
+			 (lineBuffer.getFragment(lastBeforeFrag.fragId).renderStartY /*- lineBuffer.lines[lastBeforeFrag.lineNo].height*/);
+		 gapObj.text = "" ;
 		 gapObj.flags |= richGap;
-		 gapObj.gap = markEnd - markStart;
-		 textObjs.insert(textObjs.begin() + displacedObj, gapObj);
+		 textObjs.insert(textObjs.begin() + beforeObj + 1, gapObj);
 		 currentTextObj++;
 		 createPage();
+		 textObjs[beforeObj + 1].lineRef = lineBuffer.getFirstFrag(beforeObj + 1).lineNo;
 	}
 	
 }
@@ -1360,20 +1359,25 @@ void CGUIrichText::animateFadeText(float dT) {
 }
 
 /** If there's currently displaced text (caused by removing marked text), shrink the gap.*/
-void CGUIrichText::collapseDisplacement(float dT) {
+void CGUIrichText::collapseGap(float dT) {
 	busy = true;
-	collapsePeriod += dT;
-	if (collapsePeriod > 0.01f) { //was 0.005f;
-		collapsePeriod = 0;
-		gapSize -= 2;
-		if (gapSize < 0) {
-			gapSize = 0;
-			displacedObj = INT_MAX;
+	auto gapObjIt = textObjs.begin() + gapObj;
+	gapObjIt->period += dT;
+	if (gapObjIt->period > 0.01f) { //was 0.005f;
+		gapObjIt->period = 0;
+		gapObjIt->gap -= 2;
+		lineBuffer.lines[gapObjIt->lineRef].height = gapObjIt->gap;
+		if (gapObjIt->gap < 0) {
+			textObjs.erase(gapObjIt);
+			currentTextObj = textObjs.size() - 1;
 			busy = false;
+			gapObj = -1;
 		}
-		createPage();
-		//TO DO: this should require rerendering the lineBuffer, and possibly updating frag positions,
-		//not a complete recompile of all fragments
+		if (gapObj != -1) {
+			renderLineBuffer();
+		}
+		else
+			createPage();
 	}
 	
 }
@@ -1416,6 +1420,7 @@ TRichTextRec::TRichTextRec() {
 	flags = 0;
 	period = 0;
 	gap = 0;
+	lineRef = 0;
 }
 
 

@@ -147,3 +147,30 @@ TLineFragment& CLineBuffer::trimTop(int dist) {
 	}
 	return frags[lines[0].fragments[0]];
 }
+
+/** Return the frag id and line number of the first fragment of this text obj. */
+TFragPos& CLineBuffer::getFirstFrag(int objNo) {
+	int lineNo = -1;
+	for (auto line : lines) {
+		lineNo++;
+		for (auto frag : line.fragments) {
+			if (frags[frag].textObj == objNo)
+				return TFragPos{ frag,lineNo };
+		}
+	}
+	return TFragPos{ -1,-1 };
+}
+
+/** Return the frag id and line number of the last fragment of this text obj. */
+TFragPos& CLineBuffer::getLastFrag(int objNo) {
+	TFragPos fragPos = { -1,-1 };
+	int lineNo = -1;
+	for (auto line : lines) {
+		lineNo++;
+		for (auto frag : line.fragments) {
+			if (frags[frag].textObj == objNo)
+				fragPos = { frag,lineNo };
+		}
+	}
+	return fragPos;
+}

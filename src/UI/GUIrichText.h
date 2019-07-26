@@ -32,6 +32,7 @@ struct TRichTextRec : textRec {
 	TRichTextRec();
 	unsigned int hotId;
 	int gap;
+	int lineRef;
 	unsigned int flags;
 	float period;
 
@@ -135,7 +136,7 @@ public:
 	void removeMarked();
 	void animateHotText(float dT);
 	void animateFadeText(float dT);
-	void collapseDisplacement(float dT);
+	void collapseGap(float dT);
 
 	void deliverByCharacter(float dT);
 
@@ -199,12 +200,6 @@ public:
 	std::mt19937 randEngine; ///<Random number engine.
 	static std::uniform_real_distribution<> randomPeriod;
 	
-	int markStart;
-	int markEnd;
-	int gapSize;
-	int displacedObj; ///<First object after a gap caused by removing marked text.
-	float collapsePeriod;
-
 
 	TTextDelivery deliveryMode;
 	std::string deliveryBuffer;
@@ -215,4 +210,7 @@ public:
 
 	std::vector<TFXfragment> hotFrags; ///<Indexes of fragments that are hot text.
 	std::vector<TFXfragment> fadeFrags2; ///<Currently visible fade-in text fragments
+	
+	int gapObj; ///<Current gap obj if any.
+	//int gapLine;///<Current gap line if any
 };

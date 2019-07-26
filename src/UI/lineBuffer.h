@@ -23,6 +23,11 @@ struct TLine {
 	std::vector<int> fragments;
 };
 
+struct TFragPos {
+	int fragId;
+	int lineNo;
+};
+
 /** A data structure for maintaining line fragments, referenced by index. */
 class CLineBuffer {
 public:
@@ -51,6 +56,11 @@ public:
 	}
 	int getYextent();
 	TLineFragment& trimTop(int dist);
+	const std::vector<TLineFragment>& getFrags() {
+		return frags;
+	}
+	TFragPos& getFirstFrag(int objNo);
+	TFragPos& getLastFrag(int objNo);
 
 	std::vector<TLine> lines;
 
