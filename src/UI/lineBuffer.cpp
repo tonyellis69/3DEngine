@@ -9,6 +9,7 @@
 CLineBuffer::CLineBuffer() {
 	clear();
 	yOffset = 0;
+	lineFadeIn = 1.0;
 }
 
 void CLineBuffer::clear() {
@@ -19,7 +20,12 @@ void CLineBuffer::clear() {
 
 /** Append a new, empty line. */
 void CLineBuffer::addLine() {
-	lines.push_back(TLine{ 0 });
+	lines.push_back(TLine{ 0,0,{},lineFadeIn });
+}
+
+void CLineBuffer::appendLine(TLine& newline) {
+	lines.push_back(newline);
+	lines.back().fadeInX = lineFadeIn;
 }
 
 /** Add a fragment to the bottom line. */
@@ -28,6 +34,7 @@ void CLineBuffer::appendFragment(int fragId) {
 		addLine();
 	lines.back().fragments.push_back(fragId);
 	lines.back().height = std::max(lines.back().height, frags[fragId].height);
+	lines.back().width = std::max(lines.back().width, frags[fragId].renderEndX);
 }
 
 bool CLineBuffer::isEmpty() {
@@ -173,4 +180,16 @@ TFragPos& CLineBuffer::getLastFrag(int objNo) {
 		}
 	}
 	return fragPos;
+}
+
+/** Remove any line entirely composed of fragments from the given text obj. */
+void CLineBuffer::removeObjLine(int objNo) {
+	for (auto line = lines.begin(); line != lines.end();) {
+		int firstFrag = line->fragments.front();
+		int lastFrag = line->fragments.back();
+		if (frags[firstFrag].textObj == objNo && frags[lastFrag].textObj == objNo)
+			line = lines.erase(line);
+		else
+			line++;
+	}
 }

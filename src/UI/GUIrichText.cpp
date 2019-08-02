@@ -47,6 +47,9 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	busy = false;
 	charInterval = 0;
 	charDelay = 0.01f;
+	enableLineFadeIn = false;
+	lineFadeInOn = false;
+	lineFadeSpeed = 20.0f;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -231,6 +234,7 @@ void CGUIrichText::setText(std::string newText) {
 /** Append newText to the current body of text (and update the page). */
 void CGUIrichText::appendText(std::string newText) {
 	addText(newText);
+	requestLineFadeIn(true);
 	renderLineBuffer();
 
 	if (transcriptLog)
@@ -239,8 +243,11 @@ void CGUIrichText::appendText(std::string newText) {
 
 /** Append the given text to the current body of text. */
 void CGUIrichText::addText(std::string newText) {
+	if (newText.find("do something") != string::npos)
+		int b = 0;
+
 	textObjs.back().text += newText;
-	compileLineFragments(lineBuffer.finalFrag());
+	compileFragmentsToEnd(lineBuffer.finalFrag());
 
 	overrunCorrect = true; 
 	//Important! Here we signal that we want any overrun caused by this adding this text to be corrected.
@@ -252,10 +259,11 @@ bool CGUIrichText::scrollDown2(int dist) {
 	int bottomLineOver = lineBuffer.getYextent() - getHeight();
 
 	while (abs(dist) > bottomLineOver) {
-		TLine newLine = compileLine(lineBuffer.finalFrag());
+		TLine newLine = compileSingleLine(lineBuffer.finalFrag());
 		if (newLine.fragments.empty())
 			break;
-		lineBuffer.lines.push_back(newLine);
+		lineBuffer.appendLine(newLine);
+		//lineBuffer.lines.push_back(newLine);
 		bottomLineOver += newLine.height;
 	}
 
@@ -279,7 +287,7 @@ void CGUIrichText::createPage() {
 	overrunHotTextObj = -1; underrun = 0; longestLine = 0;
 	textBuf.init(true);
 
-	compileLineFragments(TLineFragment { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+	compileFragmentsToEnd(TLineFragment { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
 	renderLineBuffer();
 }
 
@@ -315,12 +323,13 @@ void CGUIrichText::renderLineBuffer() {
 			TRichTextRec currentObj = textObjs[frag.textObj];
 			string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
 			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
-			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
+			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour * line.fadeInX };
 			textBuf.addFragment(frag.renderStartX, frag.renderStartY, dataRec);
 			finalY = frag.renderStartY + frag.height;
 
 			//create an index of hot text fragments
 			if (currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
+
 				hotFrags.push_back({ fragId,renderLine, frag.textObj });
 				textObjs[currentTextObj].period = randomPeriod(randEngine);
 			}
@@ -350,7 +359,7 @@ void CGUIrichText::renderLineBuffer() {
 
 /** Starting with the given line fragment, compile our text objects into line fragments 
 	until we run out or overflow the page. */
-void CGUIrichText::compileLineFragments(TLineFragment lineFragment) {
+void CGUIrichText::compileFragmentsToEnd(TLineFragment lineFragment) {
 	do {
 		int currObjNo = lineFragment.textObj;
 		bool startOnNewLine = false;
@@ -373,7 +382,7 @@ void CGUIrichText::compileLineFragments(TLineFragment lineFragment) {
 		int yExtent = lineBuffer.getYextent();
 		checkLineOverrun(yExtent);
 
-		if (yExtent > getHeight()) { //we've run past the buffer entirely, so no sense writing any more
+		if (yExtent > getHeight() && lineFragment.causesNewLine != no) { //we've run past the buffer entirely, so no sense writing any more
 			return;
 		}
 
@@ -412,13 +421,12 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 
 	string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 
+	if (renderLine == "do something")
+		int b = 0;
+
 	TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
 
 
-	/*if (!displaced && lineFragment.textObj == displacedObj) { //if this fragment's obj has been displaced by a text removal...
-		offset.y += gapSize; //drop our starting y by the extent of the gap
-		displaced = true;
-	}*/
 
 	if (currentObj.flags & richGap) { 
 		lineFragment.height = currentObj.gap; 
@@ -454,8 +462,8 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 	return fragId;
 }
 
-/** Create one line of line fragments from our text, starting with the given one. */
-TLine CGUIrichText::compileLine(TLineFragment lineFragment) {
+/** Create one line of line fragments from our text, starting after the given one. */
+TLine CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
 	TLine line;
 	do {
 		int id = processNextFragment(lineFragment);
@@ -463,6 +471,7 @@ TLine CGUIrichText::compileLine(TLineFragment lineFragment) {
 			break;
 		line.fragments.push_back(id);
 		line.height = std::max(line.height, lineFragment.height);
+		line.width = std::max(line.width, lineFragment.renderEndX);
 	} while (lineFragment.causesNewLine == no);
 
 	return line;
@@ -687,7 +696,7 @@ bool CGUIrichText::scrollUp3(int dist) {
 		firstVisibleObject = prevNewline.textObj;
 		firstVisibleText = prevNewline.pos;
 		//insert line in line buffer
-		TLine newFirstLine = compileLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+		TLine newFirstLine = compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
 		lineBuffer.insert(0, newFirstLine);
 		lineBuffer.adjustYoffset(-lineBuffer.getLine(0).height);
 	}
@@ -733,11 +742,12 @@ void CGUIrichText::update(float dT) {
 				overrunCorrect = isOverrun();
 		} 
 	}
-	if (!hotFrags.empty())
+	if (!hotFrags.empty() && !lineFadeInOn)
 		 animateHotText(dT);
 	if (!fadeFrags2.empty())
 		animateFadeText(dT);
-	
+	if (lineFadeInOn) 
+		animateLineFadeIn(dT);
 }
 
 
@@ -1117,17 +1127,6 @@ void CGUIrichText::resizeByWidth() {
 	}
 }
 
-/** Return true if the given id is an active hot text.*/
-/*
-bool CGUIrichText::isActiveHotText(int hotId) {
-	for (auto obj : textObjs) {
-		//TO DO: check this still works using hotId
-		if (obj.hotId == hotId)
-			return true;
-	}
-	return false;
-}*/
-
 void CGUIrichText::setResizeMode(TResizeMode mode) {
 	resizeMode = mode;
 }
@@ -1201,6 +1200,7 @@ void CGUIrichText::removeTempText() {
 	for ( int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].flags & richTemp) {
 			textObjs.erase(textObjs.begin() + obj);	
+			lineBuffer.removeObjLine(obj);
 			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp))
 				break;
 		}
@@ -1224,7 +1224,8 @@ void CGUIrichText::onDrag(const int mouseX, const int mouseY) {
 /** Remove any temporary text and update the screen. */
 void CGUIrichText::collapseTempText() {
 	removeTempText();
-	createPage();
+	//createPage();
+	renderLineBuffer();
 }
 
 /** Make the last temporary text permanent, if any. This includes making any suspended hot text active. */
@@ -1358,6 +1359,38 @@ void CGUIrichText::animateFadeText(float dT) {
 	}
 }
 
+/** If any lines aren't at full alpha, update their alpha and redraw them. */
+void CGUIrichText::animateLineFadeIn(float dT) {
+	//float proportion = 790.0f / textBuf.textTexture.width;
+	float proportion = lineFadeSpeed / textBuf.textTexture.width;
+	bool done = true;
+	for (auto& line : lineBuffer.lines) {
+		if (line.fadeInX >= 1.0)
+			continue;
+		done = false;
+		//line.fadeInX += 0.08 * proportion;
+		line.fadeInX += proportion;
+		if (line.fadeInX * textBuf.textTexture.width > line.width) {
+			line.fadeInX = 1;
+		}
+
+		//draw line
+		for (auto fragId : line.fragments) {
+			TLineFragment& frag = lineBuffer.getFragment(fragId);
+			int currObjNo = frag.textObj;
+
+			TRichTextRec currentObj = textObjs[frag.textObj];
+			string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
+			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
+			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
+			textBuf.renderFadeInTextAt(frag.renderStartX, frag.renderStartY, dataRec, line.fadeInX);
+		}
+		return;
+	}
+	if (done)
+		requestLineFadeIn(false);
+}
+
 /** If there's currently displaced text (caused by removing marked text), shrink the gap.*/
 void CGUIrichText::collapseGap(float dT) {
 	busy = true;
@@ -1405,13 +1438,30 @@ bool CGUIrichText::isOverrun() {
 	if (lineOverrun > 0)
 		return true;
 	TLineFragment finalFrag = lineBuffer.finalFrag();
-	if (textObjs.size() > finalFrag.textObj + 1)
-		return true;
+	//if (textObjs.size() > finalFrag.textObj + 1 && !textObjs.back().text.empty())
+	//	return true;
 	if (textObjs.size() == (finalFrag.textObj + 1) &&
 		textObjs.back().text.size() > (finalFrag.textPos + finalFrag.textLength)) {
 		return true;
 	}
+	for (unsigned int obj = finalFrag.textObj + 1; obj < textObjs.size(); obj++) {
+		if (!textObjs[obj].text.empty())
+			return true;
+	}
+
+
 	return false;
+}
+
+/** Activate/deactivate line fade-in mode, if it is enabled. */
+void CGUIrichText::requestLineFadeIn(bool isOn) {
+	if (!enableLineFadeIn)
+		return;
+	lineFadeInOn = isOn;
+	if (lineFadeInOn)
+		lineBuffer.setLineFadeIn(0); //create lines intitially zero faded-in
+	else
+		lineBuffer.setLineFadeIn(1.0); //create lines fully drawn
 }
 
 

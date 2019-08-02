@@ -18,9 +18,10 @@ struct TLineFragment {
 	bool finalFrag;
 };
 
-struct TLine {
-	int height;
+struct TLine  {
+	int height; int width;
 	std::vector<int> fragments;
+	float fadeInX;
 };
 
 struct TFragPos {
@@ -34,6 +35,7 @@ public:
 	CLineBuffer();
 	void clear();
 	void addLine();
+	void appendLine(TLine& line);
 	void appendFragment(int  fragId);
 	bool isEmpty();
 	const TLineFragment& finalFrag();
@@ -61,6 +63,10 @@ public:
 	}
 	TFragPos& getFirstFrag(int objNo);
 	TFragPos& getLastFrag(int objNo);
+	void removeObjLine(int objNo);
+	void setLineFadeIn(float fadeIn) {
+		lineFadeIn = fadeIn;
+	}
 
 	std::vector<TLine> lines;
 
@@ -68,4 +74,6 @@ public:
 
 	std::vector<TLineFragment> frags;
 	std::vector<int> freeFrags;
+
+	float lineFadeIn; ///<Extent of fade-in for added lines. 
 };

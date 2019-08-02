@@ -164,8 +164,10 @@ void CShell::initSuperChunks() {
 	CShellIterator scIter = getIterator();
 	while (!scIter.finished()) {
 		scIter->isEmpty = true;
-		//scIter->colour = vec4(col::randHue(), 1);
+	
 		scIter->colour = shellColour;
+		scIter->colour =  vec4(col::randHue(), 1);
+
 		scIter->origIndex = scIter.getIndex();
 	
 		scIter->SCchunks = SCchunks;

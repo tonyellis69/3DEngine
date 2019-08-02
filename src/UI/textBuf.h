@@ -45,10 +45,12 @@ public:
 	CTextBuffer();
 	void setSize(int w, int h);
 	void renderTextAt(int x, int y, TLineFragDrawRec& drawData);
+	void renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, float fadeInX);
 	void clearBuffer();
 	void init(bool clearBuffer);
 	int addFragment(int x, int y, TLineFragDrawRec& drawData);
 	void render();
+	void render(float fadeInX);
 	bool notEmpty();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
@@ -57,18 +59,14 @@ public:
 
 	CBuf buf;
 private:
-	void writeToTexture2(CBuf & glyphQuads);
-
-
+	void writeToTexture2(CBuf & glyphQuads, float fadeInX);
 
 	glm::i32vec2 size;
 
-	//textRec textData;
-
-	//CBuf buf2;
 	vector<vBuf::T2DtexVert> textQuads;
 	vector<unsigned int> textQuadsIndex;
 
 	TLineFragDrawRec* mDrawData;
 	glm::vec4 textColour;
-};
+
+	};

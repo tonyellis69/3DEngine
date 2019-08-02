@@ -63,8 +63,6 @@ public:
 	void setAppendStyleBold(bool isOn);
 	void setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId);
 	void setTextColour(UIcolour colour);
-	void setHotTextColour(const glm::vec4& colour);
-	void setHotTextHighlightColour(const glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
 	void setTextStyle(std::string styleName);
 	void setTextStyles(std::vector<TtextStyle>* styles);
@@ -76,9 +74,9 @@ public:
 	void createPage();
 	void updateFragmentPositions();
 	void renderLineBuffer();
-	void compileLineFragments(TLineFragment lineFragment);
+	void compileFragmentsToEnd(TLineFragment lineFragment);
 	int processNextFragment(TLineFragment& fragment);
-	TLine compileLine(TLineFragment lineFragment);
+	TLine compileSingleLine(TLineFragment lineFragment);
 	void checkLineOverrun(int yStart);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
@@ -136,11 +134,14 @@ public:
 	void removeMarked();
 	void animateHotText(float dT);
 	void animateFadeText(float dT);
+	void animateLineFadeIn(float dT);
 	void collapseGap(float dT);
 
 	void deliverByCharacter(float dT);
 
 	bool isOverrun();
+
+	void requestLineFadeIn(bool onOff);
 
 	~CGUIrichText();
 
@@ -212,5 +213,9 @@ public:
 	std::vector<TFXfragment> fadeFrags2; ///<Currently visible fade-in text fragments
 	
 	int gapObj; ///<Current gap obj if any.
-	//int gapLine;///<Current gap line if any
+
+
+	bool enableLineFadeIn; ///<False = line fade-in not allowed at all.
+	bool lineFadeInOn; ///<Each line will be faded in instead of drawn instantly.
+	float lineFadeSpeed; ///<Around 260. Smaller is slower
 };

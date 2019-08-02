@@ -181,6 +181,7 @@ public:
 	GLuint hTextTexture;
 	GLuint hTextColour;
 	GLuint hTextOrthoMatrix;
+	GLuint hFadeInX;
 
 	//billboard
 	GLuint hBillTexture;

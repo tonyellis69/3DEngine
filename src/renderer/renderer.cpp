@@ -887,6 +887,7 @@ void CRenderer::createTextShader() {
 	hTextTexture = textShader->getUniformHandle("fontTexture");
 	hTextColour = textShader->getUniformHandle("textColour");
 	hTextOrthoMatrix = textShader->getUniformHandle("orthoMatrix");
+	hFadeInX = textShader->getUniformHandle("fadeInX");
 }
 
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */

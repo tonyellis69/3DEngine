@@ -17,18 +17,18 @@ void CTextBuffer::setSize(int w, int h) {
 }
 
 
-
-
 /** Render the given text fragment immediately, without waiting for more. */
 void CTextBuffer::renderTextAt(int x, int y, TLineFragDrawRec& drawData) {
+	renderFadeInTextAt(x, y, drawData, 1.0f);
+}
+
+/** Render the given text fragment immediately, using the given fade-in x. */
+void CTextBuffer::renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, float fadeInX) {
 	if (!drawData.text->size())
 		return;
-
 	init(false);
-
-
 	addFragment(x, y, drawData);
-	render();
+	render(fadeInX);
 }
 
 void CTextBuffer::clearBuffer() {
@@ -36,27 +36,20 @@ void CTextBuffer::clearBuffer() {
 }
 
 
-void CTextBuffer::writeToTexture2(CBuf& glyphQuads) {
+void CTextBuffer::writeToTexture2(CBuf& glyphQuads, float fadeInX) {
 	
-	glm::vec2 halfSize = glm::vec2(size) / 2.0f;
-	//float xOffset = 0; float yOffset = 0 - (textData.font->lineHeight / 2.0f);
-	
-	//glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, -halfSize.y, halfSize.y);
+
+
 	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, 0, size.y);
 
-//	orthoMatrix = glm::translate<float>(orthoMatrix,glm::vec3(0, -halfSize.y + textData.font->lineHeight, 0));
-
-
-
-	//glm::vec4 textColour = textData.style.colour;
-	//textColour.a = 0.5;
 
 	pRenderer->setShader(pRenderer->textShader);
 	pRenderer->attachTexture(0, mDrawData->font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
-	
+	pRenderer->texShader->setShaderValue(pRenderer->hFadeInX, fadeInX);
+
 	pRenderer->renderToTextureTris(glyphQuads, textTexture);
 
 }
@@ -106,11 +99,14 @@ int CTextBuffer::addFragment(int x, int y, TLineFragDrawRec& drawData) {
 
 /** Render the currently accumulated text quads to our buffer. */
 void CTextBuffer::render() {
-	//CBuf buf;
+	render(1.0f);
+}
+
+void CTextBuffer::render(float fadeInX) {
 	buf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
 	buf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
 	buf.storeLayout(2, 2, 0, 0);
-	writeToTexture2(buf);
+	writeToTexture2(buf, fadeInX);
 
 }
 

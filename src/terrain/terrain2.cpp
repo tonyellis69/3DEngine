@@ -152,7 +152,7 @@ void CTerrain2::initialiseChunks(int numChunks) {
 int CTerrain2::createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos) {
 	int id = getFreeChunk();
 	chunks[id].index = index;
-	chunks[id].cubeSize = pow(LoD1cubeSize, 1 + shellNo);
+	chunks[id].cubeSize = LoD1cubeSize * pow(2, shellNo);
 	chunks[id].LoD = shells[shellNo].LoD;
 	chunks[id].setSample(sampleCorner, shells[shellNo].scSampleStep);
 	chunks[id].terrainPos = terrainPos;
@@ -202,6 +202,6 @@ void CTerrain2::update(float dT) {
 glm::vec3& CTerrain2::getSCpos(int shellNo, glm::i32vec3& origIndex) {
 	i32vec3 rotatedIndex = shells[shellNo].getRotatedIndex(origIndex);
 	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
-		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.f);
+		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
 }
 

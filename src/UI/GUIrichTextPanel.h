@@ -54,6 +54,10 @@ public:
 
 	void deliverByCharacter(float dT);
 
+	void setLineFadeIn(bool onOff) {
+		richText->enableLineFadeIn = onOff;
+	}
+
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
 
