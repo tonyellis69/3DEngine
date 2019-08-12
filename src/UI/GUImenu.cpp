@@ -106,8 +106,9 @@ void CGUImenu::resizeToFit() {
 
 
 
-void CGUImenu::onMouseOff(const  int mouseX, const  int mouseY, int key) {
+bool CGUImenu::onMouseOff(const  int mouseX, const  int mouseY, int key) {
 	setFocusItem(-1);
+	return true;
 };
 
 

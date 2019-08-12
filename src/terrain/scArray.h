@@ -16,6 +16,8 @@ public:
 	void rotate(glm::i32vec3 dirVec);
 	glm::i32vec3& getRotatedIndex(const glm::i32vec3& origIndex);
 
+	glm::i32vec3& getInvRotatedIndex(const glm::i32vec3& origIndex);
+
 private:
 	std::vector<CSuperChunk2> flatArray;
 	glm::i32vec3 dimensions;

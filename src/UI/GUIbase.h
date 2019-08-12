@@ -180,7 +180,7 @@ public:
 	virtual void onKeyPress(unsigned int Key, long Mod) {};
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
-	virtual void onMouseOff(const  int mouseX, const  int mouseY, int key) {};
+	virtual bool onMouseOff(const  int mouseX, const  int mouseY, int key) { return true; };
 	virtual void onDrag(const  int mouseX, const  int mouseY) {};
 	virtual void onDrop(const  int mouseX, const  int mouseY);
 	void setLocalDimensions(int x, int y, int w, int h);
@@ -372,7 +372,7 @@ const int uiCancelId = 2001;
 enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiClickOutside, uiDataEntered, uiSpin, uiLostKeyboard,
-	uiMsgHotTextClick, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore,
+	uiMsgHotTextClick, uiMsgHotTextMouseOver, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore,
 	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete, uiMsgDragging
 };
 

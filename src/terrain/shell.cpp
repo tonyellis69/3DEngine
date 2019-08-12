@@ -71,6 +71,13 @@ void CShell::playerAdvance(Tdirection direction) {
 
 		scroll(scrollDir);
 
+		if (shellNo == 0) {
+			shellColour = vec4(col::randHue(), 1);
+			pTerrain->shells[0].shellColour = vec4(0, 0, 1, 1.0f);
+			sysLog << "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!scroll";
+		}
+
+
 		//move enclosing shells back to ensure terrain still lines up
 		pTerrain->displaceOuterShells(*this, scrollDir);
 
@@ -292,6 +299,8 @@ void CShell::reinitialiseFaceSCs(Tdirection face) {
 		//clear the old intersection data
 		faceIter->isEmpty = true;
 		faceIter->clearChunks();
+		//for (auto& chunk : faceIter->chunks2)
+		//	faceIter->createChunk(faceIter.getIndex());
 		vec3 sampleSpacePosition = calcSCsampleSpacePosition(faceIter.getIndex());
 		faceIter->setSampleSpacePosition(sampleSpacePosition);
 		faceIter->checkForIntersection();
@@ -422,6 +431,11 @@ void CShell::reinitialiseInnerSCs() {
 glm::i32vec3& CShell::getRotatedIndex(const glm::i32vec3& origIndex) {
 	return scArray.getRotatedIndex(origIndex);
 }
+
+glm::i32vec3& CShell::getInvRotatedIndex(const glm::i32vec3& origIndex) {
+	return scArray.getInvRotatedIndex(origIndex);
+}
+
 
 
 /** Notify SCs on the outface to remove any chunks that have now scrolled beyond the 

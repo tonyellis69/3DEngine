@@ -32,7 +32,9 @@ public:
 
 	void update(float dT);
 
-	glm::vec3& getSCpos(int shellNo, glm::i32vec3& origIndex);
+	glm::vec3& getSCpos(int shellNo,const glm::i32vec3& origIndex);
+	glm::vec3& getSCpos2(int shellNo, const glm::i32vec3& origIndex);
+
 
 	std::vector<CShell> shells;
 

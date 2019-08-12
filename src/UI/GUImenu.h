@@ -19,7 +19,7 @@ public:
 	void DrawSelf();
 	void addItem( std::initializer_list<std::string> itemTexts);
 	void resizeToFit();
-	void onMouseOff(const int mouseX, const int mouseY, int key);
+	bool onMouseOff(const int mouseX, const int mouseY, int key);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);

@@ -20,7 +20,7 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 	shells.back().pTerrain = this;
 	shells.back().shellNo = 0;
 	shells.back().initSuperChunks();
-	initialiseChunks(100);
+	initialiseChunks(2000); //2164
 }
 
 /** Add an outer shell to the existing shells, its size adjusted by extent. */
@@ -32,7 +32,6 @@ void CTerrain2::addShell(int extent) {
 	shells.back().shellNo = shells.size() -1;
 	shells.back().pTerrain = this;
 	shells.back().initSuperChunks();
-	//shells.back().innerBounds = getInnerBounds(shells.back().shellNo);
 	shells.back().calculateInnerBounds();
 }
 
@@ -170,7 +169,7 @@ int CTerrain2::getFreeChunk() {
 		return id;
 	}
 
-	int chunkInc = chunks.size() / 10;
+	int chunkInc = std::max((int)chunks.size() / 10,1);
 	freeChunks.resize(chunkInc-1);
 	id = chunks.size();
 	iota(begin(freeChunks), end(freeChunks), id+1);
@@ -181,6 +180,14 @@ int CTerrain2::getFreeChunk() {
 
 /** Move this chunk  to the free pile. */
 void CTerrain2::removeChunk(int id) {
+/*	int newId = getFreeChunk();
+	chunks[newId] = chunks[id];
+	chunks[newId].status = chToSkin;
+	chunks[newId].colour = vec4(1, 0, 0, 1);
+	chunksToMesh.push(newId);
+	*/
+
+	chunks[id].status = chFree;
 	freeChunks.push_back(id);
 }
 
@@ -190,17 +197,25 @@ void CTerrain2::update(float dT) {
 	//TO DO: base number on time available, not const value!
 	for (int x = 0; x < 10; x++) { 
 		//are there any chunks in the queue? Mesh the next one.
-		if (!chunksToMesh.empty()) {
+		if (chunksToMesh.empty())
+			return;
+
 			int id = chunksToMesh.front();
 			chunksToMesh.pop();
 			pCallbackApp->createChunkMesh(chunks[id]);
-		}
+		
 	}
 }
 
 /** Return the NW bottom corner position of this SC in worldspace. */
-glm::vec3& CTerrain2::getSCpos(int shellNo, glm::i32vec3& origIndex) {
+glm::vec3& CTerrain2::getSCpos(int shellNo, const glm::i32vec3& origIndex) {
 	i32vec3 rotatedIndex = shells[shellNo].getRotatedIndex(origIndex);
+	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
+		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
+}
+
+glm::vec3& CTerrain2::getSCpos2(int shellNo, const glm::i32vec3& origIndex) {
+	i32vec3 rotatedIndex = shells[shellNo].getInvRotatedIndex(origIndex);;
 	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
 		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
 }

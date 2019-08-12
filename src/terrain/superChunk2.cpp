@@ -31,14 +31,23 @@ void CSuperChunk2::setCallbackApp(ITerrainCallback * pApp) {
 
 /** Acquire a new chunk at the given index position. */
 void CSuperChunk2::createChunk(glm::i32vec3 & index) {
+
+	if (shellNo > 0)
+		return;
 	vec3 sampleCorner = sampleSpacePos + vec3(index) * chunkSampleSize;
-	vec3 terrainPos = pTerrain->getSCpos(shellNo, origIndex);
+
+	vec3 terrainPos = pTerrain->getSCpos2(shellNo, origIndex); 
+
+
+
+	//vec3 terrainPos = pTerrain->getSCpos2(shellNo, origIndex);
 
 	terrainPos += vec3(index) * pTerrain->shells[shellNo].chunkSize;
 	 
 	chunks2.push_back( pTerrain->createChunk(index, sampleCorner, shellNo, terrainPos) );
-	pTerrain->chunks[chunks2.back()].colour = colour;
-}
+	//pTerrain->chunks[chunks2.back()].colour = colour;
+	pTerrain->chunks[chunks2.back()].colour = pTerrain->shells[shellNo].shellColour;
+}	
 
 
 /** Remove all th chunks of this superchunk.*/

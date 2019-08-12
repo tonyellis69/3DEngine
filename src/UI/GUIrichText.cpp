@@ -243,8 +243,6 @@ void CGUIrichText::appendText(std::string newText) {
 
 /** Append the given text to the current body of text. */
 void CGUIrichText::addText(std::string newText) {
-	if (newText.find("do something") != string::npos)
-		int b = 0;
 
 	textObjs.back().text += newText;
 	compileFragmentsToEnd(lineBuffer.finalFrag());
@@ -263,7 +261,6 @@ bool CGUIrichText::scrollDown2(int dist) {
 		if (newLine.fragments.empty())
 			break;
 		lineBuffer.appendLine(newLine);
-		//lineBuffer.lines.push_back(newLine);
 		bottomLineOver += newLine.height;
 	}
 
@@ -421,12 +418,7 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 
 	string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 
-	if (renderLine == "do something")
-		int b = 0;
-
 	TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
-
-
 
 	if (currentObj.flags & richGap) { 
 		lineFragment.height = currentObj.gap; 
@@ -579,22 +571,32 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
 		selectedHotObj = -1;
+	int distToFragTop;
 	for (auto hotTextFrag : hotFrags) {
 		TLineFragment& hotFrag = lineBuffer.getFragment(hotTextFrag.fragId);
 		if (localMouse.y > hotFrag.renderStartY &&  localMouse.y < hotFrag.renderStartY + hotFrag.height
 			&& localMouse.x > hotFrag.renderStartX && localMouse.x < hotFrag.renderEndX) {
 			selectedHotObj = hotFrag.textObj;
+
 			if (oldSelectedHotObj != selectedHotObj) {
 				msgHighlight();
-				//highlight(selectedHotObj); 
 			}
+			distToFragTop = (localMouse.y - hotFrag.renderStartY);
 			break;
 		}
 	}
+
+	CMessage msg = { uiMsgHotTextMouseOver};
+	if (selectedHotObj != -1) {
+		msg.value = textObjs[selectedHotObj].hotId;
+		msg.x = mouseX; msg.y = mouseY - distToFragTop;
+	}
+	else
+		msg.value = -1;
+	parent->message(this, msg);
 	
 	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
 		msgHighlight();
-		//unhighlight(oldSelectedHotObj);
 	}
 }
 
@@ -607,7 +609,7 @@ void CGUIrichText::msgHighlight() {
 		msg.value = textObjs[selectedHotObj].hotId;
 	else
 		msg.value = -1;
-	pDrawFuncs->handleUImsg(*this, msg);
+	pDrawFuncs->handleUImsg(*this, msg); //TO DO: phase out!
 }
 
 
@@ -625,13 +627,15 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 	}
 }
 
+
+
 void CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
 	CMessage msg;
 	msg.Msg == uiMsgLMouseUp;
 	parent->message(this, msg);
 
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!temp
-	renderLineBuffer();
+	//renderLineBuffer();
 }
 
 void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
@@ -644,15 +648,8 @@ void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 
 
 /** Check for losing mouse while hot text selected. */
-void CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
-	if (!mouseMode)
-		return;
-
-	if (selectedHotObj >= 0) {
-		//unhighlight(selectedHotObj);
-		selectedHotObj = -1;
-		msgHighlight();
-	}
+bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
+	return true;
 }
 
 
@@ -841,6 +838,7 @@ void CGUIrichText::setMouseWheelMode(TMouseWheelMode mode) {
 }
 
 /** Ensure hot text is selected, if it's onscreen, and that we enter hot text scroll mode. */
+//TO DO: scrap this. Janky hot text scroll we don't use anymore
 void CGUIrichText::updateHotTextSelection() {
 	if (hotFrags.size() == 0) { //no hot text
 		selectedHotObj = -1;
@@ -860,6 +858,7 @@ void CGUIrichText::updateHotTextSelection() {
 }
 
 /** Scroll among hot text items, or out of them. */
+//TO DO: kill
 void CGUIrichText::hotTextScroll(int direction) {
 	int nextHotOb = -1;
 	if (direction < 0) { //down/right	
@@ -965,7 +964,6 @@ void CGUIrichText::clear() {
 void CGUIrichText::clearSelection() {
 	if (selectedHotObj == -1)
 		return;
-	//unhighlight(selectedHotObj);
 	selectedHotObj = -1;
 }
 
@@ -1142,11 +1140,6 @@ void CGUIrichText::resize(int w, int h) {
 		h = 1;
 	setWidth(w);
 	setHeight(h);
-//	drawBox.size = glm::i32vec2(w, h);
-	//updateAppearance();
-	//needsUpdate = true;
-	//TO DO: see if we can get away with flag here
-	//renderText();
 }
 
 /** Append a textObj marking the start or end of temporary text. */

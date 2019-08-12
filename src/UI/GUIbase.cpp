@@ -11,6 +11,8 @@
 #include "GUIlabel.h"
 #include "GUIbutton.h"
 
+#include "..//3DEngine/src/utils/log.h"
+
 // TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
 
 unsigned int UIuniqueIDgen = 0;
@@ -277,12 +279,14 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	//Still here? Message is for this control
 	switch (Msg) {
 	case WM_MOUSEMOVE: {
+		bool mouseOffSuccess = true;
 		if (MouseOver != this) { //mouse has just entered this control 
 			MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
 			if (MouseOver)
-				MouseOver->onMouseOff(mouseX, mouseY, key);
+				mouseOffSuccess == MouseOver->onMouseOff(mouseX, mouseY, key);
 		}
-		MouseOver = this;
+		if (mouseOffSuccess)
+			MouseOver = this;
 		if (MouseDown == this) { //looks like we're dragging
 			onDrag(mouseX, mouseY);
 			//return;
@@ -580,7 +584,7 @@ void CGUIbase::setGUIcallback(Icallback * callbackInstance) {
 /** Default callback for GUI messages. Controls' callbackObj is set to this on initialisation
 	to avoid calling on NULL. */
 void CGUIbase::GUIcallback(CGUIbase * sender, CMessage & msg) {
-	cerr << "\nObject with unique id " << sender->uniqueID << " called message " << msg.Msg
+	liveLog << "\nObject with unique id " << sender->uniqueID << " called message " << msg.Msg
 		<< " value " << msg.value;
 }
 

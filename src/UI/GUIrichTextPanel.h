@@ -33,7 +33,10 @@ public:
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 
 	void OnLMouseDown(const int mouseX, const int mouseY, int key);
-	
+	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
+	void OnMouseMove(const  int mouseX, const  int mouseY, int key);
+
+
 	void resizeToFit();
 
 	void message(CGUIbase* sender, CMessage & msg);
@@ -58,6 +61,14 @@ public:
 		richText->enableLineFadeIn = onOff;
 	}
 
+	enum TStatus { initial, readyToPosition, displaying, 
+		readyToDelete};
+	void setStatus(TStatus newStatus) {
+		status = newStatus;
+	}
+	bool noMouse();
+
+
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
 
@@ -73,4 +84,8 @@ public:
 	float clauseDelay;
 	float charInterval;
 	float charDelay;
+
+	TStatus status;
+
+	int mouseOffMargin; ///<Extra pixels to allow before mouse declared outside panel.
 };

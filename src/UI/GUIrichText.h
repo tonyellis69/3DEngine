@@ -86,7 +86,7 @@ public:
 
 	void onRMouseUp(const int mouseX, const int mouseY);
 
-	void onMouseOff(const  int mouseX, const  int mouseY, int key);
+	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
 
 
 	TCharacterPos& getPreviousLine(TCharacterPos& startText);

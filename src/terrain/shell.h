@@ -46,6 +46,8 @@ public:
 
 	glm::i32vec3& getRotatedIndex(const glm::i32vec3& origIndex);
 
+	glm::i32vec3& getInvRotatedIndex(const glm::i32vec3& origIndex);
+
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
 	int shellSCs; //<shell size in superChunks.

@@ -1,4 +1,5 @@
 #include "GUIrichTextPanel.h"
+#include "GUIroot.h"
 
 CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 	setLocalPos(x, y);
@@ -25,6 +26,8 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 	clauseDelay = 0.2f;
 	charInterval = 0;
 	charDelay = 0.01f;
+	status = initial;
+	mouseOffMargin = 20; //TO DO should default to 0
 }
 
 void CGUIrichTextPanel::setInset(int newInset) {
@@ -126,6 +129,14 @@ void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key
 	}
 }
 
+bool CGUIrichTextPanel::onMouseOff(const int mouseX, const int mouseY, int key) {
+	return true;
+}
+
+void CGUIrichTextPanel::OnMouseMove(const int mouseX, const int mouseY, int key) {
+
+}
+
 
 
 
@@ -140,23 +151,39 @@ void CGUIrichTextPanel::message(CGUIbase* sender, CMessage& msg) {
 		setWidth(richText->getWidth() + (2 * inset));
 		setHeight(richText->getHeight() + (2 * inset));
 	}
-	if (sender == richText && msg.Msg == uiMsgDragging && draggable) {
-		if (!dragging) {
-			lastMousePos = glm::i32vec2(msg.x, msg.y);
-			dragging = true;
-		}
-		else {
-			glm::i32vec2 dMouse = glm::i32vec2(msg.x, msg.y) - lastMousePos;
-			lastMousePos = glm::i32vec2(msg.x, msg.y);
-			dMouse += getLocalPos();
-			setLocalPos(dMouse.x,dMouse.y);
+
+	//handle rich text child events:
+	if (sender == richText) {
+		switch (msg.Msg) {
+		case uiMsgDragging:
+			if (draggable) {
+				if (!dragging) {
+					lastMousePos = glm::i32vec2(msg.x, msg.y);
+					dragging = true;
+				}
+				else {
+					glm::i32vec2 dMouse = glm::i32vec2(msg.x, msg.y) - lastMousePos;
+					lastMousePos = glm::i32vec2(msg.x, msg.y);
+					dMouse += getLocalPos();
+					setLocalPos(dMouse.x, dMouse.y);
+
+				}
+			}
+			break;
+
+		case uiMsgLMouseUp:
+			if (dragging) {
+				dragging = false;
+			}
+			break;
+
+		case uiMsgHotTextMouseOver:
+			callbackObj->GUIcallback(this, msg);
+			break;
 
 		}
 	}
 
-	if (sender == richText && msg.Msg == uiMsgLMouseUp)
-		if (dragging)
-			dragging = false;
 }
 
 void CGUIrichTextPanel::setTempText(bool onOff) {
@@ -244,6 +271,19 @@ void CGUIrichTextPanel::deliverByCharacter(float dT) {
 	richText->appendMarkedUpText(text);
 
 }
+
+/** Return true if the mouse pointer is outside the panel and the mouseOffmargin. */
+bool CGUIrichTextPanel::noMouse() {
+	glm::i32vec2 margin = { mouseOffMargin, mouseOffMargin };
+	if (glm::any(glm::lessThan(rootUI->mousePos, getScreenPos() - margin)) ||
+		glm::any(glm::greaterThan(rootUI->mousePos, getScreenPos() + getSize() + margin))) {
+
+		return true;
+	}
+
+	return false;
+}
+
 
 
 
