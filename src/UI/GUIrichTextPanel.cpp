@@ -28,6 +28,7 @@ CGUIrichTextPanel::CGUIrichTextPanel(int x, int y, int w, int h) {
 	charDelay = 0.01f;
 	status = initial;
 	mouseOffMargin = 20; //TO DO should default to 0
+	objId = -1;
 }
 
 void CGUIrichTextPanel::setInset(int newInset) {
@@ -83,8 +84,8 @@ void CGUIrichTextPanel::setTextStyles(std::vector<TtextStyle>* styles) {
 	richText->setTextStyles(styles);
 }
 
-void CGUIrichTextPanel::setTextStyle(std::string styleName) {
-	richText->setTextStyle(styleName);
+bool CGUIrichTextPanel::setTextStyle(std::string styleName) {
+	return richText->setTextStyle(styleName);
 }
 
 void CGUIrichTextPanel::setDefaultTextStyle(std::string styleName) {
@@ -96,12 +97,12 @@ std::vector<unsigned int> CGUIrichTextPanel::purgeHotText(unsigned int id){
 }
 
 void CGUIrichTextPanel::update(float dT) {
-	if (!deliveryBuffer.empty() && !richText->busy) {
+	/*if (!deliveryBuffer.empty() && !richText->busy) {
 		switch (deliveryMode) {
 		case byClause: deliverByClause(dT); break;
 		case byCharacter: deliverByCharacter(dT); break;
 		}
-	}
+	}*/
 	richText->update(dT);
 }
 
@@ -127,6 +128,10 @@ void CGUIrichTextPanel::OnLMouseDown(const int mouseX, const int mouseY, int key
 		pDrawFuncs->handleUImsg(*this->richText, msg);
 
 	}
+}
+
+void CGUIrichTextPanel::onRMouseUp(const int mouseX, const int mouseY) {
+
 }
 
 bool CGUIrichTextPanel::onMouseOff(const int mouseX, const int mouseY, int key) {
@@ -177,7 +182,15 @@ void CGUIrichTextPanel::message(CGUIbase* sender, CMessage& msg) {
 			}
 			break;
 
-		case uiMsgHotTextMouseOver:
+		case uiMsgRMouseUp:
+			callbackObj->GUIcallback(this, msg);
+			break;
+
+		case uiMsgHotTextChange:
+			callbackObj->GUIcallback(this, msg);
+			break;
+
+		case uiMsgHotTextClick:
 			callbackObj->GUIcallback(this, msg);
 			break;
 
@@ -186,16 +199,16 @@ void CGUIrichTextPanel::message(CGUIbase* sender, CMessage& msg) {
 
 }
 
-void CGUIrichTextPanel::setTempText(bool onOff) {
-	richText->setTempText(onOff);
+bool CGUIrichTextPanel::setTempText(bool onOff) {
+	return richText->setTempText(onOff);
 }
 
 void CGUIrichTextPanel::suspend(bool isOn) {
 	richText->suspend(isOn);
 }
 
-void CGUIrichTextPanel::collapseTempText() {
-	richText->collapseTempText();
+bool CGUIrichTextPanel::collapseTempText() {
+	return richText->collapseTempText();
 }
 
 bool CGUIrichTextPanel::solidifyTempText() {
@@ -211,7 +224,7 @@ void CGUIrichTextPanel::removeMarked() {
 }
 
 bool CGUIrichTextPanel::busy() {
-	return richText->busy;
+	return richText->isBusy();
 }
 
 /** Pass the given text on to the rich text control, either immediately or via a buffer,

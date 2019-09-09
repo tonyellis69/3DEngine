@@ -34,6 +34,7 @@ public:
 	virtual bool scIntersectionCheckCallback(glm::vec3& pos, float scSize) { return false; };
 	virtual bool chunkCheckCallback(glm::vec3& chunkPos, float chunkSize) { return false; };
 	virtual void createChunkMesh(Chunk2& chunk) {};
+	virtual void deleteChunkMesh(Chunk2& chunk) {};
 };
 
 /** A container for zero or more chunks occupying a cubic volume of space. */

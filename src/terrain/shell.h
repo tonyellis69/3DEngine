@@ -72,6 +72,7 @@ public:
 
 	TBoxVolume innerBounds;
 
+	int scrolls; ///////!!!!temp!
 };
 
 

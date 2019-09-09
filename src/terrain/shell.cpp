@@ -6,6 +6,8 @@
 
 #include "..\3DEngine\src\utils\log.h"
 
+#include <glm/gtc/matrix_transform.hpp>	
+
 #include <iostream>
 
 
@@ -29,6 +31,7 @@ CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
 	//SCs don't have chunks yet, so we can safely say:
 	for (int face = 0; face < 6; face++)
 		faceLayerFull[face] = false;
+	scrolls = 0;
 }
 
 
@@ -60,10 +63,10 @@ void CShell::playerAdvance(Tdirection direction) {
 		//NB Think of scroll direction as the direction of rotation of the conveyor belt of terrain
 		Tdirection scrollDir = flipDir(direction);
 		liveLog << " scrolling.";
-
+		scrolls++;
 
 		if (shellNo != 0)
-			pTerrain->returnShellAndOuterShells(*this, direction);
+			pTerrain->recentreShellsAfterScroll(*this, direction);
 
 		if (shellNo == 0) {
 			pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
@@ -71,15 +74,19 @@ void CShell::playerAdvance(Tdirection direction) {
 
 		scroll(scrollDir);
 
-		if (shellNo == 0) {
+		/*if (shellNo == 0) {
 			shellColour = vec4(col::randHue(), 1);
 			pTerrain->shells[0].shellColour = vec4(0, 0, 1, 1.0f);
-			sysLog << "\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!scroll";
+		}*/
+		
+		vec3 move = dirToVec(scrollDir) * SCsize;
+		if (shellNo == 0) {
+			pTerrain->chunkOrigin = glm::translate(pTerrain->chunkOrigin, move);
+			liveLog << "\nchunkOrigin moved to " << vec3(pTerrain->chunkOrigin[3]);
 		}
 
-
 		//move enclosing shells back to ensure terrain still lines up
-		pTerrain->displaceOuterShells(*this, scrollDir);
+		pTerrain->alignOuterShellsWithScroll(*this, scrollDir);
 
 		//now that we've scrolled, return to the default layout of one final double-layer of chunks
 		addToFaceLayer(direction);
@@ -88,6 +95,8 @@ void CShell::playerAdvance(Tdirection direction) {
 		//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
 		//needs to add some to cover that area of terrain
 		if (shellNo < pTerrain->shells.size() - 1) {
+			//if (scrolls == 2)
+			//	pTerrain->shells[shellNo + 1].shellColour = vec4(1, 1, 1, 1.0f);
 			pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
 		}
 	}

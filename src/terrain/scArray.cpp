@@ -49,7 +49,17 @@ glm::i32vec3& CSCarry::getRotatedIndex(const glm::i32vec3& origIndex) {
 }
 
 glm::i32vec3& CSCarry::getInvRotatedIndex(const glm::i32vec3& origIndex) {
-	return (origIndex - rotation) % dimensions;
+	i32vec3 inv = origIndex - rotation;
+
+	if (inv.x < 0)
+		inv.x += dimensions.x;
+	if (inv.y < 0)
+		inv.y += dimensions.y;
+	if (inv.z < 0)
+		inv.z += dimensions.z;
+
+
+	return inv % dimensions;
 }
 
 

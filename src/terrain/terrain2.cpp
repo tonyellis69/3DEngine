@@ -100,7 +100,7 @@ void CTerrain2::fillShells() {
 
 /** Move the enclosing shells of this shell one SC length in the given direction. This is called to keep the outer terrain 
 	aligned with a shell that has just scrolled. */
-void CTerrain2::displaceOuterShells(const CShell & sender, Tdirection moveDirection) {
+void CTerrain2::alignOuterShellsWithScroll(const CShell & sender, Tdirection moveDirection) {
 	vec3 move = dirToVec(moveDirection) * shells[sender.shellNo].SCsize;
 	for (unsigned int outerShell = sender.shellNo +1; outerShell < shells.size(); outerShell++) {
 		shells[outerShell].worldSpacePos += move;
@@ -110,10 +110,12 @@ void CTerrain2::displaceOuterShells(const CShell & sender, Tdirection moveDirect
 
 /** Move this shell and any enclosing shells one SC length in the given direction. This is called to keep their
 	terrain in line with any inner shells after scrolling. It also prevents the shell from drifting away from shell 0.*/
-void CTerrain2::returnShellAndOuterShells(const CShell & sender, Tdirection moveDirection) {
+void CTerrain2::recentreShellsAfterScroll(const CShell & sender, Tdirection moveDirection) {
 	vec3 move = dirToVec(moveDirection) * sender.SCsize;
 	for (int shell = sender.shellNo; shell < shells.size(); shell++) {
 		shells[shell].worldSpacePos += move;
+		//if (shell == 0)
+		//	liveLog << "\nshell 0 moved to " << shells[shell].worldSpacePos;
 	}
 }
 
@@ -180,12 +182,7 @@ int CTerrain2::getFreeChunk() {
 
 /** Move this chunk  to the free pile. */
 void CTerrain2::removeChunk(int id) {
-/*	int newId = getFreeChunk();
-	chunks[newId] = chunks[id];
-	chunks[newId].status = chToSkin;
-	chunks[newId].colour = vec4(1, 0, 0, 1);
-	chunksToMesh.push(newId);
-	*/
+	pCallbackApp->deleteChunkMesh(chunks[id]);
 
 	chunks[id].status = chFree;
 	freeChunks.push_back(id);

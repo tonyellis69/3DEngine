@@ -12,15 +12,15 @@
 
 class CTerrain2 {
 public:
-	CTerrain2() : playerOffset(0) {};
+	CTerrain2() : playerOffset(0), chunkOrigin(1) {};
 	void createLoD1shell(float _LoD1cubeSize, int chunkCubes, int SCchunks, int shellSCs);
 	void addShell(int extent);
 	float getShellSize(unsigned int shellNo);
 	void playerWalk(glm::vec3& move);
 	void removeChunkOverlaps(Tdirection inDirection);
 	void fillShells();
-	void displaceOuterShells(const CShell& sender, Tdirection moveDirection);
-	void returnShellAndOuterShells(const CShell& sender, Tdirection moveDirection);
+	void alignOuterShellsWithScroll(const CShell& sender, Tdirection moveDirection);
+	void recentreShellsAfterScroll(const CShell& sender, Tdirection moveDirection);
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
 	void setCallbackApp(ITerrainCallback* pApp);
@@ -52,6 +52,8 @@ public:
 	std::vector<Chunk2> chunks; ///<The complete reservoir of chunks.
 	std::vector<int> freeChunks;
 	std::queue<int> chunksToMesh;
+
+	glm::mat4 chunkOrigin; ///<TO DO: keep this, or do some other way?
 
 };
 

@@ -49,7 +49,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	charDelay = 0.01f;
 	enableLineFadeIn = false;
 	lineFadeInOn = false;
-	lineFadeSpeed = 20.0f;
+	lineFadeSpeed = 5;// 20.0f;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -61,13 +61,7 @@ void CGUIrichText::DrawSelf() {
 }
 
 void CGUIrichText::setFont(CFont* newFont) {
-	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		newObj.hotId = 0; //assume we don't want to add to any preceeding hot text.
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	currentTextStyle.font = newFont->name;
 	textObjs[currentTextObj].style = currentTextStyle;
 }
@@ -82,14 +76,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	if (textObjs[currentTextObj].style.colour == vec4(r, g, b, a))
 		return;
 
-	if (textObjs[currentTextObj].text.size() > 0) { //don't change current obj if it already has text
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		newObj.hotId = 0; //assume we don't want to add to any preceeding hot text.
-		//newObj.hotObjId = 0;
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	textObjs[currentTextObj].style.colour = vec4(r, g, b, a);
 }
 
@@ -98,13 +85,7 @@ void CGUIrichText::setAppendStyleBold(bool isOn) {
 	if (textObjs[currentTextObj].bold == isOn)
 		return;
 
-	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text
-		//replace with addTextlessEndObj
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	textObjs[currentTextObj].bold = isOn;
 	if (isOn)
 		textObjs[currentTextObj].style.colour = vec4(0, 0, 1, 1); ///FAKE!!! DO NOT KEEP
@@ -118,13 +99,7 @@ void CGUIrichText::setAppendStyleHot(bool isOn, bool unsuspended, unsigned int h
 	if (textObjs[currentTextObj].hotId == hotId) 
 		return;
 
-	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text
-													 //replace with addTextlessEndObj
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	textObjs[currentTextObj].hotId = hotId;
 	
 
@@ -156,27 +131,24 @@ void CGUIrichText::setTextColour(UIcolour  colour) {
 
 /** Set the style for any text appended after this. */
 void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
+
 	currentTextStyle = newStyle;
 	if (textObjs[currentTextObj].style == newStyle)
 		return;
 
-	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		newObj.period = 0;
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	textObjs[currentTextObj].style = newStyle;
 }
 
-void CGUIrichText::setTextStyle(std::string styleName) {
+bool CGUIrichText::setTextStyle(std::string styleName) {
+//	if (busy)
+//		return false;
 	if (styles == NULL)
-		return;
+		return false;
 	for (auto style : *styles) {
 		if (style.name == styleName) {
 			setTextStyle(style);
-			return;
+			return true;
 		}
 	}
 	if (styleName == "tempOn") {
@@ -200,6 +172,11 @@ void CGUIrichText::setTextStyle(std::string styleName) {
 	if (styleName == "fadeOff") {
 		setFadeText(false);
 	}
+
+	if (styleName == "bookmark")
+		insertBookmark();
+
+	return true;
 }
 
 
@@ -233,8 +210,15 @@ void CGUIrichText::setText(std::string newText) {
 
 /** Append newText to the current body of text (and update the page). */
 void CGUIrichText::appendText(std::string newText) {
-	addText(newText);
+	cerr << "\nReceived: " << newText.substr(0, 20);
+	if (newText.find("This is a test room") != string::npos)
+		int b=0;
+
 	requestLineFadeIn(true);
+	addText(newText);
+	if (enableLineFadeIn)
+		busy = true; //because it will take a little while to fade-in this text.
+	cerr << " linefade is " << lineFadeInOn;
 	renderLineBuffer();
 
 	if (transcriptLog)
@@ -326,7 +310,7 @@ void CGUIrichText::renderLineBuffer() {
 
 			//create an index of hot text fragments
 			if (currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
-
+				
 				hotFrags.push_back({ fragId,renderLine, frag.textObj });
 				textObjs[currentTextObj].period = randomPeriod(randEngine);
 			}
@@ -571,37 +555,45 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
 		selectedHotObj = -1;
-	int distToFragTop;
+	int distToFragTop= 0;
 	for (auto hotTextFrag : hotFrags) {
 		TLineFragment& hotFrag = lineBuffer.getFragment(hotTextFrag.fragId);
 		if (localMouse.y > hotFrag.renderStartY &&  localMouse.y < hotFrag.renderStartY + hotFrag.height
 			&& localMouse.x > hotFrag.renderStartX && localMouse.x < hotFrag.renderEndX) {
 			selectedHotObj = hotFrag.textObj;
 
-			if (oldSelectedHotObj != selectedHotObj) {
-				msgHighlight();
-			}
-			distToFragTop = (localMouse.y - hotFrag.renderStartY);
+			distToFragTop = (localMouse.y - hotFrag.renderStartY);	
 			break;
 		}
 	}
 
-	CMessage msg = { uiMsgHotTextMouseOver};
+	if (oldSelectedHotObj != selectedHotObj) {
+		
+		i32vec2 adjustedMousePos = { mouseX,mouseY - distToFragTop };
+		msgHotTextChange(adjustedMousePos);
+	}
+
+	
+	//if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
+	//	msgHighlight();
+	//}
+}
+
+/** Announce that the currently selected hot text has changed. */
+void CGUIrichText::msgHotTextChange(glm::i32vec2& adjustedMousePos) {
+	CMessage msg = { uiMsgHotTextChange };
 	if (selectedHotObj != -1) {
 		msg.value = textObjs[selectedHotObj].hotId;
-		msg.x = mouseX; msg.y = mouseY - distToFragTop;
+		msg.x = adjustedMousePos.x; msg.y = adjustedMousePos.y;
 	}
 	else
 		msg.value = -1;
 	parent->message(this, msg);
-	
-	if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
-		msgHighlight();
-	}
 }
 
 
 /** Message the client that a new hot text is being moused over, in case this is useful.  */
+///TO DO: looks like I can scrap
 void CGUIrichText::msgHighlight() {
 	CMessage msg;
 	msg.Msg = uiMsgMouseMove;
@@ -609,7 +601,7 @@ void CGUIrichText::msgHighlight() {
 		msg.value = textObjs[selectedHotObj].hotId;
 	else
 		msg.value = -1;
-	pDrawFuncs->handleUImsg(*this, msg); //TO DO: phase out!
+	//pDrawFuncs->handleUImsg(*this, msg); //TO DO: phase out!
 }
 
 
@@ -623,7 +615,8 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 		msg.Msg = uiMsgHotTextClick;
 		msg.x = mouseX; msg.y = mouseY;
 		msg.value = textObjs[selectedHotObj].hotId;
-		pDrawFuncs->handleUImsg(*this, msg);
+		//pDrawFuncs->handleUImsg(*this, msg);
+		parent->message(this, msg);
 	}
 }
 
@@ -642,13 +635,19 @@ void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiMsgRMouseUp;
 	msg.x = mouseX; msg.y = mouseY;
-	pDrawFuncs->handleUImsg(*this, msg);
+	//pDrawFuncs->handleUImsg(*this, msg);
+	parent->message(this, msg);
 }
 
 
 
 /** Check for losing mouse while hot text selected. */
 bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
+	clearSelection();
+	CMessage msg = { uiMsgHotTextChange };
+	msg.value = -1;
+	parent->message(this, msg);
+
 	return true;
 }
 
@@ -971,7 +970,8 @@ void CGUIrichText::clearSelection() {
 
 void CGUIrichText::appendMarkedUpText(string text) {
 	bool bold = false; bool hot = false;
-	enum TStyleChange { styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle };
+	enum TStyleChange { styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle,
+		styleBookmark};
 
 	std::string writeTxt = text;
 	std::string remainingTxt = text;
@@ -1036,6 +1036,7 @@ void CGUIrichText::appendMarkedUpText(string text) {
 			setTextStyle(currentTextStyle);
 		if (styleChange == styleStyle)
 			setTextStyle(styleName);
+
 
 	}
 
@@ -1143,28 +1144,21 @@ void CGUIrichText::resize(int w, int h) {
 }
 
 /** Append a textObj marking the start or end of temporary text. */
-void CGUIrichText::setTempText(bool onOff) {
-	if (textObjs[currentTextObj].text.size() > 0) {  //don't change current obj if it already has text //replace with addTextlessEndObj
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		newObj.period = 0;
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+bool CGUIrichText::setTempText(bool onOff) {
+	if (busy)
+		return false;
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	if (onOff) {
 		textObjs[currentTextObj].flags |= richTemp;
 	}
 	else
 		textObjs[currentTextObj].flags &= ~richTemp;
+	return true;
 }
 
 /** Append a textObj marking the start or end of marked text. */
 void CGUIrichText::setMarkedText(bool onOff) {
-	TRichTextRec newObj = textObjs[currentTextObj];
-	newObj.text.clear();
-	newObj.period = 0;
-	textObjs.push_back(newObj);
-	currentTextObj++;
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	if (onOff) {
 		textObjs[currentTextObj].flags |= richMarked;
 	}
@@ -1174,13 +1168,7 @@ void CGUIrichText::setMarkedText(bool onOff) {
 
 /** Append a textObj marking the start or end of fade-in text. */
 void CGUIrichText::setFadeText(bool onOff) {
-	if (textObjs[currentTextObj].text.size() > 0) {
-		TRichTextRec newObj = textObjs[currentTextObj];
-		newObj.text.clear();
-		newObj.period = 0;
-		textObjs.push_back(newObj);
-		currentTextObj++;
-	}
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	if (onOff) {
 		textObjs[currentTextObj].flags |= richFadeIn;
 	}
@@ -1188,17 +1176,40 @@ void CGUIrichText::setFadeText(bool onOff) {
 		textObjs[currentTextObj].flags &= ~richFadeIn;
 }
 
+/** If objNo is a text obj with text, create a new textObj carrying over its attributes and return it.
+	If objNo is textless, just return it. */
+int CGUIrichText::getStyleChangeTextObjAt(int objNo) {
+	if (textObjs[currentTextObj].text.size() > 0 || textObjs[currentTextObj].flags & richBookmark) {
+		TRichTextRec newObj = textObjs[objNo];
+		newObj.text.clear();
+		newObj.period = 0;
+		newObj.flags &= ~richBookmark; //we never want to carry over this
+		textObjs.push_back(newObj);
+		//TO DO: change to insert
+		currentTextObj++;
+	}
+	return currentTextObj;
+}
+
 /** Remove the most recent block of text objs flagged as temporary. */
 void CGUIrichText::removeTempText() {
 	for ( int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].flags & richTemp) {
 			textObjs.erase(textObjs.begin() + obj);	
-			lineBuffer.removeObjLine(obj);
+			/////////////lineBuffer.removeObjLine(obj);
 			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp))
 				break;
 		}
 	}
 	currentTextObj = textObjs.size() - 1;
+
+	createPage();
+}
+
+/** At the current text point, insert a bookmark textObj. */
+void CGUIrichText::insertBookmark() {
+	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
+	textObjs[currentTextObj].flags |= richBookmark;
 }
 
 /** Flag that normal activity is suspended/unsuspended. */
@@ -1215,10 +1226,13 @@ void CGUIrichText::onDrag(const int mouseX, const int mouseY) {
 }
 
 /** Remove any temporary text and update the screen. */
-void CGUIrichText::collapseTempText() {
+bool CGUIrichText::collapseTempText() {
+	if (busy)
+		return false;
 	removeTempText();
 	//createPage();
 	renderLineBuffer();
+	return true;
 }
 
 /** Make the last temporary text permanent, if any. This includes making any suspended hot text active. */
@@ -1231,6 +1245,7 @@ bool CGUIrichText::solidifyTempText() {
 			if (textObjs[obj].flags & richSuspended) {
 				textObjs[obj].flags ^= richSuspended;
 				textObjs[obj].style = hotTextStyle;
+
 			}
 			else {
 				textObjs[obj].style = defaultTextStyle;
@@ -1278,23 +1293,27 @@ void CGUIrichText::removeMarked() {
 		}
 	}
 
-	if (beforeObj != -1 /*&& beforeObj < currentTextObj*/) {
+	if (beforeObj != -1 ) {
 		busy = true;
-
-		 TFragPos lastBeforeFrag = lineBuffer.getLastFrag(beforeObj);
-		 TFragPos firstAfterFrag = lineBuffer.getFirstFrag(afterObj);
-		
-		 TRichTextRec gapObj = textObjs[beforeObj];
-		 gapObj.gap = lineBuffer.getFragment(firstAfterFrag.fragId).renderStartY -
-			 (lineBuffer.getFragment(lastBeforeFrag.fragId).renderStartY /*- lineBuffer.lines[lastBeforeFrag.lineNo].height*/);
-		 gapObj.text = "" ;
-		 gapObj.flags |= richGap;
-		 textObjs.insert(textObjs.begin() + beforeObj + 1, gapObj);
-		 currentTextObj++;
-		 createPage();
-		 textObjs[beforeObj + 1].lineRef = lineBuffer.getFirstFrag(beforeObj + 1).lineNo;
+		insertGapObj(beforeObj, afterObj);
 	}
-	
+}
+
+/** Insert a special text object after the before object, defining a gap equal to the distance
+	between the last line to use beforeObj and the first line to use afterObj. */
+void CGUIrichText::insertGapObj(int beforeObj, int afterObj) {
+	TFragPos lastBeforeFrag = lineBuffer.getLastFrag(beforeObj);
+	TFragPos firstAfterFrag = lineBuffer.getFirstFrag(afterObj);
+
+	TRichTextRec gapObj = textObjs[beforeObj];
+	gapObj.gap = lineBuffer.getFragment(firstAfterFrag.fragId).renderStartY -
+		(lineBuffer.getFragment(lastBeforeFrag.fragId).renderStartY /*- lineBuffer.lines[lastBeforeFrag.lineNo].height*/);
+	gapObj.text = "";
+	gapObj.flags |= richGap;
+	textObjs.insert(textObjs.begin() + beforeObj + 1, gapObj);
+	currentTextObj++;
+	createPage();
+	textObjs[beforeObj + 1].lineRef = lineBuffer.getFirstFrag(beforeObj + 1).lineNo;
 }
 
 
@@ -1333,34 +1352,68 @@ void CGUIrichText::animateFadeText(float dT) {
 	TLineFragDrawRec dataRec; 
 	CFont* font;
 
-	for (auto fadeFrag : fadeFrags2) {
-		TLineFragment& frag = lineBuffer.getFragment(fadeFrag.fragId);
-		if (fadeFrag.textObj != objId) {
-			objId = fadeFrag.textObj;
+	for (auto fadeFrag = fadeFrags2.begin(); fadeFrag != fadeFrags2.end();) {
+		TLineFragment& frag = lineBuffer.getFragment(fadeFrag->fragId);
+		if (fadeFrag->textObj != objId) {
+			objId = fadeFrag->textObj;
 			textObjs[objId].period += dT * 1.5f;
-			if (textObjs[objId].period > 1)
+			if (textObjs[objId].period > 1) {
 				textObjs[objId].period = 1;
+				textObjs[objId].flags &= ~richFadeIn;
+			}
 		}
 
 
 		dataRec.font = pDrawFuncs->getFont(textObjs[objId].style.font);
 			
-		dataRec.text = &fadeFrag.text;
+		dataRec.text = &fadeFrag->text;
 		dataRec.textColour = textObjs[objId].style.colour;
 		dataRec.textColour.a = textObjs[objId].period;
 		textBuf.renderTextAt(frag.renderStartX, frag.renderStartY, dataRec);
+
+		if (textObjs[objId].period == 1)
+			fadeFrag = fadeFrags2.erase(fadeFrag);
+		else
+			fadeFrag++;
+
 	}
 }
 
 /** If any lines aren't at full alpha, update their alpha and redraw them. */
 void CGUIrichText::animateLineFadeIn(float dT) {
+	cerr << "\n***AnimateLineFade called***";
 	//float proportion = 790.0f / textBuf.textTexture.width;
 	float proportion = lineFadeSpeed / textBuf.textTexture.width;
 	bool done = true;
+
+	int lineNo = 0;
 	for (auto& line : lineBuffer.lines) {
-		if (line.fadeInX >= 1.0)
+		lineNo++;
+
+
+		//////////////////////////////////////////////////////
+		TLineFragment& frag = lineBuffer.getFragment(line.fragments[0]);
+		int currObjNo = frag.textObj;
+		TRichTextRec currentObj = textObjs[frag.textObj];
+		string renderLine = currentObj.text.substr(frag.textPos, 20);
+		cerr << "\n\tAnimate fading of line: " << lineNo << " " << renderLine << " current fadeX: " << line.fadeInX;
+
+
+
+
+
+
+		if (line.fadeInX >= 1.0) {
+			cerr << " ... continuing!";
 			continue;
+		}
 		done = false;
+		busy = true;
+
+
+
+
+
 		//line.fadeInX += 0.08 * proportion;
 		line.fadeInX += proportion;
 		if (line.fadeInX * textBuf.textTexture.width > line.width) {
@@ -1378,10 +1431,15 @@ void CGUIrichText::animateLineFadeIn(float dT) {
 			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
 			textBuf.renderFadeInTextAt(frag.renderStartX, frag.renderStartY, dataRec, line.fadeInX);
 		}
+		cerr << "\n\tfadeX now at " << line.fadeInX;
 		return;
 	}
-	if (done)
+	if (done) {
 		requestLineFadeIn(false);
+		busy = false;
+		cerr << "\nAnimateLineFade done!";
+	} 
+	
 }
 
 /** If there's currently displaced text (caused by removing marked text), shrink the gap.*/
@@ -1451,10 +1509,35 @@ void CGUIrichText::requestLineFadeIn(bool isOn) {
 	if (!enableLineFadeIn)
 		return;
 	lineFadeInOn = isOn;
-	if (lineFadeInOn)
+	if (lineFadeInOn) {
 		lineBuffer.setLineFadeIn(0); //create lines intitially zero faded-in
+		//busy = true;
+	}
 	else
 		lineBuffer.setLineFadeIn(1.0); //create lines fully drawn
+}
+
+/** Clear all text after the last bookmark, if it exists. */
+bool CGUIrichText::clearToBookMark() {
+	if (busy)
+		return false;
+	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
+		if (textObjs[obj].flags & richBookmark) {
+			textObjs.erase(textObjs.begin() + obj, textObjs.end());
+			currentTextObj = textObjs.size() - 1;
+			createPage();
+			break;
+		}
+
+	}
+	return true;
+}
+
+/** Returns true only if all current text has finished rendering. */
+bool CGUIrichText::isDisplayFinished() {
+	if (lineFadeInOn)
+		return false;
+	return true;
 }
 
 

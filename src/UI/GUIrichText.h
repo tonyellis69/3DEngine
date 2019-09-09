@@ -27,6 +27,7 @@ const unsigned int richMarked = 4;
 const unsigned int richTemp = 8;
 const unsigned int richFadeIn = 16;
 const unsigned int richGap = 32;
+const unsigned int richBookmark = 64;
 
 struct TRichTextRec : textRec {
 	TRichTextRec();
@@ -64,7 +65,7 @@ public:
 	void setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId);
 	void setTextColour(UIcolour colour);
 	void setTextStyle(TtextStyle& style);
-	void setTextStyle(std::string styleName);
+	bool setTextStyle(std::string styleName);
 	void setTextStyles(std::vector<TtextStyle>* styles);
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
@@ -80,6 +81,7 @@ public:
 	void checkLineOverrun(int yStart);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	void OnMouseMove(const int mouseX, const int mouseY, int key);
+	void msgHotTextChange(glm::i32vec2& adjustedMousePos);
 	void msgHighlight();
 	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void OnLMouseUp(const int mouseX, const int mouseY, int key);
@@ -120,18 +122,21 @@ public:
 
 	void setResizeMode(TResizeMode mode);
 
-	void setTempText(bool onOff);
+	bool setTempText(bool onOff);
 	void setMarkedText(bool onOff);
 	void setFadeText(bool onOff);
+	int getStyleChangeTextObjAt(int objNo);
 	void removeTempText();
+	void insertBookmark();
 	void suspend(bool isOn);
 
 	void onDrag(const  int mouseX, const  int mouseY);
 	//void onDrop(const  int mouseX, const  int mouseY);
-	void collapseTempText();
+	bool collapseTempText();
 	bool solidifyTempText();
 	void unhotDuplicates();
 	void removeMarked();
+	void insertGapObj(int beforeObj, int afterObj);
 	void animateHotText(float dT);
 	void animateFadeText(float dT);
 	void animateLineFadeIn(float dT);
@@ -142,6 +147,14 @@ public:
 	bool isOverrun();
 
 	void requestLineFadeIn(bool onOff);
+
+	bool clearToBookMark();
+
+	bool isDisplayFinished();
+
+	bool isBusy() {
+		return busy;
+	}
 
 	~CGUIrichText();
 
@@ -196,9 +209,7 @@ public:
 
 	bool suspended; ///<If true, suspend activity such as highlighting.
 	
-	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
-
-	std::mt19937 randEngine; ///<Random number engine.
+		std::mt19937 randEngine; ///<Random number engine.
 	static std::uniform_real_distribution<> randomPeriod;
 	
 
@@ -218,4 +229,8 @@ public:
 	bool enableLineFadeIn; ///<False = line fade-in not allowed at all.
 	bool lineFadeInOn; ///<Each line will be faded in instead of drawn instantly.
 	float lineFadeSpeed; ///<Around 260. Smaller is slower
+
+private:
+	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
+
 };

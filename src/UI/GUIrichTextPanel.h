@@ -21,7 +21,7 @@ public:
 	void setResizeMode(TResizeMode mode);
 	void setShortestSpaceBreak(int lineWidth);
 	void setTextStyles(std::vector<TtextStyle>* styles);
-	void setTextStyle(std::string styleName);
+	bool setTextStyle(std::string styleName);
 	void setDefaultTextStyle(std::string styleName);
 	std::vector<unsigned int> purgeHotText(unsigned int id);
 	void update(float dT);
@@ -33,6 +33,7 @@ public:
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 
 	void OnLMouseDown(const int mouseX, const int mouseY, int key);
+	void onRMouseUp(const int mouseX, const int mouseY);
 	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
 	void OnMouseMove(const  int mouseX, const  int mouseY, int key);
 
@@ -41,10 +42,10 @@ public:
 
 	void message(CGUIbase* sender, CMessage & msg);
 
-	void setTempText(bool onOff);
+	bool setTempText(bool onOff);
 
 	void suspend(bool isOn);
-	void collapseTempText();
+	bool collapseTempText();
 	bool solidifyTempText();
 	void unhotDuplicates();
 	void removeMarked();
@@ -57,8 +58,15 @@ public:
 
 	void deliverByCharacter(float dT);
 
-	void setLineFadeIn(bool onOff) {
+	bool setLineFadeIn(bool onOff) {
+		if (richText->isBusy())
+			return false;
 		richText->enableLineFadeIn = onOff;
+		return true;
+	}
+
+	bool clearToBookMark() {
+		return richText->clearToBookMark();
 	}
 
 	enum TStatus { initial, readyToPosition, displaying, 
@@ -68,6 +76,14 @@ public:
 	}
 	bool noMouse();
 
+	void setObjId(int objId) {
+		this->objId = objId;
+	}
+	int getObjId() { return objId; }
+
+	bool isDisplayFinished() {
+		return richText->isDisplayFinished();
+	}
 
 	CGUIrichText* richText; ///<Rich text control.
 	int inset; ///<Inset for rich text control within panel.
@@ -88,4 +104,6 @@ public:
 	TStatus status;
 
 	int mouseOffMargin; ///<Extra pixels to allow before mouse declared outside panel.
+
+	int objId; ///<The associated objId if this is a popUp window;
 };
