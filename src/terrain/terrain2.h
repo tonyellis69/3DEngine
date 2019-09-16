@@ -8,7 +8,9 @@
 #include "chunk2.h"
 
 
+//#include "..\terrain.h" //FIXME temp!!!!!!!!!!!!!!!
 
+//class CSuperChunk;
 
 class CTerrain2 {
 public:
@@ -35,7 +37,17 @@ public:
 	glm::vec3& getSCpos(int shellNo,const glm::i32vec3& origIndex);
 	glm::vec3& getSCpos2(int shellNo, const glm::i32vec3& origIndex);
 
-
+	/////////////////////////////////////////////////////////////
+	/*
+	CSuperChunk* getSC(const glm::vec3& pos) {
+		CSuperChunk x;
+		return  &x;
+	}; 
+	void getTris(const glm::vec3& pos, TChunkVert*& buf, unsigned int& noTris);
+	glm::vec3 getChunkPos(const glm::vec3& pos) {
+		return glm::vec3(0);
+	*/
+	
 	std::vector<CShell> shells;
 
 	float LoD1cubeSize; //<In worldspace.

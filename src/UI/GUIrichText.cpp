@@ -49,7 +49,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	charDelay = 0.01f;
 	enableLineFadeIn = false;
 	lineFadeInOn = false;
-	lineFadeSpeed = 5;// 20.0f;
+	lineFadeSpeed = 30;// 20.0f;
 }
 
 void CGUIrichText::DrawSelf() {
@@ -210,15 +210,10 @@ void CGUIrichText::setText(std::string newText) {
 
 /** Append newText to the current body of text (and update the page). */
 void CGUIrichText::appendText(std::string newText) {
-	cerr << "\nReceived: " << newText.substr(0, 20);
-	if (newText.find("This is a test room") != string::npos)
-		int b=0;
-
 	requestLineFadeIn(true);
 	addText(newText);
 	if (enableLineFadeIn)
 		busy = true; //because it will take a little while to fade-in this text.
-	cerr << " linefade is " << lineFadeInOn;
 	renderLineBuffer();
 
 	if (transcriptLog)
@@ -643,6 +638,8 @@ void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 
 /** Check for losing mouse while hot text selected. */
 bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
+	if (selectedHotObj == -1) //no hot text selected, so mousing off doesn't matter
+		return true;
 	clearSelection();
 	CMessage msg = { uiMsgHotTextChange };
 	msg.value = -1;
@@ -1202,7 +1199,7 @@ void CGUIrichText::removeTempText() {
 		}
 	}
 	currentTextObj = textObjs.size() - 1;
-
+	
 	createPage();
 }
 

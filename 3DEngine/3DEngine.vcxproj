@@ -110,6 +110,7 @@
     <ClCompile Include="..\src\physics\physObj.cpp" />
     <ClCompile Include="..\src\physics\physObjManager.cpp" />
     <ClCompile Include="..\src\physics\terrainPhysObj.cpp" />
+    <ClCompile Include="..\src\physics\terrainPhysObj2.cpp" />
     <ClCompile Include="..\src\Plants\fractalTree.cpp" />
     <ClCompile Include="..\src\playerObj.cpp" />
     <ClCompile Include="..\src\poisson.cpp" />
@@ -232,6 +233,7 @@
     <ClInclude Include="..\src\physics\physObj.h" />
     <ClInclude Include="..\src\physics\physObjManager.h" />
     <ClInclude Include="..\src\physics\terrainPhysObj.h" />
+    <ClInclude Include="..\src\physics\terrainPhysObj2.h" />
     <ClInclude Include="..\src\Plants\fractalTree.h" />
     <ClInclude Include="..\src\playerObj.h" />
     <ClInclude Include="..\src\poisson.h" />
