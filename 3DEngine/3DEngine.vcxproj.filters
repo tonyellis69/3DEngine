@@ -284,9 +284,6 @@
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIrichTextPanel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\fontManager.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
@@ -652,9 +649,6 @@
     <ClInclude Include="..\src\UI\GUIpopMenu.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\GUIrichTextPanel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\fontManager.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
@@ -756,6 +750,9 @@
     </ClInclude>
     <ClInclude Include="..\src\physics\terrainPhysObj2.h">
       <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIcontrols.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

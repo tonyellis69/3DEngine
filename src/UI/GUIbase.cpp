@@ -751,7 +751,7 @@ bool CGUIbase::getVisible() {
 	return visible;
 }
 
-unsigned int CGUIbase::getID() {
+unsigned int CGUIbase::getUniqueID() {
 	return uniqueID;
 }
 

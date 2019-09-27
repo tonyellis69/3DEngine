@@ -12,7 +12,7 @@ class CTerrainPhysObj2 : public CPhysObj {
 public:
 	CTerrainPhysObj2() { tmp = false; }
 	void collisionCheck(CBasePhysObj& collider);
-	void attachModel(CModel* model);
+	void attachModel(CTerrain2* model);
 	glm::vec3 update(const float & dT);
 
 	

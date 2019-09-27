@@ -205,7 +205,7 @@ public:
 	virtual void uncaptureKeyboard();
 	virtual void setVisible(bool onOff);
 	virtual bool getVisible();
-	unsigned int getID();
+	unsigned int getUniqueID();
 	void makeModal();
 	void makeUnModal();
 

@@ -622,8 +622,6 @@ void CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
 	msg.Msg == uiMsgLMouseUp;
 	parent->message(this, msg);
 
-	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!temp
-	//renderLineBuffer();
 }
 
 void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {

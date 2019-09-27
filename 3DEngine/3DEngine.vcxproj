@@ -189,7 +189,6 @@
     <ClCompile Include="..\src\UI\GUIpanel.cpp" />
     <ClCompile Include="..\src\UI\GUIpanelContainer.cpp" />
     <ClCompile Include="..\src\UI\GUIradio.cpp" />
-    <ClCompile Include="..\src\UI\GUIrichTextPanel.cpp" />
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
     <ClCompile Include="..\src\UI\GUIstyleSheet.cpp" />
@@ -294,6 +293,7 @@
     <ClInclude Include="..\src\UI\GUIcheckButton.h" />
     <ClInclude Include="..\src\UI\GUIcolourPicker.h" />
     <ClInclude Include="..\src\UI\GUIcontainer.h" />
+    <ClInclude Include="..\src\UI\GUIcontrols.h" />
     <ClInclude Include="..\src\UI\GUIdragDrop.h" />
     <ClInclude Include="..\src\UI\GUIdropdownMenu.h" />
     <ClInclude Include="..\src\UI\GUIimage1D.h" />
@@ -315,7 +315,6 @@
     <ClInclude Include="..\src\UI\GUIpanel.h" />
     <ClInclude Include="..\src\UI\GUIpanelContainer.h" />
     <ClInclude Include="..\src\UI\GUIradio.h" />
-    <ClInclude Include="..\src\UI\GUIrichTextPanel.h" />
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
     <ClInclude Include="..\src\UI\GUIstyleSheet.h" />

@@ -4,7 +4,7 @@ using namespace glm;
 
 
 
-CGUIlabel::CGUIlabel(std::string & text) {
+CGUIlabel::CGUIlabel(std::string  text) {
 	//OK! Essentials such as the default font, colour, etc to use should already be available
 	//via a pointer to the stylesheet
 	//so we ask for these essentials and set them up before we do anything like try 

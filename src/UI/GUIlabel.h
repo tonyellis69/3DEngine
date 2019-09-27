@@ -7,7 +7,7 @@
 /** A class to render text to the screen. */
 class CGUIlabel : public CGUIbase {
 public:
-	CGUIlabel(std::string& text);
+	CGUIlabel(std::string text);
 	//CGUIlabel(int x, int y, int w, int h);
 	void setFont(CFont* font);
 	void setText(std::string newText);

@@ -91,9 +91,11 @@ void CTerrainPhysObj2::collisionCheck(CBasePhysObj& collider) {
 }
 
 /** Modify attachModel to provide a pointer to the CTerrain class. */
-void CTerrainPhysObj2::attachModel(CModel * model) {
-	pTerrain = (CTerrain2*)model;
-	pModel = model;
+void CTerrainPhysObj2::attachModel(CTerrain2* model) {
+	pTerrain = model;
+	//pModel = model;
+	//FIXME CTerrain2 is currently not a model and so can't be attached as one
+	//straighten this out one way or another.
 }
 
 glm::vec3 CTerrainPhysObj2::update(const float & dT) {
