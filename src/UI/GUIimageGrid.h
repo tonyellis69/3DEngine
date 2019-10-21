@@ -32,7 +32,7 @@ public:
 	UIcolour highlightColour;
 	UIcolour selectColour;
 	
-	vector<int> cell; ///<A vist of values held in each cell.
+	std::vector<int> cell; ///<A vist of values held in each cell.
 	int tilesheet; ///<tilesheet used, if any. -1 means grid holds individual images instead,
 	int selected; ///<Identifies the currently selected cell, if any.
 

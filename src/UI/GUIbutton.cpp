@@ -4,7 +4,7 @@
 
 using namespace glm;
 
-CGUIbutton::CGUIbutton(std::string & text) {
+CGUIbutton::CGUIbutton(const std::string & text) {
 	type = uiButton;
 
 	setBackColour1(styleSheet->defaultButtonBackColour1);
@@ -12,12 +12,21 @@ CGUIbutton::CGUIbutton(std::string & text) {
 	setBorderColour(styleSheet->defaultBorderColour);
 	setBorderColourFocusColour(styleSheet->defaultBorderFocusColour);
 
-	label = (CGUIlabel*)add(uiLabel, text);
+	//label = (CGUIlabel*)add(uiLabel, text);
+	label = add2<CGUIlabel>(text, uiHcentred | uiVcentred);
+
+
 	label->setBorderOn(false);
-	label->setHorizontalAlignment(tcentred);
-	label->positionHint.hAlignment = uiAlignHcentred;
+	label->setTextAlignment(tcentred);
+//	label->positionHint.hAlignment = uiHcentred;
+//	label->positionHint.vAlignment = uiVcentred;
 	fitToPresets = true;
 	resizeToFit();
+}
+
+CGUIbutton::CGUIbutton(const std::string& text, unsigned int styleWord) :
+	CGUIbutton(text) {
+	setPositionStyles(styleWord);
 }
 
 /*

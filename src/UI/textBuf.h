@@ -63,8 +63,8 @@ private:
 
 	glm::i32vec2 size;
 
-	vector<vBuf::T2DtexVert> textQuads;
-	vector<unsigned int> textQuadsIndex;
+	std::vector<vBuf::T2DtexVert> textQuads;
+	std::vector<unsigned int> textQuadsIndex;
 
 	TLineFragDrawRec* mDrawData;
 	glm::vec4 textColour;

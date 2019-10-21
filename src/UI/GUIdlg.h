@@ -11,7 +11,7 @@ class CGUIdlg :  public CGUIpanel {
 public:
 //	CGUIdlg() {};
 	CGUIdlg(int x, int y, int w, int h);
-	void setHeader(const string& text);
+	void setHeader(const std::string& text);
 	//void DrawSelf();
 
 	CGUIlabel2* header; ///<Dialogue heading.
@@ -21,7 +21,7 @@ public:
 class CGUIsysDlg : public CGUIdlg {
 public:
 	CGUIsysDlg();
-	void setText(const string& text);
+	void setText(const std::string& text);
 
 	CGUIlabel2* body; ///<Dialogue body text.
 };

@@ -217,3 +217,64 @@ glm::vec3& CTerrain2::getSCpos2(int shellNo, const glm::i32vec3& origIndex) {
 		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
 }
 
+/** Return the superchunk at this position in worldspace containing terrain, or NULL. */
+CSuperChunk2* CTerrain2::getSC(const glm::vec3& pos) {
+	for (auto shell : shells) {
+		i32vec3 scIndex = shell.getSCat(pos);
+		if (any(lessThan(scIndex, i32vec3 (0))))
+			continue;
+		CSuperChunk2 sc =  shell.scArray.element(scIndex.x, scIndex.y, scIndex.z);
+		if (!sc.isEmpty)
+			return &sc;
+	}
+	return NULL;
+}
+
+
+/** Return a pointer to a buffer of chunk triangles for the given position, if any. */
+void CTerrain2::getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& buf, unsigned int& noTris) {
+	noTris = 0;
+	float chunkSize = shells[sc->shellNo].chunkSize;
+	//get chunk at this position
+	int chunkId = -1;
+	for (auto chunk : sc->chunks2) {
+		if (all(greaterThanEqual(chunks[chunk].terrainPos, pos)) && 
+				all(lessThanEqual(chunks[chunk].terrainPos, pos + vec3(chunkSize)))) {
+			chunkId = chunks[chunk].id;
+			break;
+		}
+	}
+
+	if (chunkId == -1)
+		return;
+
+
+	//Use callback to getChunkTris? Or give terrain2 a pointer to the multibuf?
+	//prob better to do the former, separating terrain model from mesh data 
+	//it's a virtual call but can always optimise later
+
+	
+
+	//check if we already have this chunk in the cache
+	for (int cacheNo = 0; cacheNo < chunkTriCacheSize2; cacheNo++) {
+		if (cachedChunkTris[cacheNo].id == chunkId) {
+			noTris = cachedChunkTris[cacheNo].noTris;
+			buf = cachedChunkTris[cacheNo].buf;
+			return;
+		}
+	}
+	
+	//no? Let's go retrieve it then
+	unsigned int size = pCallbackApp->getChunkTrisCallback(chunkId, cachedChunkTris[freeChunkTriCache].buf);
+	
+	noTris = cachedChunkTris[freeChunkTriCache].noTris = size / (sizeof(TChunkVert2) * 3);
+	cachedChunkTris[freeChunkTriCache].id = chunkId;
+	buf = cachedChunkTris[freeChunkTriCache].buf;
+
+
+	freeChunkTriCache++;
+	if (freeChunkTriCache >= chunkTriCacheSize2)
+		freeChunkTriCache = 0;
+	
+}
+

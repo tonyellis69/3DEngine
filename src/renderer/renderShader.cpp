@@ -121,12 +121,12 @@ void CRenderShader::setShaderValue(unsigned int textureHandle, CBaseTexture& tex
 void CRenderShader::loadFiles() {
 	load(vertex, vertFile);
 
-	ifstream geomExists(geomFile);
+	std::ifstream geomExists(geomFile);
 	if (geomExists) {
 		load(geometry, geomFile);
 	}
 
-	ifstream fragExists(fragFile);
+	std::ifstream fragExists(fragFile);
 	if (fragExists) {
 		load(frag, fragFile);
 	}

@@ -3,7 +3,7 @@
 #include "shader.h"
 
 //#include "renderer.h"
-using namespace std;
+//using namespace std;
 
 class CRenderer;
 class CRenderShader : public CShader {

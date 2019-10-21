@@ -64,6 +64,8 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>opengl32.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -191,6 +193,7 @@
     <ClCompile Include="..\src\UI\GUIradio.cpp" />
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
+    <ClCompile Include="..\src\UI\GUIscrollbar2.cpp" />
     <ClCompile Include="..\src\UI\GUIstyleSheet.cpp" />
     <ClCompile Include="..\src\UI\GUIswatchContainer.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
@@ -317,6 +320,7 @@
     <ClInclude Include="..\src\UI\GUIradio.h" />
     <ClInclude Include="..\src\UI\GUIroot.h" />
     <ClInclude Include="..\src\UI\GUIscrollbar.h" />
+    <ClInclude Include="..\src\UI\GUIscrollbar2.h" />
     <ClInclude Include="..\src\UI\GUIstyleSheet.h" />
     <ClInclude Include="..\src\UI\GUIswatchContainer.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />

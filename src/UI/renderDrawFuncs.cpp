@@ -5,6 +5,7 @@
 #include "glm\gtc\matrix_access.hpp"
 
 using namespace glm;
+using namespace std;
 
 CRenderDrawFuncs::CRenderDrawFuncs() {
 	cursorOn = false;

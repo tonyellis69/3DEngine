@@ -12,7 +12,7 @@ CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	header = new CGUIlabel2(0,10,w,30);
 	header->setText("Header");
 	header->hFormat = hSpan;
-	header->setHorizontalAlignment(tcentred);
+	header->setTextAlignment(tcentred);
 	Add(header);
 
 	backColour1 = oldbackColour1;
@@ -20,7 +20,7 @@ CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	drawBorder = true;
 }
 
-void CGUIdlg::setHeader(const string& text) {
+void CGUIdlg::setHeader(const std::string& text) {
 	header->setText(text);
 }
 
@@ -35,7 +35,7 @@ CGUIsysDlg::CGUIsysDlg() : CGUIdlg(0,0,defaultDlgWidth,defaultDlgHeight)  {
 }
 
 
-void CGUIsysDlg::setText(const string& text) {
+void CGUIsysDlg::setText(const std::string& text) {
 	body->setText(text);
 }
 

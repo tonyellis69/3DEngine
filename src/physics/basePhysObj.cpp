@@ -8,7 +8,8 @@ CBasePhysObj::CBasePhysObj() {
 	velocity = vec3(0);
 	setMass(10);
 	damping =  0.9f;// 0.4f;;
-	setAcceleration(vec3(0,-7,0));
+	//setAcceleration(vec3(0,-7,0));
+	setAcceleration(vec3(0, 0, 0)); ///TEMP!!! switched off gravity
 	asleep = false;
 	groundContact = false;
 }

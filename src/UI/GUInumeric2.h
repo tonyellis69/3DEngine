@@ -18,7 +18,7 @@ public:
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void setEnabled(bool onOff);
 	void setMinMax(float newMin, float mewMax);
-	void setSuffix(const string& newSuffix);
+	void setSuffix(const std::string& newSuffix);
 	void setIncrement(float increment);
 
 
@@ -30,7 +30,7 @@ public:
 	float increment; ///<Amount by which value is increased or decreased.
 	float valMin;	///<Minimum allowed value.
 	float valMax; ///<Maximum allowed value.
-	string suffix;
+	std::string suffix;
 };
 
 const int defaultNumericWidth = 60;

@@ -19,3 +19,9 @@ void CPlayerObj::setPos(glm::vec3 & pos) {
 	updatePov();
 	model.setPos(getPos());
 }
+
+void CPlayerObj::translate(glm::vec3& t) {
+	C3dObject::translate(t);
+	updatePov();
+	model.translate(t);
+}

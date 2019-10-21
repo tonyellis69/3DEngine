@@ -185,8 +185,8 @@ void CGUIpaletteBar::moveTab(CGUIpaletteTab* tab, int newPos) {
 
 	//ensure our tab can't move through another:
 	int ctrlPos; 
-	int lowerPos = min(tab->getLocalPos().x, newPos);
-	int higherPos = max(tab->getLocalPos().x, newPos);
+	int lowerPos = std::min(tab->getLocalPos().x, newPos);
+	int higherPos = std::max(tab->getLocalPos().x, newPos);
 	for (auto ctrl : controls) {
 		if (ctrl->type == uiPaletteTab && ctrl != tab) { //for each compared tab...
 			ctrlPos = ctrl->getLocalPos().x;
@@ -335,8 +335,8 @@ void CGUIpaletteBar::DrawSelf() {
 void CGUIpaletteBar::createTabAtIndicator(float falloff) {
 	createTab(indicator);
 	if (falloff > 0.05) {
-		int lowerBound = max(0, indicator - int(255 * falloff));
-		int upperBound = min(255,indicator + int(255 * falloff));
+		int lowerBound = std::max(0, indicator - int(255 * falloff));
+		int upperBound = std::min(255,indicator + int(255 * falloff));
 
 		for (auto ctrl : controls) { //ensure upper/lower tabs don't overlap an existing tab
 			if (ctrl->type == uiPaletteTab) {

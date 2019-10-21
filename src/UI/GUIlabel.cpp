@@ -4,7 +4,7 @@ using namespace glm;
 
 
 
-CGUIlabel::CGUIlabel(std::string  text) {
+CGUIlabel::CGUIlabel(const std::string&  text) {
 	//OK! Essentials such as the default font, colour, etc to use should already be available
 	//via a pointer to the stylesheet
 	//so we ask for these essentials and set them up before we do anything like try 
@@ -21,6 +21,11 @@ CGUIlabel::CGUIlabel(std::string  text) {
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;
+	//drawBorder = false;
+}
+
+CGUIlabel::CGUIlabel(const std::string& text, unsigned int styleWord) : CGUIlabel(text) {
+	setPositionStyles(styleWord);
 }
 
 /*
@@ -66,7 +71,7 @@ void CGUIlabel::setMultiLine(bool onOff) {
 	renderText();
 }
 
-void CGUIlabel::setHorizontalAlignment(TTextAlign align) {
+void CGUIlabel::setTextAlignment(TTextAlign align) {
 	textAlign = align;
 }
 

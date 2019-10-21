@@ -110,7 +110,7 @@ public:
 	std::vector<unsigned int> getHotTextIds();
 	void clear();
 	void clearSelection();
-	void appendMarkedUpText(string text);
+	void appendMarkedUpText(std::string text);
 
 	void updateAppearance();
 	void resizeToFit();

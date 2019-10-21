@@ -923,7 +923,7 @@ void CTerrainTex::plotShortestPath() {
 	//create the 'open list' - nodes whose neighbourhood we want to explore, ordered by 
 	//how easy they are to get to from the start point
 	typedef std::pair<float, int> TNode; //first: cell id, second: cost
-	std::priority_queue<TNode, vector<TNode>, greater<TNode>> openList;
+	std::priority_queue<TNode, std::vector<TNode>, std::greater<TNode>> openList;
 	std::map<int, float> distSoFar;
 
 	//add the start point to the set

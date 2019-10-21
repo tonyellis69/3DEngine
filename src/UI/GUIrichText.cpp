@@ -297,7 +297,7 @@ void CGUIrichText::renderLineBuffer() {
 			}
 
 			TRichTextRec currentObj = textObjs[frag.textObj];
-			string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
+			std::string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
 			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
 			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour * line.fadeInX };
 			textBuf.addFragment(frag.renderStartX, frag.renderStartY, dataRec);
@@ -395,7 +395,7 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 	scrollHeight = currentFont->lineHeight; //TO DO can probably remove - investigate!
 	longestLine = std::max(longestLine, lineFragment.renderEndX);
 
-	string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
+	std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
 
 	TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
 
@@ -818,7 +818,7 @@ void CGUIrichText::removeScrolledOffText() {
 		currentTextObj--;
 	}
 	firstVisibleObject = 0;
-	textObjs[0].text = textObjs[0].text.substr(firstVisibleText, string::npos);
+	textObjs[0].text = textObjs[0].text.substr(firstVisibleText, std::string::npos);
 	firstVisibleText = 0;
 	//renderText();
 }
@@ -899,7 +899,7 @@ void CGUIrichText::selectTopHotText() {
 
 /** Convert all existing hot text objects to standard style. */
 std::vector<unsigned int> CGUIrichText::purgeHotText() {
-	vector<unsigned int> purgedIds;
+	std::vector<unsigned int> purgedIds;
 	for (auto &textObj : textObjs) {
 		//if (textObj.hotMsgId || textObj.hotObjId) {
 		if (textObj.hotId != 0) {
@@ -918,7 +918,7 @@ std::vector<unsigned int> CGUIrichText::purgeHotText(unsigned int id) {
 	if (id == NULL) {
 		return purgeHotText();
 	}
-	vector<unsigned int> purgedIds;
+	std::vector<unsigned int> purgedIds;
 	for (auto &textObj : textObjs) {
 		if (textObj.hotId == id) {
 			purgedIds.push_back(textObj.hotId);
@@ -933,7 +933,7 @@ std::vector<unsigned int> CGUIrichText::purgeHotText(unsigned int id) {
 
 /** Return a vector full of the hot text ids found in the text of this control. */
 std::vector<unsigned int> CGUIrichText::getHotTextIds() {
-	vector<unsigned int> lostIds;
+	std::vector<unsigned int> lostIds;
 	for (auto& textObj : textObjs) {
 		if (textObj.hotId != 0) 
 			lostIds.push_back(textObj.hotId);
@@ -963,7 +963,7 @@ void CGUIrichText::clearSelection() {
 
 
 
-void CGUIrichText::appendMarkedUpText(string text) {
+void CGUIrichText::appendMarkedUpText(std::string text) {
 	bool bold = false; bool hot = false;
 	enum TStyleChange { styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle,
 		styleBookmark};
@@ -1256,7 +1256,7 @@ bool CGUIrichText::solidifyTempText() {
 
 /** Run backwards throught the text, removing any duplicate hot texts. */
 void CGUIrichText::unhotDuplicates() {
-	vector<int> hotIds;
+	std::vector<int> hotIds;
 	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		int hotId = textObjs[obj].hotId;
 		if (hotId == 0)
@@ -1376,7 +1376,6 @@ void CGUIrichText::animateFadeText(float dT) {
 
 /** If any lines aren't at full alpha, update their alpha and redraw them. */
 void CGUIrichText::animateLineFadeIn(float dT) {
-	cerr << "\n***AnimateLineFade called***";
 	//float proportion = 790.0f / textBuf.textTexture.width;
 	float proportion = lineFadeSpeed / textBuf.textTexture.width;
 	bool done = true;
@@ -1390,16 +1389,13 @@ void CGUIrichText::animateLineFadeIn(float dT) {
 		TLineFragment& frag = lineBuffer.getFragment(line.fragments[0]);
 		int currObjNo = frag.textObj;
 		TRichTextRec currentObj = textObjs[frag.textObj];
-		string renderLine = currentObj.text.substr(frag.textPos, 20);
-		cerr << "\n\tAnimate fading of line: " << lineNo << " " << renderLine << " current fadeX: " << line.fadeInX;
-
-
+		//string renderLine = currentObj.text.substr(frag.textPos, 20);
+		
 
 
 
 
 		if (line.fadeInX >= 1.0) {
-			cerr << " ... continuing!";
 			continue;
 		}
 		done = false;
@@ -1421,18 +1417,17 @@ void CGUIrichText::animateLineFadeIn(float dT) {
 			int currObjNo = frag.textObj;
 
 			TRichTextRec currentObj = textObjs[frag.textObj];
-			string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
+			std::string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
 			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
 			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
 			textBuf.renderFadeInTextAt(frag.renderStartX, frag.renderStartY, dataRec, line.fadeInX);
 		}
-		cerr << "\n\tfadeX now at " << line.fadeInX;
+
 		return;
 	}
 	if (done) {
 		requestLineFadeIn(false);
 		busy = false;
-		cerr << "\nAnimateLineFade done!";
 	} 
 	
 }
@@ -1463,7 +1458,7 @@ void CGUIrichText::collapseGap(float dT) {
 
 /** Break the text in deliveryBuffer into characters and send them individually to the rich text control. */
 void CGUIrichText::deliverByCharacter(float dT) {
-	string text;
+	std::string text;
 	charInterval += dT;
 	if (charInterval < charDelay)
 		return;
@@ -1472,7 +1467,7 @@ void CGUIrichText::deliverByCharacter(float dT) {
 	text = deliveryBuffer.substr(0, 1);
 	charInterval = 0;
 	
-	deliveryBuffer = deliveryBuffer.substr(text.size(), string::npos);
+	deliveryBuffer = deliveryBuffer.substr(text.size(), std::string::npos);
 
 	//appendMarkedUpText(text);
 	textObjs.back().text += text;

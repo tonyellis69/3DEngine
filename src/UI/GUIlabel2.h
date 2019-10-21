@@ -14,7 +14,7 @@ public:
 	void setTextColour(UIcolour colour);
 	void setMultiLine(bool onOff);
 	void setTextColour(glm::vec4 colour);
-	void setHorizontalAlignment(TTextAlign align);
+	void setTextAlignment(TTextAlign align);
 	void setLeftAlignIndent(int indent);
 	TTextAlign getJustification();
 	void DrawSelf();

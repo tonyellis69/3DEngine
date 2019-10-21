@@ -13,8 +13,9 @@
 
 #include "glm\glm.hpp"
 
+#include <string_view>
 
-using namespace std;
+
 
 class guiRect {
 public:
@@ -145,7 +146,13 @@ public:
 	virtual void GUIcallback(CGUIbase* sender, CMessage& msg) {};
 };
 
+
+
+
+
 /** A class defining the basis of all GUI controls. */
+//class CGUIlabel;
+class CGUIbutton;
 class CGUIradio;
 class CGUImouse;
 class CGUIroot;
@@ -162,7 +169,7 @@ public:
 	void positionLogical(CGUIbase * control);
 	glm::i32vec2& layoutControlsCoarse();
 	void layoutFine();
-	glm::i32vec2& calcCellSize(glm::i32vec2& rowCol);
+	glm::i32vec4& calcCellSize(glm::i32vec2& rowCol);
 	virtual void resizeToFit() {}
 	virtual void position(CGUIbase* control);
 	glm::i32vec2& getSize();
@@ -246,7 +253,13 @@ public:
 	virtual void dropMethod() {};
 	void deleteDragDropObj();
 	void popupMenu(std::initializer_list<std::string> options, IPopupMenu* callback);
-	
+	void setHorizontalAlignment(unsigned int mode) {
+		positionHint.hAlignment = mode;
+	}
+	void setVerticalAlignment(unsigned int mode) {
+		positionHint.vAlignment = mode;
+	}
+
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 
@@ -337,19 +350,44 @@ public:
 				rowCol.y++;
 			}
 		}
+		void setCols(int c) {
+			currentLayoutStyle.cols = c;
+		}
 		CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
 		glm::i32vec2 rowCol;
 	} TControlCursor;
 	TControlCursor controlCursor; ///<Keeps track of where the next child control should go.
 
+	bool resizesForChildren; ///<If true control shrinks/grows to fit children.
+
+
+	CGUIbase* addCtrl(CGUIbase* ctrl ) {
+		//set position arbitarily for now
+		ctrl->setLocalPos(10, 10);
+		Add(ctrl);
+		positionLogical(ctrl);
+		glm::i32vec2 maxSize = layoutControlsCoarse();
+		//resize parent if required
+
+		//do fine layou
+		layoutFine();
+
+		return ctrl;
+	}
+
+	template <typename T, typename S>
+	T* add2(S const& s, int style) {
+		if constexpr (std::is_convertible_v<S, std::string>) {
+			return (T*)addCtrl(new T(s,style));
+		}
+		return NULL;
+	}
+
+	virtual void setPositionStyles(unsigned int styleWord);
+
+
 };
 
-/** Records/
-class CControlCursor {
-public:
-
-};
-*/
 
 
 enum TTextAlign {tleft, tcentred, tright};
@@ -375,6 +413,9 @@ enum Messagetypes {
 	uiMsgHotTextClick, uiMsgHotTextChange, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore,
 	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete, uiMsgDragging
 };
+
+
+
 
 #define NONE -1
 

@@ -7,8 +7,19 @@
 #include "..\direction.h"
 #include "chunk2.h"
 
+#include "..\vertBufs.h"
 
-//#include "..\terrain.h" //FIXME temp!!!!!!!!!!!!!!!
+typedef vBuf::T3DnormVert TChunkVert2;
+
+class TChunkTriBuf2 {
+public:
+	TChunkTriBuf2() { id = noTris = 0; /*buf = NULL;*/ }
+	unsigned int id;
+	unsigned int noTris;
+	TChunkVert2 buf[4200];
+};
+
+const int chunkTriCacheSize2 = 6;
 
 //class CSuperChunk;
 
@@ -37,16 +48,12 @@ public:
 	glm::vec3& getSCpos(int shellNo,const glm::i32vec3& origIndex);
 	glm::vec3& getSCpos2(int shellNo, const glm::i32vec3& origIndex);
 
-	/////////////////////////////////////////////////////////////
-	/*
-	CSuperChunk* getSC(const glm::vec3& pos) {
-		CSuperChunk x;
-		return  &x;
-	}; 
-	void getTris(const glm::vec3& pos, TChunkVert*& buf, unsigned int& noTris);
-	glm::vec3 getChunkPos(const glm::vec3& pos) {
-		return glm::vec3(0);
-	*/
+	CSuperChunk2* getSC(const glm::vec3& pos);
+
+	void getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& buf, unsigned int& noTris);
+
+	
+
 	
 	std::vector<CShell> shells;
 
@@ -66,6 +73,9 @@ public:
 	std::queue<int> chunksToMesh;
 
 	glm::mat4 chunkOrigin; ///<TO DO: keep this, or do some other way?
+
+	TChunkTriBuf2 cachedChunkTris[chunkTriCacheSize2]; ///<Chunk triangles recently downloaded from graphics memory.
+	int freeChunkTriCache;
 
 };
 

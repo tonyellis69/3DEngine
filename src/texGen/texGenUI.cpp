@@ -1,7 +1,7 @@
 #include "texGenUI.h"
 
 #include <iostream>
-#include <filesystem>
+#include <experimental/filesystem>
 #include <string>
 #include <iomanip>
 
@@ -46,7 +46,7 @@ void CTexGenUI::initGUI() {
 
 	CGUIlabel2* lbl = new CGUIlabel2(150, 30, 70, 20);
 	lbl->setText("Load file");
-	lbl->setHorizontalAlignment(tright);
+	lbl->setTextAlignment(tright);
 	texGenListPanel->Add(lbl);
 	restoreMenu = new CGUIdropdownMenu(230, 30, 80, 20);
 	restoreMenu->setText("[select]");

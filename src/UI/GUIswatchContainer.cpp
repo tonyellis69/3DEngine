@@ -8,6 +8,7 @@
 #include "GUIroot.h"
 
 using namespace glm;
+using namespace std;
 
 CGUIswatchContainer::CGUIswatchContainer(int x, int y, int w, int h) 
 	: CGUIcontainer(x,y,w,h) {

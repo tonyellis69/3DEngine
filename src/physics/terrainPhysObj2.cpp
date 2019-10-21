@@ -107,7 +107,7 @@ glm::vec3 CTerrainPhysObj2::update(const float & dT) {
 float CTerrainPhysObj2::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contactDir) {
 	TChunkVert* pBuf = NULL; unsigned int noTris = 0; vec3 scrolledSegTop, scrolledSegBase;
 	float veryFarDown = 10000.0f; float u, v, w, t; vec3 intersectionPoint; float contactDistance; vec3 triNorm;
-	mat4 inverseScroll = glm::inverse(pTerrain->chunkOrigin); CSuperChunk* sc;
+	mat4 inverseScroll = glm::inverse(pTerrain->chunkOrigin); CSuperChunk2* sc;
 	vec3 searchPos = searchTop;
 	scrolledSegTop = inverseScroll * vec4(searchPos, 1);
 	scrolledSegBase = scrolledSegTop - vec3(0, veryFarDown, 0);
@@ -115,10 +115,11 @@ float CTerrainPhysObj2::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contact
 
 	//for each chunk space
 	///////////////////////////////////////////////////////////////
-	/*
+	
 	while (sc = pTerrain->getSC(searchPos)) {
 		//check for chunks
-		pTerrain->getTris(searchPos, pBuf, noTris);
+		//pTerrain->getTris(searchPos, pBuf, noTris);
+		pTerrain->getTris(sc, searchPos, pBuf, noTris);
 		if (pBuf) {
 			for (size_t vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
@@ -137,11 +138,11 @@ float CTerrainPhysObj2::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contact
 
 		//no chunk intersection found? Look further down
 		//move search to the top of the next chunk down
-		float chunkHeight = sc->chunkSize;
-		vec3 currentChunkCorner = pTerrain->getChunkPos(searchPos);
+		float chunkHeight = pTerrain->shells[sc->shellNo].chunkSize;
+		//vec3 currentChunkCorner = pTerrain->getChunkPos(searchPos);
 		searchPos.y -= chunkHeight;
 	}
-	*/
+	
 	std::cerr << "\n!!!!No terrain found below search point!";
 	return FLT_MAX;
 }
@@ -150,7 +151,7 @@ float CTerrainPhysObj2::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contact
 float CTerrainPhysObj2::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactDir) {
 	TChunkVert* pBuf = NULL; unsigned int noTris = 0; vec3 scrolledSegTop, scrolledSegBase;
 	float veryFarUp = 10000.0f; float u, v, w, t; vec3 intersectionPoint; float contactDistance; vec3 triNorm;
-	mat4 inverseScroll = glm::inverse(pTerrain->chunkOrigin); CSuperChunk* sc;
+	mat4 inverseScroll = glm::inverse(pTerrain->chunkOrigin); CSuperChunk2* sc;
 	vec3 searchPos = searchBase;
 	scrolledSegBase = inverseScroll * vec4(searchPos, 1);
 	scrolledSegTop = scrolledSegBase + vec3(0, veryFarUp, 0);
@@ -158,9 +159,11 @@ float CTerrainPhysObj2::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactD
 
 	//while (searchPos.y < abs(pTerrain->shells[0].nwLayerPos.y)) {
 	/////////////////////////////////////////////////////////
-	/*
+	//TO DO looks like this can be optimised to an IF not a WHILE
+	//shouldn't have to pass sc to getTris if we find sc at getTris
 	while (sc = pTerrain->getSC(searchPos)) {
-		pTerrain->getTris(searchPos, pBuf, noTris);
+		pTerrain->getTris(sc,searchPos, pBuf, noTris);
+		//pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {
 			for (size_t vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
@@ -181,11 +184,12 @@ float CTerrainPhysObj2::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactD
 		//no chunk intersection found? Look further up
 		//move search to the top of the next chunk down
 	
-		float chunkHeight = sc->chunkSize;
-		vec3 currentChunkCorner = pTerrain->getChunkPos(searchPos);
+		float chunkHeight = pTerrain->shells[sc->shellNo].chunkSize;
+		//vec3 currentChunkCorner = pTerrain->getChunkPos(searchPos);
 		searchPos.y += chunkHeight;
+		
 	}
-	*/
+	
 	std::cerr << "\n????No terrain found above search point!";
 	return 0;
 }

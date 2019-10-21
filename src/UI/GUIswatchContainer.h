@@ -31,7 +31,7 @@ public:
 
 	int addButtonX;
 	CGUIbutton2* addButton;
-	vector<glm::i32vec4> defaultSwatches;
+	std::vector<glm::i32vec4> defaultSwatches;
 
 	CGUIcolourPicker* colourPicker;
 	int lastClickedSwatch;

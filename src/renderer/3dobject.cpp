@@ -31,15 +31,15 @@ glm::vec3 C3dObject::getPos() {
 void C3dObject::rotate(float angle,glm::vec3 axis) {
 	//create a quaternion of the rotation
 	angle = glm::radians(angle);
-    axis = glm::normalize(axis);
-    axis = axis * sinf(angle / 2.0f);
-    float scalar = cosf(angle / 2.0f);
-    glm::fquat offset(scalar, axis.x, axis.y, axis.z);
+	axis = glm::normalize(axis);
+	axis = axis * sinf(angle / 2.0f);
+	float scalar = cosf(angle / 2.0f);
+	glm::fquat offset(scalar, axis.x, axis.y, axis.z);
 
-    
+	
 	//rotate the object's existing orientation quat by it
 	orientation = offset * orientation;
-    orientation = glm::normalize(orientation);
+	orientation = glm::normalize(orientation);
 
 	//set the object's matrix to this orientation
 	orientateWorldMatrix();

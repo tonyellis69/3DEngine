@@ -7,6 +7,10 @@
 #include "..\3DEngine\src\direction.h"
 #include "chunk2.h"
 
+#include "..\vertBufs.h"
+
+typedef vBuf::T3DnormVert TChunkVert2;
+
 /** Stores the inner dimensions of a shell, eg, the innermost superchunk
 	layers before they are entirely replaced by the shell within, if any.*/
 struct TBoxVolume {
@@ -35,6 +39,8 @@ public:
 	virtual bool chunkCheckCallback(glm::vec3& chunkPos, float chunkSize) { return false; };
 	virtual void createChunkMesh(Chunk2& chunk) {};
 	virtual void deleteChunkMesh(Chunk2& chunk) {};
+	virtual unsigned int getChunkTrisCallback(int chunkId, TChunkVert2* buf) { return 0; };
+	virtual void onTerrainScroll(glm::vec3& movement) {}
 };
 
 /** A container for zero or more chunks occupying a cubic volume of space. */
@@ -55,10 +61,13 @@ public:
 	void addChunksOutside(CBoxVolume& unitVolume);
 	void addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& innerUnitVolume);
 
+	//void getTris(const glm::vec3& pos, TChunkVert*& buf, unsigned int& noTris);
+
 	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
 	void clearScrolledOutChunks(Tdirection face, int maxChunks);
 	void restoreClippedChunks(TBoxVolume& innerChunkVolume);
 	
+	int getChunkAt(glm::i32vec3& pos);
 
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp

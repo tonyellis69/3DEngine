@@ -65,9 +65,11 @@ CGUIbase::CGUIbase()  {
 	setGUIcallback(this);
 	if (rootUI) {
 		setStyleSheet(rootUI->styleSheet);
-		controlCursor.rowCol = glm::i32vec2(styleSheet->controlBorder);
+		controlCursor.rowCol = glm::i32vec2(0); // styleSheet->controlBorder);
 
 	}
+
+	resizesForChildren = false;
 	
 }
 
@@ -122,6 +124,7 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 	//resize parent if required
 
 	//do fine layou
+	layoutFine();
 
 	return ctrl;
 }
@@ -141,8 +144,8 @@ void CGUIbase::positionLogical(CGUIbase * control) {
 	controlCursor.advance();
 }
 
-/** La yout all child controls based on their row/column positions,
-	ignoring alignment etc. */
+/** La yout all child controls based on their row/column positions, ignoring alignment etc. 
+	This tells us the space they require, maxSize, useful for sizing controls to children. */
 glm::i32vec2& CGUIbase::layoutControlsCoarse() {
 	glm::i32vec2 rowCol = glm::i32vec2(0);
 	glm::i32vec2 maxSize = glm::i32vec2(0);
@@ -150,10 +153,11 @@ glm::i32vec2& CGUIbase::layoutControlsCoarse() {
 	int currentRowHeight = styleSheet->controlBorder; 
 	for (auto control : controls) {
 		control->setLocalPos(currentPos.x, currentPos.y);
-		currentRowHeight = max(currentRowHeight, currentPos.y + control->getSize().y);
+		currentRowHeight = std::max(currentRowHeight, currentPos.y + control->getSize().y);
+		//is this control on the same row as the previous one?
 		if (control->positionHint.rowCol.x < control->positionHint.layoutstyle.cols - 1) {
 			currentPos.x += control->getSize().x;
-			maxSize.x = max(maxSize.x, currentPos.x);
+			maxSize.x = std::max(maxSize.x, currentPos.x);
 			currentPos.x += styleSheet->controlSpacing;
 		}
 		else {
@@ -166,40 +170,77 @@ glm::i32vec2& CGUIbase::layoutControlsCoarse() {
 
 /** Fine- djust the position of all child controls according to alignment etc. */
 void CGUIbase::layoutFine() {
-	glm::i32vec2 cellSize; int vDiff, hDiff;
+	glm::i32vec4 cellSize; int vDiff, hDiff;
 	for (auto control : controls) {
-		if (control->positionHint.hAlignment != uiAlignHnone || control->positionHint.vAlignment != uiAlignVnone) {
+		if (control->positionHint.hAlignment != uiHnone || control->positionHint.vAlignment != uiVnone) {
 			cellSize = calcCellSize(control->positionHint.rowCol);
-			vDiff = (cellSize.y - control->getSize().y) / 2;
-			hDiff = (cellSize.x - control->getSize().x) / 2;
+			vDiff = (cellSize.w - control->getSize().y) / 2;
+			hDiff = (cellSize.z - control->getSize().x) / 2;
 		}
-		if (control->positionHint.vAlignment == uiAlignVcentred) {
-			control->setPosY(control->getLocalPos().y + vDiff);
-			//TO DO! This will only work the first time. Need to calc top left corner of
-			//cell from first principles: height of previes row + borders
+		if (control->positionHint.vAlignment == uiVcentred) {
+			control->setPosY(cellSize.y + vDiff);
 		}
 
 
 
-		if (control->positionHint.hAlignment == uiAlignHcentred) {
-			control->setPosX(control->getLocalPos().x + hDiff);
+
+		if (control->positionHint.hAlignment == uiHcentred) {
+			control->setPosX(cellSize.x + hDiff);
+		}
+		else if (control->positionHint.hAlignment == uiHleft) {
+			control->setPosX(cellSize.x);
 		}
 
 	}
 }
 
 /** Return the width and height of the given cell. */
-glm::i32vec2& CGUIbase::calcCellSize(glm::i32vec2& rowCol) {
-	glm::i32vec2 size;
-	//find the height of the biggest control on this row
-	//find the width of the widest control on this column
-	for (auto control : controls) {
-		if (control->positionHint.rowCol.y == rowCol.y)
-			size.y = max(size.y, control->getSize().y);
-		if (control->positionHint.rowCol.x == rowCol.x)
-			size.x = max(size.x, control->getSize().x);
+glm::i32vec4& CGUIbase::calcCellSize(glm::i32vec2& rowCol) {
+	glm::i32vec2 size(0);
+	glm::i32vec2 pos(0);
+
+	if (resizesForChildren) {
+		//find the height of the biggest control on this row
+		//find the width of the widest control on this column
+		for (auto control : controls) {
+			if (control->positionHint.rowCol.y == rowCol.y)
+				size.y = std::max(size.y, control->getSize().y);
+			if (control->positionHint.rowCol.x == rowCol.x)
+				size.x = std::max(size.x, control->getSize().x);
+		}
+		return glm::i32vec4(pos,size);
 	}
-	return size;
+
+	std::vector<int> widths;////////////////////////
+	int totalWidths = 0;
+	int ctrlWidth = 0; int ctrlsInRow = 0; int prevWidth = -1; int prevCells = 0;
+	int rowY = 0;
+	for (auto control : controls) {
+		if (control->positionHint.rowCol.y == rowCol.y) {
+			size.y = control->getSize().y;
+			widths.push_back(control->getSize().x);
+			
+			if (control->positionHint.rowCol.x == rowCol.x) {
+				ctrlWidth = control->getSize().x;
+				prevWidth = totalWidths;
+				prevCells = ctrlsInRow;
+				rowY = control->getLocalPos().y;
+			}
+			ctrlsInRow++;
+			totalWidths += control->getSize().x;
+
+		}
+	}
+	float availableX = (float)getSize().x - (styleSheet->controlSpacing * (ctrlsInRow-1)) - (styleSheet->controlBorder * 2);
+	float ratio = availableX / totalWidths;
+	size.x = int(ctrlWidth * ratio);
+
+	//to find top left corner of cell, combine widths of previous cells x ratio,
+	//then add borders
+	pos.x = int((prevWidth) * ratio) + (prevCells  * styleSheet->controlSpacing) + styleSheet->controlBorder;
+	pos.y = rowY;
+
+	return glm::i32vec4(pos, size);
 }
 
 
@@ -213,15 +254,18 @@ void CGUIbase::position(CGUIbase * control) {
 	//get the layout style from currentLayoutStyle
 	//find the "working space" - the area we have to work within
 
-	if (free)
+	if (control->positionHint.free)
 		return;
 
 
-	if (control->positionHint.hAlignment == uiAlignHcentred) {
+	if (control->positionHint.hAlignment == uiHcentred || control->positionHint.vAlignment == uiVcentred) {
 		glm::i32vec2 childCentre = control->getSize() / 2;
 		glm::i32vec2 parentCentre = getSize() / 2;
 		glm::i32vec2 newPos = parentCentre - childCentre;
-		control->setLocalPos(newPos.x, newPos.y);
+		if (control->positionHint.hAlignment == uiHcentred)
+			control->setPosX(newPos.x);
+		if (control->positionHint.vAlignment == uiVcentred)
+			control->setPosY(newPos.y);
 	}
 
 
@@ -283,7 +327,7 @@ void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		if (MouseOver != this) { //mouse has just entered this control 
 			MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
 			if (MouseOver)
-				mouseOffSuccess == MouseOver->onMouseOff(mouseX, mouseY, key);
+				mouseOffSuccess = MouseOver->onMouseOff(mouseX, mouseY, key);
 		}
 		if (mouseOffSuccess)
 			MouseOver = this;
@@ -416,7 +460,7 @@ void CGUIbase::recalculateDiminsions() {
 	//1. Recalculate x,y,w,h *if necessary* due to justification or spanning
 	if (anchorRight != NONE) {
 		if (anchorLeft)
-			setWidth(min(getWidth(), parent->getWidth() - (anchorRight + getLocalPos().x)));
+			setWidth(std::min(getWidth(), parent->getWidth() - (anchorRight + getLocalPos().x)));
 		else
 			setPosX(parent->getWidth() - getWidth() - anchorRight);
 	}
@@ -435,7 +479,7 @@ void CGUIbase::recalculateDiminsions() {
 
 	if (anchorBottom != NONE)
 		if (anchorLeft)
-			setHeight(min(getHeight(), parent->getHeight() - (anchorBottom + getLocalPos().y)));
+			setHeight(std::min(getHeight(), parent->getHeight() - (anchorBottom + getLocalPos().y)));
 		else
 			setPosY(parent->getHeight() - getHeight() - anchorBottom);
 	else {
@@ -662,6 +706,14 @@ void CGUIbase::popupMenu(std::initializer_list<std::string> options,  IPopupMenu
 	popupMenu->makeModal();
 }
 
+/*
+CGUIlabel* CGUIbase::addLabel(const std::string& text, int style) {
+	CGUIlabel* lbl = new CGUIlabel(text);	
+	return (CGUIlabel*) addCtrl(lbl);
+}*/
+
+
+
 
 
 /** Return a pointer to the child control of this control with the given id number. */
@@ -798,6 +850,26 @@ void CGUIbase::makeUnModal() {
 			modalControls.erase(modalControls.begin() + ctrl);
 			isModal = false;
 		}
+}
+
+/** Set this control's positioning parameters (centre, left justify, etc)
+	accoding to the flags in styleWord. */
+void CGUIbase::setPositionStyles(unsigned int styleWord) {
+	if (styleWord & uiHleft)
+		setHorizontalAlignment(uiHleft);
+	else if (styleWord & uiHcentred)
+		setHorizontalAlignment(uiHcentred);
+	else if (styleWord & uiHright)
+		setHorizontalAlignment(uiHright);
+
+	if (styleWord & uiVcentred)
+		setVerticalAlignment(uiVcentred);
+	else if (styleWord & uiVtop)
+		setVerticalAlignment(uiVtop);
+	else if (styleWord & uiVbottom)
+		setVerticalAlignment(uiVbottom);
+
+
 }
 
 

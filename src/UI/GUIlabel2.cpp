@@ -42,7 +42,7 @@ void CGUIlabel2::setMultiLine(bool onOff) {
 	renderText();
 }
 
-void CGUIlabel2::setHorizontalAlignment(TTextAlign align) {
+void CGUIlabel2::setTextAlignment(TTextAlign align) {
 	textAlign = align;
 }
 

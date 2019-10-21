@@ -6,7 +6,8 @@
 
 class CGUIbutton : public CGUIbase {
 public:
-	CGUIbutton(std::string & text);
+	CGUIbutton(const std::string & text);
+	CGUIbutton(const std::string& text, unsigned int styleWord);
 	void resizeToFit();
 	//CGUIbutton(int x, int y, int w, int h);
 	void DrawSelf();

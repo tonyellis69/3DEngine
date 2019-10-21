@@ -7,14 +7,15 @@
 /** A class to render text to the screen. */
 class CGUIlabel : public CGUIbase {
 public:
-	CGUIlabel(std::string text);
+	CGUIlabel(const std::string& text);
+	CGUIlabel(const std::string& text, unsigned int styleWord);
 	//CGUIlabel(int x, int y, int w, int h);
 	void setFont(CFont* font);
 	void setText(std::string newText);
 	void setTextColour(UIcolour colour);
 	void setMultiLine(bool onOff);
 	void setTextColour(glm::vec4 colour);
-	void setHorizontalAlignment(TTextAlign align);
+	void setTextAlignment(TTextAlign align);
 	void setLeftAlignIndent(int indent);
 	TTextAlign getJustification();
 	void DrawSelf();
@@ -41,5 +42,18 @@ public:
 
 	
 	int leftAlignIndent; ///<How much left-aligned text is indented.
+
+	static CGUIlabel* make(std::string txt) {
+		return new CGUIlabel(txt);
+		};
+
+
+	//std::unique_ptr<CGUIlabel*> add2(const std::string& text, int style)   const override {
+	//	return std::make_unique<CGUIlabel*>(*this);
+		//return new CGUIlabel(text);
+	//}
+
+
+	~CGUIlabel() {};
 
 	};

@@ -70,7 +70,7 @@ public:
 	glm::mat4 lineOrthoView; ///<A matrix for viewing 2D lines offset by a half-pixel;
 
 	bool cursorOn;
-	chrono::system_clock::time_point lastCursorFlash;
+	std::chrono::system_clock::time_point lastCursorFlash;
 
 	CBuf templateQuad;
 	CBuf borderTemplateQuad;

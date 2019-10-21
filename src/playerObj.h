@@ -13,6 +13,7 @@ public:
 	CPlayerObj();
 	void updatePov();
 	void setPos(glm::vec3& pos);
+	void translate(glm::vec3& t);
 
 	float width;
 	float height;

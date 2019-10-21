@@ -73,7 +73,7 @@ int CTextBuffer::addFragment(int x, int y, TLineFragDrawRec& drawData) {
 	glyph* glyph;
 	unsigned int numChars = drawData.text->size();
 	textQuads.resize(v + numChars * 4);
-	string text = *drawData.text;
+	std::string text = *drawData.text;
 	for (unsigned int c = 0; c < numChars; c++) { 
 		if (text[c]  != '\n')
 		{

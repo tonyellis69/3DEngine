@@ -1,6 +1,6 @@
 
 #include <iostream>
-using namespace std;
+
 
 #include "texManager.h"
 //#include "..\SOIL.h"
@@ -8,6 +8,8 @@ using namespace std;
 #include "../external/stb_image.h"
 
 #include "renderer.h"
+
+using namespace std;
 
 CTextureManagerOGL::~CTextureManagerOGL() {
 	for (size_t tex = 0; tex < textures.size(); tex++)

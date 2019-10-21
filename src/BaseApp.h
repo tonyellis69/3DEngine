@@ -35,7 +35,7 @@
 
 
 #include <iostream> //for cerr
-using namespace std;
+//using namespace std;
 
 
 //class CVMapp;

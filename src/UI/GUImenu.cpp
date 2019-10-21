@@ -190,7 +190,7 @@ void CGUImenu::clear() {
 std::string & CGUImenu::getItemName(int itemNo) {
 	if (itemNo < items.size())
 		return items[itemNo]->getText();
-	return string("");
+	return std::string("");
 }
 
 void CGUImenu::setHighlight(unsigned int itemNo, bool onOff) {

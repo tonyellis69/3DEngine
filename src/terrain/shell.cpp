@@ -61,6 +61,7 @@ void CShell::playerAdvance(Tdirection direction) {
 	else {
 		//(3) scroll the SCs, then add a layer 
 		//NB Think of scroll direction as the direction of rotation of the conveyor belt of terrain
+
 		Tdirection scrollDir = flipDir(direction);
 		liveLog << " scrolling.";
 		scrolls++;
@@ -99,6 +100,9 @@ void CShell::playerAdvance(Tdirection direction) {
 			//	pTerrain->shells[shellNo + 1].shellColour = vec4(1, 1, 1, 1.0f);
 			pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
 		}
+
+		if (shellNo == 0)
+			pTerrain->pCallbackApp->onTerrainScroll(move);
 	}
 
 	//The containing shell also needs to respond to the player advancing across the terrain:
@@ -106,7 +110,7 @@ void CShell::playerAdvance(Tdirection direction) {
 		 pTerrain->shells[shellNo + 1].playerAdvance(direction);
 	}
 
-
+	
 }
 
 /** Return the number of chunks of terrain lying in the given direction from the player positionHint. */
@@ -404,12 +408,36 @@ void CShell::calculateInnerBounds() {
 }
 
 /** Return the index of the superchunk at this worldspace position. */
- glm::i32vec3 CShell::getSCat(glm::vec3& pos) {
-	vec3 scPos;
-	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f) - worldSpacePos;
-	scPos = pos + shellOrigin; //pos is now 0,0,0 - n,n,n
-	return i32vec3(scPos / vec3(SCsize));
+/*
+ glm::i32vec3 CShell::getSCat(const glm::vec3& pos) {
+	// if (pos == vec3{-0.500000000 , -722.461060 ,-0.500000000 })
+	//	 int v = 0;
+	 vec3 halfSize(worldSpaceSize * 0.5f);
+	vec3 shellOrigin = halfSize - worldSpacePos;
+	vec3 scPos = pos + shellOrigin; //pos is now 0,0,0 - n,n,n
+	
+	//check if pos falls entirely outside shell. If so, return -1-1-1
+	if (any(greaterThan(scPos, halfSize)) ||
+		any(lessThan(scPos,vec3(0))) ) {
+		return i32vec3(-1);
+	}
+
+	i32vec3 result = i32vec3(scPos / vec3(SCsize));
+	//if (result.y == -2)
+	//	int b = 0;
+
+	return result;
 }
+ */
+ glm::i32vec3 CShell::getSCat(const glm::vec3& pos) {
+	 vec3 scPos;
+	 vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f) - worldSpacePos;
+	 scPos = pos + shellOrigin; //pos is now 0,0,0 - n,n,n
+	 return i32vec3(scPos / vec3(SCsize));
+ }
+
+
+
 
 /** Return the volume of this shell's chunk extent in worldspace, counting from a central origin. */
 CBoxVolume CShell::getChunkVolume2() {

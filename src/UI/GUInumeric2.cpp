@@ -45,8 +45,8 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 /** Directly sets the numeric value of the control. */
 void CGUInumeric2::setValue(float newValue) {
 	value = newValue;
-	string numStr; //now update the text:
-	ostringstream convert;
+	std::string numStr; //now update the text:
+	std::ostringstream convert;
 	convert << value;
 	numStr = convert.str();
 	numStr += suffix;
@@ -104,7 +104,7 @@ void CGUInumeric2::setMinMax(float newMin, float mewMax) {
 	valMin = newMin; valMax = mewMax;
 }
 
-void CGUInumeric2::setSuffix(const string& newSuffix) {
+void CGUInumeric2::setSuffix(const std::string& newSuffix) {
 	suffix = newSuffix;
 }
 

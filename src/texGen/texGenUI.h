@@ -1,4 +1,5 @@
 #pragma once
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 
 #include "..\BaseApp.h"
 #include "GUItrackImage.h"

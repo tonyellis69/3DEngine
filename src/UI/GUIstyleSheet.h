@@ -15,6 +15,8 @@ const glm::vec4 uiOldbackColour2 = { 0.75f, 0.75f, 0.75f,1.0f };
 
 
 
+
+
 /** Defines the structure for storing the style settings of the GUI.*/
 class CGUIstyleSheet {
 public:
@@ -23,7 +25,7 @@ public:
 		controlSpacing(10),
 		labelTextSurround(2),
 		buttonLabelSurround(4),
-		buttonPresets{ {60,24}, {80,28},
+		buttonPresets{ {60,24}, {80,28}, {100,32},
 		defaultButtonBackColour1 = glm::vec4(uiLightGrey),
 		defaultButtonBackColour2 = glm::vec4(uiDarkGrey),
 		defaultBorderColour = glm::vec4(uiDarkGrey),

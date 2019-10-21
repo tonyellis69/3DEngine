@@ -15,7 +15,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "..\external/stb_image.h"
 
-using namespace std;
+//using namespace std;
 
 //int totalbufsize = 0;
 //int totalchunks = 0;

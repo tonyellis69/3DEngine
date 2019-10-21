@@ -38,7 +38,7 @@ public:
 
 	void calculateInnerBounds();
 
-	glm::i32vec3 getSCat(glm::vec3& pos);
+	glm::i32vec3 getSCat(const glm::vec3& pos);
 
 	CBoxVolume getChunkVolume2();
 

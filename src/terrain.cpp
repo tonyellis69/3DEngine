@@ -7,7 +7,7 @@
 
 using namespace glm;
 using namespace vBuf;
-using namespace std;
+
 
 #include "watch.h"
 
@@ -15,7 +15,7 @@ using namespace watch;
 
 #include "colour.h"
 
-
+using namespace std;
 
  int totalbufsize = 0;
  int totalchunks = 1;

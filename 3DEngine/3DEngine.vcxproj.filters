@@ -380,6 +380,9 @@
     <ClCompile Include="..\src\physics\terrainPhysObj2.cpp">
       <Filter>physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUIscrollbar2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\BaseApp.h">
@@ -752,6 +755,9 @@
       <Filter>physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIcontrols.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIscrollbar2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
