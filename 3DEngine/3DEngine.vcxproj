@@ -201,6 +201,7 @@
     <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
+    <ClCompile Include="..\src\UI\themeServer.cpp" />
     <ClCompile Include="..\src\utils\idContainer.cpp" />
     <ClCompile Include="..\src\utils\log.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />

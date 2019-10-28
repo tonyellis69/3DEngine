@@ -60,7 +60,7 @@ void CShell::playerAdvance(Tdirection direction) {
 	}
 	else {
 		//(3) scroll the SCs, then add a layer 
-		//NB Think of scroll direction as the direction of rotation of the conveyor belt of terrain
+		//NB Think of scroll direction (scrollDir) as the direction of rotation of the conveyor belt of terrain
 
 		Tdirection scrollDir = flipDir(direction);
 		liveLog << " scrolling.";
@@ -312,7 +312,7 @@ void CShell::reinitialiseFaceSCs(Tdirection face) {
 		//clear the old intersection data
 		faceIter->isEmpty = true;
 		faceIter->clearChunks();
-		//for (auto& chunk : faceIter->chunks2)
+		//for (auto& chunk : faceIter->scChunks)
 		//	faceIter->createChunk(faceIter.getIndex());
 		vec3 sampleSpacePosition = calcSCsampleSpacePosition(faceIter.getIndex());
 		faceIter->setSampleSpacePosition(sampleSpacePosition);

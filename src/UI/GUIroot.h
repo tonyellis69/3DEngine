@@ -1,5 +1,6 @@
 #pragma once
 #include "GUIbase.h"
+#include "themeServer.h"
 
 
 
@@ -31,5 +32,7 @@ public:
 	CGUIbase* focusControl; ///<The current control with focus, if any.
 
 	glm::i32vec2 mousePos; ///<Current mouse screen position.
+
+	CThemeServer themeServer; ///<Stores the available text style collecctions
 };
 

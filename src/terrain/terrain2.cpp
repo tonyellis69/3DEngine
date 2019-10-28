@@ -157,6 +157,7 @@ int CTerrain2::createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int she
 	chunks[id].LoD = shells[shellNo].LoD;
 	chunks[id].setSample(sampleCorner, shells[shellNo].scSampleStep);
 	chunks[id].terrainPos = terrainPos;
+	chunks[id].status = chToSkin;
 	chunksToMesh.push(id);
 	return id;
 }
@@ -182,6 +183,7 @@ int CTerrain2::getFreeChunk() {
 
 /** Move this chunk  to the free pile. */
 void CTerrain2::removeChunk(int id) {
+	//TO DO: mesh may not have been created yet - is this safe/efficient?
 	pCallbackApp->deleteChunkMesh(chunks[id]);
 
 	chunks[id].status = chFree;
@@ -192,14 +194,17 @@ void CTerrain2::removeChunk(int id) {
 void CTerrain2::update(float dT) {
 
 	//TO DO: base number on time available, not const value!
-	for (int x = 0; x < 10; x++) { 
+	unsigned int tmp = chunksToMesh.size(); //10
+	for (int x = 0; x < tmp; x++) {  
 		//are there any chunks in the queue? Mesh the next one.
 		if (chunksToMesh.empty())
 			return;
 
 			int id = chunksToMesh.front();
 			chunksToMesh.pop();
-			pCallbackApp->createChunkMesh(chunks[id]);
+			if (chunks[id].status == chToSkin )
+				pCallbackApp->createChunkMesh(chunks[id]);
+
 		
 	}
 }
@@ -237,7 +242,7 @@ void CTerrain2::getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& bu
 	float chunkSize = shells[sc->shellNo].chunkSize;
 	//get chunk at this position
 	int chunkId = -1;
-	for (auto chunk : sc->chunks2) {
+	for (auto chunk : sc->scChunks) {
 		if (all(greaterThanEqual(chunks[chunk].terrainPos, pos)) && 
 				all(lessThanEqual(chunks[chunk].terrainPos, pos + vec3(chunkSize)))) {
 			chunkId = chunks[chunk].id;

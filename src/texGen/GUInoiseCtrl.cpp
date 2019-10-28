@@ -264,7 +264,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
 	lbl2->setText("Scale");
 	coverScaleCtrl = new CGUInumeric2(CtrlCol2X + 70, 0, 70, 18);
-	coverScaleCtrl->setValue(1); coverScaleCtrl->setMinMax(0.05, 10);
+	coverScaleCtrl->setValue(1); coverScaleCtrl->setMinMax(0.05f, 10.0f);
 	coverScaleCtrl->setIncrement(0.1f);
 
 	addToRow("iterationsScale", { lbl,coverIterationsCtrl,lbl2,coverScaleCtrl });

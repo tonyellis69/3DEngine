@@ -250,7 +250,7 @@ void CBaseApp::AppTasks() {
 
 	//Engine.removeUserScale();
 
-	logWindow->update(dT);
+	logWindow->update((float)dT);
 	DrawUI(); 
 
 
@@ -381,7 +381,7 @@ void CBaseApp::exit() {
 
 
 void CBaseApp::initLogWindow() {
-	logWindow = new CGUIrichText(0, 0, 220, 100);
+	logWindow = new CGUIrichText(0, 0, 400, 150);
 	logWindow->anchorRight = 10;
 	logWindow->anchorBottom = 10;
 	logWindow->insetX = 13;
@@ -430,7 +430,13 @@ void CBaseApp::initialiseSystemStylesheet() {
 	//TO DO: ultimately it might be best to load fonts into font manager here too, 
 	//scrap the systemFont* member. More streamlined, less duplication
 	sysStyleSheet.defaultFont = &renderer.fontManager.getFont("smallSysFont");
-	sysStyleSheet.defaultFontColour = uiBlack;
+	//sysStyleSheet.defaultFontColour = uiBlack;
+
+	//kludigly create default text styles for rich text controls
+	GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextStyle);
+	GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextHotStyle);
+	GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextSelectedStyle);
+
 }
 
 /** Use the Windows Common Dialog to get a filename. */

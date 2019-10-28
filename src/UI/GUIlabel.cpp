@@ -9,8 +9,8 @@ CGUIlabel::CGUIlabel(const std::string&  text) {
 	//via a pointer to the stylesheet
 	//so we ask for these essentials and set them up before we do anything like try 
 	//to calculate how big 'text' will be.
-	setFont(styleSheet->defaultFont);
-	setTextColour(styleSheet->defaultFontColour);
+
+	applyStyleSheet();
 
 	setText(text);
 	resizeToFit();
@@ -21,6 +21,9 @@ CGUIlabel::CGUIlabel(const std::string&  text) {
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;
+
+
+
 	//drawBorder = false;
 }
 
@@ -46,8 +49,16 @@ CGUIlabel::CGUIlabel(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	textAlign = tleft;
 }*/
 
+void CGUIlabel::applyStyleSheet() {
+	setFont(styleSheet->defaultFont);
+	setTextColour(styleSheet->defaultFontColour);
+	setBorderColour(styleSheet->defaultBorderColour);
+}
+
 void CGUIlabel::setFont(CFont* newFont) {
 	textData.font = newFont;
+	int fontSize = textData.font->lineHeight + 2 * styleSheet->labelTextSurround;
+	resizeMin = i32vec2(fontSize);
 }
 
 void CGUIlabel::setText(std::string newText) {

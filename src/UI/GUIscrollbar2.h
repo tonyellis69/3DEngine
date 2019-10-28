@@ -9,6 +9,8 @@ class CGUIbaseScrollbar2 :  public CGUIbase {
 public:
 //	CGUIbaseScrollbar() {};
 	CGUIbaseScrollbar2(ScrollbarOrientationType2 axis, int x, int y, int length);
+	CGUIbaseScrollbar2(ScrollbarOrientationType2 axis);
+	void applyStyleSheet();
 	void updateAppearance();
 	void updateSliderAppearance();
 	void setValue(int newValue);
@@ -48,6 +50,7 @@ public:
 class CGUIsysScrollbar2: public CGUIbaseScrollbar2 {
 public:
 	CGUIsysScrollbar2::CGUIsysScrollbar2(ScrollbarOrientationType2 axis, int x, int y, int length) : CGUIbaseScrollbar2(axis,x,y,length) {};
+	CGUIsysScrollbar2(ScrollbarOrientationType2 axis, unsigned int styleWord);
 	void updateValue();
 
 };

@@ -176,7 +176,7 @@ void CColourTex::render() {
 	pRenderer->attachTexture1D(1, palette.handle);
 
 	shader->setShaderValue(hSource, 0);
-    shader->setShaderValue(hPalette, 1);
+	shader->setShaderValue(hPalette, 1);
 	shader->setShaderValue(hSelectedShade, selectedShade);
 	shader->setShaderValue(hSelectionFalloff, selectionFalloff);
 	pRenderer->renderToTextureQuad(mTarget);
@@ -451,7 +451,7 @@ void CScalePointTex::read(std::ifstream & in) {
 	readObject(scale, in);
 }
 
-glm::vec3 & CScalePointTex::getScalePt() {
+glm::vec3  CScalePointTex::getScalePt() {
 	return scale;
 }
 
@@ -824,8 +824,8 @@ CTerrainTex::CTerrainTex() : CTexGen(texTerrain) {
 	randomSeed = 42;
 
 	margin = 2;
-	startOffset = 0.02;
-	endOffset = 0.8;// 0.98;
+	startOffset = 0.02f;
+	endOffset = 0.8f;// 0.98;
 
 }
 

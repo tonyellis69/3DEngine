@@ -85,7 +85,7 @@ public:
 	float chunkSampleSize; ///<Chunk size in samplespace
 
 	//std::vector<glm::i32vec3> chunks; ///<The chunks owned by this superchunk
-	std::vector<int> chunks2; ///<Ids of the chunks owned by this superChunk;
+	std::vector<int> scChunks; ///<Ids of the chunks owned by this superChunk;
 
 	float cubeSize; ///<The size of this shell's marching cubes.
 	int shellNo; ///TO DO may mean above is redundant

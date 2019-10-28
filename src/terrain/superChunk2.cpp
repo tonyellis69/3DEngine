@@ -32,8 +32,8 @@ void CSuperChunk2::setCallbackApp(ITerrainCallback * pApp) {
 /** Acquire a new chunk at the given index position. */
 void CSuperChunk2::createChunk(glm::i32vec3 & index) {
 
-	//if (shellNo > 1)
-	//	return;
+	if (shellNo > 1)
+		return;
 	vec3 sampleCorner = sampleSpacePos + vec3(index) * chunkSampleSize;
 
 	vec3 terrainPos = pTerrain->getSCpos2(shellNo, origIndex); 
@@ -42,18 +42,20 @@ void CSuperChunk2::createChunk(glm::i32vec3 & index) {
 
 	terrainPos += vec3(index) * pTerrain->shells[shellNo].chunkSize;
 	 
-	chunks2.push_back( pTerrain->createChunk(index, sampleCorner, shellNo, terrainPos) );
-	//pTerrain->chunks[chunks2.back()].colour = colour;
-	//pTerrain->chunks[chunks2.back()].colour = pTerrain->shells[shellNo].shellColour;
-	pTerrain->chunks[chunks2.back()].colour = colour;
+	scChunks.push_back( pTerrain->createChunk(index, sampleCorner, shellNo, terrainPos) );
+	//pTerrain->chunks[scChunks.back()].colour = colour;
+	//pTerrain->chunks[scChunks.back()].colour = pTerrain->shells[shellNo].shellColour;
+	pTerrain->chunks[scChunks.back()].colour = colour;
+
+
 }	
 
 
 /** Remove all th chunks of this superchunk.*/
 void CSuperChunk2::clearChunks() {
-	for (auto id : chunks2)
+	for (auto id : scChunks)
 		pTerrain->removeChunk(id);
-	chunks2.clear();
+	scChunks.clear();
 	isEmpty = true;
 }
 
@@ -62,11 +64,11 @@ void CSuperChunk2::clearChunks(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(SCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(SCchunks);
 
-	for (auto id = chunks2.begin(); id != chunks2.end();) {
+	for (auto id = scChunks.begin(); id != scChunks.end();) {
 		i32vec3* chunkIndex = &pTerrain->chunks[*id].index;
 		if (all(greaterThanEqual(*chunkIndex, indexBL)) && all(lessThanEqual(*chunkIndex, indexTR))) {
 			pTerrain->removeChunk(*id);
-			id = chunks2.erase(id);
+			id = scChunks.erase(id);
 		}
 		else
 			++id;
@@ -96,7 +98,7 @@ void CSuperChunk2::addChunks(CBoxVolume& unitVolume) {
 
 /** Returns true if this SC has a chunk at this index position. */
 bool CSuperChunk2::chunkExists(glm::i32vec3& index) {
-	for (auto localChunk : chunks2) {
+	for (auto localChunk : scChunks) {
 		if (pTerrain->chunks[localChunk].index == index) {
 			return true;
 		}
@@ -160,12 +162,12 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 void CSuperChunk2::clearScrolledOutChunks(Tdirection face, int overlap) {
 	int axis = getAxis(face);
 
-	for (auto id = chunks2.begin(); id != chunks2.end();) {
+	for (auto id = scChunks.begin(); id != scChunks.end();) {
 		i32vec3* chunkIndex = &pTerrain->chunks[*id].index;
 		if (face == north || face == west || face == down) {
 			if ((*chunkIndex)[axis] < SCchunks - overlap) {
 				pTerrain->removeChunk(*id);
-				id = chunks2.erase(id);
+				id = scChunks.erase(id);
 			}
 			else
 				++id;
@@ -173,7 +175,7 @@ void CSuperChunk2::clearScrolledOutChunks(Tdirection face, int overlap) {
 		else {
 			if ((*chunkIndex)[axis] >= overlap) {
 				pTerrain->removeChunk(*id);
-				id = chunks2.erase(id);
+				id = scChunks.erase(id);
 			}
 			else
 				++id;

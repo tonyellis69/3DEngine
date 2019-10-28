@@ -30,11 +30,15 @@ public:
 	parent control. */
 class CGUIposition {
 public:
-	CGUIposition() : free(false),  hAlignment(uiHnone), vAlignment(uiVnone) {}
+	CGUIposition() : free(false),  hAlignment(uiHnone), vAlignment(uiVnone),
+	expansive(false), centreRow(false) {}
 
 	bool free; ///<Control is positioned freely, make no attempt to position it.
 	unsigned int hAlignment; ///<Whether the control is centred, left-aligned, etc
 	unsigned int vAlignment; 
 	CGUIlayout layoutstyle; ///<Two-column, three etc
 	glm::i32vec2 rowCol;
+	bool expansive; ///<Control should be expanded to fill available space
+	//TO DO: break into horizontal and vertical
+	bool centreRow;
 };

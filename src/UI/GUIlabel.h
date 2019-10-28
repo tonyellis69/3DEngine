@@ -10,6 +10,7 @@ public:
 	CGUIlabel(const std::string& text);
 	CGUIlabel(const std::string& text, unsigned int styleWord);
 	//CGUIlabel(int x, int y, int w, int h);
+	void applyStyleSheet();
 	void setFont(CFont* font);
 	void setText(std::string newText);
 	void setTextColour(UIcolour colour);

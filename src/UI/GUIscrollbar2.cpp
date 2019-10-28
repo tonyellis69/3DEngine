@@ -18,7 +18,34 @@ CGUIbaseScrollbar2::CGUIbaseScrollbar2(ScrollbarOrientationType2 axis, int x, in
 
 	lastMouseDownX = lastMouseDownY = 0;
 	id = uiScrollbarID;
-;
+	applyStyleSheet();
+
+}
+
+/** Construct default scrollbar. */
+CGUIbaseScrollbar2::CGUIbaseScrollbar2(ScrollbarOrientationType2 axis) {
+	orientation = axis;
+	type = scrollbar;
+	//setLocalPos(x, y);
+	if (orientation == scrlHorizontal) {
+		setWidth(styleSheet->scrollbarLength); setHeight(styleSheet->scrollbarWidth);
+	}
+	else {
+		setHeight(styleSheet->scrollbarLength); setWidth(styleSheet->scrollbarWidth);
+	}
+
+	SliderSize = styleSheet->scrollbarSliderSize;
+	Max = 100; Min = 1; Value = 1;
+	clickIncrement = 10;
+
+	lastMouseDownX = lastMouseDownY = 0;
+	id = uiScrollbarID;
+	
+	setBackColour1(styleSheet->defaultScrollbarBackColour);
+	setBackColour2(styleSheet->defaultScrollbarBackColour);
+}
+
+void CGUIbaseScrollbar2::applyStyleSheet() {
 	setBackColour1(UIlightGrey);
 	setBackColour2(UIlightGrey);
 }
@@ -149,6 +176,13 @@ void CGUIbaseScrollbar2::setMin(int newMin) {
 int CGUIscrollbar2::Count = 1;
 CGUIscrollbar2::CGUIscrollbar2(ScrollbarOrientationType2 axis, int x, int y, int length) : CGUIbaseScrollbar2(axis,x,y,length){
 	GenName("Scrollbar",Count++);
+}
+
+/** Create default scrollbar. */
+CGUIsysScrollbar2::CGUIsysScrollbar2(ScrollbarOrientationType2 axis, unsigned int styleWord) : CGUIbaseScrollbar2( axis) {
+	positionHint.expansive = true;
+	positionHint.vAlignment = uiVcentred;
+	setPositionStyles(styleWord);	
 }
 
 /** Overloaded version of updateValue that notifies the parent that Value has changed. */

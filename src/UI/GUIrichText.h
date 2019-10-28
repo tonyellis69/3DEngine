@@ -6,9 +6,12 @@
 #include "lineBuffer.h"
 #include "..\3DEngine\src\utils\log.h"
 
+
+
 enum TMouseWheelMode {scroll,hotText};
 
 struct TtextTheme {
+	std::string themeName;
 	std::vector<TtextStyle> styles;
 
 };
@@ -57,6 +60,7 @@ struct TFXfragment {
 class CGUIrichText : public CGUIlabel2 {
 public:
 	CGUIrichText(int x, int y, int w, int h);
+	void applyStyleSheet();
 	void DrawSelf();
 	void setFont(CFont* newFont);
 	CFont* getFont();
@@ -64,9 +68,11 @@ public:
 	void setAppendStyleBold(bool isOn);
 	void setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId);
 	void setTextColour(UIcolour colour);
+	void setTextColour(glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
 	bool setTextStyle(std::string styleName);
 	void setTextStyles(std::vector<TtextStyle>* styles);
+	void setTextTheme(const std::string& themeName);
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
 	void appendText(std::string newText);

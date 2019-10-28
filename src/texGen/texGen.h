@@ -60,7 +60,7 @@ public:
 	virtual glm::vec3& getAngle() { return rotationAngles; }
 	virtual glm::vec3& getTranslation() { return translation; }
 	virtual ColourGradient* getColourGradient() { return NULL; }
-	virtual glm::vec3& getScalePt() { return glm::vec3(0); }
+	virtual glm::vec3 getScalePt() { return glm::vec3(0); }
 	virtual float getLowerBound() { return 0; }
 	virtual float getUpperBound() { return 0; }
 	virtual float getFalloff() { return 0; };
@@ -303,7 +303,7 @@ public:
 	void write(std::ofstream & out);
 	void read(std::ifstream& in);
 
-	glm::vec3& getScalePt();
+	glm::vec3 getScalePt();
 	unsigned int hScale;
 	glm::vec3 scale;
 };

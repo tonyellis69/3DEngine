@@ -5,6 +5,7 @@
 
 
 #include "..\3DEngine\src\utils\log.h"
+#include "..\3DEngine\src\UI\GUIroot.h"
 
 using namespace glm;
 
@@ -12,13 +13,13 @@ std::uniform_real_distribution<> CGUIrichText::randomPeriod{ 0,1.0f };
 
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	styles = NULL;
-	defaultTextStyle = { "default","defaultFont",glm::vec4(0,0,0,1) };
+	//defaultTextStyle = { "default","defaultFont",glm::vec4(0,0,0,1) };
 
 	TRichTextRec defaultStyleObj;
 	defaultStyleObj.style = currentTextStyle;
 	textObjs.push_back(defaultStyleObj);
 	currentTextObj = 0;
-	setTextStyle(defaultTextStyle);
+	//setTextStyle(defaultTextStyle);
 
 	firstVisibleText = 0;
 	firstVisibleObject = 0;
@@ -32,8 +33,8 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	yPixelOffset = 0;
 	smoothScrollStep = 8;// 8;
 	setMouseWheelMode(scroll);
-	hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
-	selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
+	//hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
+	//selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
 
 	mouseMode = true;
 	maxHeight = 1000;
@@ -50,6 +51,15 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	enableLineFadeIn = false;
 	lineFadeInOn = false;
 	lineFadeSpeed = 30;// 20.0f;
+
+	applyStyleSheet();
+	setTextTheme("default"); //provides essential styles so we don't crash without further initialisation
+	setTextStyle("default"); //set initial text style
+}
+
+void CGUIrichText::applyStyleSheet() {
+	setTextColour(styleSheet->defaultFontColour);
+
 }
 
 void CGUIrichText::DrawSelf() {
@@ -127,6 +137,10 @@ void CGUIrichText::setTextColour(UIcolour  colour) {
 	setTextColour(colour.r, colour.g, colour.b, colour.a);
 }
 
+void CGUIrichText::setTextColour(glm::vec4& colour) {
+	setTextColour(colour.r, colour.g, colour.b, colour.a);
+}
+
 
 
 /** Set the style for any text appended after this. */
@@ -187,11 +201,19 @@ void CGUIrichText::setTextStyles(std::vector<TtextStyle>* styleList) {
 	///////////////////
 	//cache hot/selected styles if supplied
 	for (auto style : *styles) {
-		if (style.name == "hot")
+		if (style.name == "default")
+			defaultTextStyle = style;
+		else if (style.name == "hot")
 			hotTextStyle = style;
 		else if (style.name == "hotSelected")
 			selectedHotTextStyle = style;
 	}
+}
+
+
+/** Load the styles of the named theme, for use when requested. */
+void CGUIrichText::setTextTheme(const std::string& themeName) {
+	setTextStyles( &rootUI->themeServer.getTheme(themeName).styles);
 }
 
 void CGUIrichText::setDefaultTextStyle(std::string styleName) {

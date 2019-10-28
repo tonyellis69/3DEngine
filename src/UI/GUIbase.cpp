@@ -54,7 +54,7 @@ CGUIbase::CGUIbase()  {
 	//BetterBase stuff, may overrule some of the above:
 	backColour1 = UIlightGrey;
 	backColour2 = UIdarkGrey;
-	borderColour = UIdarkGrey;
+	borderColour = (glm::vec4&)UIdarkGrey;
 	drawBorder = true;
 	uniqueID = UIuniqueIDgen++;
 	visible = true;
@@ -141,12 +141,13 @@ void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
 void CGUIbase::positionLogical(CGUIbase * control) {
 	control->positionHint.rowCol = controlCursor.rowCol;
 	control->positionHint.layoutstyle = controlCursor.currentLayoutStyle;
+	control->positionHint.centreRow = controlCursor.centreRowOn;
 	controlCursor.advance();
 }
 
 /** La yout all child controls based on their row/column positions, ignoring alignment etc. 
 	This tells us the space they require, maxSize, useful for sizing controls to children. */
-glm::i32vec2& CGUIbase::layoutControlsCoarse() {
+glm::i32vec2 CGUIbase::layoutControlsCoarse() {
 	glm::i32vec2 rowCol = glm::i32vec2(0);
 	glm::i32vec2 maxSize = glm::i32vec2(0);
 	glm::i32vec2 currentPos = glm::i32vec2(styleSheet->controlBorder);
@@ -160,7 +161,7 @@ glm::i32vec2& CGUIbase::layoutControlsCoarse() {
 			maxSize.x = std::max(maxSize.x, currentPos.x);
 			currentPos.x += styleSheet->controlSpacing;
 		}
-		else {
+		else { //no? Then place it at the start of a new row
 			currentPos = glm::i32vec2(styleSheet->controlBorder, currentRowHeight + styleSheet->controlSpacing);
 		}
 	}
@@ -168,12 +169,28 @@ glm::i32vec2& CGUIbase::layoutControlsCoarse() {
 	return maxSize;
 }
 
-/** Fine- djust the position of all child controls according to alignment etc. */
+/** Fine-adjust the position of all child controls according to alignment etc. */
 void CGUIbase::layoutFine() {
-	glm::i32vec4 cellSize; int vDiff, hDiff;
+	glm::i32vec4 cellSize; int vDiff, hDiff; int row = 0;
+	std::vector<CGUIbase*> rowCtrls;
 	for (auto control : controls) {
+
+		if (control->positionHint.rowCol.y > row) {
+			if (rowCtrls[0]->positionHint.centreRow &&
+				std::find_if(rowCtrls.begin(), rowCtrls.end(), [](const CGUIbase* x) { return x->positionHint.expansive; }) == rowCtrls.end()) {
+				centreCtrlRow(rowCtrls);
+			}
+			rowCtrls.clear();
+			row++;
+		}
+
+
+		rowCtrls.push_back(control);
+		cellSize = calcCellSize(control);
+		if (control->positionHint.expansive)
+			control->setWidth(cellSize.z);
+
 		if (control->positionHint.hAlignment != uiHnone || control->positionHint.vAlignment != uiVnone) {
-			cellSize = calcCellSize(control->positionHint.rowCol);
 			vDiff = (cellSize.w - control->getSize().y) / 2;
 			hDiff = (cellSize.z - control->getSize().x) / 2;
 		}
@@ -190,38 +207,117 @@ void CGUIbase::layoutFine() {
 		else if (control->positionHint.hAlignment == uiHleft) {
 			control->setPosX(cellSize.x);
 		}
+		else if (control->positionHint.hAlignment == uiHright) {
+			control->setPosX(cellSize.x + (cellSize.z - control->getWidth()) );
+		}
+
+
 
 	}
 }
 
-/** Return the width and height of the given cell. */
-glm::i32vec4& CGUIbase::calcCellSize(glm::i32vec2& rowCol) {
+/** Calculate the width and height of the given cell, and its position, by analyising the size of the controls
+	in its row and the preceeding rows. */
+glm::i32vec4& CGUIbase::calcCellSize(CGUIbase* cellControl) {
+	glm::i32vec2 size(0); glm::i32vec2 pos(0);
+
+	//build a model of the row we're looking at:
+	std::vector<CGUIbase*> rowControls;
+	int ctrlsInRow = 0; int totalWidths = 0; int expansiveCtrls = 0;
+	float availableParentWidth = (float)getSize().x - styleSheet->controlBorder * 2;
+
+	for (auto control : controls) {
+		if (control->positionHint.rowCol.y == cellControl->positionHint.rowCol.y) {
+			rowControls.push_back(control);
+			ctrlsInRow++;
+			size.y = std::max(size.y, control->getHeight());
+			if (control->positionHint.expansive)
+				expansiveCtrls++;
+			else
+				totalWidths += control->getSize().x;
+		}
+	}
+
+	availableParentWidth -= styleSheet->controlSpacing * (ctrlsInRow - 1);
+	int defaultCellSize = availableParentWidth / ctrlsInRow;
+
+	float cellToCtrlRatio; 
+	if (expansiveCtrls) {
+		availableParentWidth -= totalWidths;
+		cellToCtrlRatio = 1.0f;
+	}
+	else {
+		cellToCtrlRatio = availableParentWidth / totalWidths;
+	}
+
+	//build cell widths
+	std::map<CGUIbase*,int> cellWidths;
+	for (auto control : rowControls) {
+		if (control->positionHint.expansive)
+			cellWidths[control] = int( availableParentWidth / expansiveCtrls);
+		else
+			cellWidths[control] =  int(control->getWidth() * cellToCtrlRatio);
+			//cellWidths[control] = defaultCellSize; //use for equal-sized cells
+	}
+	size.x = cellWidths[cellControl];
+
+	//calc cell starting position based on preceding cell widths
+	pos.x = styleSheet->controlBorder;
+	for (auto control : rowControls) {
+		if (control == cellControl)
+			break;
+		pos.x += cellWidths[control];
+		pos.x += styleSheet->controlSpacing;
+	}
+	pos.y = cellControl->getLocalPos().y;
+	return glm::i32vec4(pos, size);
+}
+
+/** Adjust the positions of these controls so that combined, they are centred. */
+void CGUIbase::centreCtrlRow(std::vector<CGUIbase*>& rowCtrls) {
+	//find combined width
+	//find difference to parent width
+	//find adjustment
+	//apply to all controls.
+	int combinedWidth = rowCtrls.back()->getLocalPos().x + rowCtrls.back()->getWidth()
+		- rowCtrls[0]->getLocalPos().x;
+	int startPos = int( (getWidth() - combinedWidth) * 0.5f);
+	int adjust = rowCtrls[0]->getLocalPos().x - startPos;
+	for (auto control : rowCtrls)
+		control->setPosX(control->getLocalPos().x - adjust);
+
+}
+
+/*
+glm::i32vec4& CGUIbase::calcCellSize(glm::i32vec2& cellRowCol) {
 	glm::i32vec2 size(0);
 	glm::i32vec2 pos(0);
 
-	if (resizesForChildren) {
+	if (resizesForChildren) { //TO DO: not fully realised. Ideally, merge with the code below
 		//find the height of the biggest control on this row
 		//find the width of the widest control on this column
 		for (auto control : controls) {
-			if (control->positionHint.rowCol.y == rowCol.y)
+			if (control->positionHint.rowCol.y == cellRowCol.y)
 				size.y = std::max(size.y, control->getSize().y);
-			if (control->positionHint.rowCol.x == rowCol.x)
+			if (control->positionHint.rowCol.x == cellRowCol.x)
 				size.x = std::max(size.x, control->getSize().x);
 		}
 		return glm::i32vec4(pos,size);
 	}
 
-	std::vector<int> widths;////////////////////////
+
 	int totalWidths = 0;
 	int ctrlWidth = 0; int ctrlsInRow = 0; int prevWidth = -1; int prevCells = 0;
 	int rowY = 0;
+	//redo this by building a temporary array of ctrls in this row which we then step through to make calculations
+	//get working for non-expansive controls first.
 	for (auto control : controls) {
-		if (control->positionHint.rowCol.y == rowCol.y) {
+		if (control->positionHint.rowCol.y == cellRowCol.y) {
 			size.y = control->getSize().y;
-			widths.push_back(control->getSize().x);
 			
-			if (control->positionHint.rowCol.x == rowCol.x) {
+			if (control->positionHint.rowCol.x == cellRowCol.x) {
 				ctrlWidth = control->getSize().x;
+				//if control expansive, treat width as minimal for now
 				prevWidth = totalWidths;
 				prevCells = ctrlsInRow;
 				rowY = control->getLocalPos().y;
@@ -231,9 +327,14 @@ glm::i32vec4& CGUIbase::calcCellSize(glm::i32vec2& rowCol) {
 
 		}
 	}
-	float availableX = (float)getSize().x - (styleSheet->controlSpacing * (ctrlsInRow-1)) - (styleSheet->controlBorder * 2);
-	float ratio = availableX / totalWidths;
+	float availableParentWidth = (float)getSize().x - (styleSheet->controlSpacing * (ctrlsInRow-1)) - (styleSheet->controlBorder * 2);
+	float ratio = availableParentWidth / totalWidths;
 	size.x = int(ctrlWidth * ratio);
+
+	//if *a* control in this row is expansive, but it's not this cell's, 
+	//set this cell to the minimum width for the control. ratio becomes 1.
+	//if the control in this cell is expansive
+	//find the remaining parent width not used by the totalWidths and give it all to this cell
 
 	//to find top left corner of cell, combine widths of previous cells x ratio,
 	//then add borders
@@ -242,7 +343,7 @@ glm::i32vec4& CGUIbase::calcCellSize(glm::i32vec2& rowCol) {
 
 	return glm::i32vec4(pos, size);
 }
-
+*/
 
 /**	Position the given child control according to its requirements and this control's own
 	situation. */
@@ -824,11 +925,11 @@ void CGUIbase::setBackColour2(const glm::vec4 & colour) {
 }
 
 void CGUIbase::setBorderColour(const UIcolour& colour) {
-	borderColour = colour;
+	borderColour = (glm::vec4&)colour;
 }
 
 void CGUIbase::setBorderColour(const glm::vec4& colour) {
-	borderColour = (UIcolour&)colour;
+	borderColour = (glm::vec4&)colour;
 }
 
 void CGUIbase::setBorderColourFocusColour(const glm::vec4 & colour) {

@@ -166,10 +166,12 @@ public:
 	virtual ~CGUIbase(void);
 	CGUIbase* add(UItype ctrlType, std::string text);
 	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
+	virtual void applyStyleSheet() {};
 	void positionLogical(CGUIbase * control);
-	glm::i32vec2& layoutControlsCoarse();
+	glm::i32vec2 layoutControlsCoarse();
 	void layoutFine();
-	glm::i32vec4& calcCellSize(glm::i32vec2& rowCol);
+	glm::i32vec4& calcCellSize(CGUIbase* cellControl);
+	void centreCtrlRow(std::vector<CGUIbase*>& rowCtrls);
 	virtual void resizeToFit() {}
 	virtual void position(CGUIbase* control);
 	glm::i32vec2& getSize();
@@ -322,7 +324,7 @@ public:
 	guiRect drawBox; ///<Defines the dimensions of the control for drawing (replaces screenPos).
 	guiRect clipBox; ///<Defines the drawable area of this control for child controls.
 
-	UIcolour borderColour; ///<Colour for the border of this control.
+	glm::vec4 borderColour; ///<Colour for the border of this control.
 	bool drawBorder; ///<true if we draw this control's border.
 	Icallback * callbackObj;
 	bool isModal;
@@ -348,38 +350,55 @@ public:
 			if (rowCol.x >= currentLayoutStyle.cols) {
 				rowCol.x = 0;
 				rowCol.y++;
+				centreRowOn = false;
 			}
 		}
 		void setCols(int c) {
 			currentLayoutStyle.cols = c;
+			if (rowCol.x > 0)
+				rowCol = glm::i32vec2(0, rowCol.y + 1);
+			centreRowOn = false;
+		}
+		void centreRow() {
+			centreRowOn = true;
 		}
 		CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
 		glm::i32vec2 rowCol;
+		bool centreRowOn = false; 
 	} TControlCursor;
 	TControlCursor controlCursor; ///<Keeps track of where the next child control should go.
 
 	bool resizesForChildren; ///<If true control shrinks/grows to fit children.
 
-
-	CGUIbase* addCtrl(CGUIbase* ctrl ) {
+	/** Auto-position the given control. */
+	CGUIbase* autoPosition(CGUIbase* ctrl ) {
 		//set position arbitarily for now
 		ctrl->setLocalPos(10, 10);
-		Add(ctrl);
 		positionLogical(ctrl);
 		glm::i32vec2 maxSize = layoutControlsCoarse();
 		//resize parent if required
 
-		//do fine layou
+		//do fine layout
 		layoutFine();
 
 		return ctrl;
 	}
 
+	/** Create and add a child control of type T, using auto-positioning. */
 	template <typename T, typename S>
 	T* add2(S const& s, int style) {
 		if constexpr (std::is_convertible_v<S, std::string>) {
-			return (T*)addCtrl(new T(s,style));
+			T* ctrl = new T(s, style);
+			Add(ctrl);
+			autoPosition(ctrl);
+			return ctrl;
 		}
+
+			T* ctrl = new T(s, style);
+			Add(ctrl);
+			autoPosition(ctrl);
+			return ctrl;
+
 		return NULL;
 	}
 
