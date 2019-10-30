@@ -327,6 +327,7 @@
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
     <ClInclude Include="..\src\UI\lineBuffer.h" />
     <ClInclude Include="..\src\UI\rowObject.h" />
+    <ClInclude Include="..\src\UI\text.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\renderDrawFuncs.h" />
     <ClInclude Include="..\src\userTypes.h" />

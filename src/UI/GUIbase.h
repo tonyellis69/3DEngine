@@ -164,13 +164,15 @@ public:
 	CGUIbase() ;
 	CGUIbase(int x, int y, int w, int h);
 	virtual ~CGUIbase(void);
-	CGUIbase* add(UItype ctrlType, std::string text);
+	//CGUIbase* add(UItype ctrlType, std::string text);
 	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
 	virtual void applyStyleSheet() {};
+	void propagateStylesheet();
 	void positionLogical(CGUIbase * control);
 	glm::i32vec2 layoutControlsCoarse();
 	void layoutFine();
 	glm::i32vec4& calcCellSize(CGUIbase* cellControl);
+	glm::i32vec4& calcCellSizeMin(CGUIbase* cellControl);
 	void centreCtrlRow(std::vector<CGUIbase*>& rowCtrls);
 	virtual void resizeToFit() {}
 	virtual void position(CGUIbase* control);
@@ -368,7 +370,7 @@ public:
 	} TControlCursor;
 	TControlCursor controlCursor; ///<Keeps track of where the next child control should go.
 
-	bool resizesForChildren; ///<If true control shrinks/grows to fit children.
+	glm::bvec2 resizesForChildren; ///<If true control shrinks/grows to fit children.
 
 	/** Auto-position the given control. */
 	CGUIbase* autoPosition(CGUIbase* ctrl ) {
@@ -376,9 +378,13 @@ public:
 		ctrl->setLocalPos(10, 10);
 		positionLogical(ctrl);
 		glm::i32vec2 maxSize = layoutControlsCoarse();
-		//resize parent if required
 
-		//do fine layout
+		//resize parent if requested
+		if (resizesForChildren.x)
+			setWidth(maxSize.x);
+		if (resizesForChildren.y)
+			setHeight(maxSize.y);
+
 		layoutFine();
 
 		return ctrl;
@@ -386,7 +392,7 @@ public:
 
 	/** Create and add a child control of type T, using auto-positioning. */
 	template <typename T, typename S>
-	T* add2(S const& s, int style) {
+	T* add(S const& s, int style) {
 		if constexpr (std::is_convertible_v<S, std::string>) {
 			T* ctrl = new T(s, style);
 			Add(ctrl);

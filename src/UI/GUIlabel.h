@@ -49,7 +49,7 @@ public:
 		};
 
 
-	//std::unique_ptr<CGUIlabel*> add2(const std::string& text, int style)   const override {
+	//std::unique_ptr<CGUIlabel*> add(const std::string& text, int style)   const override {
 	//	return std::make_unique<CGUIlabel*>(*this);
 		//return new CGUIlabel(text);
 	//}

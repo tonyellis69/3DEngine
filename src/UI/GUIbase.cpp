@@ -69,7 +69,7 @@ CGUIbase::CGUIbase()  {
 
 	}
 
-	resizesForChildren = false;
+	resizesForChildren = glm::bvec2(false);
 	
 }
 
@@ -107,7 +107,7 @@ CGUIbase::~CGUIbase(void) {
 			delete controls[i];
 }
 
-/** Create a child control of the requested type. */
+/** Create a child control of the requested type. *//*
 CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 	CGUIbase* ctrl;
 	switch (ctrlType) {
@@ -128,6 +128,7 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 
 	return ctrl;
 }
+*/
 
 void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
 	this->styleSheet = styleSheet;
@@ -135,6 +136,13 @@ void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
 	resizeMax = styleSheet->resizeMax;
 }
 
+/** Apply the current stylesheet to all child controls and their controls, recursively. */
+void CGUIbase::propagateStylesheet() {
+	for (auto control : controls) {
+		control->propagateStylesheet();
+	}
+	applyStyleSheet();
+}
 
 /** Set the given control's abstract position as a child control, as defined by its
 	requirements and by this, its parent control. */
@@ -145,7 +153,7 @@ void CGUIbase::positionLogical(CGUIbase * control) {
 	controlCursor.advance();
 }
 
-/** La yout all child controls based on their row/column positions, ignoring alignment etc. 
+/** Layout all child controls based on their row/column positions, ignoring alignment etc. 
 	This tells us the space they require, maxSize, useful for sizing controls to children. */
 glm::i32vec2 CGUIbase::layoutControlsCoarse() {
 	glm::i32vec2 rowCol = glm::i32vec2(0);
@@ -162,7 +170,9 @@ glm::i32vec2 CGUIbase::layoutControlsCoarse() {
 			currentPos.x += styleSheet->controlSpacing;
 		}
 		else { //no? Then place it at the start of a new row
+			maxSize.x = std::max(maxSize.x, currentPos.x + control->getSize().x);
 			currentPos = glm::i32vec2(styleSheet->controlBorder, currentRowHeight + styleSheet->controlSpacing);
+
 		}
 	}
 	maxSize = glm::i32vec2(maxSize.x, currentRowHeight) + glm::i32vec2(styleSheet->controlBorder);
@@ -175,6 +185,7 @@ void CGUIbase::layoutFine() {
 	std::vector<CGUIbase*> rowCtrls;
 	for (auto control : controls) {
 
+		//if we've completed a row, check if it is to be centred
 		if (control->positionHint.rowCol.y > row) {
 			if (rowCtrls[0]->positionHint.centreRow &&
 				std::find_if(rowCtrls.begin(), rowCtrls.end(), [](const CGUIbase* x) { return x->positionHint.expansive; }) == rowCtrls.end()) {
@@ -187,6 +198,7 @@ void CGUIbase::layoutFine() {
 
 		rowCtrls.push_back(control);
 		cellSize = calcCellSize(control);
+		//cellSize = calcCellSizeMin(control);
 		if (control->positionHint.expansive)
 			control->setWidth(cellSize.z);
 
@@ -273,6 +285,48 @@ glm::i32vec4& CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	return glm::i32vec4(pos, size);
 }
 
+/////Oops, don't actually need this as parent resizing happens before this stage.
+/** Calculate the width and height of the given cell, and its position, by analysing the size of the controls
+	in its row and the preceeding rows, on the assumption controls are to take up the minimum space possible. */
+glm::i32vec4& CGUIbase::calcCellSizeMin(CGUIbase* cellControl) {
+	glm::i32vec2 size(0); glm::i32vec2 pos(0);
+
+	//build a model of the row we're looking at:
+	std::vector<CGUIbase*> rowControls;
+	int ctrlsInRow = 0; int totalWidths = 0; int expansiveCtrls = 0;
+
+	for (auto control : controls) {
+		if (control->positionHint.rowCol.y == cellControl->positionHint.rowCol.y) { //found our control's row
+			rowControls.push_back(control);
+			ctrlsInRow++;
+			size.y = std::max(size.y, control->getHeight());
+			if (control->positionHint.expansive)
+				expansiveCtrls++;
+			else
+				totalWidths += control->getSize().x;
+		}
+	}
+
+
+	//build cell widths
+	std::map<CGUIbase*, int> cellWidths;
+	for (auto control : rowControls) {
+		cellWidths[control] = control->getWidth();
+	}
+	size.x = cellWidths[cellControl];
+
+	//calc cell starting position based on preceding cell widths
+	pos.x = styleSheet->controlBorder;
+	for (auto control : rowControls) {
+		if (control == cellControl)
+			break;
+		pos.x += cellWidths[control];
+		pos.x += styleSheet->controlSpacing;
+	}
+	pos.y = cellControl->getLocalPos().y;
+	return glm::i32vec4(pos, size);
+}
+
 /** Adjust the positions of these controls so that combined, they are centred. */
 void CGUIbase::centreCtrlRow(std::vector<CGUIbase*>& rowCtrls) {
 	//find combined width
@@ -287,63 +341,6 @@ void CGUIbase::centreCtrlRow(std::vector<CGUIbase*>& rowCtrls) {
 		control->setPosX(control->getLocalPos().x - adjust);
 
 }
-
-/*
-glm::i32vec4& CGUIbase::calcCellSize(glm::i32vec2& cellRowCol) {
-	glm::i32vec2 size(0);
-	glm::i32vec2 pos(0);
-
-	if (resizesForChildren) { //TO DO: not fully realised. Ideally, merge with the code below
-		//find the height of the biggest control on this row
-		//find the width of the widest control on this column
-		for (auto control : controls) {
-			if (control->positionHint.rowCol.y == cellRowCol.y)
-				size.y = std::max(size.y, control->getSize().y);
-			if (control->positionHint.rowCol.x == cellRowCol.x)
-				size.x = std::max(size.x, control->getSize().x);
-		}
-		return glm::i32vec4(pos,size);
-	}
-
-
-	int totalWidths = 0;
-	int ctrlWidth = 0; int ctrlsInRow = 0; int prevWidth = -1; int prevCells = 0;
-	int rowY = 0;
-	//redo this by building a temporary array of ctrls in this row which we then step through to make calculations
-	//get working for non-expansive controls first.
-	for (auto control : controls) {
-		if (control->positionHint.rowCol.y == cellRowCol.y) {
-			size.y = control->getSize().y;
-			
-			if (control->positionHint.rowCol.x == cellRowCol.x) {
-				ctrlWidth = control->getSize().x;
-				//if control expansive, treat width as minimal for now
-				prevWidth = totalWidths;
-				prevCells = ctrlsInRow;
-				rowY = control->getLocalPos().y;
-			}
-			ctrlsInRow++;
-			totalWidths += control->getSize().x;
-
-		}
-	}
-	float availableParentWidth = (float)getSize().x - (styleSheet->controlSpacing * (ctrlsInRow-1)) - (styleSheet->controlBorder * 2);
-	float ratio = availableParentWidth / totalWidths;
-	size.x = int(ctrlWidth * ratio);
-
-	//if *a* control in this row is expansive, but it's not this cell's, 
-	//set this cell to the minimum width for the control. ratio becomes 1.
-	//if the control in this cell is expansive
-	//find the remaining parent width not used by the totalWidths and give it all to this cell
-
-	//to find top left corner of cell, combine widths of previous cells x ratio,
-	//then add borders
-	pos.x = int((prevWidth) * ratio) + (prevCells  * styleSheet->controlSpacing) + styleSheet->controlBorder;
-	pos.y = rowY;
-
-	return glm::i32vec4(pos, size);
-}
-*/
 
 /**	Position the given child control according to its requirements and this control's own
 	situation. */

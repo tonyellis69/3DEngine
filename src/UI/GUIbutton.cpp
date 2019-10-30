@@ -7,7 +7,7 @@ using namespace glm;
 CGUIbutton::CGUIbutton(const std::string & text) {
 	type = uiButton;
 
-	label = add2<CGUIlabel>(text, uiHcentred | uiVcentred);
+	label = add<CGUIlabel>(text, uiHcentred | uiVcentred);
 	applyStyleSheet();
 
 	label->setBorderOn(false);

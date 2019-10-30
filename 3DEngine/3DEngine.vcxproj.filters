@@ -763,5 +763,8 @@
     <ClInclude Include="..\src\UI\GUIscrollbar2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\UI\text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

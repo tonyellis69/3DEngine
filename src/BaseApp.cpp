@@ -433,9 +433,9 @@ void CBaseApp::initialiseSystemStylesheet() {
 	//sysStyleSheet.defaultFontColour = uiBlack;
 
 	//kludigly create default text styles for rich text controls
-	GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextStyle);
-	GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextHotStyle);
-	GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextSelectedStyle);
+	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextStyle);
+	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextHotStyle);
+	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextSelectedStyle);
 
 }
 

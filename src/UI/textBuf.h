@@ -9,15 +9,7 @@
 
 #include "renderDrawFuncs.h"
 
-struct TtextStyle {
-	std::string name;
-	std::string font;
-	glm::vec4 colour;
-	bool operator == (const TtextStyle &style) const {
-		return this->font == style.font && this->colour == style.colour &&
-			this->name == style.name;
-	};
-};
+
 
 /** Stores the style details of a homogenous piece of text, ie, one with the same
 font, colour, etc, together with the text itself. */

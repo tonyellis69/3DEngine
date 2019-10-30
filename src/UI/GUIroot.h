@@ -33,6 +33,6 @@ public:
 
 	glm::i32vec2 mousePos; ///<Current mouse screen position.
 
-	CThemeServer themeServer; ///<Stores the available text style collecctions
+	//CThemeServer themeServer; ///<Stores the available text style collecctions
 };
 

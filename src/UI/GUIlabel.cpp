@@ -24,7 +24,7 @@ CGUIlabel::CGUIlabel(const std::string&  text) {
 
 
 
-	//drawBorder = false;
+	drawBorder = false;
 }
 
 CGUIlabel::CGUIlabel(const std::string& text, unsigned int styleWord) : CGUIlabel(text) {

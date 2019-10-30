@@ -52,14 +52,17 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	lineFadeInOn = false;
 	lineFadeSpeed = 30;// 20.0f;
 
+
+	//setTextTheme("defaultTheme"); //provides essential styles so we don't crash without further initialisation
+	currentTheme = "defaultTheme";
 	applyStyleSheet();
-	setTextTheme("default"); //provides essential styles so we don't crash without further initialisation
 	setTextStyle("default"); //set initial text style
+	
 }
 
 void CGUIrichText::applyStyleSheet() {
-	setTextColour(styleSheet->defaultFontColour);
-
+	setTextColour(styleSheet->defaultFontColour); //TO DO: prob redundant now
+	refreshCurrentTextStyles();
 }
 
 void CGUIrichText::DrawSelf() {
@@ -160,10 +163,16 @@ bool CGUIrichText::setTextStyle(std::string styleName) {
 	if (styles == NULL)
 		return false;
 	for (auto style : *styles) {
-		if (style.name == styleName) {
+		/*if (style.name == styleName) {
 			setTextStyle(style);
 			return true;
+		}*/
+
+		if (style.first == styleName) {
+			setTextStyle(style.second);
+			return true;
 		}
+
 	}
 	if (styleName == "tempOn") {
 		setTempText(true);
@@ -194,32 +203,46 @@ bool CGUIrichText::setTextStyle(std::string styleName) {
 }
 
 
-/** Provide a pointer to a set of text styles to use */
-void CGUIrichText::setTextStyles(std::vector<TtextStyle>* styleList) {
-	styles = styleList;
+/** Update the set of text styles to use */
+void CGUIrichText::refreshCurrentTextStyles() {
+	styles = &styleSheet->getTheme(currentTheme).styles;
+
 
 	///////////////////
 	//cache hot/selected styles if supplied
-	for (auto style : *styles) {
+	/*for (auto style : *styles) {
 		if (style.name == "default")
 			defaultTextStyle = style;
 		else if (style.name == "hot")
 			hotTextStyle = style;
 		else if (style.name == "hotSelected")
 			selectedHotTextStyle = style;
+	}*/
+
+	for (auto style : *styles) {
+		if (style.first == "default")
+			defaultTextStyle = style.second;
+		else if (style.first == "hot")
+			hotTextStyle = style.second;
+		else if (style.first == "hotSelected")
+			selectedHotTextStyle = style.second;
 	}
 }
 
 
-/** Load the styles of the named theme, for use when requested. */
+/** Set the current theme, and load the styles of that theme, for use when requested. */
 void CGUIrichText::setTextTheme(const std::string& themeName) {
-	setTextStyles( &rootUI->themeServer.getTheme(themeName).styles);
+	currentTheme = themeName;
+	refreshCurrentTextStyles();
 }
 
 void CGUIrichText::setDefaultTextStyle(std::string styleName) {
 	for (auto style : *styles) {
-		if (style.name == styleName)
-			defaultTextStyle = style;
+		//if (style.name == styleName)
+		//	defaultTextStyle = style;
+		if (style.first == styleName)
+			defaultTextStyle = style.second;
+
 	}
 }
 

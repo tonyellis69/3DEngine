@@ -6,15 +6,11 @@
 #include "lineBuffer.h"
 #include "..\3DEngine\src\utils\log.h"
 
-
+#include "text.h"
 
 enum TMouseWheelMode {scroll,hotText};
 
-struct TtextTheme {
-	std::string themeName;
-	std::vector<TtextStyle> styles;
 
-};
 
 struct TCharacterPos {
 	int textObj;
@@ -71,7 +67,7 @@ public:
 	void setTextColour(glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
 	bool setTextStyle(std::string styleName);
-	void setTextStyles(std::vector<TtextStyle>* styles);
+	void refreshCurrentTextStyles();
 	void setTextTheme(const std::string& themeName);
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
@@ -199,7 +195,7 @@ public:
 
 	TResizeMode resizeMode;
 
-	std::vector<TtextStyle>* styles; ///<List of available styles
+	std::map<std::string, TtextStyle>* styles; ///<List of available styles
 	TtextStyle hotTextStyle;
 	TtextStyle selectedHotTextStyle;
 
@@ -238,5 +234,5 @@ public:
 
 private:
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
-
+	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
 };

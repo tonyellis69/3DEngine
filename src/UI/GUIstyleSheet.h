@@ -1,5 +1,7 @@
 #pragma once
 
+#include "themeServer.h"
+
 struct TtextStyleDef {
 	std::string name;
 	std::string font;
@@ -30,16 +32,24 @@ const glm::vec4 uiOldbackColour2 = { 0.75f, 0.75f, 0.75f,1.0f };
 
 /** Defines the structure for storing the style settings of the GUI, and initialises
 	it with default values.*/
-class CGUIstyleSheet {
+class CGUIstyleSheet : public CThemeServer {
 public:
 	CGUIstyleSheet() : defaultBackgroundColour(uiWhite),
 		resizeMin(40, 10), resizeMax(200, 30),
 		controlBorder(10),
 		controlSpacing(10),
-		defaultFontColour(uiRed),
+		defaultFontColour(uiBlack),
 		richtextStyle{ "default","defaultFont",uiBlack },
 		richtextHotStyle{ "hot","defaultFont",glm::vec4(0,0,0.5,1) },
 		richtextSelectedStyle{ "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) },
+
+		//themeInitList { 
+		//				{ "defaultTheme",{richtextStyle, richtextHotStyle, richtextSelectedStyle} }
+						//another theme here
+		//			},
+
+	
+	
 
 		labelTextSurround(2),
 		buttonLabelSurround(4),
@@ -57,7 +67,9 @@ public:
 		scrollbarSliderSize(30),
 		defaultScrollbarBackColour{ uiLightishGrey }
 	{
-
+		addToTheme("defaultTheme", richtextStyle);
+		addToTheme("defaultTheme", richtextHotStyle);
+		addToTheme("defaultTheme", richtextSelectedStyle);
 	
 	}
 
@@ -86,8 +98,13 @@ public:
 	int scrollbarWidth;
 	int scrollbarSliderSize;
 
-	TtextStyleDef richtextStyle; ///<The default richtext styles
-	TtextStyleDef richtextHotStyle;
-	TtextStyleDef richtextSelectedStyle;
+	TtextStyle richtextStyle; ///<The default richtext styles
+	TtextStyle richtextHotStyle;
+	TtextStyle richtextSelectedStyle;
+
+
+	std::vector<TtextTheme> themeInitList;// = { { "defaultTheme",{richtextStyle, richtextHotStyle, richtextSelectedStyle} }
+		//another theme here
+//	};
 };
 
