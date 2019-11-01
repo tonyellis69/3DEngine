@@ -45,7 +45,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	insetX = 0;
 	transcriptLog = NULL;
 	suspended = false;
-	busy = false;
+	setBusy(false);
 	charInterval = 0;
 	charDelay = 0.01f;
 	enableLineFadeIn = false;
@@ -258,7 +258,7 @@ void CGUIrichText::appendText(std::string newText) {
 	requestLineFadeIn(true);
 	addText(newText);
 	if (enableLineFadeIn)
-		busy = true; //because it will take a little while to fade-in this text.
+		setBusy(true); //because it will take a little while to fade-in this text.
 	renderLineBuffer();
 
 	if (transcriptLog)
@@ -1064,7 +1064,8 @@ void CGUIrichText::appendMarkedUpText(std::string text) {
 		writeTxt = remainingTxt.substr(0, found);
 		remainingTxt = remainingTxt.substr(writeTxt.size() + cut, std::string::npos);
 		//TO DO: writeTxt can be empty, in which case don't append
-		appendText(writeTxt);
+		if (!writeTxt.empty())
+			appendText(writeTxt);
 
 		if (styleChange == styleBold)
 			setAppendStyleBold(bold);
@@ -1334,7 +1335,7 @@ void CGUIrichText::removeMarked() {
 	}
 
 	if (beforeObj != -1 ) {
-		busy = true;
+		setBusy(true);
 		insertGapObj(beforeObj, afterObj);
 	}
 }
@@ -1444,7 +1445,7 @@ void CGUIrichText::animateLineFadeIn(float dT) {
 			continue;
 		}
 		done = false;
-		busy = true;
+		setBusy (true);
 
 
 
@@ -1472,14 +1473,14 @@ void CGUIrichText::animateLineFadeIn(float dT) {
 	}
 	if (done) {
 		requestLineFadeIn(false);
-		busy = false;
+		setBusy(false);
 	} 
 	
 }
 
 /** If there's currently displaced text (caused by removing marked text), shrink the gap.*/
 void CGUIrichText::collapseGap(float dT) {
-	busy = true;
+	setBusy(true);
 	auto gapObjIt = textObjs.begin() + gapObj;
 	gapObjIt->period += dT;
 	if (gapObjIt->period > 0.01f) { //was 0.005f;
@@ -1489,7 +1490,7 @@ void CGUIrichText::collapseGap(float dT) {
 		if (gapObjIt->gap < 0) {
 			textObjs.erase(gapObjIt);
 			currentTextObj = textObjs.size() - 1;
-			busy = false;
+			setBusy(false);
 			gapObj = -1;
 		}
 		if (gapObj != -1) {

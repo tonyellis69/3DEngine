@@ -267,9 +267,14 @@ glm::i32vec4& CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	for (auto control : rowControls) {
 		if (control->positionHint.expansive)
 			cellWidths[control] = int( availableParentWidth / expansiveCtrls);
-		else
-			cellWidths[control] =  int(control->getWidth() * cellToCtrlRatio);
-			//cellWidths[control] = defaultCellSize; //use for equal-sized cells
+		else {
+			
+			if (expansiveCtrls)
+				cellWidths[control] = control->getWidth();
+			else
+				cellWidths[control] = defaultCellSize; //use for equal-sized cells
+				//cellWidths[control] =  int(control->getWidth() * cellToCtrlRatio);
+		}
 	}
 	size.x = cellWidths[cellControl];
 

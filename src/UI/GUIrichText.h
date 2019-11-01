@@ -154,6 +154,9 @@ public:
 
 	bool isDisplayFinished();
 
+	void setBusy(bool onOff) {
+		busy = onOff;
+	}
 	bool isBusy() {
 		return busy;
 	}
