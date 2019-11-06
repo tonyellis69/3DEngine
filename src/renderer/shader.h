@@ -14,6 +14,7 @@ enum TStandardShaderType { standardTex, standardPhong, standardWire, standardMul
 /**	Encapsulates a shader, to conveniently gather the various data handles it needs
 	and also hide OpenGL specifics from user. */
 
+
 class CShader {
 public:
 	CShader() { ident = userShader; };
@@ -49,4 +50,10 @@ public:
 
 	const char* feedbackVaryings[10];
 	unsigned int noFeedbackSettings;
+};
+
+template <typename T>
+class CShader2 : public CShader {
+
+	T uniforms;
 };

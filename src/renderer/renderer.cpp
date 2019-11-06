@@ -295,9 +295,9 @@ void CRenderer::storeVertexLayout(unsigned int& hVAO, unsigned int bufferObj, un
 	//GLuint vaoObject;
 	if ( hVAO == 0)
 		glGenVertexArrays(1, &hVAO);
-    setVAO(hVAO);
-        
-    glBindBuffer(GL_ARRAY_BUFFER, bufferObj);
+	setVAO(hVAO);
+		
+	glBindBuffer(GL_ARRAY_BUFFER, bufferObj);
 
 
 
@@ -411,10 +411,12 @@ void CRenderer::drawModel(CRenderModel& model) {
 	setVAO(0);
 }
 
+
+
 float g_vertex_buffer_data[] = { 
-    -1.0f, -1.0f,
-     1.0f, -1.0f,
-     -1.0f,  1.0f,
+	-1.0f, -1.0f,
+	 1.0f, -1.0f,
+	 -1.0f,  1.0f,
 	 -1.0f, 1.0f,
 	 1.0f, -1.0f,
 	1.0f,  1.0f,
@@ -424,8 +426,8 @@ float g_vertex_buffer_data[] = {
 /*
 void CRenderer::initRenderToTextureBufs() {
 	
-    glGenBuffers(1, &r2texQuadBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, r2texQuadBuffer);
+	glGenBuffers(1, &r2texQuadBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, r2texQuadBuffer);
 	
 	//create a simple quad that will fill clipspace.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
@@ -743,6 +745,21 @@ void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
 		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
 	else
 		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, buf.indexType, 0);
+	setVAO(0);
+}
+
+/////!!!!Prefer this kind of specialised drawing command from now on.
+/////The decision of which to use should be taken higher up 
+/** Draw a buffer of line loop vertices using the current shader. */
+void CRenderer::drawLineLoopBuf(CBuf& buf) {
+	setVAO(buf.hVAO);
+	glDrawElements(GL_LINE_LOOP, buf.noIndices, buf.indexType, 0);
+	setVAO(0);
+}
+
+void CRenderer::drawLineStripBuf(CBuf& buf) {
+	setVAO(buf.hVAO);
+	glDrawElements(GL_LINE_STRIP, buf.noIndices, buf.indexType, 0);
 	setVAO(0);
 }
 

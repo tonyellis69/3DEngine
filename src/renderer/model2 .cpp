@@ -25,7 +25,7 @@ void CModel2::setDrawCallout(callbackFunctionPtr cb, void * callee) {
 }
 
 /** Load a mesh from memory. */
-void CModel2::loadMesh(CMesh<glm::vec3> & newMesh) {
+void CModel2::loadMesh(CMesh& newMesh) {
 	mesh = newMesh;
 	bufferMesh();
 }

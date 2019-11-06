@@ -68,7 +68,7 @@
       <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-d.lib</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions> /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
@@ -104,6 +104,9 @@
     <ClCompile Include="..\src\createShape.cpp" />
     <ClCompile Include="..\src\direction.cpp" />
     <ClCompile Include="..\Src\Engine.cpp" />
+    <ClCompile Include="..\src\hex\hex.cpp" />
+    <ClCompile Include="..\src\hex\hexArray.cpp" />
+    <ClCompile Include="..\src\importer\importer.cpp" />
     <ClCompile Include="..\src\physics\aabb.cpp" />
     <ClCompile Include="..\src\physics\basePhysObj.cpp" />
     <ClCompile Include="..\src\physics\bsphere.cpp" />
@@ -227,6 +230,10 @@
     <ClInclude Include="..\Src\Engine.h" />
     <ClInclude Include="..\src\external\stb_image.h" />
     <ClInclude Include="..\src\external\stb_image_write.h" />
+    <ClInclude Include="..\src\hex\hex.h" />
+    <ClInclude Include="..\src\hex\hexArray.h" />
+    <ClInclude Include="..\src\importer\importer.h" />
+    <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\physics\aabb.h" />
     <ClInclude Include="..\src\physics\basePhysObj.h" />

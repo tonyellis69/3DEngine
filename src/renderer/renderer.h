@@ -9,9 +9,6 @@
 
 //#include "..\soil.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>         // Output data structure
-#include <assimp/postprocess.h>     // Post processing flags
 
 
 #include "camera.h"
@@ -111,6 +108,8 @@ public:
 	void attachTexture1D(unsigned int textureUnit, unsigned int hTexture);
 	void attachTexture(unsigned int textureUnit, CBaseTexture& texture);
 	void drawBuf(CBuf& buf, TdrawMode drawMode);
+	void drawLineLoopBuf(CBuf& buf);
+	void drawLineStripBuf(CBuf& buf);
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();
 	void createStandardPhongShader();
@@ -214,8 +213,6 @@ public:
 	rgba clearColour;
 
 	bool initialised;
-
-	Assimp::Importer importer;
 
 	glm::vec3 defaultLightPos;
 	glm::vec3 defaultLightDir; //TO DO: scrap. Default light is not a spotlight!

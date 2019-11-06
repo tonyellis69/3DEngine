@@ -12,6 +12,7 @@ public:
 	void lookAt(glm::vec3& target);
 	void setAspectRatio(float w, float h);
 	void setPos(glm::vec3& pos);
+	void translate(glm::vec3& dir);
 	void adjustTarget(glm::vec2 inc);
 	void yaw(float angle);
 	void pitch(float angle);

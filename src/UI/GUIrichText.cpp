@@ -13,13 +13,11 @@ std::uniform_real_distribution<> CGUIrichText::randomPeriod{ 0,1.0f };
 
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	styles = NULL;
-	//defaultTextStyle = { "default","defaultFont",glm::vec4(0,0,0,1) };
 
 	TRichTextRec defaultStyleObj;
 	defaultStyleObj.style = currentTextStyle;
 	textObjs.push_back(defaultStyleObj);
 	currentTextObj = 0;
-	//setTextStyle(defaultTextStyle);
 
 	firstVisibleText = 0;
 	firstVisibleObject = 0;
@@ -33,15 +31,13 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	yPixelOffset = 0;
 	smoothScrollStep = 8;// 8;
 	setMouseWheelMode(scroll);
-	//hotTextStyle = { "default","defaultFont",glm::vec4(0,0,0.5,1) };
-	//selectedHotTextStyle = { "default","defaultFont",glm::vec4(0,0,1.0,1) };
 
 	mouseMode = true;
 	maxHeight = 1000;
 	longestLine = 0;
 	shortestSpaceBreak = 0;
 	noScrollMode = true; //TO DO for testing purposes!!!!
-	//setBorderOn(true);
+
 	insetX = 0;
 	transcriptLog = NULL;
 	suspended = false;
@@ -53,7 +49,6 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	lineFadeSpeed = 30;// 20.0f;
 
 
-	//setTextTheme("defaultTheme"); //provides essential styles so we don't crash without further initialisation
 	currentTheme = "defaultTheme";
 	applyStyleSheet();
 	setTextStyle("default"); //set initial text style
@@ -765,7 +760,7 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 void CGUIrichText::update(float dT) {
 	//if (!deliveryBuffer.empty())
 		//deliverByCharacter(dT);
-
+	
 	if (gapObj != -1)
 		collapseGap(dT);
 
@@ -778,6 +773,7 @@ void CGUIrichText::update(float dT) {
 				overrunCorrect = isOverrun();
 		} 
 	}
+	
 	if (!hotFrags.empty() && !lineFadeInOn)
 		 animateHotText(dT);
 	if (!fadeFrags2.empty())
@@ -1360,13 +1356,15 @@ void CGUIrichText::insertGapObj(int beforeObj, int afterObj) {
 
 /** Cause any visible hot text to animate. */
 void CGUIrichText::animateHotText(float dT) {
-
+	//TO DO:!!!!!!Massive slow down - mostly in renderTextAt FIND A BETTER WAY
 	CFont* font = pDrawFuncs->getFont(selectedHotTextStyle.font);
 	TLineFragDrawRec dataRec = { NULL, font, selectedHotTextStyle.colour };
 
 	int objId = -1;
+	
 	for (auto hotTextFrag : hotFrags) {
 		TLineFragment& frag = lineBuffer.getFragment(hotTextFrag.fragId);
+
 		if (hotTextFrag.textObj != objId) {
 			objId = hotTextFrag.textObj;
 			textObjs[objId].period += dT * 0.2f;
@@ -1375,14 +1373,16 @@ void CGUIrichText::animateHotText(float dT) {
 		}
 
 		float transition = 1;
+		
 		if (selectedHotObj != hotTextFrag.textObj) {
 			transition = std::max(textObjs[objId].period, 0.8f) - 0.8f;
 			transition /= 0.2f;
 			transition = sin(transition * PI);
 		}
-
+		
 		dataRec.textColour = mix(hotTextStyle.colour, selectedHotTextStyle.colour, transition);
 		dataRec.text = &hotTextFrag.text;
+		
 		textBuf.renderTextAt(frag.renderStartX, frag.renderStartY, dataRec);
 	}
 }

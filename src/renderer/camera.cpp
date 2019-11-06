@@ -8,6 +8,7 @@
 CCamera::CCamera() : C3dObject() {
 	//set up some default perspective settings
 	zNear = 0.1f; zFar = 90000.0f; Fov = 45.0f;
+	lookAt(glm::vec3(0, 0, -1));
 	setAspectRatio(800,600);
 }
 	
@@ -42,6 +43,11 @@ void CCamera::setAspectRatio(float w, float h) {
 void CCamera::setPos(glm::vec3& pos)  {
 	glm::vec3 translation = pos - getPos();
 	C3dObject::setPos(pos);
+	createClipMatrix();
+}
+
+void CCamera::translate(glm::vec3& dir)  {
+	C3dObject::translate(dir);
 	createClipMatrix();
 }
 

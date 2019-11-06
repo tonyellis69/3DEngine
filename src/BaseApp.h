@@ -32,6 +32,7 @@
 
 #include "utils/log.h"
 
+#include "importer/importer.h"
 
 
 #include <iostream> //for cerr
@@ -132,12 +133,6 @@ public:
 
 	int viewWidth, viewHeight;
 
-//	CGUIlabel2* wLabel1;
-//	CGUIlabel2* wLabel2;
-//	CGUIlabel2* wLabel3;
-//	CGUIlabel2* consoleLbl;
-
-
 	unsigned int hTextureShader;
 	unsigned int hTexture;
 	unsigned int hTextureMVP;
@@ -151,5 +146,7 @@ public:
 	CRenderer& renderer;
 
 	std::string dataPath; //<Path to app data folder
+
+	CImporter importer; ///<Object for importing 3D scenes.
 	};
 

@@ -10,7 +10,7 @@ public:
 	C3dObject() { setPos(glm::vec3(0,0,0)); };
 	C3dObject(glm::vec3& pos);
 	virtual void setPos(glm::vec3& pos);
-	void translate(glm::vec3& dir);
+	virtual void translate(glm::vec3& dir);
 	glm::vec3 getPos();
 	void rotate(float angle,glm::vec3 axis);
 	virtual void orientateWorldMatrix();

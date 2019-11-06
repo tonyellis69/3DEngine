@@ -14,14 +14,14 @@ class CModel2 : public C3dObject {
 public:
 	CModel2();
 	void setDrawCallout(callbackFunctionPtr cb, void* callee);
-	void loadMesh(CMesh<glm::vec3>& newMesh);
+	void loadMesh(CMesh& newMesh);
 	void bufferMesh();
 	void draw();
 	void scale(glm::vec3& scaleVec);
 	void orientateWorldMatrix();
 	void setTexture(CRenderTexture* texture);
 
-	CMesh<glm::vec3> mesh; ///<Stores the verts locally.
+	CMesh mesh; ///<Stores the verts locally.
 	CBuf buffer; ///<Stores the verts in graphics memory.
 
 	CMaterial2 material; ///TO DO: should this be a pointer to a material instead?

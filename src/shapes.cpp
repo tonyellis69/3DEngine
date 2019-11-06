@@ -75,7 +75,7 @@ namespace shape {
 		*verts = { A, B, C, D, E, F, G, H };
 	}
 
-	void cylinder( CMesh<glm::vec3>& mesh, float r, float h, int steps) {
+	void cylinder( CMesh& mesh, float r, float h, int steps) {
 		float step = 360.0f / steps;
 
 		const int noVerts = (steps * 4) + 2;
@@ -131,8 +131,8 @@ namespace shape {
 	}
 
 	/** Create a cube stored in a CMesh object and return it .*/
-	CMesh<glm::vec3> cubeMesh() {
-		CMesh<glm::vec3> mesh;
+	CMesh cubeMesh() {
+		CMesh mesh;
 		cube(&mesh.vertices, &mesh.normals, &mesh.indices);
 		mesh.type = meshTrisIndexed;
 		mesh.calculateVertexNormals();
@@ -140,8 +140,8 @@ namespace shape {
 	}
 
 	/** Create a fustrum in a CMesh object and return it. */
-	CMesh<glm::vec3> fustrumMesh(float gradient) {
-		CMesh<glm::vec3> mesh;
+	CMesh fustrumMesh(float gradient) {
+		CMesh mesh;
 		cube(&mesh.vertices, &mesh.normals, &mesh.texCoords, &mesh.indices,gradient);
 
 		mesh.type = meshTrisIndexed;
@@ -149,8 +149,8 @@ namespace shape {
 	}
 
 	/** Create a cylinder stored in a CMesh object and return it .*/
-	CMesh<glm::vec3> cylinderMesh(float radius, float height, float steps) {
-		CMesh<glm::vec3> mesh;
+	CMesh cylinderMesh(float radius, float height, float steps) {
+		CMesh mesh;
 		cylinder(mesh,radius,height,steps);
 		mesh.type = meshTrisIndexed;
 		//mesh.calculateVertexNormals();

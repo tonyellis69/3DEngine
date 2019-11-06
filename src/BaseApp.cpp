@@ -366,7 +366,6 @@ glm::i32vec2 CBaseApp::getMousePos() {
 
 bool CBaseApp::keyNow(int vKey) {
 	return win.keyPressed( vKey);
-	//return GetAsyncKeyState(vKey) && 0x4000;
 }
 
 
