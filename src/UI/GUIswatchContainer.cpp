@@ -63,9 +63,7 @@ void CGUIswatchContainer::addSwatchGroup(std::string name, std::vector<glm::i32v
 
 }
 
-void CGUIswatchContainer::onDoubleClick(const int mouseX, const int mouseY, int key) {
 
-}
 
 void CGUIswatchContainer::message(CGUIbase * sender, CMessage & msg) {
 	CGUIcontainer::message(sender, msg);
@@ -254,14 +252,15 @@ void CGUIswatchGroup::DrawSelf() {
 }
 
 /** Alert the container if the user clicks on a swatch. */
-void CGUIswatchGroup::OnClick(const int mouseX, const int mouseY) {
+bool CGUIswatchGroup::OnClick(const int mouseX, const int mouseY) {
 	int index = getSwatchIndex(mouseX, mouseY);
 	if (index == -1)
-		return;
-		CMessage msg;
-		msg.Msg = uiClick;
-		msg.value = index;
-		callbackObj->GUIcallback(this, msg);
+		return true;
+	CMessage msg;
+	msg.Msg = uiClick;
+	msg.value = index;
+	callbackObj->GUIcallback(this, msg);
+	return true;
 }
 
 int CGUIswatchGroup::getSwatchIndex(const int mouseX, const int mouseY) {
@@ -281,17 +280,19 @@ int CGUIswatchGroup::getSwatchIndex(const int mouseX, const int mouseY) {
 	return index;
 }
 
-void CGUIswatchGroup::onDoubleClick(const int mouseX, const int mouseY, int key) {
+bool CGUIswatchGroup::onDoubleClick(const int mouseX, const int mouseY, int key) {
 	addUserSwatch(i32vec4(127,127,127,255 ));
+	return true;
 }
 
 /** Use to delete group if Ctrl held down. */
-void CGUIswatchGroup::OnRMouseDown(const int mouseX, const int mouseY, int key) {
+bool CGUIswatchGroup::OnRMouseDown(const int mouseX, const int mouseY, int key) {
 	if (key == GLFW_MOD_CONTROL) {
 		CMessage msg;
 		msg.Msg = uiMsgDelete;
 		callbackObj->GUIcallback(this, msg);
 	}
+	return true;
 }
 
 /** Catch attemp to drag on a swatch. If so, create a drag-drop object with that swatch's colour. */

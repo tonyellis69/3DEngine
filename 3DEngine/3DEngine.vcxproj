@@ -45,7 +45,7 @@
     <OutDir>$(SolutionDir)lib\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)-d.lib</TargetName>
-    <IncludePath>D:\projects\assimp-4.0.1\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\projects\assimp\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>

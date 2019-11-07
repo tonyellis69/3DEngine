@@ -17,7 +17,6 @@ CGUIlabel::CGUIlabel(const std::string&  text) {
 
 	type = uiLabel;
 	multiLine = false;
-	mousePassthru = true;
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;

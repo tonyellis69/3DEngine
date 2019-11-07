@@ -43,7 +43,7 @@ class CGUInumericIconButton : public CGUIsysIconButton {
 public:
 	CGUInumericIconButton(int x, int y) : CGUIsysIconButton(x, y) {};
 	CGUInumericIconButton(int x, int y, int w, int h) : CGUIsysIconButton(x, y,w,h) {};
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 	void onDoubleClick(int mouseX, int mouseY);
 
 };

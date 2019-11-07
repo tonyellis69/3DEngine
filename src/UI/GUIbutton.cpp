@@ -82,11 +82,12 @@ void CGUIbutton::DrawSelf() {
 }
 
 
-void CGUIbutton::OnClick(const int mouseX, const int mouseY) {
+bool CGUIbutton::OnClick(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
 	parent->message(this, msg);
 	callbackObj->GUIcallback(this, msg);
+	return true;
 }
 
 void CGUIbutton::setText(const std::string & text) {

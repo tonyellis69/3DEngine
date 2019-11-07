@@ -11,7 +11,7 @@ class CGUIradio :  public CGUIbase {
 public:
 	CGUIradio(int x , int y, int w, int h);
 	void DrawSelf( );
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 
 	static int Count;
 	RadioOrientationType Orientation; ///<Which way around the label and icon go.

@@ -9,8 +9,9 @@ void CGUIpopMenu::setMenuCallback(IPopupMenu * callback) {
 }
 
 
-void CGUIpopMenu::OnClick(const int mouseX, const int mouseY) {
+bool CGUIpopMenu::OnClick(const int mouseX, const int mouseY) {
 	pMenuCallback->popupMenuCallback(focusItem);
 	CGUIpopMenu::~CGUIpopMenu();
+	return true;
 }
 

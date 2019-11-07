@@ -64,9 +64,10 @@ CGUIiconButton::CGUIiconButton(int x, int y) : CGUIsysIconButton(x,y) {
 	GenName("iconButton",Count++);
 }
 
-void CGUIiconButton::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUIiconButton::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
 	pDrawFuncs->handleUImsg(*this,msg);
+	return true;
 }
 

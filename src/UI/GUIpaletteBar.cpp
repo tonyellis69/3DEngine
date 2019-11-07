@@ -58,12 +58,10 @@ void CGUIpaletteBar::setGradient(ColourGradient & gradient) {
 
 }
 
-void CGUIpaletteBar::OnClick(const int mouseX, const int mouseY) {
-
-}
 
 
-void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
+
+bool CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if (IsOnControl(*paletteImage, mouseX, mouseY)) {
 		if (Msg == MY_DOUBLECLICK) {
 			if (MouseDown == paletteImage) {
@@ -90,21 +88,21 @@ void CGUIpaletteBar::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key)
 		}
 		if (topTab) {
 			topTab->OnLMouseDown(mouseX, mouseY, key);
-			return;
+			return true;
 		}
 	}
 
 	if (Msg == WM_LBUTTONUP) {
 		if (IsOnControl(*paletteImage, mouseX, mouseY) && dragDropObj != NULL) {
 			onDrop(mouseX, mouseY);
-			return;
+			return true;
 		}
 		tabPosLbl->setVisible(false);
 
 	}
 
 
-	CGUIbase::MouseMsg(Msg, mouseX, mouseY, key);
+	return CGUIbase::MouseMsg(Msg, mouseX, mouseY, key);
 }
 
 void CGUIpaletteBar::createTab(int tabIndex) {
@@ -372,32 +370,34 @@ void CGUIpaletteBar::onDrop(const int mouseX, const int mouseY) {
 
 
 
-void CGUIpaletteTab::onDoubleClick(const int mouseX, const int mouseY, int key) {
+bool CGUIpaletteTab::onDoubleClick(const int mouseX, const int mouseY, int key) {
 	scrollbarHasMouse = NULL;
 	pDrawFuncs->mouseCaptured(false);
 
 	CMessage msg;
 	msg.Msg = MY_DOUBLECLICK;
 	parent->message(this, msg);
+	return true;
 }
 
-void CGUIpaletteTab::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
-	//return;
+bool CGUIpaletteTab::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	MouseDown = this;
 	int mousePos;
 
 	scrollbarHasMouse = this;
 	pDrawFuncs->mouseCaptured(true);
-	lastMouseX = mouseX; //localToScreenCoords(mouseX, mouseY).x;
+	lastMouseX = mouseX; 
+	return true;
 }
 
-void CGUIpaletteTab::onRMouseUp(const int mouseX, const int mouseY) {
+bool CGUIpaletteTab::onRMouseUp(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = WM_RBUTTONUP;
 	parent->message(this, msg);
+	return true;
 }
 
-void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
+bool CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 	if ((MouseDown == this) && (scrollbarHasMouse == this)) {
 		CMessage msg;
 		msg.Msg = WM_MOUSEMOVE;
@@ -406,6 +406,7 @@ void CGUIpaletteTab::OnMouseMove(int mouseX, int mouseY, int key) {
 		parent->message(this, msg);
 
 	}
+	return true;
 }
 
 /** Catch an attempt to drop a swatch. */

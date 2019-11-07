@@ -14,15 +14,15 @@ std::uniform_real_distribution<> CGUIrichText::randomPeriod{ 0,1.0f };
 CGUIrichText::CGUIrichText(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	styles = NULL;
 
-	TRichTextRec defaultStyleObj;
-	defaultStyleObj.style = currentTextStyle;
-	textObjs.push_back(defaultStyleObj);
+	//initialise to receive first text
+	TRichTextRec rootObj;
+	textObjs.push_back(rootObj);
 	currentTextObj = 0;
-
 	firstVisibleText = 0;
 	firstVisibleObject = 0;
-	mousePassthru = false;
 	selectedHotObj = -1;
+
+
 	updateDt = 0;
 	correctOverrunDelay = 0.001f;
 	overrunCorrect = true;// false;
@@ -583,9 +583,10 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 }
 
 /** Check for mouse over hot text. */
-void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
-	if (suspended || busy)
-		return;
+bool CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+	if (suspended || busy) {
+		return true;
+	}
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 	int oldSelectedHotObj = selectedHotObj;
 	if (mouseMode)
@@ -612,6 +613,7 @@ void CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	//if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
 	//	msgHighlight();
 	//}
+	return true;
 }
 
 /** Announce that the currently selected hot text has changed. */
@@ -642,9 +644,9 @@ void CGUIrichText::msgHighlight() {
 
 
 /** Detect clicks on any menu items. */
-void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
+bool CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 	if (suspended || busy)
-		return;
+		return true;
 	if (selectedHotObj > -1) {
 		CMessage msg;
 		msg.Msg = uiMsgHotTextClick;
@@ -653,23 +655,24 @@ void CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 		//pDrawFuncs->handleUImsg(*this, msg);
 		parent->message(this, msg);
 	}
+	return true;
 }
 
 
 
-void CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
+bool CGUIrichText::OnLMouseUp(const int mouseX, const int mouseY, int key) {
 	CMessage msg;
 	msg.Msg == uiMsgLMouseUp;
 	parent->message(this, msg);
-
+	return true;
 }
 
-void CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
+bool CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 	CMessage msg;
 	msg.Msg = uiMsgRMouseUp;
 	msg.x = mouseX; msg.y = mouseY;
-	//pDrawFuncs->handleUImsg(*this, msg);
 	parent->message(this, msg);
+	return true;
 }
 
 

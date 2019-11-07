@@ -19,7 +19,7 @@ class CGUIiconButton : public CGUIsysIconButton {
 public:
 	CGUIiconButton(int x, int y);
 	CGUIiconButton(int x, int y, int w, int h) : CGUIsysIconButton(x, y, w, h) {};
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 
 
 	static int Count;

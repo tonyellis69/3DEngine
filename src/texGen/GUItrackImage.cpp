@@ -1,7 +1,7 @@
 #include "GUItrackImage.h"
 
 
-void CGUItrackImage::OnMouseMove(const int mouseX, const int mouseY, int key) {
+bool CGUItrackImage::OnMouseMove(const int mouseX, const int mouseY, int key) {
 	if (callbackObj) {
 		CMessage msg;
 		msg.Msg = uiMsgMouseMove;
@@ -9,7 +9,7 @@ void CGUItrackImage::OnMouseMove(const int mouseX, const int mouseY, int key) {
 		msg.y = mouseY;
 		callbackObj->GUIcallback(this, msg);
 	}
-
+	return true;
 }
 
 bool CGUItrackImage::onMouseOff(const int mouseX, const int mouseY, int key) {
@@ -21,7 +21,7 @@ bool CGUItrackImage::onMouseOff(const int mouseX, const int mouseY, int key) {
 	return true;
 }
 
-void CGUItrackImage::OnRMouseDown(const int mouseX, const int mouseY, int key) {
+bool CGUItrackImage::OnRMouseDown(const int mouseX, const int mouseY, int key) {
 	if (callbackObj) {
 		CMessage msg;
 		msg.x = mouseX;
@@ -29,6 +29,7 @@ void CGUItrackImage::OnRMouseDown(const int mouseX, const int mouseY, int key) {
 		msg.Msg = uiMsgRMdown;
 		callbackObj->GUIcallback(this, msg);
 	}
+	return true;
 }
 
 bool CGUItrackImage::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key) {
@@ -43,11 +44,12 @@ bool CGUItrackImage::MouseWheelMsg(const int mouseX, const int mouseY, int wheel
 	return true;
 }
 
-void CGUItrackImage::onDoubleClick(const int mouseX, const int mouseY, int key) {
+bool CGUItrackImage::onDoubleClick(const int mouseX, const int mouseY, int key) {
 	if (callbackObj) {
 		CMessage msg;
 		msg.Msg = uiMsgDoubleClick;
 		msg.value = key;
 		callbackObj->GUIcallback(this, msg);
 	}
+	return true;
 }

@@ -12,7 +12,7 @@ public:
 	void resizeToFit();
 	//CGUIbutton(int x, int y, int w, int h);
 	void DrawSelf();
-	void OnClick(const int mouseX, const int mouseY);
+	bool OnClick(const int mouseX, const int mouseY);
 	void setText(const std::string& text);
 	void resize(int w, int h);
 

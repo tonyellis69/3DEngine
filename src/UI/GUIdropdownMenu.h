@@ -9,7 +9,7 @@ public:
 	CGUIdropdownMenu(int x, int y, int w, int h);
 	void setText(const std::string& title);
 	void DrawSelf();
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 	void GUIcallback(CGUIbase * sender, CMessage & msg);
 	void clear();
 	std::string& getItemName(int itemNo);

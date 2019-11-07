@@ -94,9 +94,10 @@ void CGUItextbox2::calcLineOffset() {
 
 
 /**User has clicked on the textbox, so give it focus, allowing it to be edited. */
-void CGUItextbox2::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUItextbox2::OnClick(const  int mouseX, const  int mouseY) {
 	captureKeyboard();
 	calcCursorPosition();
+	return true;
 }
 
 /**User has pressed a key, and we have focus. Use this to catch cursor keys, backspace,etc*/

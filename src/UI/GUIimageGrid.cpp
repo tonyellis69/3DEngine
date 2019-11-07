@@ -20,9 +20,10 @@ CGUIimageGrid::CGUIimageGrid(int x, int y, int _cols, int _rows, int size) {
 }
 
 /** Overloads function to find which row and column the mouse is in. */
-void CGUIimageGrid::OnMouseMove(const int mouseX, const int mouseY, int key) {
+bool CGUIimageGrid::OnMouseMove(const int mouseX, const int mouseY, int key) {
 	mouseCol = mouseX / cellSize; 
 	mouseRow = mouseY / cellSize;
+	return true;
 }
 
 /** Set the given cell to the given value. */
@@ -89,7 +90,7 @@ void CGUIimageGrid::DrawSelf( ) {
 }
 
 /** User has mouseuped on a cell; send a message saying which one.*/
-void CGUIimageGrid::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUIimageGrid::OnClick(const  int mouseX, const  int mouseY) {
 	mouseCol = mouseX / cellSize; 
 	mouseRow = mouseY / cellSize;
 	int cellNo = getCellNo(mouseCol,mouseRow);
@@ -99,6 +100,7 @@ void CGUIimageGrid::OnClick(const  int mouseX, const  int mouseY) {
 	//	pDrawFuncs->handleUImsg(*this,Message);	
 	}
 	selected = Message.value;
+	return true;
 }
 
 /** Returns the number of the cell at the given row and column. */

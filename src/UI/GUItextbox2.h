@@ -16,7 +16,7 @@ public:
 	guiRect& getCursorPos();
 	void calcCursorPosition();
 	void calcLineOffset();
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 	void onKeyPress(unsigned int Key, long Mod);
 	void moveCursor(int x, int y);
 	void backSpace();

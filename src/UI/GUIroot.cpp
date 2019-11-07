@@ -15,21 +15,19 @@ CGUIroot::CGUIroot()  {
 
 /** Root overloads this method so it can send messages direct to any control that has trapped the
 	mouse, keyboard, etc. */
-void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
+bool CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
-		return;
+		return false;
 
 	
 	if (scrollbarHasMouse) { //a scrollbar has captured the mouse, so pass the message straight there.
 		if ((Msg == WM_MOUSEMOVE)) { //TO DO: pass all messages to the scrollbar instead?
-			scrollbarHasMouse->OnMouseMove(mouseX , mouseY , key);
-			return;
+			return scrollbarHasMouse->OnMouseMove(mouseX , mouseY , key);
 		}
 	}
 
 	if (modalControls.size() > 0 /*&& scrollbarHasMouse == NULL*/) {
-		modalControls.back()->MouseMsg(Msg, mouseX , mouseY , key);
-		return;
+		return modalControls.back()->MouseMsg(Msg, mouseX , mouseY , key);
 	}
 
 	if ((Msg == WM_MOUSEMOVE)) {
@@ -41,7 +39,7 @@ void CGUIroot::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 		return focusControl->MouseMsg(Msg, mouseX, mouseY,key);
 
 
-	CGUIbase::MouseMsg(Msg,mouseX,mouseY,key);
+	return CGUIbase::MouseMsg(Msg,mouseX,mouseY,key);
 }
 
 /** Root overloads this method so it can send messages direct to any control that has trapped the
@@ -136,7 +134,7 @@ void CGUIroot::Draw() {
 
 
 /** Ensures the mouse drawing coordinates are always set to where the mouse is. */
-void CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
+bool CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
 	mousePos.x = mouseX;
 	mousePos.y = mouseY;
 	CMessage msg;
@@ -145,16 +143,19 @@ void CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
 	msg.x = mouseX;
 	msg.y = mouseY;
 	pDrawFuncs->handleUImsg(*this,msg);
+	return false;
 }
 
+//TO DO: scrap and its brethern if possible - surely not needed?
 /** Root response to a left-mouse down action - report it, in case it's of use to the user.*/
-void CGUIroot::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
+bool CGUIroot::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgLMdown;
 	msg.x = mouseX;
 	msg.y = mouseY;
 	msg.value = key;
 	pDrawFuncs->handleUImsg(*this,msg);
+	return true;
 }
 
 void CGUIroot::onLMouseUp(const int mouseX, const int mouseY) {
@@ -177,11 +178,12 @@ void CGUIroot::OnRMouseDown(const  int mouseX, const  int mouseY) {
 }
 
 /** Root response to being clicked. */
-void CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
 	msg.x = mouseX; msg.y = mouseY;
 	pDrawFuncs->handleUImsg(*this,msg);
+	return true;
 }
 
 /* 05/01/15 This was root default behavour, making it base control behaviour. */

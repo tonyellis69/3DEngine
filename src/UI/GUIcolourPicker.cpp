@@ -56,23 +56,6 @@ void CGUIcolourPicker::setColour(glm::i32vec4 newColour) {
 }
 
 
-void CGUIcolourPicker::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
-/*	if (IsOnControl(*paletteImage, mouseX, mouseY)) {
-		if (Msg == MY_DOUBLECLICK) {
-			if (MouseDown == paletteImage) {
-				MouseDown = NULL;
-				createTab(mouseX - paletteImage->localPos.x, mouseY - paletteImage->localPos.y);
-			}
-		}
-
-	}*/
-	CGUIbase::MouseMsg(Msg, mouseX, mouseY, key);
-}
-
-void CGUIcolourPicker::OnClick(const  int mouseX, const  int mouseY) {
-
-}
-
 void CGUIcolourPicker::message(CGUIbase* sender, CMessage & msg) {
 	if (msg.Msg == uiSpin || msg.Msg == uiDataEntered) {
 		updateColour();

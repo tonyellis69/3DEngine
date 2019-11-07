@@ -57,11 +57,11 @@ CGUIdlgButton::CGUIdlgButton(int x, int y, int w, int h) : CGUIbutton2(x,y,w,h) 
 
 }
 
-void CGUIdlgButton::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUIdlgButton::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = dlgOKID;
 	parent->message(this,msg);
-
+	return true;
 }
 
 

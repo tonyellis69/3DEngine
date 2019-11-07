@@ -11,9 +11,9 @@ public:
 	//~CGUIimageGrid();
 	void DrawSelf();
 //	void OnLMouseUp(const  int mouseX, const  int mouseY);
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 
-	void OnMouseMove(const int mouseX, const int mouseY, int key);
+	bool OnMouseMove(const int mouseX, const int mouseY, int key);
 	void setCell(int cellNo, int value);
 	void setRows(int newRows);
 	void setColumns(int newCols);

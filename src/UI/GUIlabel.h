@@ -10,6 +10,10 @@ public:
 	CGUIlabel(const std::string& text);
 	CGUIlabel(const std::string& text, unsigned int styleWord);
 	//CGUIlabel(int x, int y, int w, int h);
+	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key) { return false; };
+	bool OnMouseMove(const  int mouseX, const  int mouseY, int key) { return false; };
+	bool OnLMouseUp(const  int mouseX, const  int mouseY) { return false; };
+
 	void applyStyleSheet();
 	void setFont(CFont* font);
 	void setText(std::string newText);

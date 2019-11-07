@@ -37,7 +37,7 @@ public:
 class CGUIdlgButton : public CGUIbutton2 {
 public:
 	CGUIdlgButton(int x, int y, int w, int h);
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 
 };
 

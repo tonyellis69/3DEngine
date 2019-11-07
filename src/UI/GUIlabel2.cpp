@@ -12,7 +12,6 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	setTextColour(vec4(0, 0, 0, 1));
 	multiLine = false;
 	drawBorder = false;
-	mousePassthru = true;
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;

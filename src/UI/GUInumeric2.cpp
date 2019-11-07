@@ -134,12 +134,13 @@ void CGUInumericTextbox2::onKeyPress(unsigned int Key, long Mod) {
 
 
 /** Overload the usual onclick message, to alert the numeric control instead. */
-void CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUInumericIconButton::OnClick(const  int mouseX, const  int mouseY) {
 	int direction = (id == downButtonID) ? -1 : 1;
 	CMessage msg;
 	msg.value = direction;
 	msg.Msg = uiSpin;
 	parent->message(this, msg);
+	return true;
 }
 
 void CGUInumericIconButton::onDoubleClick(int mouseX, int mouseY) {

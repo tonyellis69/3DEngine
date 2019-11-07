@@ -308,10 +308,11 @@ void CGUIbaseSurface::message(CGUIbase * sender, CMessage & msg) {
 		parent->message(this, msg);
 }
 
-void CGUIbaseSurface::onDoubleClick(const int mouseX, const int mouseY, int key) {
+bool CGUIbaseSurface::onDoubleClick(const int mouseX, const int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgDoubleClick;
 	parent->message(this, msg);
+	return true;
 }
 
 

@@ -11,8 +11,6 @@ class CGUIcolourPicker : public CGUIpanel {
 public:
 	CGUIcolourPicker(int x, int y, int w, int h) ;
 	void setColour(glm::i32vec4 newColour);
-	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
-	void OnClick(const  int mouseX, const  int mouseY);
 	void message(CGUIbase* sender, CMessage& msg);
 	//void setMsgCallback(msgCallback callbackFn);
 	void updateColour();

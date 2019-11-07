@@ -7,7 +7,7 @@ class CGUIbutton2 : public CGUIbase {
 public:
 	CGUIbutton2(int x, int y, int w, int h);
 	void DrawSelf();
-	void OnClick(const int mouseX, const int mouseY);
+	bool OnClick(const int mouseX, const int mouseY);
 	void setText(const std::string& text);
 
 	CGUIlabel2* label;

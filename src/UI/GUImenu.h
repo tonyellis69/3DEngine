@@ -21,11 +21,11 @@ public:
 	void resizeToFit();
 	bool onMouseOff(const int mouseX, const int mouseY, int key);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
-	void OnMouseMove(const int mouseX, const int mouseY, int key);
-	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
-	void OnRMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool OnMouseMove(const int mouseX, const int mouseY, int key);
+	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool OnRMouseDown(const  int mouseX, const  int mouseY, int key);
 
-	void OnClick(const int mouseX, const int mouseY);
+	bool OnClick(const int mouseX, const int mouseY);
 	void clear();
 	std::string& getItemName(int itemNo);
 

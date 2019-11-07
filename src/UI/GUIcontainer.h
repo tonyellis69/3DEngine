@@ -55,7 +55,7 @@ public:
 	virtual void assignPanelPositions() {};
 	void setViewbox(int x, int y, int w, int h);
 	void message(CGUIbase* sender, CMessage& msg);
-	void onDoubleClick(const int mouseX, const int mouseY, int key);
+	bool onDoubleClick(const int mouseX, const int mouseY, int key);
 
 	UIrect viewBox; ///<Rectangle describing the window through which this control is viewed.
 	int spaceAroundControls; ///<Space allowed around outlying controls when calculating dimensions of surface.

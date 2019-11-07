@@ -83,7 +83,7 @@ void CGUIbaseScrollbar::DrawSelf( ) {
 
 
 /** Called when user left-clicks *down* on a scrollbar. */
-void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
+bool CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	MouseDown = this;
 	int mousePos;
 
@@ -95,20 +95,21 @@ void CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 	if (mousePos < SliderPos) {
 		SliderPos -= clickIncrement; 
 		updateValue();
-		return;
+		return true;
 	}
 	if (mousePos > (SliderPos + SliderSize)) {
 		SliderPos += clickIncrement;
 		updateValue(); 
-		return;
+		return true;
 	}
 	mouseSliderOffset = mousePos - SliderPos;
 	scrollbarHasMouse = this;
 	pDrawFuncs->mouseCaptured(true);
+	return true;
 }
 
 
-void CGUIbaseScrollbar::OnMouseMove(int mouseX, int mouseY,int key) {
+bool CGUIbaseScrollbar::OnMouseMove(int mouseX, int mouseY,int key) {
 	if ((MouseDown == this) && ( scrollbarHasMouse  == this)) {//scrollbar dragging appears to be going on
 		if (orientation == horizontal) 
 			SliderPos = screenToLocalCoords(mouseX, mouseY).x - mouseSliderOffset;
@@ -117,6 +118,7 @@ void CGUIbaseScrollbar::OnMouseMove(int mouseX, int mouseY,int key) {
 		}
 		updateValue();
 	}
+	return true;
 }
 
 void CGUIbaseScrollbar::updateValue() {

@@ -50,7 +50,7 @@ void CGUIcheckButton::DrawSelf( ) {
 	//pDrawFuncs->drawCtrlBorder(*this);
 }
 
-void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
 	Set = !Set;
 	//call the user's event handler.
 	CMessage msg;
@@ -58,6 +58,7 @@ void CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
 	msg.value = Set;
 	pDrawFuncs->handleUImsg(*this,msg);
 	parent->message(this, msg);
+	return true;
 }
 
 void CGUIcheckButton::setText(std::string newText) {

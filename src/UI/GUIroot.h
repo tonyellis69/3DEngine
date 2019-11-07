@@ -9,7 +9,7 @@ class CGUIroot : public CGUIbase {
 public:
 	CGUIroot();
 	~CGUIroot();
-	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
+	bool MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 	void setLocalDimensions(int x, int y, int w, int h);
 	void recalculateClipbox();
@@ -17,12 +17,12 @@ public:
 	void CharEntryMsg(unsigned int Key, long Mod);
 	void setDrawFuncs(CDrawFuncs* drawFunc);
 	void Draw();
-	void OnMouseMove(const int mouseX, const int mouseY, int key);
-	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool OnMouseMove(const int mouseX, const int mouseY, int key);
+	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void OnRMouseDown(const  int mouseX, const  int mouseY);
 	//void onRMouseUp(const int mouseX, const int mouseY);
 	void onLMouseUp(const  int mouseX, const  int mouseY);
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 	void addModal(CGUIbase* control);
 	void deleteModal();
 	void removeModal();

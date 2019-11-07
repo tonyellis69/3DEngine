@@ -15,7 +15,7 @@ CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
 	int labelPad = 4;
 	menuButton = new CGUIlabel2(labelPad, labelPad, w - labelPad*2, h- labelPad*2);
 	menuButton->setBorderOn(true);
-	menuButton->mousePassthru = true;
+	//menuButton->mousePassthru = true;
 	menuButton->setBorderOn(false);
 	Add(menuButton);
 
@@ -46,10 +46,11 @@ void CGUIdropdownMenu::DrawSelf() {
 
 }
 
-void CGUIdropdownMenu::OnClick(const int mouseX, const int mouseY) {
+bool CGUIdropdownMenu::OnClick(const int mouseX, const int mouseY) {
 	menu->setLocalPos(drawBox.pos.x, drawBox.pos.y + getHeight());
 	menu->setVisible(true);
 	menu->makeModal();
+	return true;
 }
 
 

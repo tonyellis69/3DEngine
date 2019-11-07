@@ -82,13 +82,13 @@ public:
 	TLine compileSingleLine(TLineFragment lineFragment);
 	void checkLineOverrun(int yStart);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
-	void OnMouseMove(const int mouseX, const int mouseY, int key);
+	bool OnMouseMove(const int mouseX, const int mouseY, int key);
 	void msgHotTextChange(glm::i32vec2& adjustedMousePos);
 	void msgHighlight();
-	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
-	void OnLMouseUp(const int mouseX, const int mouseY, int key);
+	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool OnLMouseUp(const int mouseX, const int mouseY, int key);
 
-	void onRMouseUp(const int mouseX, const int mouseY);
+	bool onRMouseUp(const int mouseX, const int mouseY);
 
 	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
 

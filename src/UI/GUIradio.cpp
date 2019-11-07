@@ -62,7 +62,7 @@ void CGUIradio::DrawSelf( ) {
 
 }
 
-void CGUIradio::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUIradio::OnClick(const  int mouseX, const  int mouseY) {
 	Set = true;
 	//notify the parent  that this switch has been activated.
 	CMessage msg;
@@ -71,6 +71,7 @@ void CGUIradio::OnClick(const  int mouseX, const  int mouseY) {
 
 	//call the user's event handler.
 	pDrawFuncs->handleUImsg(*this,msg);
+	return true;
 }
 
 

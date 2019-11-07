@@ -10,7 +10,7 @@ class CGUIcheckButton :  public CGUIbase {
 public:
 	CGUIcheckButton(int x, int y, int w, int h);
 	void DrawSelf();
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 
 	void setText(std::string newText);
 

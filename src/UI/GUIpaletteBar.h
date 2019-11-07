@@ -20,8 +20,7 @@ public:
 	
 	void setGradientTexture(CBaseTexture& texture);
 	void setGradient(ColourGradient& gradient);
-	void OnClick(const  int mouseX, const  int mouseY);
-	void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
+	bool MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
 
 	void createTab(int mouseX);
 	CGUIpaletteTab * addTab(int tabIndex);
@@ -77,10 +76,10 @@ public:
 		setBorderOn(false); 
 		type = uiPaletteTab;
 	};
-	void onDoubleClick(const int mouseX, const int mouseY, int key);
-	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
-	void onRMouseUp(const int mouseX, const int mouseY);
-	void OnMouseMove(int mouseX, int mouseY, int key);
+	bool onDoubleClick(const int mouseX, const int mouseY, int key);
+	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool onRMouseUp(const int mouseX, const int mouseY);
+	bool OnMouseMove(int mouseX, int mouseY, int key);
 	void onDrop(const  int mouseX, const  int mouseY);
 	bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
 

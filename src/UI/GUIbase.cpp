@@ -49,8 +49,6 @@ CGUIbase::CGUIbase()  {
 
 	enabled = true;
 
-	mousePassthru = false;
-
 	//BetterBase stuff, may overrule some of the above:
 	backColour1 = UIlightGrey;
 	backColour2 = UIdarkGrey;
@@ -398,7 +396,7 @@ std::vector<CGUIbase*> CGUIbase::modalControls;
 
 /** Returns true if the given point is inside this control's area. */
 bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  int mouseY) {
-	if (!Control.visible || !Control.enabled || Control.mousePassthru)
+	if (!Control.visible || !Control.enabled /*|| Control.mousePassthru*/)
 		return false;
 	//return ( (Control.localPos.x < mouseX) && ((Control.localPos.x + Control.width) > mouseX)
 	//	&& (Control.localPos.y < mouseY) && ((Control.localPos.y + Control.height) > mouseY));
@@ -410,75 +408,80 @@ bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  in
 
 
 /** Handle any of several mouse messages from the OS. This may well involve recursively passing the message to this control's children. */
-void CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
+bool CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
-		return;
+		return false;
+
 	
 	//otherwise, recursively test message against this control's child controls
 	//for (size_t i = 0; i < controls.size(); i++) {
 	//TO DO: reverse order is a bodge for z order, which I need to implement
 	for (int i = controls.size()-1; i >= 0; i--) {
 		if (IsOnControl(*controls[i], mouseX, mouseY)) {		
-			controls[i]->MouseMsg(Msg, mouseX, mouseY, key);
-			return; //TO DO: should only return if MouseMsg returns this message as dealt with!
+			if (controls[i]->MouseMsg(Msg, mouseX, mouseY, key))
+				return true;
 		}
 	}
 	//Still here? Message is for this control
 	switch (Msg) {
 	case WM_MOUSEMOVE: {
-		bool mouseOffSuccess = true;
-		if (MouseOver != this) { //mouse has just entered this control 
-			MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
-			if (MouseOver)
-				mouseOffSuccess = MouseOver->onMouseOff(mouseX, mouseY, key);
-		}
-		if (mouseOffSuccess)
-			MouseOver = this;
-		if (MouseDown == this) { //looks like we're dragging
-			onDrag(mouseX, mouseY);
-			//return;
-		}
-		OnMouseMove(mouseX, mouseY, key); 
-		return; }
+		if (!OnMouseMove(mouseX, mouseY, key)) //control is ignoring mousemoves
+			return false;
+		defaultMouseMoveResponse(mouseX, mouseY, key);
+		return true;  
+	}
 	case WM_LBUTTONDOWN: {
 		uncaptureKeyboard();
+		if (!OnLMouseDown(mouseX, mouseY, key)) //control ignoring mouseup
+			return false;
 		MouseDown = this;
-		OnLMouseDown(mouseX, mouseY, key);
-		return; }
+		return true;
+	 }
 	case WM_RBUTTONDOWN: {
 		uncaptureKeyboard();
 		MouseDown = this;
-		OnRMouseDown(mouseX, mouseY, key);
-		return; }
+		return OnRMouseDown(mouseX, mouseY, key);
+	}
 	case WM_LBUTTONUP: {
-		if (dragDropObj != NULL) {
-			onDrop(mouseX, mouseY);
-			//return;
-		}
-		else {
-			OnLMouseUp(mouseX, mouseY);
-			if (MouseDown == this) //we've been clicked on!
-				OnClick(mouseX, mouseY);
-		}
-		if (MouseOver != this)
-			MouseOver = this;
-		scrollbarHasMouse = NULL;
-		pDrawFuncs->mouseCaptured(false);
-		MouseDown = NULL;
-		return; }
+		return OnLMouseUp(mouseX, mouseY);
+	 }
 	case WM_RBUTTONUP: {
 		onRMouseUp(mouseX, mouseY);
-		return; }
+		return true; }
 	case LM_HELD_DOWN: {
 		if ((MouseDown == MouseOver) && (scrollbarHasMouse == NULL)) {
 			OnLMouseDown(mouseX, mouseY, key);
-			return;
+			return true;
 		}
 	case MY_DOUBLECLICK: {
 		onDoubleClick(mouseX, mouseY, key);
-		return; }
+		return true; }
 	}
 	};
+
+	return false;
+}
+
+
+bool CGUIbase::OnLMouseUp(const int mouseX, const int mouseY)
+{
+	if (MouseOver != this)
+		MouseOver = this;
+	scrollbarHasMouse = NULL;
+	pDrawFuncs->mouseCaptured(false);
+	CGUIbase* lastMouseDown = MouseDown;
+	MouseDown = NULL;
+
+	if (dragDropObj != NULL) {
+		onDrop(mouseX, mouseY);
+		return true;
+	}
+	
+
+	if (lastMouseDown == this) //we've been clicked on!
+		return OnClick(mouseX, mouseY);
+	
+	return true;
 }
 
 
@@ -855,13 +858,6 @@ CGUIbase* CGUIbase::findControl(CGUIbase* child) {
 }
 
 
-void CGUIbase::OnLMouseUp(const int mouseX, const int mouseY) {
-	
-}
-
-void CGUIbase::onRMouseUp(const int mouseX, const int mouseY) {
-
-}
 
 /** Returns the positionHint of this control in the child-list of its parent. */
 int CGUIbase::getControlNo() {
@@ -953,6 +949,21 @@ void CGUIbase::makeUnModal() {
 			modalControls.erase(modalControls.begin() + ctrl);
 			isModal = false;
 		}
+}
+
+void CGUIbase::defaultMouseMoveResponse(int mouseX, int mouseY, int key)
+{
+	bool mouseOffSuccess = true;
+	if (MouseOver != this) { //mouse has just entered this control 
+		MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
+		if (MouseOver)
+			mouseOffSuccess = MouseOver->onMouseOff(mouseX, mouseY, key);
+	}
+	if (mouseOffSuccess)
+		MouseOver = this;
+	if (MouseDown == this) { //looks like we're dragging
+		onDrag(mouseX, mouseY);
+	}
 }
 
 /** Set this control's positioning parameters (centre, left justify, etc)

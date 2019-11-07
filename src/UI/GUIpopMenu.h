@@ -15,8 +15,7 @@ class CGUIpopMenu : public CGUImenu {
 public:
 	CGUIpopMenu(int x, int y, int w, int h);
 	void setMenuCallback(IPopupMenu* callback);
-	void OnLMouseDown(const  int mouseX, const  int mouseY, int key) {};
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 
 
 	IPopupMenu* pMenuCallback;

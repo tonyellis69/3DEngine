@@ -180,14 +180,14 @@ public:
 	void setLayout(CGUIlayout& layout);
 
 	bool IsOnControl(const CGUIbase& Control,const  int mouseX, const  int mouseY);
-	virtual void MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
-	virtual void OnMouseMove(const  int mouseX, const  int mouseY, int key) {};
-	virtual void OnLMouseDown(const  int mouseX, const  int mouseY, int key) {};
-	virtual void OnRMouseDown(const  int mouseX, const  int mouseY, int key) {};
-	virtual void OnLMouseUp(const  int mouseX, const  int mouseY) ;
-	virtual void onRMouseUp(const  int mouseX, const  int mouseY) ;
-	virtual void OnClick(const  int mouseX, const  int mouseY) {};
-	virtual void onDoubleClick(const int mouseX, const int mouseY, int key) {};
+	virtual bool MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
+	virtual bool OnMouseMove(const  int mouseX, const  int mouseY, int key) {return true; };
+	virtual bool OnLMouseDown(const  int mouseX, const  int mouseY, int key) { return true; };
+	virtual bool OnRMouseDown(const  int mouseX, const  int mouseY, int key) { return false; };
+	virtual bool OnLMouseUp(const  int mouseX, const  int mouseY);
+	virtual bool onRMouseUp(const  int mouseX, const  int mouseY) { return false; };
+	virtual bool OnClick(const  int mouseX, const  int mouseY) { return false; };
+	virtual bool onDoubleClick(const int mouseX, const int mouseY, int key) { return false; };
 	virtual void onKeyPress(unsigned int Key, long Mod) {};
 	virtual void OnCharEntry(unsigned int Key, long Mod) {};
 	virtual bool MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key);
@@ -319,8 +319,6 @@ public:
 
 	static CGUIroot* rootUI; ///<Points to root UI control.
 	
-	bool mousePassthru;
-
 	unsigned int uniqueID; ///<Unique identifier for each control; TO DO: make private
 
 	guiRect drawBox; ///<Defines the dimensions of the control for drawing (replaces screenPos).
@@ -333,6 +331,10 @@ public:
 protected:
 	bool enabled; ///<False if this control has been deactivated.
 	static CFont* defaultFont;
+
+private:
+	void defaultMouseMoveResponse(int mouseX, int mouseY, int key);
+
 public:
 	//static DelegateP<void,int> setFont;
 	static std::vector<CGUIbase*> modalControls; ///<List of modal controls, if any.

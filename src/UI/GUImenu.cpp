@@ -83,7 +83,6 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 				itemWidth += leftAlignIndent;
 		}
 
-		item->mousePassthru = true;
 		Add(item);
 		items.push_back(item);
 	}
@@ -119,9 +118,9 @@ bool CGUImenu::MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta,
 }
 
 /** If the mouse moves over a menu item, give it focus. */
-void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
+bool CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	if (items.size() == 0)
-		return;
+		return true;
 	i32vec2 mouse = screenToLocalCoords(mouseX, mouseY);
 	if (focusItem >=0 && focusStyle == menuHighlightText)
 		items[focusItem]->setTextColour(textColour);
@@ -141,28 +140,30 @@ void CGUImenu::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 			callbackObj->GUIcallback(this, msg);
 		}
 	}
-		
+	return true;
 }
 
 /** User pressed left-mouse, affirming the currently selected item. */
-void CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
+bool CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgLMdown;
 	msg.value = focusItem;
 	pDrawFuncs->handleUImsg(*this, msg);
+	return true;
 }
 
-void CGUImenu::OnRMouseDown(const int mouseX, const int mouseY, int key) {
+bool CGUImenu::OnRMouseDown(const int mouseX, const int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgRMdown;
 	msg.value = focusItem;
 	if (callbackObj) {
 		callbackObj->GUIcallback(this, msg);
 	}
+	return true;
 }
 
 /** User pressed left-mouse, affirming the currently selected item. */
-void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
+bool CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	if (IsOnControl(*this,mouseX,mouseY))
 		msg.Msg = uiClick;
@@ -174,6 +175,7 @@ void CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 	if (callbackObj) {
 		callbackObj->GUIcallback(this, msg);
 	}
+	return true;
 }
 
 

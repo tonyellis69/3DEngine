@@ -15,8 +15,8 @@ public:
 	void updateSliderAppearance();
 	void setValue(int newValue);
 	void DrawSelf( );
-	void OnMouseMove(const int mouseX,const  int mouseY,int key);
-	void OnLMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool OnMouseMove(const int mouseX,const  int mouseY,int key);
+	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	virtual void updateValue();
 	void setMax(int newMax); 
 	void setMin(int newMin); 

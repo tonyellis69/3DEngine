@@ -13,7 +13,6 @@ public:
 	CGUIswatchContainer(int x, int y, int w, int h);
 	 ~CGUIswatchContainer();
 	void addSwatchGroup(std::string name, std::vector<glm::i32vec4>* colours);
-	void onDoubleClick(const int mouseX, const int mouseY, int key);
 	void message(CGUIbase* sender, CMessage& msg);
 	void GUIcallback(CGUIbase* sender, CMessage& msg);
 	void openColourPicker(CGUIswatchGroup * group, int swatchNo);
@@ -45,10 +44,10 @@ class CGUIswatchGroup : public CGUIpanel {
 public:
 	CGUIswatchGroup(int x, int y, int w, int h);
 	void DrawSelf();
-	void OnClick(const  int mouseX, const  int mouseY);
+	bool OnClick(const  int mouseX, const  int mouseY);
 	int getSwatchIndex(const int mouseX, const int mouseY);
-	void onDoubleClick(const int mouseX, const int mouseY, int key);
-	void OnRMouseDown(const  int mouseX, const  int mouseY, int key);
+	bool onDoubleClick(const int mouseX, const int mouseY, int key);
+	bool OnRMouseDown(const  int mouseX, const  int mouseY, int key);
 	void onDrag(const  int mouseX, const  int mouseY);
 	void onDrop(const  int mouseX, const  int mouseY);
 
