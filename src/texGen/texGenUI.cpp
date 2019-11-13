@@ -11,13 +11,16 @@ namespace fs = std::experimental::filesystem;
 void CTexGenUI::init(CBaseApp * app) {
 	pApp = app;
 	trackImage = NULL;
+
 	initGUI();
+
 	fillRestoreMenu();
+
 	fillPaletteRestoreMenu();
 	shadeSelectionMode = false;
 
 	GUInoiseCtrl->swatchCtrl->assignDataFile(pApp->dataPath + "swatchGroups.txt");
-
+	
 }
 
 /** Create the interface for viewing textures. */
@@ -28,9 +31,12 @@ void CTexGenUI::initGUI() {
 	pApp->GUIroot.Add(image);
 
 
+	//got here
 
 	GUInoiseCtrl = new CGUInoiseCtrl(700, 430, 380, 360);
+
 	GUInoiseCtrl->setGUIcallback(this);
+
 	pApp->GUIroot.Add(GUInoiseCtrl);
 	//pApp->GUIroot.focusControl = GUInoiseCtrl;
 
@@ -38,11 +44,16 @@ void CTexGenUI::initGUI() {
 	pApp->GUIroot.Add(texGenListPanel);
 
 	CGUIlabel2* listTitle = new CGUIlabel2(10, 10, 100, 20);
+	
 	listTitle->setText("Tex gen stack:");
+
 	texGenListPanel->Add(listTitle);
+	
 
 	container = new CGUIcontainer(10, 30, 130, 175);
 	texGenListPanel->Add(container);
+
+	//didn't get here
 
 	CGUIlabel2* lbl = new CGUIlabel2(150, 30, 70, 20);
 	lbl->setText("Load file");

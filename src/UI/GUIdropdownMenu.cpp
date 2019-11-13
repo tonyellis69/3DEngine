@@ -19,14 +19,20 @@ CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
 	menuButton->setBorderOn(false);
 	Add(menuButton);
 
+	//get here
+
 	menu = new CGUImenu(0, 0 + h, w, 30);
+
 	menu->setVisible(false);
 	menu->setGUIcallback(this);
 	menu->setBackColour1(backColour1);
 	menu->setBackColour2(backColour2);
+	
+	//didn't get here
 	menu->minItemsShown = 3;
 	menu->resizeHorizontal = true;
 	rootUI->Add(menu);
+
 }
 
 void CGUIdropdownMenu::setText(const std::string & title) {
@@ -73,7 +79,7 @@ void CGUIdropdownMenu::clear() {
 	menu->clear();
 }
 
-std::string & CGUIdropdownMenu::getItemName(int itemNo) {
+std::string  CGUIdropdownMenu::getItemName(int itemNo) {
 	return menu->getItemName(itemNo);
 }
 

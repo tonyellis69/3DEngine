@@ -39,6 +39,9 @@
     <Filter Include="Source Files\importer">
       <UniqueIdentifier>{19bf425d-5c6f-4142-b721-0326346c1ca7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\hex">
+      <UniqueIdentifier>{8c60de7b-8f87-46d3-bc94-c5a78907ca8d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -389,14 +392,20 @@
     <ClCompile Include="..\src\UI\themeServer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\hex\hex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\hex\hexArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\importer\importer.cpp">
       <Filter>Source Files\importer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\hexArray.cpp">
+      <Filter>Source Files\hex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\hexElement.cpp">
+      <Filter>Source Files\hex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\hex.cpp">
+      <Filter>Source Files\hex</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\hexObject.cpp">
+      <Filter>Source Files\hex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -775,12 +784,6 @@
     <ClInclude Include="..\src\UI\text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\hex\hex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\hex\hexArray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\BaseApp.h">
       <Filter>Header Files\utils</Filter>
     </ClInclude>
@@ -789,6 +792,18 @@
     </ClInclude>
     <ClInclude Include="..\src\importer\simpleMesh.h">
       <Filter>Source Files\importer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\hexArray.h">
+      <Filter>Source Files\hex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\hexElement.h">
+      <Filter>Source Files\hex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\hex.h">
+      <Filter>Source Files\hex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\hexObject.h">
+      <Filter>Source Files\hex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

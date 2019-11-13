@@ -228,7 +228,7 @@ void CGUIbase::layoutFine() {
 
 /** Calculate the width and height of the given cell, and its position, by analyising the size of the controls
 	in its row and the preceeding rows. */
-glm::i32vec4& CGUIbase::calcCellSize(CGUIbase* cellControl) {
+glm::i32vec4 CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	glm::i32vec2 size(0); glm::i32vec2 pos(0);
 
 	//build a model of the row we're looking at:
@@ -291,7 +291,7 @@ glm::i32vec4& CGUIbase::calcCellSize(CGUIbase* cellControl) {
 /////Oops, don't actually need this as parent resizing happens before this stage.
 /** Calculate the width and height of the given cell, and its position, by analysing the size of the controls
 	in its row and the preceeding rows, on the assumption controls are to take up the minimum space possible. */
-glm::i32vec4& CGUIbase::calcCellSizeMin(CGUIbase* cellControl) {
+glm::i32vec4 CGUIbase::calcCellSizeMin(CGUIbase* cellControl) {
 	glm::i32vec2 size(0); glm::i32vec2 pos(0);
 
 	//build a model of the row we're looking at:

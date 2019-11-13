@@ -110,7 +110,11 @@ void CRenderer::init() {
 //	initRenderToTextureBufs();
 	glEnable(GL_PROGRAM_POINT_SIZE);
 
+	//From now on, this is something we temporarily switch off, not temporarily switch on
+	//index numbers are unlikely to rise high enough for this to be a problem, but be vigilant
+	glEnable(GL_PRIMITIVE_RESTART); 
 	glPrimitiveRestartIndex(65535);
+
 
 	createScreenQuad();
 	createFrameBuffer();
@@ -549,7 +553,7 @@ unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode,
 	
 	glEnable(GL_RASTERIZER_DISCARD);
 
-	glEnable(GL_PRIMITIVE_RESTART);
+	//glEnable(GL_PRIMITIVE_RESTART);
 
 
 	GLint elapsed = 0;
@@ -577,7 +581,7 @@ unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode,
 	glGetQueryObjectuiv(query, GL_QUERY_RESULT, &primitives);
 	//	glGetQueryObjectiv(speedQuery,GL_QUERY_RESULT,&elapsed);
 
-	glDisable(GL_PRIMITIVE_RESTART);
+	//glDisable(GL_PRIMITIVE_RESTART);
 	
 
 		glDisable(GL_RASTERIZER_DISCARD);
@@ -690,6 +694,7 @@ unsigned long CRenderer::getTimerQuery() {
 void CRenderer::drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
 	setVAO(multiBuf.childBufs[childBufNo].hVAO);
 	glDrawArrays(getGLdrawMode(drawMode), vertStart, vertCount);
+
 }
 
 /** Draw an instanced model using instancing data from the given childbuffer of a multibuffer. */
@@ -760,6 +765,18 @@ void CRenderer::drawLineLoopBuf(CBuf& buf) {
 void CRenderer::drawLineStripBuf(CBuf& buf) {
 	setVAO(buf.hVAO);
 	glDrawElements(GL_LINE_STRIP, buf.noIndices, buf.indexType, 0);
+	setVAO(0);
+}
+
+void CRenderer::drawLinesBuf(CBuf& buf) {
+	setVAO(buf.hVAO);
+	glDrawElements(GL_LINES, buf.noIndices, buf.indexType, 0);
+	setVAO(0);
+}
+
+void CRenderer::drawTriStripBuf(CBuf& buf) {
+	setVAO(buf.hVAO);
+	glDrawElements(GL_TRIANGLE_STRIP, buf.noIndices, buf.indexType, 0);
 	setVAO(0);
 }
 

@@ -21,13 +21,13 @@ public:
 	void addToFaceLayer(Tdirection direction);
 	void scroll(Tdirection direction);
 	void initSuperChunks();
-	glm::vec3 & calcSCsampleSpacePosition(glm::i32vec3& scIndex);
+	glm::vec3  calcSCsampleSpacePosition(glm::i32vec3& scIndex);
 	void findAllSCchunks();
 	void fillAllUnclippedSCs();
-	CShellIterator& getIterator();
-	COuterSCIterator& getOuterSCiterator();
-	CFaceIterator& getFaceIterator(Tdirection face);
-	TBoxVolume& getInnerBounds();
+	CShellIterator getIterator();
+	COuterSCIterator getOuterSCiterator();
+	CFaceIterator getFaceIterator(Tdirection face);
+	TBoxVolume getInnerBounds();
 	void reinitialiseFaceSCs(Tdirection face);
 	void addChunksToFaceSCs2(Tdirection face);
 	void removeEncroachedOnChunks2(Tdirection face);
@@ -44,9 +44,9 @@ public:
 
 	void reinitialiseInnerSCs();
 
-	glm::i32vec3& getRotatedIndex(const glm::i32vec3& origIndex);
+	glm::i32vec3 getRotatedIndex(const glm::i32vec3& origIndex);
 
-	glm::i32vec3& getInvRotatedIndex(const glm::i32vec3& origIndex);
+	glm::i32vec3 getInvRotatedIndex(const glm::i32vec3& origIndex);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int SCchunks; //<SC size in chunks.
@@ -80,17 +80,17 @@ class CShellIterator  {
 public:
 	CShellIterator(CShell* pShell);
 	CSuperChunk2* SC();
-	CShellIterator& operator++();
+	CShellIterator operator++();
 	CShellIterator operator++(int);
 
-	CSuperChunk2& operator*();
+	CSuperChunk2 operator*();
 	CSuperChunk2* operator->();
 
 	bool finished();
 
-	glm::i32vec3& getIndex();
+	glm::i32vec3 getIndex();
 
-protected:
+//protected:
 	CSuperChunk2* pSC;
 	glm::i32vec3 index;
 	glm::i32vec3 max;
@@ -106,7 +106,7 @@ protected:
 class COuterSCIterator : public CShellIterator {
 public:
 	COuterSCIterator(CShell* pShell);
-	COuterSCIterator & operator++();
+	COuterSCIterator  operator++();
 	COuterSCIterator operator++(int);
 private:
 	TBoxVolume innerBounds;
@@ -116,10 +116,10 @@ private:
 class CFaceIterator : public CShellIterator {
 public:
 	CFaceIterator(CShell* pShell, Tdirection face);
-	CFaceIterator & operator++();
+	CFaceIterator  operator++();
 	CFaceIterator operator++(int);
 	glm::i32vec3 getIndex();
-private:
+//private:
 	int pseudoX, pseudoY, pseudoZ;
 	int pseudoZValue;
 };

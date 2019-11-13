@@ -3,6 +3,7 @@
 using namespace glm;
 
 CGUImenu::CGUImenu(int x, int y, int w, int h) {
+	
 	setLocalPos(x, y);
 	setWidth(w);
 	setHeight(h);
@@ -15,8 +16,10 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	itemWidth = w;
 	maxTextWidth = 0;// itemWidth;
 	itemHeight = itemFont->lineHeight + vItemPad;
+	focusItem = -1;
 	clear();
-	
+
+	//didn't get here
 	//pDrawFuncs->registerControl(*this);
 	itemTextAlignment = tleft;
 	leftAlignIndent = 10;
@@ -29,6 +32,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	maxItemsShown = 1000;
 	resizeHorizontal = false;
 	drawBorder = false;
+
 }
 
 /** Set the font used by the menu items. */
@@ -180,16 +184,21 @@ bool CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 
 
 void CGUImenu::clear() {
+	
 	nItems = 0;
 	nextItemPos = vItemPad;
+
 	setFocusItem(-1);
+	
+	
+	//didn't get here
 	items.clear();
 	for (size_t i = 0; i < controls.size(); i++)
 		delete controls[i];
 	controls.clear();
 }
 
-std::string & CGUImenu::getItemName(int itemNo) {
+std::string  CGUImenu::getItemName(int itemNo) {
 	if (itemNo < items.size())
 		return items[itemNo]->getText();
 	return std::string("");
@@ -206,6 +215,7 @@ void CGUImenu::setHighlight(unsigned int itemNo, bool onOff) {
 void CGUImenu::setFocusItem(int itemNo) {
 	if (focusItem > -1)
 		items[focusItem]->hasFocus = false;
+	
 	focusItem = itemNo;
 	if (focusItem > -1)
 		items[focusItem]->hasFocus = true;

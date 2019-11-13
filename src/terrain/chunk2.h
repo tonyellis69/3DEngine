@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 
-enum  TChunkStatus { chToSkin, chSkinned, chFree, chRemoveOnAlert };
+enum  TChunkStatus { chToSkin, chSkinned, chFree, chRemoveOnAlert, chDead };
 
 struct TDrawDetails {
 	int childBufNo;
@@ -28,7 +28,7 @@ public:
 	float LoD;
 	glm::vec3 terrainPos;
 
-	unsigned int id;
+	unsigned int bufId;
 	TDrawDetails drawDetails;
 	glm::vec4 colour; ///Colour chunk will be shaded in.
 	TChunkStatus status;

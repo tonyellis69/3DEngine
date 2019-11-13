@@ -39,6 +39,7 @@ template <typename T>
 	friend CLog& operator<<(CLog& log, const TLogMsg& in);
 	friend CLog& operator<<(CLog& log, const glm::vec3& in);
 	friend CLog& operator<<(CLog& log, const glm::i32vec3& in);
+	friend CLog& operator<<(CLog& log, const glm::vec4& in);
  
 	std::ofstream outFile;
 	ILogCallback * callbackObj;

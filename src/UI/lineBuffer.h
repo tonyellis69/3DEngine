@@ -38,7 +38,7 @@ public:
 	void appendLine(TLine& line);
 	void appendFragment(int  fragId);
 	bool isEmpty();
-	const TLineFragment& finalFrag();
+	TLineFragment finalFrag();
 	void updateFragmentPositions();
 	void setYoffset(int value);
 	void adjustYoffset(int adjust);
@@ -58,11 +58,11 @@ public:
 	}
 	int getYextent();
 	TLineFragment& trimTop(int dist);
-	const std::vector<TLineFragment>& getFrags() {
+	std::vector<TLineFragment>& getFrags() {
 		return frags;
 	}
-	TFragPos& getFirstFrag(int objNo);
-	TFragPos& getLastFrag(int objNo);
+	TFragPos getFirstFrag(int objNo);
+	TFragPos getLastFrag(int objNo);
 	void removeObjLine(int objNo);
 	void setLineFadeIn(float fadeIn) {
 		lineFadeIn = fadeIn;

@@ -67,6 +67,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	vm.setApp(this);
 
 	sysLog <<  "BaseApp constructor finished. Yay!\n";
+
 }
 
 
@@ -89,8 +90,10 @@ void CBaseApp::loadSystemFonts() {
 
 /** Starts the application loop. This will not return until the app is shut down. */
 void CBaseApp::start() {
+	
 	LastTime = Engine.Time.seconds();
 	onStart();
+
 	win.hideWindow(false);
 	//toggleLogWindow();
 	while (!win.windowClosing()) {
@@ -209,6 +212,7 @@ void CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
 
 
 void CBaseApp::AppTasks() {
+
 	if (Engine.MakingFit) //activate the global scaling matrix, if we're using one.
 		Engine.applyGlobalScale(); //TO DO: messes GUI - look into or scrap - prob due to line-drawing methods
 
@@ -225,11 +229,12 @@ void CBaseApp::AppTasks() {
 	keyCheck(); //happens every frame, therefore responsive
 
 	//TO DO: mouseCheck, which calls user with last reported mouse positionHint.
+
 	if (!Paused) {
 		//Engine.updateRegisteredSprites(dT);
 		Update();
 	}
-
+	
 
 	if (Engine.skyDome) {
 		drawSkyDome();
@@ -383,10 +388,10 @@ void CBaseApp::initLogWindow() {
 	logWindow = new CGUIrichText(0, 0, 400, 150);
 	logWindow->anchorRight = 10;
 	logWindow->anchorBottom = 10;
-	logWindow->insetX = 13;
 	logWindow->setVisible(false);
 	logWindow->setBorderOn(true);
 	logWindow->setFont(smallSysFont);
+
 
 	logWindow->resizeMode = resizeNone;
 	//sysLog.setCallback(this);

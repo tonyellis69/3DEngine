@@ -44,7 +44,7 @@ public:
 	GLuint hVAO; ///<Handle referencing vertex array object for this buffer.
 	GLuint hIndex; ///<Handle referencing index object for this buffer.
 	unsigned int noIndices; ///<Number of indices used by buffer.
-	int normOffset; ///<Start of normal values in buffer
+	//int normOffset; ///<Start of normal values in buffer
 
 	unsigned int nTris; ///<Number of triangles
 

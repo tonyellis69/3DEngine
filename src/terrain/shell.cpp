@@ -50,13 +50,17 @@ void CShell::playerAdvance(Tdirection direction) {
 		liveLog << " suffient terrain, returning.";
 		return;
 	}
+	
+	//got here
 
 	//still here? More terrain is needed in the given direction
 	//Is there room for more chunks in the final SC in the given direction?
 	if (!faceLayerFull[direction]) {
+		
 		//(2) add chunks to the face layer SCs in this direction!;
 		addToFaceLayer(direction);
 		liveLog << " adding to face layer.";
+	
 	}
 	else {
 		//(3) scroll the SCs, then add a layer 
@@ -104,7 +108,8 @@ void CShell::playerAdvance(Tdirection direction) {
 		if (shellNo == 0)
 			pTerrain->pCallbackApp->onTerrainScroll(move);
 	}
-
+	
+	//didn't get here
 	//The containing shell also needs to respond to the player advancing across the terrain:
 	if (shellNo < pTerrain->shells.size() - 1) {
 		 pTerrain->shells[shellNo + 1].playerAdvance(direction);
@@ -146,7 +151,9 @@ void CShell::addToFaceLayer(Tdirection direction) {
 		faceLayerFull[direction] = true;
 
 	//add the new chunks
+
 	addChunksToFaceSCs2(direction);
+
 }
 
 /** Rotate the SC ordering, moving them one step in the given direction, and moving the outgoing layer
@@ -208,7 +215,7 @@ void CShell::initSuperChunks() {
 }
 
 /** Return the point in sample space of the bottom NW corner of the superchunk at this index positionHint. */
-vec3& CShell::calcSCsampleSpacePosition(i32vec3& scIndex) {
+vec3 CShell::calcSCsampleSpacePosition(i32vec3& scIndex) {
 	//find worldspace displacement of SC from terrain centre 
 	vec3 scPos = vec3(scIndex) * SCsize;
 	scPos -= worldSpaceSize * 0.5f;
@@ -285,19 +292,19 @@ void CShell::fillAllUnclippedSCs() {
 
 
 
-CShellIterator & CShell::getIterator() {
+CShellIterator  CShell::getIterator() {
 	return CShellIterator(this);
 }
 
-COuterSCIterator & CShell::getOuterSCiterator() {
+COuterSCIterator  CShell::getOuterSCiterator() {
 	return COuterSCIterator(this);
 }
 
-CFaceIterator & CShell::getFaceIterator(Tdirection face) {
+CFaceIterator  CShell::getFaceIterator(Tdirection face) {
 	return CFaceIterator(this, face);
 }
 
-TBoxVolume & CShell::getInnerBounds() {
+TBoxVolume  CShell::getInnerBounds() {
 	return innerBounds;
 }
 
@@ -334,9 +341,15 @@ void CShell::addChunksToFaceSCs2(Tdirection face) {
 			//add any new chunks
 			vec3 pos = vec3(faceIter.getIndex()) * SCsize - shellOrigin;
 			SCvol.set(pos, pos + vec3(SCsize));
+			
+			//didn't get here
 			if (chunkVolume.isClippedBy(SCvol)) {
+				
+				
 				faceIter->addChunks(SCvol);
+
 			}
+			
 		}
 		faceIter++;
 	}
@@ -465,11 +478,11 @@ void CShell::reinitialiseInnerSCs() {
 }
 
 /** Convert the given index to its rotated equivalent. */
-glm::i32vec3& CShell::getRotatedIndex(const glm::i32vec3& origIndex) {
+glm::i32vec3 CShell::getRotatedIndex(const glm::i32vec3& origIndex) {
 	return scArray.getRotatedIndex(origIndex);
 }
 
-glm::i32vec3& CShell::getInvRotatedIndex(const glm::i32vec3& origIndex) {
+glm::i32vec3 CShell::getInvRotatedIndex(const glm::i32vec3& origIndex) {
 	return scArray.getInvRotatedIndex(origIndex);
 }
 
@@ -539,7 +552,7 @@ CSuperChunk2* CShellIterator::SC() {
 	return pSC;
 }
 
-CShellIterator & CShellIterator::operator++() {
+CShellIterator  CShellIterator::operator++() {
 	if (pSC != NULL) {
 		index.z++;
 		if (index.z == max.z) {
@@ -567,7 +580,7 @@ CShellIterator CShellIterator::operator++(int) {
 	return tmp; 
 }
 
-CSuperChunk2 & CShellIterator::operator*() {
+CSuperChunk2  CShellIterator::operator*() {
 	return *pSC;
 }
 
@@ -579,7 +592,7 @@ bool CShellIterator::finished() {
 	return pSC == NULL;
 }
 
-glm::i32vec3 & CShellIterator::getIndex() {
+glm::i32vec3  CShellIterator::getIndex() {
 	return index;
 }
 
@@ -590,7 +603,7 @@ COuterSCIterator::COuterSCIterator(CShell * pShell) : CShellIterator(pShell) {
 }
 
 
-COuterSCIterator & COuterSCIterator::operator++() {
+COuterSCIterator  COuterSCIterator::operator++() {
 	if (pSC != NULL) {
 		if (index.z == innerBounds.bl.z && ( index.y > innerBounds.bl.y && index.y < innerBounds.tr.y ) 
 			&& (index.x > innerBounds.bl.x && index.x < innerBounds.tr.x) )
@@ -636,6 +649,8 @@ CFaceIterator::CFaceIterator(CShell * pShell, Tdirection face) : CShellIterator(
 	pseudoY = getYaxis(face);
 	pseudoZ = getAxis(face);
 
+	
+
 	if (face == south || face == east || face == up)
 		pseudoZValue = pShell->shellSCs - 1;
 	else
@@ -648,10 +663,11 @@ CFaceIterator::CFaceIterator(CShell * pShell, Tdirection face) : CShellIterator(
 	element[pseudoY] = 0;
 	element[pseudoZ] = pseudoZValue;
 
+
 	pSC = &pShell->scArray.element(element.x, element.y, element.z);
 }
 
-CFaceIterator & CFaceIterator::operator++() {
+CFaceIterator  CFaceIterator::operator++() {
 	i32vec3 element;
 	element[pseudoZ] = pseudoZValue;
 
@@ -685,6 +701,5 @@ glm::i32vec3  CFaceIterator::getIndex() {
 	element[pseudoX] = index.x;
 	element[pseudoY] = index.y;
 	element[pseudoZ] = pseudoZValue;// index.z;
-
 	return element;
 }

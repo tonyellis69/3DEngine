@@ -171,8 +171,8 @@ public:
 	void positionLogical(CGUIbase * control);
 	glm::i32vec2 layoutControlsCoarse();
 	void layoutFine();
-	glm::i32vec4& calcCellSize(CGUIbase* cellControl);
-	glm::i32vec4& calcCellSizeMin(CGUIbase* cellControl);
+	glm::i32vec4 calcCellSize(CGUIbase* cellControl);
+	glm::i32vec4 calcCellSizeMin(CGUIbase* cellControl);
 	void centreCtrlRow(std::vector<CGUIbase*>& rowCtrls);
 	virtual void resizeToFit() {}
 	virtual void position(CGUIbase* control);

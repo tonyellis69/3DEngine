@@ -3,7 +3,7 @@
 Chunk2::Chunk2()
 {
 	//noTris = 0;
-	id = 0;
+	bufId = 0;
 	//creatorSC = NULL;
 	//overlapDir = none;
 	status = chFree;

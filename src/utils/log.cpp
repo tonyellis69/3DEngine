@@ -52,6 +52,11 @@ CLog& operator<<(CLog& log, const glm::vec3& in) {
 	return log;
 }
 
+CLog& operator<<(CLog& log, const glm::vec4& in) {
+	log.ss << "x " << in.x << " y " << in.y << " z " << in.z << " w " << in.w;
+	return log;
+}
+
 CLog& operator<<(CLog& log, const glm::i32vec3& in) {
 	log.ss << "x " << in.x << " y " << in.y << " z " << in.z;
 	return log;

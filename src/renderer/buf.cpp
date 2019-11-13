@@ -8,6 +8,8 @@ CBuf::CBuf() {
 	hBuffer = 0;
 	hVAO = 0;
 	hIndex = 0;
+	noIndices = 0;
+	noVerts = 0;
 	nTris = 0;
 	bufSize = 0;
 	hInstancedBuf = 0;

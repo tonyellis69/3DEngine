@@ -45,8 +45,8 @@ public:
 
 	void update(float dT);
 
-	glm::vec3& getSCpos(int shellNo,const glm::i32vec3& origIndex);
-	glm::vec3& getSCpos2(int shellNo, const glm::i32vec3& origIndex);
+	glm::vec3 getSCpos(int shellNo,const glm::i32vec3& origIndex);
+	glm::vec3 getSCpos2(int shellNo, const glm::i32vec3& origIndex);
 
 	CSuperChunk2* getSC(const glm::vec3& pos);
 

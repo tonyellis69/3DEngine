@@ -15,12 +15,13 @@ void CHexArray::init(int w, int h) {
 			glm::vec3 offset = glm::vec3(x * xStep, y * yStep, 0) - origin;
 			offset += glm::vec3(xStep * 0.5f, 0, 0) * float(y & 1);
 			hex(x, y).position = offset;
+			hex(x, y).content = 1; //TO DO: temp!
 		}
 
 	}
 }
 
 /** Return the hex at the given 2D coordinates. */
-CHex& CHexArray::hex(int x, int y) {
+CHexElement& CHexArray::hex(int x, int y) {
 	return flatArray[y * width + x];
 }

@@ -20,7 +20,7 @@ void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchu
 	shells.back().pTerrain = this;
 	shells.back().shellNo = 0;
 	shells.back().initSuperChunks();
-	initialiseChunks(2000); //2164
+	initialiseChunks(2000); //2000  //2164
 }
 
 /** Add an outer shell to the existing shells, its size adjusted by extent. */
@@ -71,11 +71,13 @@ void CTerrain2::playerWalk(glm::vec3 & move) {
 		inDirection = down;
 		playerOffset.y = mod(playerOffset.y, -LoD1chunkSize);
 	}
-
-	if (inDirection != none) {
-		shells[0].playerAdvance(inDirection);
+	
+	if (inDirection != none) {		
+		shells[0].playerAdvance(inDirection);		
 		removeChunkOverlaps(inDirection);
+
 	}
+	
 }
 
 /** Iterate through the shells, removing any chunks now overlapped by chunks of an inner shell. */
@@ -183,10 +185,10 @@ int CTerrain2::getFreeChunk() {
 
 /** Move this chunk  to the free pile. */
 void CTerrain2::removeChunk(int id) {
-	//TO DO: mesh may not have been created yet - is this safe/efficient?
-	pCallbackApp->deleteChunkMesh(chunks[id]);
+	if (chunks[id].status == chSkinned)
+		pCallbackApp->deleteChunkMesh(chunks[id]);
 
-	chunks[id].status = chFree;
+	chunks[id].status = chFree; 
 	freeChunks.push_back(id);
 }
 
@@ -194,7 +196,7 @@ void CTerrain2::removeChunk(int id) {
 void CTerrain2::update(float dT) {
 
 	//TO DO: base number on time available, not const value!
-	unsigned int tmp = chunksToMesh.size(); //10
+	unsigned int tmp = 10;// chunksToMesh.size(); //10
 	for (int x = 0; x < tmp; x++) {  
 		//are there any chunks in the queue? Mesh the next one.
 		if (chunksToMesh.empty())
@@ -210,13 +212,13 @@ void CTerrain2::update(float dT) {
 }
 
 /** Return the NW bottom corner position of this SC in worldspace. */
-glm::vec3& CTerrain2::getSCpos(int shellNo, const glm::i32vec3& origIndex) {
+glm::vec3 CTerrain2::getSCpos(int shellNo, const glm::i32vec3& origIndex) {
 	i32vec3 rotatedIndex = shells[shellNo].getRotatedIndex(origIndex);
 	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
 		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
 }
 
-glm::vec3& CTerrain2::getSCpos2(int shellNo, const glm::i32vec3& origIndex) {
+glm::vec3 CTerrain2::getSCpos2(int shellNo, const glm::i32vec3& origIndex) {
 	i32vec3 rotatedIndex = shells[shellNo].getInvRotatedIndex(origIndex);;
 	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
 		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
@@ -228,9 +230,9 @@ CSuperChunk2* CTerrain2::getSC(const glm::vec3& pos) {
 		i32vec3 scIndex = shell.getSCat(pos);
 		if (any(lessThan(scIndex, i32vec3 (0))))
 			continue;
-		CSuperChunk2 sc =  shell.scArray.element(scIndex.x, scIndex.y, scIndex.z);
-		if (!sc.isEmpty)
-			return &sc;
+		CSuperChunk2* sc =  &shell.scArray.element(scIndex.x, scIndex.y, scIndex.z);
+		if (!sc->isEmpty)
+			return sc;
 	}
 	return NULL;
 }
@@ -245,7 +247,7 @@ void CTerrain2::getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& bu
 	for (auto chunk : sc->scChunks) {
 		if (all(greaterThanEqual(chunks[chunk].terrainPos, pos)) && 
 				all(lessThanEqual(chunks[chunk].terrainPos, pos + vec3(chunkSize)))) {
-			chunkId = chunks[chunk].id;
+			chunkId = chunks[chunk].bufId;
 			break;
 		}
 	}

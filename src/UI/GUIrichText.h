@@ -71,7 +71,7 @@ public:
 	void setTextTheme(const std::string& themeName);
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
-	void appendText(std::string newText);
+	void appendText(const std::string& newText);
 	void addText(std::string newText);
 	bool scrollDown2(int dist);
 	void createPage();
@@ -93,7 +93,7 @@ public:
 	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
 
 
-	TCharacterPos& getPreviousLine(TCharacterPos& startText);
+	TCharacterPos getPreviousLine(TCharacterPos& startText);
 	bool scrollUp3(int dist);
 	TCharacterPos getPrevNewline(int textObj, int pos);
 	void update(float dT);
@@ -163,9 +163,9 @@ public:
 
 	~CGUIrichText();
 
-	int lineOverrun;
+	int overrunningPixels;
 	int underrun;
-	int maxHeight;
+	int maxResizeHeight;
 	int longestLine;
 	int shortestSpaceBreak; ///<Only spacebreak after this many pixels.
 
@@ -179,9 +179,9 @@ public:
 	float updateDt; ///<Elapsed seconds since last call to update().
 
 	float correctOverrunDelay; ///<Delay before we next scroll
-	bool overrunCorrect; ///<If true, scroll down to correct overrun
+	bool overrunCorrectionOn; ///<If true, scroll down to correct overrun
 	int overrunHotTextObj;
-	int yPixelOffset; ///<Used for scrolling by pixel.
+
 	int scrollHeight; ///<Pixels to smoothscroll before actually scrolling the text one line.
 	int smoothScrollStep;
 	TMouseWheelMode mouseWheelMode; ///<Either scrolling or hot text selecting.
@@ -194,8 +194,7 @@ public:
 	TtextStyle defaultTextStyle; //The one we start with and fall back to
 	TtextStyle currentTextStyle;
 
-	bool mouseMode; ///<True for selection hot text with mouse pointer.
-
+	
 	TResizeMode resizeMode;
 
 	std::map<std::string, TtextStyle>* styles; ///<List of available styles
@@ -206,10 +205,7 @@ public:
 	int textureHeight; ///<Height of the texture being drawn to.
 	int textureWidth; ///<Guess.
 
-	bool noScrollMode; ///<If true, text above the top line is thrown away.
-
-	int insetX; ///<Little hack to enable left indent if > 0.
-
+	
 	CLog* transcriptLog; ///<If exists, send prerendered text here. 
 
 	bool suspended; ///<If true, suspend activity such as highlighting.
@@ -236,6 +232,10 @@ public:
 	float lineFadeSpeed; ///<Around 260. Smaller is slower
 
 private:
+	void prepForFirstText();
+	void prepForScrolling();
+	void initTextDelivery();
+
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
 };

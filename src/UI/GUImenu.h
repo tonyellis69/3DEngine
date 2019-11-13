@@ -27,7 +27,7 @@ public:
 
 	bool OnClick(const int mouseX, const int mouseY);
 	void clear();
-	std::string& getItemName(int itemNo);
+	std::string getItemName(int itemNo);
 
 	void setHighlight(unsigned int itemNo, bool onOff);
 

@@ -48,9 +48,11 @@ bool CLineBuffer::isEmpty() {
 	return lines.back().fragments.empty();
 }
 
-const TLineFragment& CLineBuffer::finalFrag() {
-	if (lines.empty())
+TLineFragment CLineBuffer::finalFrag() {
+	if (lines.empty()) {
 		return TLineFragment{ 0,0,0,0,0,0,0,no,0 };
+	}
+	
 	return frags[lines.back().fragments.back()];
 }
 
@@ -156,7 +158,7 @@ TLineFragment& CLineBuffer::trimTop(int dist) {
 }
 
 /** Return the frag id and line number of the first fragment of this text obj. */
-TFragPos& CLineBuffer::getFirstFrag(int objNo) {
+TFragPos CLineBuffer::getFirstFrag(int objNo) {
 	int lineNo = -1;
 	for (auto line : lines) {
 		lineNo++;
@@ -169,7 +171,7 @@ TFragPos& CLineBuffer::getFirstFrag(int objNo) {
 }
 
 /** Return the frag id and line number of the last fragment of this text obj. */
-TFragPos& CLineBuffer::getLastFrag(int objNo) {
+TFragPos CLineBuffer::getLastFrag(int objNo) {
 	TFragPos fragPos = { -1,-1 };
 	int lineNo = -1;
 	for (auto line : lines) {

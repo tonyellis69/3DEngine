@@ -9,6 +9,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	CGUIlabel2* lbl = new CGUIlabel2(20, CtrlStartY, 50, 20);
 	lbl->setText("Octaves");
 
+
 	int ctrlX = 100;
 	octaveCtrl = new CGUInumeric2(ctrlX, CtrlStartY, 70, 18);
 	octaveCtrl->setValue(1);
@@ -112,6 +113,9 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 		addToRow("scalePoint", { scalePtCtrl[axis] });
 	}
 
+	
+	//got here
+
 	lbl = new CGUIlabel2(20, posStartY + 90, 80, 20);
 	lbl->setText("Lower");
 
@@ -138,6 +142,10 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl = new CGUIlabel2(20, posStartY + 150, 80, 20);
 	lbl->setText("Samp. width");
 
+	
+	//got here
+
+
 	widthCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
 	widthCtrl->setValue(2); widthCtrl->setMinMax(0, 10);
 	addToRow("sampWidthHeight", { lbl,widthCtrl });
@@ -152,18 +160,31 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl = new CGUIlabel2(20, 0, 80, 20);
 	lbl->setText("Source 1");
 
+
+	//got here
+	
 	src1Ctrl = new CGUIdropdownMenu(ctrlX, 0, 80, 20);
+	
+
 	src1Ctrl->setText("");
+
+	//didn't get here
 	src1Ctrl->setGUIcallback(this);
 	addToRow("source1", { lbl, src1Ctrl });
+	
+	//didn't get here
 
 	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
 	lbl2->setText("Source 2");
+	
+	//didn't get here
 
 	src2Ctrl = new CGUIdropdownMenu(CtrlCol2X + 70, 0, 80, 20);
 	src2Ctrl->setText("");
 	src2Ctrl->setGUIcallback(this);
 	addToRow("source1&2", { lbl, src1Ctrl, lbl2, src2Ctrl });
+
+	//didn't get here
 
 	lbl = new CGUIlabel2(20, 0, 80, 20);
 	lbl->setText("Source 3");
@@ -209,6 +230,8 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	lbl->setText("Depth");
 	rectsDepthCtrl = new CGUInumeric2(ctrlX, posStartY + 150, 70, 18);
 	rectsDepthCtrl->setValue(3); rectsDepthCtrl->setMinMax(1, 10);
+
+	//didn't get here
 
 	lbl2 = new CGUIlabel2(CtrlCol2X, 0, 80, 20);
 	lbl2->setText("Variance");
@@ -299,6 +322,7 @@ CGUInoiseCtrl::CGUInoiseCtrl(int x, int y, int w, int h) : CGUIpanel(x, y, w, h)
 	seedCtrl->setValue(42); seedCtrl->setMinMax(INT_MIN, INT_MAX);
 
 	addToRow("randomSeed", { lbl, seedCtrl });
+	
 }
 
 

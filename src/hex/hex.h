@@ -1,14 +1,15 @@
 #pragma once
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
-
-/** A class describing a hex object. */
+/** A class describing a hex position. */
 class CHex {
 public:
-	CHex() : content(0) {};
 	
+	glm::i32vec2 getAxial();
 
-	int content;
-	glm::vec3 position; 
+	//cube coordinates:
+	int x;
+	int y;
+	int z;
 };
