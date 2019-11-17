@@ -14,10 +14,11 @@ CGUIsysContainer::CGUIsysContainer(int x, int y, int w, int h){
 	setHeight(h);
 
 	horizontalBarActive = false;
+	createSurface();
 	createScrollbars();
 	verticalBar->visible = false;
 	horizontalBar->visible = false;
-	createSurface();
+	//createSurface();
 	fitViewBoxToContainer(); //establish base viewbox
 	adaptToContents(); //ensure surface fits
 	wheelMultiplier = 10;

@@ -8,6 +8,8 @@ void CHexArray::init(int w, int h) {
 	width = w; height = h;
 	float xStep = sqrt(3);
 	float yStep = 1.5f;
+	bbTL = glm::vec3(0);
+	bbBR = glm::vec3(0);
 
 	glm::vec3 origin (w * 0.5f * xStep, h * 0.5f * yStep, 0.0f);
 	for (int y = 0; y < h; y++) {
@@ -16,9 +18,15 @@ void CHexArray::init(int w, int h) {
 			offset += glm::vec3(xStep * 0.5f, 0, 0) * float(y & 1);
 			hex(x, y).position = offset;
 			hex(x, y).content = 1; //TO DO: temp!
+
+
+			//TO DO: also temp - do this more elegantly!
 		}
 
 	}
+	bbTL = origin * glm::vec3(-1,-1,-1);
+	bbBR = origin * glm::vec3(1,1,-1);
+
 }
 
 /** Return the hex at the given 2D coordinates. */

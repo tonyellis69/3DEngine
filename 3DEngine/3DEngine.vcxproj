@@ -142,6 +142,7 @@
     <ClCompile Include="..\src\renderer\model2.cpp" />
     <ClCompile Include="..\src\renderer\modelMulti.cpp" />
     <ClCompile Include="..\src\renderer\multiBuf.cpp" />
+    <ClCompile Include="..\src\renderer\multiBuf2.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
     <ClCompile Include="..\src\renderer\renderMaterial.cpp" />
     <ClCompile Include="..\src\renderer\renderModel.cpp" />
@@ -271,6 +272,7 @@
     <ClInclude Include="..\src\renderer\model2.h" />
     <ClInclude Include="..\src\renderer\modelMulti.h" />
     <ClInclude Include="..\src\renderer\multiBuf.h" />
+    <ClInclude Include="..\src\renderer\multiBuf2.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
     <ClInclude Include="..\src\renderer\renderMaterial.h" />
     <ClInclude Include="..\src\renderer\renderModel.h" />

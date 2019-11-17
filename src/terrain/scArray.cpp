@@ -19,13 +19,13 @@ glm::i32vec2 CSCarry::getDimensions() {
 	return dimensions;
 }
 
-CSuperChunk2 & CSCarry::element(int x, int y, int z) {
+CSuperChunk2 * CSCarry::element(int x, int y, int z) {
 	x = (x + rotation.x) % dimensions.x;
 	y = (y + rotation.y) % dimensions.y;
 	z = (z + rotation.z) % dimensions.z;
 
 	int index = x + (y * dimensions.x * dimensions.z) + (z * dimensions.x);
-	return flatArray[index];
+	return &flatArray[index];
 }
 
 void CSCarry::rotate(glm::i32vec3 dirVec) {

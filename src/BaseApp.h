@@ -58,7 +58,7 @@ public:
 	void onKeyPress(int key, long Mod);
 	void OnKeyRelease(unsigned int Key, long Mod);
 	void OnCharEntry(unsigned int Key, long Mod);
-	void onMouseMove(int x, int y);
+	void onWinMouseMove(int x, int y);
 	void onMouseButton(int button, int action, int mods);
 	virtual void OnMouseWheelMsg(float xoffset, float yoffset);
 	virtual void OnEvent() {};
@@ -73,6 +73,7 @@ public:
 	void initLogWindow();
 	void logCallback(std::stringstream& logStream);
 	void logAlertCallback();
+	void logFatalCallback(std::stringstream& logStream);
 
 	string getExePath();
 

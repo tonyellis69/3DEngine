@@ -165,3 +165,6 @@ void CCamera::getBackPlane(glm::vec3 & planePos, glm::vec3 & planeNormal) {
 //camera object but how it changes the view
 
 
+glm::vec2 CCamera::getView() {
+	return glm::vec2(viewW,viewH);
+}

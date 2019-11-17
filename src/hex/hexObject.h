@@ -10,7 +10,7 @@ enum THexDir { hexNE, hexEast, hexSE, hexSW, hexWest, hexNW};
 /** A class for defining moveable objects in the hex world.*/
 class CHexObject {
 public:
-
+	CHexObject() {};
 	void setPosition(int x, int y, int z);
 	void move(THexDir direction);
 

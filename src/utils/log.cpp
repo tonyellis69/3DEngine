@@ -2,6 +2,7 @@
 
 CLog  sysLog;
 CLog liveLog;
+CFatalLog fatalLog;
 
 
 CLog::CLog() : callbackObj(NULL) {
@@ -61,3 +62,4 @@ CLog& operator<<(CLog& log, const glm::i32vec3& in) {
 	log.ss << "x " << in.x << " y " << in.y << " z " << in.z;
 	return log;
 }
+

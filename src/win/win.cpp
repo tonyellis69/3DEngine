@@ -81,6 +81,7 @@ void CWin::getMousePos(int & x, int & y) {
 	double dx, dy;
 	glfwGetCursorPos(window, &dx, &dy);
 	x = floor(dx); y = floor(dy);
+	//pApp->mouseMove(x,y,0);
 }
 
 /** Poll cached left mouse button state. */
@@ -148,7 +149,7 @@ bool CWin::keyPressed(int key) {
 
 
 void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
-	pApp->onMouseMove(xpos, ypos);
+	pApp->onWinMouseMove(xpos, ypos);
 }
 
 void CWin::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

@@ -22,6 +22,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 
 	logWindow = NULL;
 	sysLog.setFile(homeDir + "sysLog.txt");
+	fatalLog.setCallback(this);
 	liveLog.setCallback(this);
 	sysLog << startMsg << "\nBaseApp constructor starting...";
 	
@@ -159,7 +160,7 @@ void CBaseApp::OnCharEntry(unsigned int Key, long Mod) {
 
 
 
-void CBaseApp::onMouseMove(int x, int y) {
+void CBaseApp::onWinMouseMove(int x, int y) {
 	unsigned int msg = WM_MOUSEMOVE;
 	int key = 0;
 	if (win.leftMouseDown())
@@ -170,6 +171,9 @@ void CBaseApp::onMouseMove(int x, int y) {
 		key += MK_MBUTTON;
 	mouseKey = key;
 	GUIroot.MouseMsg(msg, x, y, key);
+	//liveLog << "\nmouse move! " << x << " " << y;
+	mouseMove(x, y, key);
+
 }
 
 void CBaseApp::onMouseButton(int button, int action, int mods) {
@@ -406,7 +410,7 @@ void CBaseApp::initLogWindow() {
 	created yet, send it to the sysLog (which can write it to a file.) */
 void CBaseApp::logCallback(std::stringstream & logStream) {
 	if (logWindow)
-		logWindow->appendText(logStream.str());
+		logWindow->appendMarkedUpText(logStream.str());
 	else
 		sysLog << logStream.str();
 }
@@ -416,6 +420,22 @@ void CBaseApp::logAlertCallback() {
 	if (logWindow)
 		logWindow->setVisible(true);
 	//TO DO: consider making  log window bigger, too.
+}
+
+/** Handle a fatal log entry. This typically means exiting. */
+void CBaseApp::logFatalCallback(std::stringstream& logStream) {
+	if (logWindow) {
+		logWindow->setVisible(true);
+		logWindow->appendMarkedUpText(logStream.str());
+	}
+	sysLog << logStream.str();
+	sysLog.outFile.flush();
+	#ifdef _DEBUG
+		//pop up dialog box or something.
+	int b = 0;
+	#else
+		exit();
+	#endif
 }
 
 /** Returns the file path of the current program. */

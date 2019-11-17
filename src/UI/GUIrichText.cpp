@@ -21,128 +21,21 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
 }
 
 /** Append newText to the current body of text and show the updated page. */
-void CGUIrichText::appendMarkedUpText(std::string text) {
-	bool bold = false; bool hot = false;
-	enum TStyleChange {
-		styleNone, styleBold, styleHot, styleSuspendedHot, styleStyle,
-		styleBookmark
-	};
-	
-	std::string writeTxt = text;
+void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	std::string remainingTxt = text;
-	std::string styleName;
-	TStyleChange styleChange;
 	while (remainingTxt.size()) {
-		styleChange = styleNone;
-		int cut = 0; int msgId = 0; int objId = 0; unsigned int hotId = 0;
-
-		//CUT: process the next piece of hypertext, if any
-		// precedingText = findNextTag(remainingText, styleChange)
-		//scrap bold WE DON'T EVEN HAVE A BOLD OPTION
-		//delete textObj flag too
-		size_t found = remainingTxt.find('\\');
-		if (found != std::string::npos) {
-			cut = 1;
-			if (remainingTxt[found + 1] == 'b') {
-				styleChange = styleBold;
-				bold = !bold;
-				cut = 2;
-			}
-
-			if (remainingTxt[found + 1] == 'h' || remainingTxt[found + 1] == 'S') {
-				hot = !hot;
-				if (remainingTxt[found + 1] == 'h')
-					styleChange = styleHot;
-				else
-					styleChange = styleSuspendedHot;
-
-				if (remainingTxt[found + 2] == '{') {
-					size_t end = remainingTxt.find("}", found);
-					std::string id = remainingTxt.substr(found + 3, end - (found + 3));
-					size_t sz, sz2;
-					hotId = std::stoi(id, &sz);
-					cut = 4 + id.size();
-				}
-				else {
-					cut = 2;
-					//use this determine if it's style on or style off
-				}
-			}
-
-
-
-			//other markup checks here
-			if (remainingTxt.substr(found + 1, 6) == "style{") {
-				styleChange = styleStyle;
-				size_t end = remainingTxt.find("}", found);
-				styleName = remainingTxt.substr(found + 7, end - (found + 7));
-				cut = 8 + styleName.size();
-			}
-
-
+		TStyleRec styleRec; 
+		std::string precedingText = findNextTag(remainingTxt, styleRec);	
+		if (!precedingText.empty()) {
+			appendText(precedingText);
 		}
-
-		//CUT ENDS
-
-
-		//got here
-
-		//CUT: append the text that led up to the above hypertext
-		writeTxt = remainingTxt.substr(0, found);
-		remainingTxt = remainingTxt.substr(writeTxt.size() + cut, std::string::npos);
-		//TO DO: writeTxt can be empty, in which case don't append
-		if (!writeTxt.empty()) {
-		
-			appendText(writeTxt);
-		}
-		//CUT ENDS
-
-		//didn't get here
-
-		//CUT: make any style change dictated by the hypertext before we process it next loop
-		if (styleChange == styleBold)
-			setAppendStyleBold(bold);
-		if (styleChange == styleHot)
-			setAppendStyleHot(hot, true, hotId);
-		if (styleChange == styleSuspendedHot)
-			setAppendStyleHot(hot, false, hotId);
-		if (styleChange == styleNone)
-			setTextStyle(currentTextStyle);
-		if (styleChange == styleStyle)
-			setTextStyle(styleName);
-		//CUT ENDS
-
+		setStyleChange(styleRec);
 	}
-
-
 }
 
 
-/** Append newText to the current body of text and show the updated page. */
-void CGUIrichText::appendText(const std::string& newText) {
-	requestLineFadeIn(true); //move to renderLineBuffer, that's where it happens
-	
-	addText(newText);
-	
-	if (enableLineFadeIn) //ditto
-		setBusy(true); //because it will take a little while to fade-in this text.
-	renderLineBuffer();
 
-	if (transcriptLog)
-		*transcriptLog << newText;
-}
 
-/** Append the given text to the current body of text. */
-void CGUIrichText::addText(std::string newText) {
-
-	textObjs.back().text += newText;
-
-	compileFragmentsToEnd(lineBuffer.finalFrag());
-
-	//overrunCorrectionOn = true;
-	//Important! Here we signal that we want any overrun caused by this adding this text to be corrected.
-	//ie, by scrolling.
-}
 
 
 void CGUIrichText::applyStyleSheet() {
@@ -178,18 +71,7 @@ void CGUIrichText::setTextColour(float r, float g, float b, float a) {
 	textObjs[currentTextObj].style.colour = vec4(r, g, b, a);
 }
 
-/** Set the bold style for appending text, ie, on or off. */
-void CGUIrichText::setAppendStyleBold(bool isOn) {
-	if (textObjs[currentTextObj].bold == isOn)
-		return;
 
-	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
-	textObjs[currentTextObj].bold = isOn;
-	if (isOn)
-		textObjs[currentTextObj].style.colour = vec4(0, 0, 1, 1); ///FAKE!!! DO NOT KEEP
-	else
-		textObjs[currentTextObj].style.colour = vec4(1, 1, 1, 1);
-}
 
 
 /** Set hot text style for appending text on or off. */
@@ -1214,6 +1096,93 @@ void CGUIrichText::initTextDelivery() {
 	enableLineFadeIn = false; // true; //TO DO scrap!!!
 	lineFadeInOn = false;
 	lineFadeSpeed = 1.0f;// 30;// 20.0f;
+}
+
+std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& styleRec) {
+	int cut = 0;
+	styleRec = { styleNone, 0, "" };
+	size_t found = remainingTxt.find('\\');
+	if (found != std::string::npos) {
+		cut = 1;
+		if (remainingTxt[found + 1] == 'h' || remainingTxt[found + 1] == 'S') {
+		
+
+
+			if (remainingTxt[found + 2] == '{') {
+				size_t end = remainingTxt.find("}", found);
+				std::string id = remainingTxt.substr(found + 3, end - (found + 3));
+				size_t sz, sz2;
+				styleRec.hotId = std::stoi(id, &sz);
+				cut = 4 + id.size();
+
+				if (remainingTxt[found + 1] == 'h')
+					styleRec.styleChange = styleHotOn;
+				else
+					styleRec.styleChange = styleSuspendedHotOn;
+			}
+			else {
+				cut = 2;
+				if (remainingTxt[found + 1] == 'h')
+					styleRec.styleChange = styleHotOff;
+				else
+					styleRec.styleChange = styleSuspendedHotOff;
+			}
+		}
+
+		//other markup checks here
+		if (remainingTxt.substr(found + 1, 6) == "style{") {
+			styleRec.styleChange = styleStyle;
+			size_t end = remainingTxt.find("}", found);
+			styleRec.styleName = remainingTxt.substr(found + 7, end - (found + 7));
+			cut = 8 + styleRec.styleName.size();
+		}
+	}
+
+	std::string writeTxt = remainingTxt.substr(0, found);
+	remainingTxt = remainingTxt.substr(writeTxt.size() + cut, std::string::npos);
+
+	return writeTxt;
+}
+
+/** Append newText to the current body of text and show the updated page. */
+void CGUIrichText::appendText(const std::string& newText) {
+	requestLineFadeIn(true); //move to renderLineBuffer, that's where it happens
+
+	addText(newText);
+
+	if (enableLineFadeIn) //ditto
+		setBusy(true); //because it will take a little while to fade-in this text.
+	renderLineBuffer();
+
+	if (transcriptLog)
+		*transcriptLog << newText;
+}
+
+/** Append the given text to the current body of text. */
+void CGUIrichText::addText(std::string newText) {
+
+	textObjs.back().text += newText;
+
+	compileFragmentsToEnd(lineBuffer.finalFrag());
+
+	//overrunCorrectionOn = true;
+	//Important! Here we signal that we want any overrun caused by this adding this text to be corrected.
+	//ie, by scrolling.
+}
+
+void CGUIrichText::setStyleChange(TStyleRec& styleRec) {
+	if (styleRec.styleChange == styleHotOn)
+		setAppendStyleHot(true, true, styleRec.hotId);
+	if (styleRec.styleChange == styleHotOff)
+		setAppendStyleHot(false, true, styleRec.hotId);
+	if (styleRec.styleChange == styleSuspendedHotOn)
+		setAppendStyleHot(true, false, styleRec.hotId);
+	if (styleRec.styleChange == styleSuspendedHotOff)
+		setAppendStyleHot(false, false, styleRec.hotId);
+	if (styleRec.styleChange == styleNone)
+		setTextStyle(currentTextStyle);
+	if (styleRec.styleChange == styleStyle)
+		setTextStyle(styleRec.styleName);
 }
 
 void CGUIrichText::resize(int w, int h) {

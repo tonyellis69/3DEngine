@@ -15,4 +15,7 @@ public:
 	std::vector<CHexElement> flatArray;
 	int width;
 	int height;
+
+	glm::vec3 bbTL;
+	glm::vec3 bbBR;
 };

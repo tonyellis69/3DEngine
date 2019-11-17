@@ -225,17 +225,22 @@ glm::vec3 CTerrain2::getSCpos2(int shellNo, const glm::i32vec3& origIndex) {
 }
 
 /** Return the superchunk at this position in worldspace containing terrain, or NULL. */
-CSuperChunk2* CTerrain2::getSC(const glm::vec3& pos) {
+TSCident CTerrain2::getSC(const glm::vec3& pos) {
+	//if (pos == glm::vec3(-0.5, 0.5, -0.5))
+	//	int b = 0;
 	for (auto shell : shells) {
 		i32vec3 scIndex = shell.getSCat(pos);
 		if (any(lessThan(scIndex, i32vec3 (0))))
 			continue;
-		CSuperChunk2* sc =  &shell.scArray.element(scIndex.x, scIndex.y, scIndex.z);
+		 CSuperChunk2* sc =  shell.scArray.element(scIndex.x, scIndex.y, scIndex.z);
 		if (!sc->isEmpty)
-			return sc;
+			return {sc->shellNo,scIndex};
 	}
-	return NULL;
+	return { -1,glm::i32vec3(-1) };
 }
+//TO DO: weird pointer corruption if I return sc directly to terrainPhysObj2, as if shell sc vector gone out of scope
+
+
 
 
 /** Return a pointer to a buffer of chunk triangles for the given position, if any. */

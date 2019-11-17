@@ -8,6 +8,7 @@
 #include "chunk2.h"
 
 #include "..\vertBufs.h"
+#include "..\renderer\multiBuf2.h"
 
 typedef vBuf::T3DnormVert TChunkVert2;
 
@@ -17,6 +18,11 @@ public:
 	unsigned int id;
 	unsigned int noTris;
 	TChunkVert2 buf[4200];
+};
+
+struct TSCident {
+	int shellNo;
+	glm::i32vec3 index;
 };
 
 const int chunkTriCacheSize2 = 6;
@@ -48,7 +54,7 @@ public:
 	glm::vec3 getSCpos(int shellNo,const glm::i32vec3& origIndex);
 	glm::vec3 getSCpos2(int shellNo, const glm::i32vec3& origIndex);
 
-	CSuperChunk2* getSC(const glm::vec3& pos);
+	TSCident getSC(const glm::vec3& pos);
 
 	void getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& buf, unsigned int& noTris);
 
@@ -76,6 +82,9 @@ public:
 
 	TChunkTriBuf2 cachedChunkTris[chunkTriCacheSize2]; ///<Chunk triangles recently downloaded from graphics memory.
 	int freeChunkTriCache;
+
+private:
+	CMultiBuf2 multiBuf;
 
 };
 

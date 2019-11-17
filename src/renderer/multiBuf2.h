@@ -1,0 +1,32 @@
+#pragma once
+
+#include <unordered_map>
+
+#include "buf.h"
+
+struct TBlock {
+
+	int start;
+	int size;
+};
+
+/** An class that enables a single vertex buffer to be accessed as a number
+	of separate blocks, which can then be read and written to without the 
+	overhead of changing buffers. Freed blocks are recycled. */
+class CMultiBuf2 {
+public:
+	CMultiBuf2() {}
+	void setSize(int numBytes);
+	int copyBuf(CBuf& src, int size);
+	void freeBlock(int addr);
+	int getBlock(int size);
+
+private:
+	int getFreeBlock(int size);
+	TBlock split(TBlock& block, int size);
+
+	CBuf buffer;
+	std::unordered_map<int, TBlock> freeBlocks;
+	std::unordered_map<int, TBlock> reservedBlocks;
+
+};

@@ -10,7 +10,16 @@
 
 enum TMouseWheelMode {scroll,hotText};
 
+enum TStyleChange {
+	styleNone, styleBold, styleHotOn, styleHotOff, styleSuspendedHotOn, styleSuspendedHotOff, styleStyle,
+	styleBookmark
+};
 
+struct TStyleRec {
+	TStyleChange styleChange;
+	unsigned int hotId;
+	std::string styleName;
+};
 
 struct TCharacterPos {
 	int textObj;
@@ -71,8 +80,7 @@ public:
 	void setTextTheme(const std::string& themeName);
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
-	void appendText(const std::string& newText);
-	void addText(std::string newText);
+
 	bool scrollDown2(int dist);
 	void createPage();
 	void updateFragmentPositions();
@@ -112,7 +120,7 @@ public:
 	std::vector<unsigned int> getHotTextIds();
 	void clear();
 	void clearSelection();
-	void appendMarkedUpText(std::string text);
+	void appendMarkedUpText(const std::string& text);
 
 	void updateAppearance();
 	void resizeToFit();
@@ -235,6 +243,11 @@ private:
 	void prepForFirstText();
 	void prepForScrolling();
 	void initTextDelivery();
+
+	std::string findNextTag( std::string& remainingTxt, TStyleRec& styleRec);
+	void setStyleChange(TStyleRec& styleRec);
+	void appendText(const std::string& newText);
+	void addText(std::string newText);
 
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.

@@ -17,6 +17,7 @@ class ILogCallback {
 public:
 	virtual void logCallback(std::stringstream& logStream) {};
 	virtual void logAlertCallback() {};
+	virtual void logFatalCallback(std::stringstream& logStream) {};
 };
 
 enum TLogMsg { timerOnMsg, timerOffMsg, alertMsg, startMsg};
@@ -24,6 +25,7 @@ enum TLogMsg { timerOnMsg, timerOffMsg, alertMsg, startMsg};
 
 /** A class for logging to a text file or to a rich text window. */
 //lass CLogManip;
+class CFatalLog;
 class CLog {
 public:
 	CLog() ;
@@ -40,6 +42,7 @@ template <typename T>
 	friend CLog& operator<<(CLog& log, const glm::vec3& in);
 	friend CLog& operator<<(CLog& log, const glm::i32vec3& in);
 	friend CLog& operator<<(CLog& log, const glm::vec4& in);
+
  
 	std::ofstream outFile;
 	ILogCallback * callbackObj;
@@ -65,10 +68,36 @@ CLog& operator<<(CLog& log, const T& in) {
 	return log;
 }
 
+
 extern CLog  sysLog;
 extern CLog  liveLog;
 
+class CFatalLog : public CLog {
+public:
+template <typename T>
+	friend CLog& operator<<(CFatalLog& log, const T& in);
 
+};
+
+template <typename T>
+CLog& operator<<(CFatalLog& log, const T& in) {
+
+	if (log.callbackObj) {
+		CLog tmpLog;
+		tmpLog << in;
+		log.callbackObj->logFatalCallback(tmpLog.ss);
+		return log;
+	}
+
+	//default action:
+	sysLog << in;
+	exit(1);
+	return log;
+}
+
+
+
+extern CFatalLog fatalLog;
 
 
 

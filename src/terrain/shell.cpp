@@ -186,7 +186,7 @@ void CShell::scroll(Tdirection scrollDirection) {
 
 /** Any SC setup required when a shell is created. */
 void CShell::initSuperChunks() {
-	scArray.element(0, 0, 0).setCallbackApp(pTerrain->pCallbackApp);
+	scArray.element(0, 0, 0)->setCallbackApp(pTerrain->pCallbackApp);
 	scSampleStep = SCsize / pTerrain->worldToSampleScale;
 	CShellIterator scIter = getIterator();
 	while (!scIter.finished()) {
@@ -380,7 +380,7 @@ void CShell::removeEncroachedOnChunks2(Tdirection face) {
 				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin;
 				SCvol.set(pos, pos + vec3(SCsize));
 				if (innerChunkVol.isClippedBy(SCvol)) {
-					scArray.element(x, y, z).clearChunks(SCvol);
+					scArray.element(x, y, z)->clearChunks(SCvol);
 				}
 			}
 		}
@@ -471,7 +471,7 @@ void CShell::reinitialiseInnerSCs() {
 	for (int x = innerFace.bl.x + 1; x < innerFace.tr.x; x++) {
 		for (int y = innerFace.bl.y + 1; y < innerFace.tr.y; y++) {
 			for (int z = innerFace.bl.z + 1; z < innerFace.tr.z; z++) {
-				scArray.element(x, y, z).clearChunks();
+				scArray.element(x, y, z)->clearChunks();
 			}
 		}
 	}
@@ -533,7 +533,7 @@ void CShell::addInnerFaceChunks2(Tdirection face) {
 				SCvol.set(pos, pos + vec3(SCsize));
 
 				if (innerChunkVol.doesNotEntirelyEnvelop(SCvol)) {
-					scArray.element(x, y, z).addChunksOutside(SCvol);
+					scArray.element(x, y, z)->addChunksOutside(SCvol);
 				}
 			}
 		}
@@ -545,7 +545,7 @@ CShellIterator::CShellIterator(CShell * pShell) {
 	this->pShell = pShell;
 	index = i32vec3(0);
 	max = i32vec3(pShell->shellSCs);
-	pSC = &pShell->scArray.element(0, 0, 0);
+	pSC = pShell->scArray.element(0, 0, 0);
 }
 
 CSuperChunk2* CShellIterator::SC() {
@@ -568,7 +568,7 @@ CShellIterator  CShellIterator::operator++() {
 			}
 
 		}
-		pSC = &pShell->scArray.element(index.x, index.y, index.z);
+		pSC = pShell->scArray.element(index.x, index.y, index.z);
 	}
 	return *this;
 
@@ -631,7 +631,7 @@ COuterSCIterator  COuterSCIterator::operator++() {
 			}
 
 		}
-		pSC = &pShell->scArray.element(index.x, index.y, index.z);
+		pSC = pShell->scArray.element(index.x, index.y, index.z);
 	}
 	return *this;
 
@@ -664,7 +664,7 @@ CFaceIterator::CFaceIterator(CShell * pShell, Tdirection face) : CShellIterator(
 	element[pseudoZ] = pseudoZValue;
 
 
-	pSC = &pShell->scArray.element(element.x, element.y, element.z);
+	pSC = pShell->scArray.element(element.x, element.y, element.z);
 }
 
 CFaceIterator  CFaceIterator::operator++() {
@@ -685,7 +685,7 @@ CFaceIterator  CFaceIterator::operator++() {
 		element[pseudoX] = index.x;
 		element[pseudoY] = index.y;
 
-		pSC = &pShell->scArray.element(element.x, element.y, element.z);
+		pSC = pShell->scArray.element(element.x, element.y, element.z);
 	}
 	return *this;
 }

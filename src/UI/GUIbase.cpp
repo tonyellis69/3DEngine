@@ -411,7 +411,6 @@ bool CGUIbase::IsOnControl(const CGUIbase& Control, const  int mouseX, const  in
 bool CGUIbase::MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key) {
 	if ((!visible) || (!enabled))
 		return false;
-
 	
 	//otherwise, recursively test message against this control's child controls
 	//for (size_t i = 0; i < controls.size(); i++) {
