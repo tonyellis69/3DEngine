@@ -1,5 +1,7 @@
 #include "hexArray.h"
 
+#include <algorithm>"
+
 
 /** Initialise the array to the given dimensions. */
 void CHexArray::init(int w, int h) {
@@ -16,8 +18,8 @@ void CHexArray::init(int w, int h) {
 		for (int x = 0; x < w; x++) {
 			glm::vec3 offset = glm::vec3(x * xStep, y * yStep, 0) - origin;
 			offset += glm::vec3(xStep * 0.5f, 0, 0) * float(y & 1);
-			hex(x, y).position = offset;
-			hex(x, y).content = 1; //TO DO: temp!
+			getHex(x, y).position = offset;
+			getHex(x, y).content = 1; //TO DO: temp!
 
 
 			//TO DO: also temp - do this more elegantly!
@@ -30,6 +32,17 @@ void CHexArray::init(int w, int h) {
 }
 
 /** Return the hex at the given 2D coordinates. */
-CHexElement& CHexArray::hex(int x, int y) {
+CHexElement& CHexArray::getHex(int x, int y) {
+	x = std::clamp(x, 0, width - 1);
+	y = std::clamp(y,0, height - 1);
 	return flatArray[y * width + x];
+}
+
+/** Return the worldspace position of this hex. */
+glm::vec3 CHexArray::getWorldPos(CHex& hex) {
+	glm::i32vec2 offset = cubeToOffset(hex);
+	offset.x += width / 2;
+	offset.y = -offset.y + height / 2;
+
+	return getHex(offset.x, offset.y).position;
 }

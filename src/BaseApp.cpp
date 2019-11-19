@@ -171,12 +171,11 @@ void CBaseApp::onWinMouseMove(int x, int y) {
 		key += MK_MBUTTON;
 	mouseKey = key;
 	GUIroot.MouseMsg(msg, x, y, key);
-	//liveLog << "\nmouse move! " << x << " " << y;
 	mouseMove(x, y, key);
 
 }
 
-void CBaseApp::onMouseButton(int button, int action, int mods) {
+void CBaseApp::onWinMouseButton(int button, int action, int mods) {
 	unsigned int msg = 0; 
 	glm::i32vec2 mousePos = getMousePos();
 
@@ -203,6 +202,7 @@ void CBaseApp::onMouseButton(int button, int action, int mods) {
 	}
 	//////////GUIroot.MouseMsg(msg, mousePos.x, mousePos.y, mods);
 	GUIroot.MouseMsg(msg, mouseX, mouseY, mods);
+	onMouseButton(button, action, mods);
 }
 
 /** Event handler for mouse wheel messages. */

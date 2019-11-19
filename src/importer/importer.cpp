@@ -6,7 +6,7 @@ void CImporter::loadFile(const std::string& filename) {
 	Assimp::Importer importer;
 	meshes.clear();
 
-	const aiScene* scene = importer.ReadFile(filename, aiProcess_JoinIdenticalVertices);
+	const aiScene* scene = importer.ReadFile(filename, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 	
 	processNode(scene->mRootNode, scene);
 

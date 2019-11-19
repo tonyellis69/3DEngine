@@ -54,12 +54,13 @@ public:
 	virtual void onResize(int width, int height) {};
 	virtual void keyCheck() {};
 	virtual void mouseMove(int x, int y, int key) {};
+	virtual void onMouseButton(int button, int action, int mods) {};
 	void onWinResize( int w, int h);
 	void onKeyPress(int key, long Mod);
 	void OnKeyRelease(unsigned int Key, long Mod);
 	void OnCharEntry(unsigned int Key, long Mod);
 	void onWinMouseMove(int x, int y);
-	void onMouseButton(int button, int action, int mods);
+	void onWinMouseButton(int button, int action, int mods);
 	virtual void OnMouseWheelMsg(float xoffset, float yoffset);
 	virtual void OnEvent() {};
 	void AppTasks();

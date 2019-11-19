@@ -1,5 +1,8 @@
 #include "hex.h"
 
+#include <cmath>
+
+#include "..\utils\log.h"
 
 
 CHex::CHex() {
@@ -16,6 +19,14 @@ CHex::CHex(int q, int r) {
 	x = q;
 	z = r;
 	y = -x - z;
+}
+
+CHex CHex::operator+(CHex& hex2) {
+	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
+}
+
+CHex CHex::operator-(CHex& hex2) {
+	return CHex(x - hex2.x, y - hex2.y, z - hex2.z);
 }
 
 /** Construct from a worldspace location.*/
@@ -43,8 +54,13 @@ glm::vec3 axialToCube(float q, float r) {
 	return glm::vec3(x, y, z);
 }
 
+/** Convert cube coordiantes to odd-row offset coordinates.*/
+glm::i32vec2 cubeToOffset(CHex& hex) {
+	return glm::i32vec2(hex.x + (hex.z - (hex.z & 1)) / 2, hex.z);
+}
+
 /** Round floating point coordinates to the nearest hex. */
-CHex cubeRound(glm::vec3& cubePos) {
+CHex hexRound(glm::vec3& cubePos) {
 	int rx = round(cubePos.x);
 	int ry = round(cubePos.y);
 	int rz = round(cubePos.z);
@@ -67,7 +83,7 @@ CHex cubeRound(glm::vec3& cubePos) {
 
 /** Convert fractional axial coordinates to integer axials .*/
 CHex hexRound(float q, float r) {
-	return cubeToAxial(cubeRound(axialToCube(q, r)));
+	return cubeToAxial(hexRound(axialToCube(q, r)));
 }
 
 CHex worldSpaceToHex(glm::vec3& worldSpace) {
@@ -76,4 +92,42 @@ CHex worldSpaceToHex(glm::vec3& worldSpace) {
 	float r = 2.0f / 3.0f * -worldSpace.y;
 
 	return hexRound(q, r);
+}
+
+/** Distance between two hex coordinates. */
+int cubeDistance(CHex& cubeA, CHex& cubeB) {
+	return (abs(cubeA.x - cubeB.x) + abs(cubeA.y - cubeB.y) +  abs(cubeA.z - cubeB.z)) / 2;
+}
+
+glm::vec3 hexLerp(CHex& cubeA, CHex& cubeB, float t) {
+	return glm::vec3(glm::mix(cubeA.x, cubeB.x, t),
+		glm::mix(cubeA.y, cubeB.y, t),
+		glm::mix(cubeA.z, cubeB.z, t));
+
+}
+
+/** Return the line of hexes between the two hexes given. */
+THexList* hexLine(CHex& cubeA, CHex& cubeB) {
+	int N = cubeDistance(cubeA, cubeB);
+	static THexList results;
+	results.clear();
+
+	glm::vec3 A(cubeA.x, cubeA.y, cubeA.z);
+	A += glm::vec3(1e-6, 2e-6, -3e-6);
+	glm::vec3 B(cubeB.x, cubeB.y, cubeB.z);
+	for (int h = 0; h <= N; h++) {
+		results.push_back(hexRound(glm::mix(A, B, 1.0 / N * h)  ));
+	}
+	return &results;
+}
+
+/** Return the direction of the neighbouring hex. */
+THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
+	CHex dirVector = neighbour - hex;
+	for (int dir = hexNE; dir <= hexNW; dir++) {
+		if (dirVector.x == moveVector[dir].x && dirVector.y == moveVector[dir].y
+			&& dirVector.z == moveVector[dir].z)
+			return (THexDir)dir;
+	}
+	fatalLog << "\nNeighbour direction not found!";
 }
