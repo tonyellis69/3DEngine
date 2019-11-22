@@ -1,6 +1,11 @@
 #include "hexArray.h"
 
 #include <algorithm>"
+#include <queue>
+#include <unordered_map>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
 
 
 /** Initialise the array to the given dimensions. */
@@ -45,4 +50,43 @@ glm::vec3 CHexArray::getWorldPos(CHex& hex) {
 	offset.y = -offset.y + height / 2;
 
 	return getHex(offset.x, offset.y).position;
+}
+
+/**Return a path from start to end using the breadth-first algorithm. */
+THexList CHexArray::breadthFirstPath(CHex& start, CHex& end) {
+	std::queue<CHex>  frontier;
+	frontier.push(start);
+
+	std::unordered_map<glm::i32vec2,CHex> cameFrom;
+
+
+	while (!frontier.empty()) {
+		CHex current = frontier.front();
+		frontier.pop();
+
+		//for each neighbour of this hex
+		for (int dir = 0; dir < 6; dir++) {
+			CHex& next = getNeighbour(current, (THexDir)dir);
+			
+			//check for obstacles here
+			if (abs(next.getAxial().x) > width / 2 || abs(next.getAxial().y) > height / 2)
+				break;
+
+			if (cameFrom.find(next.getAxial()) == cameFrom.end() ) {
+				frontier.push(next);
+				cameFrom[next.getAxial()] = current;
+			}
+		}
+	}
+
+	CHex current = end;
+	THexList path;
+	while (current != start) {
+		path.push_back(current);
+		current = cameFrom[current.getAxial()];
+	}
+	std::reverse(path.begin(),path.end());
+
+
+	return path;
 }

@@ -12,6 +12,7 @@ public:
 	void init(int w, int h);
 	CHexElement& getHex(int x, int y);
 	glm::vec3 getWorldPos(CHex& hex);
+	THexList breadthFirstPath(CHex& start, CHex& end);
 
 
 	std::vector<CHexElement> flatArray;

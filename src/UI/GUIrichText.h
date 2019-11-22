@@ -4,6 +4,7 @@
 
 #include "GUIlabel2.h"
 #include "lineBuffer.h"
+#include "lineBuffer2.h"
 #include "..\3DEngine\src\utils\log.h"
 
 #include "text.h"
@@ -30,22 +31,7 @@ struct TCharacterPos {
 enum TTextDelivery { noDelivery, byClause, byCharacter };
 
 enum TTempText {tempNone,tempOn,tempOff };
-const unsigned int richSuspended = 2;
-const unsigned int richMarked = 4;
-const unsigned int richTemp = 8;
-const unsigned int richFadeIn = 16;
-const unsigned int richGap = 32;
-const unsigned int richBookmark = 64;
 
-struct TRichTextRec : textRec {
-	TRichTextRec();
-	unsigned int hotId;
-	int gap;
-	int lineRef;
-	unsigned int flags;
-	float period;
-
-};
 
 
 enum TOverrunMode {overScrollMode, overResizeMode};
@@ -62,11 +48,12 @@ struct TFXfragment {
 };
 
 /** A more versatile multiline text display class. */
-class CGUIrichText : public CGUIlabel2 {
+class CGUIrichText : public ILineBufferCallback, public CGUIlabel2 {
 public:
 	CGUIrichText(int x, int y, int w, int h);
 	void applyStyleSheet();
 	void DrawSelf();
+	TRichTextRec& getTexObjCallback(int objNo);
 	void setFont(CFont* newFont);
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
@@ -81,7 +68,7 @@ public:
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
 
-	bool scrollDown2(int dist);
+	bool scrollDownSuccessful(int dist);
 	void createPage();
 	void updateFragmentPositions();
 	void renderLineBuffer();
@@ -102,14 +89,13 @@ public:
 
 
 	TCharacterPos getPreviousLine(TCharacterPos& startText);
-	bool scrollUp3(int dist);
+	bool scrollUpSuccessful(int dist);
 	TCharacterPos getPrevNewline(int textObj, int pos);
 	void update(float dT);
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 	bool attemptHotTextScroll(int direction);
-	void smoothScroll2(int pixels);
-	void updatePage();
+	void smoothScroll(int pixels);
 	void removeScrolledOffText();
 	void setMouseWheelMode(TMouseWheelMode mode);
 	void updateHotTextSelection();
@@ -188,7 +174,7 @@ public:
 
 	float correctOverrunDelay; ///<Delay before we next scroll
 	bool overrunCorrectionOn; ///<If true, scroll down to correct overrun
-	int overrunHotTextObj;
+	int SCRAP_THISoverrunHotTextObj;
 
 	int scrollHeight; ///<Pixels to smoothscroll before actually scrolling the text one line.
 	int smoothScrollStep;
@@ -249,6 +235,13 @@ private:
 	void appendText(const std::string& newText);
 	void addText(std::string newText);
 
+	void initialisePage();
+	void writePageToLineBuffer();
+
+	void checkHotTextContact(const  int mouseX, const  int mouseY);
+
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
+
+	CLineBuffer2 lineBuffer2;
 };

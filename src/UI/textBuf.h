@@ -9,19 +9,9 @@
 
 #include "renderDrawFuncs.h"
 
+#include "text.h"
 
 
-/** Stores the style details of a homogenous piece of text, ie, one with the same
-font, colour, etc, together with the text itself. */
-struct textRec {
-	textRec() { firstLineIndent = 0;  }
-	std::string text;
-	CFont* font;
-	//glm::vec4 textColour;
-	TtextStyle style;
-	int firstLineIndent;
-	//others to follow
-};
 
 /** Holds the minimum data the textBuffer needs to draw: text, font, text colour. */
 struct TLineFragDrawRec {
@@ -38,7 +28,7 @@ public:
 	void renderTextAt(int x, int y, TLineFragDrawRec& drawData);
 	void renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, float fadeInX);
 	void clearBuffer();
-	void init(bool clearBuffer);
+	void init(int clearBuffer);
 	int addFragment(int x, int y, TLineFragDrawRec& drawData);
 	void render();
 	void render(float fadeInX);
@@ -61,3 +51,7 @@ private:
 	glm::vec4 textColour;
 
 	};
+
+#define CLEAR_EXISTING_IMAGE true
+#define KEEP_EXISTING_IMAGE false
+

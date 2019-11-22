@@ -410,6 +410,15 @@
     <ClCompile Include="..\src\renderer\multiBuf2.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\lineBuffer2.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\imageBuf.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\textSprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -810,6 +819,15 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\multiBuf2.h">
       <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\lineBuffer2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\imageBuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\textSprite.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

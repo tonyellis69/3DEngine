@@ -55,8 +55,8 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads, float fadeInX) {
 }
 
 /** Prepare to compose a buffer-full of text for rendering. */
-void CTextBuffer::init(bool clearBuf) {
-	if (clearBuf)
+void CTextBuffer::init(int clearBuf) {
+	if (clearBuf == CLEAR_EXISTING_IMAGE)
 		clearBuffer(); 
 	textQuads.clear();
 	textQuadsIndex.clear();

@@ -2,10 +2,10 @@
 
 #include <vector>
 
+#include "text.h"
 
-
-enum TNewLine { no, wordwrap, newline };
-/** A partial or complete line of text, with its rendered (x) dimensions. */
+//enum TNewLine { no, wordwrap, newline };
+/** A partial or complete line of text, with its rendered (x) dimensions. 
 struct TLineFragment {
 	int textObj;
 	int textPos;
@@ -17,6 +17,7 @@ struct TLineFragment {
 	TNewLine causesNewLine;
 	bool finalFrag;
 };
+*/
 
 struct TLine  {
 	int height; int width;

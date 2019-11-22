@@ -20,7 +20,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
 	initTextDelivery();
 }
 
-/** Append newText to the current body of text and show the updated page. */
+/** Append new text to the current body of text and show the updated page. */
 void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	std::string remainingTxt = text;
 	while (remainingTxt.size()) {
@@ -31,6 +31,15 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 		}
 		setStyleChange(styleRec);
 	}
+	renderLineBuffer();
+}
+
+
+/**	Compose all the currently in-view text into a single image, ready for drawing to the screen. */
+void CGUIrichText::createPage() {
+	initialisePage();
+	writePageToLineBuffer();
+	renderLineBuffer();
 }
 
 
@@ -49,6 +58,10 @@ void CGUIrichText::DrawSelf() {
 	if (drawBorder) { //should be an overridable basic drawborder routine in the superclass
 		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
 	}
+}
+
+TRichTextRec& CGUIrichText::getTexObjCallback(int objNo) {
+	return textObjs[objNo];
 }
 
 void CGUIrichText::setFont(CFont* newFont) {
@@ -223,7 +236,12 @@ void CGUIrichText::setText(std::string newText) {
 
 
 /** Scroll down by the given amount if possible, returning true if the page needs to be redrawn. */
-bool CGUIrichText::scrollDown2(int dist) {
+bool CGUIrichText::scrollDownSuccessful(int dist) {
+	if (!isOverrun()) //nowhere to scroll down
+		return false;
+	//TO DO: check if this is redundant
+
+
 	int bottomLineOver = lineBuffer.getYextent() - getHeight();
 
 	while (abs(dist) > bottomLineOver) {
@@ -247,16 +265,7 @@ bool CGUIrichText::scrollDown2(int dist) {
 
 
 
-/** Starting with the top visible object, work through the list, converting each to line fragments and adding them
-	to the lineBuffer, until we run out or overrun the bottom of the display area.*/
-void CGUIrichText::createPage() {
-	lineBuffer.clear();
-	overrunHotTextObj = -1; underrun = 0; longestLine = 0;
-	textBuf.init(true);
 
-	compileFragmentsToEnd(TLineFragment { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
-	renderLineBuffer();
-}
 
 /** Update the position details of each fragment, based on line number, line height, and scroll offset. */
 void CGUIrichText::updateFragmentPositions() {
@@ -273,7 +282,7 @@ void CGUIrichText::renderLineBuffer() {
 	hotFrags.clear();
 	fadeFrags2.clear();
 	gapObj = -1; 
-	textBuf.init(true);
+	textBuf.init(CLEAR_EXISTING_IMAGE);
 	int currObjNo = lineBuffer.frags[lineBuffer.getLine(0).fragments[0]].textObj;
 	int finalY = 0; int lineNo = 0;
 	for (auto line : lineBuffer.lines) {
@@ -282,7 +291,7 @@ void CGUIrichText::renderLineBuffer() {
 			if (frag.textObj != currObjNo) { //is this line fragment the start of a new text object?
 				if (textBuf.notEmpty()) { //yes? Render the last of the old text object (if any) before we go any further
 					textBuf.render();
-					textBuf.init(false);
+					textBuf.init(KEEP_EXISTING_IMAGE);
 				}
 				currObjNo = frag.textObj;
 			}
@@ -327,6 +336,7 @@ void CGUIrichText::renderLineBuffer() {
 /** Starting with the given line fragment, compile our text objects into line fragments 
 	until we run out or overflow the page. */
 void CGUIrichText::compileFragmentsToEnd(TLineFragment lineFragment) {
+	SCRAP_THISoverrunHotTextObj = -1; underrun = 0;
 	do {
 		int currObjNo = lineFragment.textObj;
 		bool startOnNewLine = false;
@@ -340,12 +350,13 @@ void CGUIrichText::compileFragmentsToEnd(TLineFragment lineFragment) {
 			checkLineOverrun(lineBuffer.getYextent());
 			return;
 		}
-		//didn't get here
+
 		if (startOnNewLine) {
 			lineBuffer.addLine();
 		}
 
 		lineBuffer.appendFragment(fragId);
+		lineBuffer2.addTextSprite(lineFragment);
 
 		int yExtent = lineBuffer.getYextent();
 		checkLineOverrun(yExtent);
@@ -353,7 +364,7 @@ void CGUIrichText::compileFragmentsToEnd(TLineFragment lineFragment) {
 		if (yExtent > getHeight() && lineFragment.causesNewLine != no) { //we've run past the buffer entirely, so no sense writing any more
 			return;
 		}
-		//didn't get here
+	
 
 	} while (!lineFragment.finalFrag);
 }
@@ -440,6 +451,7 @@ TLine CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
 		line.fragments.push_back(id);
 		line.height = std::max(line.height, lineFragment.height);
 		line.width = std::max(line.width, lineFragment.renderEndX);
+		lineBuffer2.addTextSprite(lineFragment);
 	} while (lineFragment.causesNewLine == no);
 
 	return line;
@@ -550,36 +562,8 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 }
 
 /** Check for mouse over hot text. */
-bool CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
-	if (suspended || busy) {
-		return true;
-	}
-	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
-	int oldSelectedHotObj = selectedHotObj;
-	//if (mouseMode)
-		selectedHotObj = -1;
-	int distToFragTop= 0;
-	for (auto hotTextFrag : hotFrags) {
-		TLineFragment& hotFrag = lineBuffer.getFragment(hotTextFrag.fragId);
-		if (localMouse.y > hotFrag.renderStartY &&  localMouse.y < hotFrag.renderStartY + hotFrag.height
-			&& localMouse.x > hotFrag.renderStartX && localMouse.x < hotFrag.renderEndX) {
-			selectedHotObj = hotFrag.textObj;
-
-			distToFragTop = (localMouse.y - hotFrag.renderStartY);	
-			break;
-		}
-	}
-
-	if (oldSelectedHotObj != selectedHotObj) {
-		
-		i32vec2 adjustedMousePos = { mouseX,mouseY - distToFragTop };
-		msgHotTextChange(adjustedMousePos);
-	}
-
-	
-	//if (oldSelectedHotObj > -1 && oldSelectedHotObj != selectedHotObj) {
-	//	msgHighlight();
-	//}
+bool CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {	
+	checkHotTextContact(mouseX, mouseY);
 	return true;
 }
 
@@ -685,7 +669,7 @@ TCharacterPos CGUIrichText::getPreviousLine(TCharacterPos& startText) {
 }
 
 /** Attempt to scroll up by the given distance. Return true if the page now needs to be redrawn. */
-bool CGUIrichText::scrollUp3(int dist) {
+bool CGUIrichText::scrollUpSuccessful(int dist) {
 	while (dist > abs(lineBuffer.yOffset)) {  //attempting to scroll beyond current top visible line
 		//can we find a previous line?
 		TCharacterPos currentLine = { firstVisibleObject,firstVisibleText };
@@ -707,6 +691,10 @@ bool CGUIrichText::scrollUp3(int dist) {
 
 	lineBuffer.adjustYoffset(dist);
 	updateFragmentPositions();
+	int finalRow = lineBuffer.getFinalRow();
+	if (lineBuffer.getLineTop(finalRow) > getHeight()) { //bottom line scrolled out?
+		lineBuffer.removeLine(finalRow);
+	}
 	return true;
 }
 
@@ -739,7 +727,7 @@ void CGUIrichText::update(float dT) {
 	{
 		updateDt = 0;
 		if (isOverrun() && overrunCorrectionOn) {
-				smoothScroll2(-smoothScrollStep);
+				smoothScroll(-smoothScrollStep);
 				//overrunCorrectionOn = isOverrun();
 		} 
 	}
@@ -766,8 +754,7 @@ bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheel
 
 	if (mouseWheelMode == scroll) {
 		if (!attemptHotTextScroll(direction))
-			//smoothScroll(direction /* * scrollHeight */);
-			smoothScroll2(direction * smoothScrollStep);
+			smoothScroll(direction * smoothScrollStep);
 	}
 	else {
 		hotTextScroll(direction);
@@ -791,30 +778,16 @@ bool CGUIrichText::attemptHotTextScroll(int direction) {
 
 
 /** Scroll the visible text by the given number of pixels, if possible. */
-void CGUIrichText::smoothScroll2(int dist) {
-	if (dist < 0 && !isOverrun()) //nowhere to scroll down
-		return;
-
+void CGUIrichText::smoothScroll(int dist) {
 	if (dist < 0) { //scrolling down to the end...
-		if (scrollDown2(dist)) {
-			renderLineBuffer();
-		}
-	}
-	else if (scrollUp3(dist)) {
-			int finalRow = lineBuffer.getFinalRow();
-			if (lineBuffer.getLineTop(finalRow) > getHeight()) { //bottom line scrolled out?
-				lineBuffer.removeLine(finalRow);
-			}
-
+		if (scrollDownSuccessful(dist))
 			renderLineBuffer();
 	}
-
+	else if (scrollUpSuccessful(dist)) {
+		renderLineBuffer();		
+	}
 }
 
-
-void CGUIrichText::updatePage() {
-	createPage();	
-}
 
 /**	Delete text objects and text that has scrolled beyond the top of visibility. */
 void CGUIrichText::removeScrolledOffText() {
@@ -887,9 +860,9 @@ void CGUIrichText::hotTextScroll(int direction) {
 	//highlight(selectedHotObj);
 	/////////////////////////////////////////
 	//check here if the hot text we've selected is overruning
-	if (overrunHotTextObj == selectedHotObj) {
-		overrunHotTextObj = -1;
-		smoothScroll2(-scrollHeight);
+	if (SCRAP_THISoverrunHotTextObj == selectedHotObj) {
+		SCRAP_THISoverrunHotTextObj = -1;
+		smoothScroll(-scrollHeight);
 	}
 }
 
@@ -1078,6 +1051,7 @@ void CGUIrichText::prepForFirstText() {
 	currentTheme = "defaultTheme";
 	applyStyleSheet();
 	setTextStyle("default"); //set initial text style
+	lineBuffer2.setCallbackObj(this);
 }
 
 /** Ready the system to handle scrolling. */
@@ -1152,7 +1126,7 @@ void CGUIrichText::appendText(const std::string& newText) {
 
 	if (enableLineFadeIn) //ditto
 		setBusy(true); //because it will take a little while to fade-in this text.
-	renderLineBuffer();
+	//renderLineBuffer();
 
 	if (transcriptLog)
 		*transcriptLog << newText;
@@ -1168,6 +1142,42 @@ void CGUIrichText::addText(std::string newText) {
 	//overrunCorrectionOn = true;
 	//Important! Here we signal that we want any overrun caused by this adding this text to be corrected.
 	//ie, by scrolling.
+}
+
+void CGUIrichText::initialisePage() {
+	longestLine = 0;
+	lineBuffer.clear();
+	textBuf.init(CLEAR_EXISTING_IMAGE);
+	lineBuffer2.clear();
+}
+
+void CGUIrichText::writePageToLineBuffer() {
+	TLineFragment startingFragment = { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 };
+	compileFragmentsToEnd(startingFragment);
+}
+
+void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
+	if (suspended || busy) {
+		return;
+	}
+
+	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
+	int oldSelectedHotObj = selectedHotObj;
+	selectedHotObj = -1;
+	int distToFragTop = 0;
+	for (auto hotTextFrag : hotFrags) {
+		TLineFragment& hotFrag = lineBuffer.getFragment(hotTextFrag.fragId);
+		if (all(greaterThan(localMouse,i32vec2(hotFrag.renderStartX, hotFrag.renderStartY))) &&
+					all(lessThan(localMouse, i32vec2(hotFrag.renderEndX, hotFrag.renderStartY + hotFrag.height))) ) { 
+			selectedHotObj = hotFrag.textObj;
+			distToFragTop = (localMouse.y - hotFrag.renderStartY);
+			break;
+		}
+	}
+
+	if (oldSelectedHotObj != selectedHotObj) {
+		msgHotTextChange(i32vec2{ mouseX,mouseY - distToFragTop });
+	}
 }
 
 void CGUIrichText::setStyleChange(TStyleRec& styleRec) {
@@ -1192,6 +1202,9 @@ void CGUIrichText::resize(int w, int h) {
 		h = 1;
 	setWidth(w);
 	setHeight(h);
+
+	lineBuffer2.setPageSize(w, h);
+	//TO DO: shouldn't we resize the textBuffer here too?
 }
 
 /** Append a textObj marking the start or end of temporary text. */

@@ -25,8 +25,20 @@ CHex CHex::operator+(CHex& hex2) {
 	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
 }
 
+CHex CHex::operator+(glm::i32vec3& hex2) {
+	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
+}
+
 CHex CHex::operator-(CHex& hex2) {
 	return CHex(x - hex2.x, y - hex2.y, z - hex2.z);
+}
+
+bool CHex::operator==(CHex& hex2) {
+	return (x == hex2.x) && (y == hex2.y) && (z == hex2.z);
+}
+
+bool CHex::operator!=(CHex& hex2) {
+	return (x != hex2.x) || (y != hex2.y) || (z != hex2.z);
 }
 
 /** Construct from a worldspace location.*/
@@ -39,6 +51,8 @@ CHex::CHex(glm::vec3& worldSpace) {
 glm::i32vec2 CHex::getAxial() {
 	return glm::i32vec2(x,z);
 }
+
+
 
 
 /**Convert cube coordinates to axial.*/
@@ -57,6 +71,16 @@ glm::vec3 axialToCube(float q, float r) {
 /** Convert cube coordiantes to odd-row offset coordinates.*/
 glm::i32vec2 cubeToOffset(CHex& hex) {
 	return glm::i32vec2(hex.x + (hex.z - (hex.z & 1)) / 2, hex.z);
+}
+
+/** Convert cube coordinates to a point in worldspace. */
+glm::vec3 cubeToWorldSpace(CHex& hex) {
+	//float x = (hex.x + (-0.5f * (hex.z & 1))) * hexWidth;
+	//float y = -hex.z * 1.5f;
+	glm::i32vec2 offset = cubeToOffset(hex);
+	float x = (offset.x + (0.5f * (hex.z & 1)))* hexWidth;
+	float y = -offset.y * 1.5f;
+	return glm::vec3(x,y,0);
 }
 
 /** Round floating point coordinates to the nearest hex. */
@@ -125,9 +149,19 @@ THexList* hexLine(CHex& cubeA, CHex& cubeB) {
 THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
 	CHex dirVector = neighbour - hex;
 	for (int dir = hexNE; dir <= hexNW; dir++) {
-		if (dirVector.x == moveVector[dir].x && dirVector.y == moveVector[dir].y
-			&& dirVector.z == moveVector[dir].z)
+		if (dirVector.x == moveVectorCube[dir].x && dirVector.y == moveVectorCube[dir].y
+			&& dirVector.z == moveVectorCube[dir].z)
 			return (THexDir)dir;
 	}
 	fatalLog << "\nNeighbour direction not found!";
+}
+
+/** Convert a cube direction as a normalised 3D space vector. */
+glm::vec3 directionToVec(THexDir direction) {
+	return glm::normalize(moveVector3D[direction]);
+}
+
+/** Return the adjacent hex in this direction. */
+CHex getNeighbour(CHex& hex, THexDir direction){
+	return hex + moveVectorCube[direction];
 }
