@@ -180,13 +180,8 @@ public:
 	int smoothScrollStep;
 	TMouseWheelMode mouseWheelMode; ///<Either scrolling or hot text selecting.
 
-	//glm::vec4 hotTextColour; ///<colour for unselected hot text.
-	//glm::vec4 hotTextHighlightColour;  ///<colour for selected hot text.
-
-	//CFont* currentSetFont;
-
-	TtextStyle defaultTextStyle; //The one we start with and fall back to
-	TtextStyle currentTextStyle;
+	//TtextStyle defaultTextStyle; ///<The one we start with.
+	TtextStyle currentTextStyle; ///<The one most recently set by the user, and to which we revert after any markup effects.
 
 	
 	TResizeMode resizeMode;

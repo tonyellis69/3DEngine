@@ -1,6 +1,6 @@
 #include "imageBuf.h"
 
-
+#include "../utils/log.h"
 
 C2DimageBuf::C2DimageBuf() {
 	nextId = 0;
@@ -8,59 +8,51 @@ C2DimageBuf::C2DimageBuf() {
 
 /** Set the size of the main buffer. This will wipe any existing content.*/
 void C2DimageBuf::setSize(int width, int height) {
-	maxSize = { width, height };
-
-	buffers.resize(1);
-	buffers[0].setSize(glm::i32vec2{ width, height });
+	texBuf.resize(width, height * 1.25f);
 	nextId = 0;
+	freeBlocks.push_back({ 0,texBuf.height });
 }
 
 /** Reserve a chunk of image memory, and return the identifying id. */
-unsigned int C2DimageBuf::getBuf(glm::i32vec2& size) {
-	//do we have space in an existing buffer?
-	//yes? Reserve it
-	//no? Create a new buffer
-	//reserve space in it
-	for (auto buffer : buffers) {
-		if (buffer.reserve(size, nextId))
-			return nextId++;
+unsigned int C2DimageBuf::reserve(glm::i32vec2& size) {
+	int index = getFreeBlock(size.y);
+	
+	if (freeBlocks[index].size >= size.y * 2)
+		split(index, size.y);
+	
+	int addr = freeBlocks[index].start;
+	reservedBlocks[addr] = freeBlocks[index];
+	freeBlocks.erase(freeBlocks.begin() + index);
+	
+	return addr;
+}
+
+CRenderTexture& C2DimageBuf::getBuffer() {
+	return texBuf;
+}
+
+/** Return the index in freeBlocks of a free memory block >= size. */
+int C2DimageBuf::getFreeBlock(int size) {
+	int index = 0;
+	for (auto freeBlock : freeBlocks) {
+		if (freeBlock.size >= size) {
+			break;
+		}
+		index++;
 	}
 
-	buffers.push_back(CBufRec());
-	buffers.back().setSize(glm::i32vec2{ maxSize.x,glm::max(maxSize.y / 2, size.y) });
-	//TO DO: this may not be the best strategy for size of new buffers
-	//investigate?
+	if (index == freeBlocks.size()) {
+		liveLog << "\nCouldn't find a texBlock!!";
+		int b = 0; //(no? enlarge texBuf and copy, but that can wait);
+	}
+	return index;
+}
 
-	buffers.back().reserve(size, nextId);
-	return nextId++;
+/** Split this block into two, one of size size. */
+void C2DimageBuf::split(unsigned int index, int size) {
+	TTexBlock newBlock = { freeBlocks[index].start + size, freeBlocks[index].size - size };
+	freeBlocks.push_back(newBlock);
+	freeBlocks[index].size = size;
 }
 
 
-
-void CBufRec::setSize(glm::i32vec2& size) {
-	buffer.resize(size.x, size.y);
-	topSpace = 0;
-	bottomSpace = size.y;
-};
-
-//** Attempt to reserve the requested block of memory.*/
-bool CBufRec::reserve(glm::i32vec2& size, unsigned int id) {
-	if (size.x > buffer.width) //needs a wider buffer
-		return false;
-
-	if (topSpace > size.y) {
-		TBlock block = { id,{0,topSpace - size.y}, size };
-		blocks.push_back(block);
-		topSpace -= size.y;
-		return true;
-	}
-
-	if (buffer.height - bottomSpace > size.y) {
-		TBlock block = { id,{0,bottomSpace}, size };
-		bottomSpace += size.y;
-		blocks.push_back(block);
-		return true;
-	}
-
-	return false;
-}

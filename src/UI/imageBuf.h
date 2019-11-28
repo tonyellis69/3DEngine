@@ -1,51 +1,38 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include "../renderer/renderTexture.h"
 
 
+struct TTexBlock {
+	int start;
+	int size;
+};
 
-class CBufRec;
-/** Provides 2D blocks of graphics memory for storage. Attempts to recyclee
-	and use as few textures as possible. */
+/** Provides 2D blocks of graphics memory for storage. Attempts to recycle. */
 class C2DimageBuf {
 public:
 	C2DimageBuf();
 	void setSize(int width, int height);
-	unsigned int getBuf(glm::i32vec2& size);
-
+	unsigned int reserve(glm::i32vec2& size);
+	CRenderTexture& getBuffer();
 
 private:
-	glm::i32vec2 maxSize;
+	int getFreeBlock(int size);
+	void split(unsigned int index, int size);
 
-	std::vector<CBufRec> buffers;
+	std::vector<TTexBlock> freeBlocks;
+	std::unordered_map<int,TTexBlock> reservedBlocks;
+
+	CRenderTexture texBuf;
 	unsigned int nextId;
+;
 };
 
 
 
 
-class CBufRec {
-public:
 
-	struct TBlock {
-		unsigned int id;
-		glm::i32vec2 start;
-		glm::i32vec2 size;
-
-	};
-
-	CBufRec() {};
-	void setSize(glm::i32vec2& size);
-	bool reserve(glm::i32vec2& size, unsigned int id);
-	int bufNo;
-	int topSpace;
-	int bottomSpace;
-
-	CRenderTexture buffer;
-	std::vector<TBlock> blocks;
-
-
-};
 

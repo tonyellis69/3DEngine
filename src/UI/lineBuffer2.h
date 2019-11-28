@@ -15,6 +15,8 @@ public:
 	void setPageSize(int width, int height);
 	void clear();
 	void addTextSprite(TLineFragment& fragment);
+	CRenderTexture& getBuffer();
+	void renderToTextBuf(CRenderTexture& texBuf);
 
 private:
 	C2DimageBuf imageBuf; ///<Provides storage for text sprite image buffers.

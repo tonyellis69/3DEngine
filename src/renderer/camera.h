@@ -10,6 +10,7 @@ public:
 	CCamera();
 	CCamera(glm::vec3& pos);
 	void lookAt(glm::vec3& target);
+	void setNearFar(float, float);
 	void setAspectRatio(float w, float h);
 	void setPos(glm::vec3& pos);
 	void translate(glm::vec3& dir);

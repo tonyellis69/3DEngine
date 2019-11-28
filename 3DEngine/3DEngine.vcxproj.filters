@@ -122,9 +122,6 @@
     <ClCompile Include="..\src\vertBufs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\watch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\2d.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>

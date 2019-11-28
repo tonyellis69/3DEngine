@@ -31,7 +31,7 @@ const int chunkTriCacheSize2 = 6;
 
 class CTerrain2 {
 public:
-	CTerrain2() : playerOffset(0), chunkOrigin(1) {};
+	CTerrain2();
 	void createLoD1shell(float _LoD1cubeSize, int chunkCubes, int SCchunks, int shellSCs);
 	void addShell(int extent);
 	float getShellSize(unsigned int shellNo);
@@ -83,8 +83,10 @@ public:
 	TChunkTriBuf2 cachedChunkTris[chunkTriCacheSize2]; ///<Chunk triangles recently downloaded from graphics memory.
 	int freeChunkTriCache;
 
-private:
+
 	CMultiBuf2 multiBuf;
+
+private:
 
 };
 

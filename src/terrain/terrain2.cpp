@@ -7,6 +7,11 @@
 
 using namespace glm;
 
+CTerrain2::CTerrain2() : playerOffset(0), chunkOrigin(1)  {
+	multiBuf.setSize(175000000);
+	multiBuf.storeLayout({ 3, 3, 0, 0 });
+	//TO DO: temp!!! create a setter!!!
+};
 
 
 /** Create the central shell, establishing some variables. */

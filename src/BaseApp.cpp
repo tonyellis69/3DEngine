@@ -4,11 +4,11 @@
 
 #include <glm/glm.hpp>
 
-#include "watch.h"
+//#include "watch.h"
 
 #include "utils/log.h"
 
-using namespace watch;
+//using namespace watch;
 
 
 
@@ -62,7 +62,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	
 	quitOnEsc = true;
 	//initWatches();
-	pTimer = &Engine.Time; //last vestige of watch.h - get rid of!
+	//pTimer = &Engine.Time; //last vestige of watch.h - get rid of!
 	initLogWindow();
 
 	vm.setApp(this);

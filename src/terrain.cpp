@@ -373,14 +373,14 @@ void CTerrain::prepareToFree(Chunk* chunk) {
 void CTerrain::update() {
 	
 	//Skin the next chunk on the list that needs it, if any. */
-	double startT = watch::pTimer->milliseconds();
+//	double startT = watch::pTimer->milliseconds();
 	Chunk* chunk;
 
 	
 
 
 	size_t s = toSkin.size();
-	while ((watch::pTimer->milliseconds() - startT) < 30) { //75 brings judder back, eats too many cycles
+/*	while ((watch::pTimer->milliseconds() - startT) < 30) { //75 brings judder back, eats too many cycles
 						//NB 30 can cause glitches for very fast alternation of north/west scrolling - not real life
 		if (s == 0)
 			break;
@@ -389,7 +389,7 @@ void CTerrain::update() {
 		toSkin.pop_front(); 
 		chunk->getSkinned();
 		s--;
-	}
+	}*/
 
 	
 

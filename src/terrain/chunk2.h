@@ -30,6 +30,8 @@ public:
 
 	unsigned int bufId;
 	TDrawDetails drawDetails;
+	TDrawDetails drawDetails2;
+
 	glm::vec4 colour; ///Colour chunk will be shaded in.
 	TChunkStatus status;
 

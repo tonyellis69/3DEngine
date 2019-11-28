@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 
 #include "buf.h"
 
@@ -20,13 +21,18 @@ public:
 	int copyBuf(CBuf& src, int size);
 	void freeBlock(int addr);
 	int getBlock(int size);
+	void storeLayout(std::initializer_list<int> attribs);
+	unsigned int getVAO();
 
 private:
 	int getFreeBlock(int size);
-	TBlock split(TBlock& block, int size);
+	TBlock split(TBlock block, int size);
+	void copyToBlock(CBuf& src, int blockAddr, int size);
 
 	CBuf buffer;
-	std::unordered_map<int, TBlock> freeBlocks;
-	std::unordered_map<int, TBlock> reservedBlocks;
+	//std::multimap<int, TBlock> freeBlocks; //ordered by size
+	std::unordered_map<int, TBlock> freeBlocks; //ordered by start
+	std::unordered_map<int, TBlock> reservedBlocks; //ordered by start
 
+	int highestAddr;
 };

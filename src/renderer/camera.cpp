@@ -32,6 +32,11 @@ void CCamera::lookAt(glm::vec3& target) {
 	createClipMatrix();
 }
 
+void CCamera::setNearFar(float near, float far) {
+	zNear = near; zFar = far;
+	setAspectRatio(viewW, viewH);
+}
+
 /** Recreate the perspective transform based on the given aspect ratio. */
 void CCamera::setAspectRatio(float w, float h) {
 	perspectiveMatrix = glm::perspective<float>(Fov,w/h,zNear,zFar);

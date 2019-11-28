@@ -216,7 +216,6 @@
     <ClCompile Include="..\src\utils\idContainer.cpp" />
     <ClCompile Include="..\src\utils\log.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
-    <ClCompile Include="..\src\watch.cpp" />
     <ClCompile Include="..\src\win\win.cpp" />
   </ItemGroup>
   <ItemGroup>

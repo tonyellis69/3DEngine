@@ -32,6 +32,7 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 		setStyleChange(styleRec);
 	}
 	renderLineBuffer();
+	lineBuffer2.renderToTextBuf(textBuf.textTexture);
 }
 
 
@@ -77,6 +78,7 @@ CFont * CGUIrichText::getFont() {
 
 /** Set the current text drawing colour. */
 void CGUIrichText::setTextColour(float r, float g, float b, float a) {
+	currentTextStyle.colour = vec4(r, g, b, a);
 	if (textObjs[currentTextObj].style.colour == vec4(r, g, b, a))
 		return;
 
@@ -201,7 +203,7 @@ void CGUIrichText::refreshCurrentTextStyles() {
 
 	for (auto style : *styles) {
 		if (style.first == "default")
-			defaultTextStyle = style.second;
+			;// defaultTextStyle = style.second;
 		else if (style.first == "hot")
 			hotTextStyle = style.second;
 		else if (style.first == "hotSelected")
@@ -216,12 +218,13 @@ void CGUIrichText::setTextTheme(const std::string& themeName) {
 	refreshCurrentTextStyles();
 }
 
+//!!!!!!!!!!!!!!!!TO DO: get rid of
 void CGUIrichText::setDefaultTextStyle(std::string styleName) {
 	for (auto style : *styles) {
 		//if (style.name == styleName)
 		//	defaultTextStyle = style;
 		if (style.first == styleName)
-			defaultTextStyle = style.second;
+			;// defaultTextStyle = style.second;
 
 	}
 }
@@ -409,7 +412,7 @@ int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
 		lineFragment.causesNewLine = newline;
 	}
 
-	//didn't get here
+	
 	
 
 	offset.x = lineFragment.renderStartX + indent;
@@ -1052,6 +1055,7 @@ void CGUIrichText::prepForFirstText() {
 	applyStyleSheet();
 	setTextStyle("default"); //set initial text style
 	lineBuffer2.setCallbackObj(this);
+	lineBuffer2.setPageSize(getWidth(), getHeight());
 }
 
 /** Ready the system to handle scrolling. */
@@ -1148,7 +1152,7 @@ void CGUIrichText::initialisePage() {
 	longestLine = 0;
 	lineBuffer.clear();
 	textBuf.init(CLEAR_EXISTING_IMAGE);
-	lineBuffer2.clear();
+	lineBuffer2.setPageSize(getWidth(), getHeight());
 }
 
 void CGUIrichText::writePageToLineBuffer() {
@@ -1312,7 +1316,12 @@ bool CGUIrichText::solidifyTempText() {
 
 			}
 			else {
-				textObjs[obj].style = defaultTextStyle;
+				//////////textObjs[obj].style = defaultTextStyle;
+				textObjs[obj].style = currentTextStyle;
+				//TO DO: pretty sure this should be set to currenTextStyle
+				//and the defaultTextStyle member can be scrapped
+				//We have the stylesheet now to say what the default style is
+				//we don't and shouldn't record it internally.
 			}
 			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp)) {
 				renderLineBuffer();

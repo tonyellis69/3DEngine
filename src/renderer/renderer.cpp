@@ -692,7 +692,7 @@ unsigned long CRenderer::getTimerQuery() {
 
 /** Draw a range of geometry from the given childbuffer of a multibuffer. */
 void CRenderer::drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
-	setVAO(multiBuf.childBufs[childBufNo].hVAO);
+	//setVAO(multiBuf.childBufs[childBufNo].hVAO);
 	glDrawArrays(getGLdrawMode(drawMode), vertStart, vertCount);
 
 }

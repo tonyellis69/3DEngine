@@ -52,6 +52,11 @@ glm::i32vec2 CHex::getAxial() {
 	return glm::i32vec2(x,z);
 }
 
+glm::i32vec3 CHex::getCubeVec()
+{
+	return glm::i32vec3(x,y,z);
+}
+
 
 
 
@@ -68,9 +73,14 @@ glm::vec3 axialToCube(float q, float r) {
 	return glm::vec3(x, y, z);
 }
 
-/** Convert cube coordiantes to odd-row offset coordinates.*/
+/** Convert cube coordinates to odd-row offset coordinates.*/
 glm::i32vec2 cubeToOffset(CHex& hex) {
 	return glm::i32vec2(hex.x + (hex.z - (hex.z & 1)) / 2, hex.z);
+}
+
+/** Convert axial coordinates to odd-row offset coordinates. */
+glm::i32vec2 axialToOffset(int q, int r) {
+	return glm::i32vec2(q + (r - (r & 1)) / 2, r);
 }
 
 /** Convert cube coordinates to a point in worldspace. */
@@ -113,7 +123,7 @@ CHex hexRound(float q, float r) {
 CHex worldSpaceToHex(glm::vec3& worldSpace) {
 	//find fractional position
 	float q = sqrt(3.0f) / 3.0f * worldSpace.x - 1.0f / 3.0f * -worldSpace.y;
-	float r = 2.0f / 3.0f * -worldSpace.y;
+	float r = -2.0f / 3.0f * worldSpace.y;
 
 	return hexRound(q, r);
 }

@@ -27,6 +27,7 @@ public:
 	bool operator != (CHex& hex2);
 	CHex(glm::vec3& worldSpace);
 	glm::i32vec2 getAxial();
+	glm::i32vec3 getCubeVec();
 
 	//cube coordinates:
 	int x;
@@ -39,6 +40,7 @@ typedef std::vector<CHex> THexList;
 CHex cubeToAxial(CHex& cube);
 glm::vec3 axialToCube(float q, float r);
 glm::i32vec2 cubeToOffset(CHex& hex);
+glm::i32vec2 axialToOffset(int q, int r);
 glm::vec3 cubeToWorldSpace(CHex& hex);
 CHex hexRound(glm::vec3& cubePos);
 CHex hexRound(float q, float r);

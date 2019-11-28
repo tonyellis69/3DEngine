@@ -70,3 +70,10 @@ struct TRichTextRec : textRec {
 	float period;
 
 };
+
+/** Holds the minimum data the textBuffer needs to draw: text, font, text colour. */
+struct TLineFragDrawRec {
+	std::string* text;
+	CFont* font;
+	glm::vec4 textColour;
+};

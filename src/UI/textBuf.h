@@ -13,12 +13,7 @@
 
 
 
-/** Holds the minimum data the textBuffer needs to draw: text, font, text colour. */
-struct TLineFragDrawRec {
-	std::string* text;
-	CFont* font;
-	glm::vec4 textColour;
-};
+
 
 /** A class that maintains a rectangular buffer of rendered text for displaying. */
 class CTextBuffer {

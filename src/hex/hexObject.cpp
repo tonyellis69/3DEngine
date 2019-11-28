@@ -19,6 +19,9 @@ void CHexObject::setPosition(int x, int y, int z) {
 	glm::vec3 translation(0);
 	translation.x = sqrt(3) * axial.x + sqrt(3) / 2.0f * axial.y;
 	translation.y = -3.0f / 2.0f * axial.y;
+
+	//translation = cubeToWorldSpace(destination);
+
 	translation.z = zHeight;
 
 	worldMatrix =  glm::translate(glm::mat4(1), translation);
@@ -33,12 +36,12 @@ void CHexObject::move(THexDir direction) {
 
 /**	Order this object to move to the neighbouring hex. */
 void CHexObject::moveOrder() {
-	if (travelPath.size() < 2)
+	if (travelPath.empty()) 
 		return;
-	CHex& nextHex = travelPath[1];
+	CHex& nextHex = travelPath[0];
 
 	moving = true;
-	destination = travelPath[1];
+	destination = travelPath[0];
 	worldSpaceDestination = cubeToWorldSpace(destination);
 	CHex moveVectorHex = destination - hexPosition;
 	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
