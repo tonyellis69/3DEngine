@@ -24,7 +24,7 @@ public:
 	void setCallbacks();
 	void setApp(CBaseApp* app);
 	void getMousePos(int& x, int& y);
-	bool leftMouseDown();
+	bool leftMouseHeldDown();
 	bool rightMouseDown();
 	bool middleMouseDown();
 	void setMousePos(int x, int y);
@@ -35,6 +35,7 @@ public:
 	void setTitle(std::string & title);
 	void showMouse(bool onOff);
 	bool keyPressed(int key);
+	bool mouseButtonPressed(int button);
 
 
 	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);

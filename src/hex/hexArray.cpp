@@ -20,12 +20,20 @@ void CHexArray::init(int w, int h) {
 	float yStep = 1.5f;
 
 	glm::vec3 origin (w * 0.5f * xStep, h * 0.5f * yStep, 0.0f);
+	glm::i32vec2 intOrigin(w * 0.5f, h * 0.5f);
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			glm::vec3 offset = glm::vec3(x * xStep, (h-y) * yStep, 0) - origin;
-			offset += glm::vec3(xStep * 0.5f, 0, 0) * float(y & 1);
-			getHexOffset(x, y).position = offset;
-			getHexOffset(x, y).content = 1; //TO DO: temp!
+			//glm::vec3 offset = glm::vec3(x * xStep, (h-y) * yStep, 0) - origin;
+			//offset += glm::vec3(xStep * 0.5f, 0, 0) * float(y & 1);
+			//getHexOffset(x, y).position = offset;
+			glm::i32vec2 offset = glm::i32vec2(x, y) - intOrigin;
+
+			glm::vec3 worldPos(0);
+			worldPos.x = (offset.x + (0.5f * (offset.y & 1))) * hexWidth;
+			worldPos.y = -offset.y * 1.5f;
+
+
+			getHexOffset(x, y).position = worldPos;
 		}
 
 	}

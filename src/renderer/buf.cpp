@@ -267,6 +267,38 @@ CRenderer * CBuf::getRenderer() {
 	return pRenderer;
 }
 
+/** Resize the buffer while preserving its contents. */
+void CBuf::resizeSafe(unsigned int size) {
+
+	//create the larger buffer.
+	unsigned int hNewBuffer;
+	glGenBuffers(1, &hNewBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, hNewBuffer);
+	glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_DYNAMIC_DRAW); 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	//copy everything to it
+	glBindBuffer(GL_COPY_READ_BUFFER, hBuffer);
+	glBindBuffer(GL_COPY_WRITE_BUFFER, hNewBuffer);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, bufSize);
+
+
+	//free old buffer
+	//glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+	glDeleteBuffers(1, &hBuffer);
+
+
+
+
+	//make new buffer 'our' buffer
+
+	hBuffer = hNewBuffer;
+	bufSize = size;
+	storeLayout(attr[0], attr[1], attr[2], attr[3]);
+
+
+}
+
 
 
 CBuf::~CBuf() {

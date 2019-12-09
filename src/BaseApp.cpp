@@ -163,7 +163,7 @@ void CBaseApp::OnCharEntry(unsigned int Key, long Mod) {
 void CBaseApp::onWinMouseMove(int x, int y) {
 	unsigned int msg = WM_MOUSEMOVE;
 	int key = 0;
-	if (win.leftMouseDown())
+	if (win.leftMouseHeldDown())
 		key += MK_LBUTTON;
 	if (win.rightMouseDown())
 		key += MK_RBUTTON;
@@ -377,6 +377,9 @@ bool CBaseApp::keyNow(int vKey) {
 	return win.keyPressed( vKey);
 }
 
+bool CBaseApp::mouseButtonNow(int button) {
+	return win.mouseButtonPressed(button);
+}
 
 /** Shut down the entire app and exit. */
 void CBaseApp::exit() {

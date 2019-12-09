@@ -8,8 +8,9 @@ C2DimageBuf::C2DimageBuf() {
 
 /** Set the size of the main buffer. This will wipe any existing content.*/
 void C2DimageBuf::setSize(int width, int height) {
-	texBuf.resize(width, height * 1.25f);
+	texBuf.resize(width, height  *2 );
 	nextId = 0;
+	freeBlocks.clear();
 	freeBlocks.push_back({ 0,texBuf.height });
 }
 

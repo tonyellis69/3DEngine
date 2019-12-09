@@ -177,9 +177,10 @@ unsigned char * CRenderTexture::getChequePattern() {
 	if (xStep == 0 || yStep == 0)
 		return pixels;
 	int p = 0;
-	for (int x = 0; x < width; x++) {
-		for (int y = 0; y < height; y++) {
-			int b = (x / xStep) % 2;
+	
+	for (int y = 0; y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			unsigned char b = (x / xStep) % 2;
 			b = b ^ (y / yStep) % 2;
 			b = b * 255;
 			pixels[p] = pixels[p + 1] = pixels[p + 2] = b; pixels[p + 3] = 32;

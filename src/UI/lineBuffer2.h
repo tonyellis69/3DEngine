@@ -1,8 +1,10 @@
 #pragma once
 
+//include "../renderer/renderer.h"
 #include "text.h"
 #include "imageBuf.h"
 #include "textSprite.h"
+#include "../renderer/shader.h"
 
 
 class ILineBufferCallback;
@@ -10,7 +12,7 @@ class ILineBufferCallback;
 	in real-time, employing whatever effects these blocks require. */
 class CLineBuffer2 {
 public:
-	CLineBuffer2() {};
+	CLineBuffer2();
 	void setCallbackObj(ILineBufferCallback* obj);
 	void setPageSize(int width, int height);
 	void clear();
@@ -25,8 +27,16 @@ private:
 	int height;
 
 	ILineBufferCallback* pCallbackObj;
+	CRenderer* pRenderer;
 
 	std::vector<CTextSprite> textSprites;
+
+	CShader* lineBufShader;
+	unsigned int hOrthoMatrix;
+	unsigned int hTextureUnit;
+	unsigned int hOffset;
+	unsigned int hSize;
+	glm::mat4 orthoView;
 };
 
 class ILineBufferCallback {

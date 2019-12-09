@@ -22,6 +22,7 @@ public:
 	void setShaderValue(unsigned int matrixHandle, glm::mat4& matrix);
 	void setShaderValue(unsigned int matrixHandle, glm::mat3& matrix);
 	void setShaderValue(unsigned int vecHandle, glm::vec2& vector);
+	void setShaderValue(unsigned int vecHandle, glm::i32vec2& vector);
 	void setShaderValue(unsigned int vecHandle, glm::vec3& vector);
 	void setShaderValue(unsigned int vecHandle, const glm::vec4& vector);
 	void setShaderValue(unsigned int intHandle, int value);

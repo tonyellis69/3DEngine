@@ -75,6 +75,7 @@ public:
 	void setShaderValue(unsigned int matrixHandle,int elements, glm::mat4& matrix);
 	void setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix);
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec2& vector);
+	void setShaderValue(unsigned int vecHandle, int elements, glm::i32vec2& vector);
 	void setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector);
 	void setShaderValue(unsigned int vecHandle, int elements, const glm::vec4& vector);
 	void setShaderValue(unsigned int intHandle, int elements, int value);
@@ -86,9 +87,11 @@ public:
 	void createFrameBuffer();
 	void createScreenQuad();
 	void renderToTextureQuad(CBaseTexture & texture);
+	void renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset, glm::i32vec2& size);
 	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
+	void renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture);
 	void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
-	void beginRenderToTexture(CBaseTexture & texture);
+	void beginRenderToTexture(CBaseTexture & texture, glm::i32vec2& offset, glm::i32vec2& size);
 	void endRenderToTexture();
 	void rendertToTextureClear(CBaseTexture& texture, glm::vec4 & colour);
 	unsigned int getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode);

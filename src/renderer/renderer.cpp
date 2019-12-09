@@ -378,6 +378,10 @@ void CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec2 &
 	glUniform2fv(vecHandle, elements, glm::value_ptr(vector));
 }
 
+void CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::i32vec2& vector) {
+	glUniform2iv(vecHandle, elements, glm::value_ptr(vector));
+}
+
 /** Use the given uniform vector with the current shader. */
 void  CRenderer::setShaderValue(unsigned int vecHandle, int elements, glm::vec3& vector) {
 	glUniform3fv(vecHandle, elements, glm::value_ptr(vector));
@@ -481,20 +485,37 @@ void CRenderer::createScreenQuad() {
 
 /** Draw a full-screen quad to the given texture using the current shader. */
 void CRenderer::renderToTextureQuad(CBaseTexture& texture) {
-	beginRenderToTexture(texture);
+	beginRenderToTexture(texture, glm::i32vec2 { 0,0 }, glm::i32vec2{ texture.width,texture.height });
 	drawBuf(*screenQuad, drawTriStrip);
 	endRenderToTexture();
 }
 
+/** Draw a full-screen quad to an offset area in the given texture using the current shader. */
+void CRenderer::renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset, glm::i32vec2& size) {
+	beginRenderToTexture(texture,offset, size);
+//	setBackColour((rgba&)glm::vec4(1,0,0,1));
+	//glClear(GL_COLOR_BUFFER_BIT);
+	drawBuf(*screenQuad, drawTriStrip);
+	endRenderToTexture();
+	//setBackColour(clearColour);
+}
+
 /** Draw the given buffer of tris to the texture using the current shader. */
 void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
-	beginRenderToTexture(texture);
+	beginRenderToTexture(texture, glm::i32vec2{ 0,0 }, glm::i32vec2{ texture.width,texture.height });
 	drawBuf(buffer, drawTris);
 	endRenderToTexture();
 }
 
+/** Draw the given tri strip buffer to the texture using the current shader. */
+void CRenderer::renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture) {
+	beginRenderToTexture(texture, glm::i32vec2{ 0,0 }, glm::i32vec2{ texture.width,texture.height });
+	drawTriStripBuf(buffer);
+	endRenderToTexture();
+}
+
 void CRenderer::renderToTexturePoints(CBuf& buffer, CBaseTexture& texture) {
-	beginRenderToTexture(texture);
+	beginRenderToTexture(texture, glm::i32vec2{ 0,0 }, glm::i32vec2{texture.width,texture.height });
 	drawBuf(buffer, drawPoints);
 	endRenderToTexture();
 }
@@ -504,7 +525,7 @@ void CRenderer::renderToTexturePoints(CBuf& buffer, CBaseTexture& texture) {
 //TO DO: see if there's any overhead in deleting/regenerating FBO
 //and maybe only calling drawbuffers once
 //ANSWER: no overhead, drivers seem to check for this stuff.
-void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
+void CRenderer::beginRenderToTexture(CBaseTexture& texture,glm::i32vec2& offset, glm::i32vec2& size) {
 	
 	
 	CRenderTexture* glTex = (CRenderTexture*)&texture;
@@ -523,7 +544,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 		liveLog << alertMsg << "\nError creating framebuffer.";
 		return;
 	}
-	glViewport(0, 0, glTex->width, glTex->height); // Render on the whole framebuffer, complete from the lower left corner to the upper right.    
+	glViewport(offset.x, offset.y, size.x, size.y);    
 
 }
 
@@ -538,7 +559,7 @@ void CRenderer::endRenderToTexture() {
 }
 
 void CRenderer::rendertToTextureClear(CBaseTexture& texture,glm::vec4& colour) {
-	beginRenderToTexture(texture);
+	beginRenderToTexture(texture, glm::i32vec2{ 0,0 }, glm::i32vec2{ texture.width, texture.height });
 	rgba clr = { colour.r,colour.g, colour.b, colour.a };
 	setBackColour((rgba&)colour);
 	glClear(GL_COLOR_BUFFER_BIT);

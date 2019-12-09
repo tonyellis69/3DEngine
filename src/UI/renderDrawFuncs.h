@@ -40,7 +40,7 @@ public:
 	CFont* getFont(std::string name);
 	void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture);
 	void drawRect2(guiRect& drawBox, const glm::vec4& colour1, const glm::vec4&  colour2);
-    void drawBorder2(guiRect& drawBox, const glm::vec4& colour);
+	void drawBorder2(guiRect& drawBox, const glm::vec4& colour);
 
 
 //private:

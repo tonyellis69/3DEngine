@@ -93,6 +93,15 @@ glm::vec3 cubeToWorldSpace(CHex& hex) {
 	return glm::vec3(x,y,0);
 }
 
+/** Convert odd-row offset coordinates to cube coordinates. */
+CHex offsetToCube(int x, int y) {
+	CHex hex;
+	hex.x = x - (y - (y & 1)) / 2;
+	hex.z = y;		
+	hex.y = -hex.x - hex.z;
+	return hex;
+}
+
 /** Round floating point coordinates to the nearest hex. */
 CHex hexRound(glm::vec3& cubePos) {
 	int rx = round(cubePos.x);
@@ -174,4 +183,9 @@ glm::vec3 directionToVec(THexDir direction) {
 /** Return the adjacent hex in this direction. */
 CHex getNeighbour(CHex& hex, THexDir direction){
 	return hex + moveVectorCube[direction];
+}
+
+/** Return true if cube coordinated ar malformed. */
+bool badHex(CHex& hex) {
+	return hex.x + hex.y + hex.z;
 }

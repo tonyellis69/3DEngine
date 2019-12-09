@@ -48,16 +48,19 @@ int CTextSprite::makeTextVerts( const std::string& text, CFont* font) {
 
 /** Render our text vertexes to our reserved block on the buffer. */
 void CTextSprite::renderText(CRenderTexture& buf, glm::vec4& colour) {
+
+	glm::mat4 posM = glm::translate(glm::mat4(1), glm::vec3(0,bufId, 0));
 	
 
-	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, bufId, size.y);
+	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)buf.width, 0, buf.height);
+
+	orthoMatrix = orthoMatrix * posM;
 
 	pRenderer->setShader(pRenderer->textShader);
 	pRenderer->attachTexture(0, font->texture); //attach texture to textureUnit (0)
 	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, colour);
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
-	//pRenderer->texShader->setShaderValue(pRenderer->hFadeInX, fadeInX);
 
 	pRenderer->renderToTextureTris(tmpVertBuf, buf);
 }

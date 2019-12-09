@@ -35,13 +35,14 @@ public:
 	int z;
 };
 
-typedef std::vector<CHex> THexList;
+using THexList = std::vector<CHex> ;
 
 CHex cubeToAxial(CHex& cube);
 glm::vec3 axialToCube(float q, float r);
 glm::i32vec2 cubeToOffset(CHex& hex);
 glm::i32vec2 axialToOffset(int q, int r);
 glm::vec3 cubeToWorldSpace(CHex& hex);
+CHex offsetToCube(int x, int y);
 CHex hexRound(glm::vec3& cubePos);
 CHex hexRound(float q, float r);
 CHex worldSpaceToHex(glm::vec3& worldSpace);
@@ -50,3 +51,4 @@ THexList* hexLine(CHex& cubeA, CHex& cubeB);
 THexDir neighbourDirection(CHex& hex, CHex& neighbour);
 glm::vec3 directionToVec(THexDir direction);
 CHex getNeighbour(CHex& hex, THexDir direction);
+bool badHex(CHex& hex);

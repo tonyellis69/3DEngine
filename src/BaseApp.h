@@ -128,6 +128,7 @@ public:
 	void setMousePos(int x, int y);
 	glm::i32vec2 getMousePos();
 	bool keyNow(int vKey);
+	bool mouseButtonNow(int button);
 
 	int mouseX,mouseY;
 	int dMouseX,dMouseY;

@@ -6,7 +6,6 @@
 #include "buf.h"
 
 struct TBlock {
-
 	int start;
 	int size;
 };
@@ -28,9 +27,10 @@ private:
 	int getFreeBlock(int size);
 	TBlock split(TBlock block, int size);
 	void copyToBlock(CBuf& src, int blockAddr, int size);
+	void memoryPanic();
 
 	CBuf buffer;
-	//std::multimap<int, TBlock> freeBlocks; //ordered by size
+	std::multimap<int, TBlock> freeBlocksSized; //ordered by size
 	std::unordered_map<int, TBlock> freeBlocks; //ordered by start
 	std::unordered_map<int, TBlock> reservedBlocks; //ordered by start
 

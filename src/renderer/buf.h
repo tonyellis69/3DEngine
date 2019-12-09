@@ -36,6 +36,7 @@ public:
 	unsigned int getNoIndices();
 	unsigned int getIndexHandle();
 	CRenderer* getRenderer();
+	void resizeSafe(unsigned int size);
 
 	GLuint hBuffer; ///<Handle referencing object's vertex data buffer.
 	int colourOffset; ///<Start of colour values in buffer.

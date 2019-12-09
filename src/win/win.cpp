@@ -85,7 +85,7 @@ void CWin::getMousePos(int & x, int & y) {
 }
 
 /** Poll cached left mouse button state. */
-bool CWin::leftMouseDown() {
+bool CWin::leftMouseHeldDown() {
 	return glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 }
 
@@ -145,6 +145,10 @@ void CWin::showMouse(bool onOff) {
 
 bool CWin::keyPressed(int key) {
 	return glfwGetKey(window, key);
+}
+
+bool CWin::mouseButtonPressed(int button) {
+	return glfwGetMouseButton(window, button);
 }
 
 

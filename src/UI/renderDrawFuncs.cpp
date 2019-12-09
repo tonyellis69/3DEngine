@@ -14,11 +14,6 @@ CRenderDrawFuncs::CRenderDrawFuncs() {
 	//create a template quad:
 	vBuf::T2DtexVert corners[4];
 
-	//corners[0].v = vec2(-0.5,-0.5); //A
-	//corners[1].v = vec2(0.5,-0.5); //B  1,0
-	//corners[2].v = vec2(-0.5,0.5); //C  0,1
-	//corners[3].v = vec2(0.5, 0.5); //D  1,1
-
 	corners[0].v = vec2(0, 0); //A
 	corners[1].v = vec2(1, 0); //B  1,0
 	corners[2].v = vec2(0, 1); //C  0,1
@@ -41,13 +36,7 @@ CRenderDrawFuncs::CRenderDrawFuncs() {
 	borderTemplateQuad.storeIndex(index2, 4);
 	borderTemplateQuad.storeLayout(2, 2, 0, 0);
 
-	//create cursor template line;
-/*	unsigned int index3[2] = {0,2 };
-	cursorTemplateLine.storeVertexes(corners, sizeof(corners), 2);
-	cursorTemplateLine.storeIndex(index3, 2);
-	cursorTemplateLine.storeLayout(2, 2, 0, 0);
-	*/
-	//Looks like we can get by using draw rect
+
 }
 
 
