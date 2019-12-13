@@ -32,12 +32,15 @@ void CTextBuffer::renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, f
 }
 
 void CTextBuffer::clearBuffer() {
+	
+		return;
 	pRenderer->rendertToTextureClear(textTexture, glm::vec4(0, 0, 0, 0));
 }
 
 
 void CTextBuffer::writeToTexture2(CBuf& glyphQuads, float fadeInX) {
 	
+		//return;
 
 
 	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, 0, size.y);

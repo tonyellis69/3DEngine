@@ -1,5 +1,6 @@
 #pragma once
 
+#define _USE_MATH_DEFINES //for cmath
 #include <glm/glm.hpp>
 
 #include "../renderer/buf.h"
@@ -13,7 +14,7 @@ public:
 	void setCallbackObj(IhexObjectCallback* obj);
 	void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);
-	void move(THexDir direction);
+	void setDirection(THexDir direction);
 	void startTravel();
 	void setZheight(float height);
 	void setTravelPath(THexList& path);
@@ -23,15 +24,27 @@ public:
 
 	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
-	glm::mat4 worldMatrix; ///<Position in the 3D universe.
+	glm::mat4 worldMatrix; ///<Position and orientation in the 3D universe.
 	CHex hexPosition; ///<Position on a hex grid in cube coordinates.
+	glm::vec3 worldPos; ///<Position in world space.
 
 	bool isRobot;
-protected:
-	float zHeight; ///<Height above XY plane where drawn.
 	CHex destination; ///<The hex we're travelling to.
+protected:
+	void buildWorldMatrix();
+
+	float zHeight; ///<Height above XY plane where drawn.
+	
 	glm::vec3 worldSpaceDestination; ///<Worldspace point we're travelling to.
 	glm::vec3 moveVector; ///<Direction of travel as a 3D space vector.
+
+	THexDir facing; ///<Direction entity is facing.
+	THexDir destinationDirection; ///<Direction of destination hex.
+	float destinationAngle; ///<Rotation we're trying to achieve.
+	float rotation; ///<Angle of object's z-rotation in world space.
+	float rotationalVelocity; ///<Which way we're turning, how fast.
+	bool turning; ///<True if we're engaged in turning.
+
 
 	THexList travelPath; ///<Route for movement.
 

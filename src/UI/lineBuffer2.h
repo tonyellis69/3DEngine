@@ -19,6 +19,9 @@ public:
 	void addTextSprite(TLineFragment& fragment);
 	CRenderTexture& getBuffer();
 	void renderToTextBuf(CRenderTexture& texBuf);
+	int scroll(int scrollAmount);
+	int getOverlap();
+	TCharacterPos getStartText();
 
 private:
 	C2DimageBuf imageBuf; ///<Provides storage for text sprite image buffers.

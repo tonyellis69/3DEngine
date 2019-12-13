@@ -217,9 +217,6 @@ CRenderTexture & CRenderTexture::operator=(const CRenderTexture & other) {
 
 
 	return *this;
-
-
-
 }
 
 /** Save this texture as a PNG image file.*/
@@ -229,12 +226,34 @@ void CRenderTexture::savePNG(std::string filepath) {
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
 	//SOIL_save_image (filepath.c_str(), SOIL_SAVE_TYPE_BMP,width,height,channels,data.data() );
 
-
-
 	stbi_write_png(filepath.c_str(), width, height, channels, data.data(), width * channels);
+}
 
+/** Resize this texture while preserving its contents. */
+void CRenderTexture::resizeSafe(int w, int h) {
+	//create new texture
+	CRenderTexture newTexture(w, h);
+	
+	//newTexture = *this;
 
+	GLuint hTempFrameBuffer;
+	glGenFramebuffers(1, &hTempFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, hTempFrameBuffer);
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, handle, 0);
+	glBindTexture(GL_TEXTURE_2D, newTexture.handle);
 
+	//glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width, height, 0);
+	glCopyTexSubImage2D(GL_TEXTURE_2D, 0,0,0,0,0, width,height);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	width = w;
+	height = h;
+	unsigned int oldHandle = handle;
+	handle = newTexture.handle;
+	newTexture.handle = oldHandle;
+	//when newTexture is destroyed on exit, it actually destroys old texture.
 }
 
 

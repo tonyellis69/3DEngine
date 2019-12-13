@@ -22,11 +22,7 @@ struct TStyleRec {
 	std::string styleName;
 };
 
-struct TCharacterPos {
-	int textObj;
-	int pos;
-	bool operator==(const TCharacterPos& rhs) { return textObj == rhs.textObj && pos == rhs.pos; }
-};
+
 
 enum TTextDelivery { noDelivery, byClause, byCharacter };
 
@@ -52,12 +48,12 @@ class CGUIrichText : public ILineBufferCallback, public CGUIlabel2 {
 public:
 	CGUIrichText(int x, int y, int w, int h);
 	void applyStyleSheet();
+	void appendMarkedUpText(const std::string& text);
 	void DrawSelf();
 	TRichTextRec& getTexObjCallback(int objNo);
 	void setFont(CFont* newFont);
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
-	void setAppendStyleBold(bool isOn);
 	void setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId);
 	void setTextColour(UIcolour colour);
 	void setTextColour(glm::vec4& colour);
@@ -106,7 +102,7 @@ public:
 	std::vector<unsigned int> getHotTextIds();
 	void clear();
 	void clearSelection();
-	void appendMarkedUpText(const std::string& text);
+	
 
 	void updateAppearance();
 	void resizeToFit();
@@ -235,8 +231,11 @@ private:
 
 	void checkHotTextContact(const  int mouseX, const  int mouseY);
 
+	bool scrollDown2(int dist);
+
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
 
 	CLineBuffer2 lineBuffer2;
+	bool autoscrollingDown; ///<If true, we scroll down if there's any text below.
 };

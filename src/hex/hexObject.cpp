@@ -1,5 +1,7 @@
 #include "hexObject.h"
 
+#include <cmath>
+
 #include "..\utils\log.h"
 
 #include <glm/gtc/matrix_transform.hpp>	
@@ -9,7 +11,14 @@ CHexObject::CHexObject() {
 	zHeight = 0;
 	moving = false;
 	isRobot = false;
+	worldPos = glm::vec3(0);
 	setZheight(0.05f);
+
+	facing = hexEast;
+	rotation = 0.0f;
+	rotationalVelocity = 0.0f;
+	turning = false;
+	buildWorldMatrix();
 }
 
 void CHexObject::setCallbackObj(IhexObjectCallback* obj) {
@@ -24,12 +33,12 @@ void CHexObject::setPosition(int x, int y, int z) {
 	destination = hexPosition;
 
 	glm::i32vec2 axial = hexPosition.getAxial();
-	glm::vec3 translation(0);
-	translation.x = sqrt(3) * axial.x + sqrt(3) / 2.0f * axial.y;
-	translation.y = -3.0f / 2.0f * axial.y;
-	translation.z = zHeight;
+	
+	worldPos.x = sqrt(3) * axial.x + sqrt(3) / 2.0f * axial.y;
+	worldPos.y = -3.0f / 2.0f * axial.y;
+	worldPos.z = zHeight;
 
-	worldMatrix =  glm::translate(glm::mat4(1), translation);
+	buildWorldMatrix();
 }
 
 /** Set position using offset coordinates. */
@@ -38,11 +47,14 @@ void CHexObject::setPosition(int x, int y) {
 	setPosition(pos.x, pos.y, pos.z);
 }
 
-void CHexObject::move(THexDir direction) {
-	glm::i32vec3 newPos = glm::i32vec3(hexPosition.x, hexPosition.y, hexPosition.z)
-		+ moveVectorCube[direction];
-	setPosition(newPos.x, newPos.y, newPos.z);
+/** Set the rotation and facing direction of this object. */
+void CHexObject::setDirection(THexDir direction) {
+	facing = direction;
+	rotation = dirToAngle(direction);
+	buildWorldMatrix();
 }
+
+
 
 /**	Order this object to move to the next hex on its current travel path. */
 void CHexObject::startTravel() {
@@ -50,18 +62,28 @@ void CHexObject::startTravel() {
 		return;
 	}
 	CHex& nextHex = travelPath[0];
-
 	moving = true;
 	destination = travelPath[0];
 	worldSpaceDestination = cubeToWorldSpace(destination);
 	CHex moveVectorHex = destination - hexPosition;
 	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
+
+
+
+	destinationDirection =  neighbourDirection(hexPosition, destination);
+	float rotationDir = shortestRotation(facing, destinationDirection);
+	if (rotationDir == 0.0f)
+		return;
+
+	turning = true;
+	rotationalVelocity = (rotationDir > 0) - (rotationDir < 0) ;
+	destinationAngle = dirToAngle(destinationDirection);
 }
 
 /** Set the height at which this object is drawn. */
 void CHexObject::setZheight(float height) {
 	zHeight = height;
-	worldMatrix = glm::translate(worldMatrix, glm::vec3(0, 0, height));
+	worldPos.z = height;
 }
 
 /** Load a sequence of hexes to travel down. */
@@ -77,19 +99,37 @@ THexList& CHexObject::getTravelPath() {
 bool CHexObject::update(float dT) {
 	if (moving) {
 
+		if (turning) {
+			rotation += rotationalVelocity * 0.01f;
+			//if (rotation < 0)
+			//	rotation = 2 * M_PI - rotation;
+			rotation = glm::mod<float>(rotation, 2 * M_PI);
+			if (abs(rotation - destinationAngle) < 0.1f) {
+				turning = false;
+				setDirection(destinationDirection);
+				return true; //because moving itself not yet resolved
+			}
+			buildWorldMatrix();
+			return true;
+		}
+
+
+
+
 		float speed = 0.01f;
 		glm::vec3 velocity = moveVector * speed;
-		worldMatrix = glm::translate(worldMatrix, velocity);
-		glm::vec3 currentPos = glm::vec3(worldMatrix[3]);
-		if (glm::distance(currentPos, worldSpaceDestination) < 0.1f) {
+		//worldMatrix = glm::translate(worldMatrix, velocity);
+		worldPos += velocity;
+		
+		//glm::vec3 currentPos = glm::vec3(worldMatrix[3]);
+		if (glm::distance(worldPos, worldSpaceDestination) < 0.1f) {
 			moving = false;
-			if (badHex(destination))
-				int b = 0;
 			setPosition(destination.x,destination.y,destination.z);
 			if (destination == travelPath[0])
 				travelPath.erase(travelPath.begin());
 			return false;
 		}
+		buildWorldMatrix();
 		return true;
 	}
 	return false;
@@ -105,6 +145,12 @@ void CHexObject::findTravelPath(CHex& target) {
 	else
 		travelPath = callbackObj->getPathCallback(hexPosition,target);
 
+}
+
+/** Construct this object's world matrix from its known position and rotation.*/
+void CHexObject::buildWorldMatrix() {
+	worldMatrix = glm::translate(glm::mat4(1), worldPos);
+	worldMatrix = glm::rotate(worldMatrix, rotation, glm::vec3(0, 0, -1));
 }
 
 

@@ -10,7 +10,6 @@
 //#include "..\soil.h"
 
 
-
 #include "camera.h"
 #include "modelMulti.h"
 #include "renderModel.h"

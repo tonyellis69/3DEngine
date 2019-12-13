@@ -19,15 +19,21 @@ public:
 	unsigned int reserve(glm::i32vec2& size);
 	CRenderTexture& getBuffer();
 
+	CRenderTexture imageBuffer;
+
 private:
 	int getFreeBlock(int size);
 	void split(unsigned int index, int size);
+	int panic();
 
 	std::vector<TTexBlock> freeBlocks;
 	std::unordered_map<int,TTexBlock> reservedBlocks;
 
-	CRenderTexture texBuf;
+	
+
 	unsigned int nextId;
+
+	int highestReservedAddress;
 ;
 };
 

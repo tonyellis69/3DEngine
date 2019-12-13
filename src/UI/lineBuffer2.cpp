@@ -4,6 +4,8 @@
 
 #include "../renderer/renderer.h"
 
+#include "../utils/log.h"
+
 
 CLineBuffer2::CLineBuffer2() {
 	pRenderer = &CRenderer::getInstance();
@@ -25,8 +27,9 @@ void CLineBuffer2::setPageSize(int width, int height) {
 	this->width = width;
 	this->height = height;
 	textSprites.clear();
-	imageBuf.setSize(this->width, this->height);
-	orthoView = glm::ortho<float>(0, (float)width, 0, height);
+	imageBuf.setSize(this->width, this->height ); 
+	
+	orthoView = glm::ortho<float>((float)width * -0.5f, (float)width * 0.5f, -(float)height * 0.5f, (float)height * 0.5f );
 }
 
 /** Delete all text sprites and clear the page of any existing text. */
@@ -38,10 +41,9 @@ void CLineBuffer2::clear() {
 
 /**	Add this text fragment as a text sprite. */
 void CLineBuffer2::addTextSprite(TLineFragment& fragment) {
-	return;
+	//return;
 
-	if (width == 780)
-		int b = 0;
+	
 
 	textSprites.push_back(CTextSprite(fragment.renderStartX, fragment.renderStartY));
 	auto& sprite = textSprites.back();
@@ -61,9 +63,12 @@ void CLineBuffer2::addTextSprite(TLineFragment& fragment) {
 
 	sprite.size = glm::i32vec2(lineWidth, fragment.height);
 	sprite.bufId = imageBuf.reserve(sprite.size);
+	sprite.textObj = fragment.textObj;
+	sprite.textPos = fragment.textPos;
 
 
 	sprite.renderText(getBuffer(),textObj.style.colour);
+
 }
 
 CRenderTexture& CLineBuffer2::getBuffer() {
@@ -72,57 +77,78 @@ CRenderTexture& CLineBuffer2::getBuffer() {
 
 /** Draw all the text sprites to the given text buffer. */
 void CLineBuffer2::renderToTextBuf(CRenderTexture& textBuf) {
-
-	//imageBuf.getBuffer().resize(65, 64);
-
+	pRenderer->rendertToTextureClear(textBuf, glm::vec4(0, 0, 0, 0));
 	pRenderer->setShader(lineBufShader);
 	pRenderer->attachTexture(0, imageBuf.getBuffer().handle);
 	lineBufShader->setTextureUnit(hTextureUnit, 0);
 
 	glm::vec2 imageBufScale(1.0f / imageBuf.getBuffer().width, 1.0f / imageBuf.getBuffer().height);
 
-
-
-	//display whole buffer
-	/*
-	glm::mat4 blockPos(1);// = orthoView;// *shape;
-	lineBufShader->setShaderValue(hOrthoMatrix, blockPos);
-	pRenderer->renderToTextureTriStrip(*pRenderer->screenQuad, textBuf);
-
-	//return;
-	*/
-	if (width == 780 /*&& textSprites.size() == 10*/)
-		int b = 0;
-	
 	
 	for (auto sprite : textSprites) {
-
 		glm::vec3 spriteOriginDist = glm::vec3(sprite.size, 0) * 0.5f;
-		
-
 		glm::vec3 pageOriginDist = glm::vec3(textBuf.width,textBuf.height,0) * 0.5f;
-		glm::vec3 spriteTranslation = pageOriginDist - spriteOriginDist + glm::vec3(sprite.positionOnPage, 0);
-		spriteTranslation.x *= -1;
+		glm::vec3 spriteTranslation = spriteOriginDist - pageOriginDist  + glm::vec3(sprite.positionOnPage, 0);
 
 		glm::mat4 trans = glm::translate(glm::mat4(1), spriteTranslation);
 		glm::mat4 shape = glm::scale(trans, spriteOriginDist);
-
-		glm::mat4 spritePos = orthoView * shape;
-
-		
-
-		glm::vec3 test = spritePos * glm::vec4( 1,-1, 0,0);
-	
+		glm::mat4 spritePos = orthoView  *shape;
 
 		lineBufShader->setShaderValue(hOrthoMatrix, spritePos);
 		lineBufShader->setShaderValue(hOffset, glm::vec2(0,sprite.bufId) * imageBufScale);
-		lineBufShader->setShaderValue(hSize, (glm::vec2(0, sprite.bufId)+ glm::vec2(sprite.size)) * imageBufScale);
+		lineBufShader->setShaderValue(hSize, ( glm::vec2(sprite.size)) * imageBufScale);
 
 		pRenderer->renderToTextureTriStrip(*pRenderer->screenQuad,textBuf);
-		//return;
 	}
-	
-
 }
+
+/** Move all text sprites up or down by the given amount.*/
+int CLineBuffer2::scroll(int scrollAmount) {
+	int overlap = getOverlap();
+	int maxScroll = std::min(scrollAmount, overlap);
+	//return;
+	if (width == 780)
+		sysLog << "\nscroll: " << maxScroll;
+	for (auto sprite = textSprites.begin(); sprite != textSprites.end();) {
+		sprite->positionOnPage.y -= maxScroll;
+		if (sprite->positionOnPage.y + sprite->size.y < 0) {
+			sprite = textSprites.erase(sprite);
+			//TO DO: free imagebuf memory!
+		}
+		else
+			sprite++;
+	}
+	return maxScroll;
+}
+
+/** Return the distance in pixels between the bottom of the page and the bottom of the lowest
+	text sprite.*/
+int CLineBuffer2::getOverlap() {
+	int overlap = 0;
+	for (auto sprite : textSprites)
+		overlap = std::max(overlap, sprite.positionOnPage.y + sprite.size.y);
+	overlap = overlap - height;
+	return std::max(0, overlap);
+}
+
+/** Return a data structure showing the topmost textObj drawn on the page
+	and the position in its text at which drawing commences. */
+TCharacterPos CLineBuffer2::getStartText() {
+	TCharacterPos startText;
+	int earliestTextObj = INT_MAX; int earliesTextPos;
+	for (auto sprite : textSprites) {
+		int currentTextObj = std::min(earliestTextObj, sprite.textObj);
+		if (currentTextObj < earliestTextObj) {
+			earliesTextPos = INT_MAX;
+			earliestTextObj = currentTextObj;
+		}
+		earliesTextPos = std::min(earliesTextPos, sprite.textPos);
+	}
+
+	startText = { earliestTextObj, earliesTextPos };
+	return startText;
+}
+
+
 
 

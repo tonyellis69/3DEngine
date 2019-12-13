@@ -39,6 +39,11 @@ void CHexArray::init(int w, int h) {
 	}
 }
 
+/** Provides a list of enities to check for collision with in pathfinding. */
+void CHexArray::setEntityList(TEntities* pEntities) {
+	entities = pEntities;
+}
+
 /** Return a reference to the hex at the given offset coordinates. */
 CHexElement& CHexArray::getHexOffset(int x, int y) {
 	x = std::clamp(x, 0, width - 1);
@@ -187,6 +192,11 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end) {
 			if (getHexCube(next).content == 2)
 				continue; //solid hex
 
+			if (entityCheck(next) == true)
+				continue;
+
+
+
 			int newCost = costSoFar[current.getAxial()] + findCost;
 
 			if (costSoFar.find(next.getAxial()) == costSoFar.end() || newCost < costSoFar[next.getAxial()]) {
@@ -225,6 +235,7 @@ bool CHexArray::outsideArray(CHex& hex) {
 	return false;
 }
 
+///////////////PRIVATE//////////////
 
 /** Utility func to return a journey from a pathfinding results list.*/
 THexList CHexArray::walkBack(CHex& start, CHex& end, TCameFrom& cameFrom) {
@@ -236,4 +247,13 @@ THexList CHexArray::walkBack(CHex& start, CHex& end, TCameFrom& cameFrom) {
 	}
 	std::reverse(path.begin(), path.end());
 	return path;
+}
+
+/** Returns true if there's an entity occupying this hex. */
+bool CHexArray::entityCheck(CHex& hex) {
+	for (auto entity : *entities) {
+		if (entity->destination == hex)
+			return true;
+	}
+	return false;
 }

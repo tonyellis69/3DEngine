@@ -15,6 +15,7 @@ class CMesh {
 public:
 	void calculateVertexNormals();
 	void writeToBufferv3i(CBuf& buf);
+	void clear();
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;

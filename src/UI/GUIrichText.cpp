@@ -33,6 +33,7 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	}
 	renderLineBuffer();
 	lineBuffer2.renderToTextBuf(textBuf.textTexture);
+	autoscrollingDown = true;
 }
 
 
@@ -41,6 +42,7 @@ void CGUIrichText::createPage() {
 	initialisePage();
 	writePageToLineBuffer();
 	renderLineBuffer();
+	lineBuffer2.renderToTextBuf(textBuf.textTexture);
 }
 
 
@@ -263,6 +265,9 @@ bool CGUIrichText::scrollDownSuccessful(int dist) {
 	firstVisibleObject = firstFrag.textObj;
 	firstVisibleText = firstFrag.textPos;
 	updateFragmentPositions();
+
+
+	lineBuffer2.renderToTextBuf(textBuf.textTexture);
 	return true;
 }
 
@@ -698,6 +703,9 @@ bool CGUIrichText::scrollUpSuccessful(int dist) {
 	if (lineBuffer.getLineTop(finalRow) > getHeight()) { //bottom line scrolled out?
 		lineBuffer.removeLine(finalRow);
 	}
+
+
+	lineBuffer2.renderToTextBuf(textBuf.textTexture);
 	return true;
 }
 
@@ -733,7 +741,23 @@ void CGUIrichText::update(float dT) {
 				smoothScroll(-smoothScrollStep);
 				//overrunCorrectionOn = isOverrun();
 		} 
+
+
+
+		//lineRender2 stuff;
+		if (autoscrollingDown) {
+			autoscrollingDown = scrollDown2(smoothScrollStep);
+			lineBuffer2.renderToTextBuf(textBuf.textTexture);
+		}
+
+
+
+
+
 	}
+
+	
+
 	
 	if (!hotFrags.empty() && !lineFadeInOn)
 		 animateHotText(dT);
@@ -1056,6 +1080,7 @@ void CGUIrichText::prepForFirstText() {
 	setTextStyle("default"); //set initial text style
 	lineBuffer2.setCallbackObj(this);
 	lineBuffer2.setPageSize(getWidth(), getHeight());
+	autoscrollingDown = false;
 }
 
 /** Ready the system to handle scrolling. */
@@ -1182,6 +1207,19 @@ void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
 	if (oldSelectedHotObj != selectedHotObj) {
 		msgHotTextChange(i32vec2{ mouseX,mouseY - distToFragTop });
 	}
+}
+
+/** Attempt to scroll down by the given distance in pixels. */
+bool CGUIrichText::scrollDown2(int dist) {
+	while (lineBuffer2.getOverlap() < dist) {
+		//add lines to bottom of lineBuffer if we can
+		//else break
+		TLine newLine = compileSingleLine(lineBuffer.finalFrag());
+		if (newLine.fragments.empty())
+			break;
+	}
+	int result = lineBuffer2.scroll(dist);
+	return result;
 }
 
 void CGUIrichText::setStyleChange(TStyleRec& styleRec) {

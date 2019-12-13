@@ -77,3 +77,9 @@ struct TLineFragDrawRec {
 	CFont* font;
 	glm::vec4 textColour;
 };
+
+struct TCharacterPos {
+	int textObj;
+	int pos;
+	bool operator==(const TCharacterPos& rhs) { return textObj == rhs.textObj && pos == rhs.pos; }
+};

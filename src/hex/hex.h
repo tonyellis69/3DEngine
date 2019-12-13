@@ -1,18 +1,21 @@
 #pragma once
 
+#define _USE_MATH_DEFINES //for cmath
+
 #include <vector>
+
 
 #include <glm/glm.hpp>
 
 
-enum THexDir { hexNE, hexEast, hexSE, hexSW, hexWest, hexNW };
-static glm::i32vec3 moveVectorCube[]{ {1,0,-1}, {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0,1,-1} };
+enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE};
+static glm::i32vec3 moveVectorCube[]{ {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0,1,-1}, {1,0,-1} };
 
 const float hexWidth = sqrt(3);
 const float hexHeight = 2;
 
-static glm::vec3 moveVector3D[]{ {hexWidth *0.5f,1.5f,0}, {hexWidth,01,0}, {hexWidth * 0.5f,-1.5f,0}, 
-	{-hexWidth * 0.5f,-1.5f,0}, {-hexWidth,0,0}, {-hexWidth * 0.5f,1.5f,0} };
+static glm::vec3 moveVector3D[]{ {hexWidth,0,0}, {hexWidth * 0.5f,-1.5f,0}, 
+	{-hexWidth * 0.5f,-1.5f,0}, {-hexWidth,0,0}, {-hexWidth * 0.5f,1.5f,0}, {hexWidth * 0.5f,1.5f,0} };
 
 /** A class describing a hex position. */
 class CHex {
@@ -49,6 +52,8 @@ CHex worldSpaceToHex(glm::vec3& worldSpace);
 int cubeDistance(CHex& cubeA, CHex& cubeB);
 THexList* hexLine(CHex& cubeA, CHex& cubeB);
 THexDir neighbourDirection(CHex& hex, CHex& neighbour);
+float dirToAngle(THexDir direction);
 glm::vec3 directionToVec(THexDir direction);
 CHex getNeighbour(CHex& hex, THexDir direction);
 bool badHex(CHex& hex);
+float shortestRotation(THexDir start, THexDir end);

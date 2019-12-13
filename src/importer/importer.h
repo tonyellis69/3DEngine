@@ -15,6 +15,7 @@ class CImporter {
 public:
 	void loadFile(const std::string& filename);
 	std::vector<CMesh>& CImporter::getMeshes();
+	CMesh& getSingleMesh();
 
 private:
 	void processNode(aiNode* node, const aiScene* scene);
@@ -22,6 +23,8 @@ private:
 	
 
 	std::vector<CMesh> meshes;
+
+	CMesh singleMesh; ///<All the imported 3D model objects stored as one mesh object.
 };
 
 

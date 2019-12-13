@@ -167,12 +167,17 @@ THexList* hexLine(CHex& cubeA, CHex& cubeB) {
 /** Return the direction of the neighbouring hex. */
 THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
 	CHex dirVector = neighbour - hex;
-	for (int dir = hexNE; dir <= hexNW; dir++) {
+	for (int dir = hexEast; dir <= hexNE; dir++) {
 		if (dirVector.x == moveVectorCube[dir].x && dirVector.y == moveVectorCube[dir].y
 			&& dirVector.z == moveVectorCube[dir].z)
 			return (THexDir)dir;
 	}
 	fatalLog << "\nNeighbour direction not found!";
+}
+
+/** Return the relative angle of the neighbouring hex, where hexEas = 0; */
+float dirToAngle(THexDir direction) {
+	return (float)direction * M_PI / 3.0f;
 }
 
 /** Convert a cube direction as a normalised 3D space vector. */
@@ -188,4 +193,13 @@ CHex getNeighbour(CHex& hex, THexDir direction){
 /** Return true if cube coordinated ar malformed. */
 bool badHex(CHex& hex) {
 	return hex.x + hex.y + hex.z;
+}
+
+/** Return the shortest angle of rotation required to get from start to end. */
+float shortestRotation(THexDir start, THexDir end) {
+	float dist = (6 + end - start) % 6;
+	if (dist > 3)
+		dist = -(6 - dist);
+
+	return dist * M_PI / 3.0f;
 }

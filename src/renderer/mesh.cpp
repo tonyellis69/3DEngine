@@ -21,3 +21,12 @@ void CMesh::writeToBufferv3i(CBuf& buf) {
 	buf.storeLayout(3, 0, 0, 0);
 }
 //TO DO: look into making a general purpose template-based writeToBuffer
+
+
+/** Clear all vertex buffers etc so mesh can be resused. */
+void CMesh::clear() {
+	vertices.clear();
+	normals.clear();
+	indices.clear();
+	texCoords.clear();
+}

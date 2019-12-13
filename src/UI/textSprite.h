@@ -18,7 +18,8 @@ public:
 	unsigned int bufId;
 	glm::i32vec2 positionOnPage;
 	glm::i32vec2 size;
-
+	int textObj;
+	int textPos;
 
 private:
 

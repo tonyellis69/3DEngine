@@ -5,6 +5,7 @@
 
 #include "hexElement.h"
 #include "hex.h"
+#include "hexObject.h"
 
 typedef std::unordered_map<glm::i32vec2, CHex> TCameFrom; 
 /** A 2D container for CHexElement objects. */
@@ -12,6 +13,7 @@ class CHexArray {
 public:
 	CHexArray() {};
 	void init(int w, int h);
+	void setEntityList(TEntities* pEntities);
 	CHexElement& getHexOffset(int x, int y);
 	CHexElement& getHexAxial(int q, int r);
 	CHexElement& getHexCube(CHex& cube);
@@ -26,10 +28,11 @@ public:
 
 private:
 	THexList walkBack(CHex& start, CHex& end, TCameFrom& cameFrom);
+	bool entityCheck(CHex& hex);
 
 	std::vector<CHexElement> flatArray;
 
-
+	TEntities* entities; ///<To check for collision against.
 
 };
 

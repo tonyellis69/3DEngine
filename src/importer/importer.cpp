@@ -5,16 +5,21 @@
 void CImporter::loadFile(const std::string& filename) {
 	Assimp::Importer importer;
 	meshes.clear();
+	singleMesh.clear();
 
 	const aiScene* scene = importer.ReadFile(filename, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate);
 	
 	processNode(scene->mRootNode, scene);
-
 }
 
 /** Return a vector of the currently loaded meshes. */
 std::vector<CMesh>& CImporter::getMeshes() {
 	return meshes;
+}
+
+/** Return a single mesh composed of all the objects imported. */
+CMesh& CImporter::getSingleMesh() {
+	return singleMesh;
 }
 
 /** Recursively retrieve all the verts etc from each node in the scene. */
@@ -32,22 +37,25 @@ void CImporter::processNode(aiNode* node, const aiScene* scene) {
 
 /**	Return a mesh object holding all the data from this assimp mesh. */
 CMesh CImporter::processMesh(aiMesh* mesh, const aiScene* scene) {
-	CMesh ourMesh;
+	CMesh localMesh;
 
+	unsigned int prevVerts = singleMesh.vertices.size();
 	//get verts
 	for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
 		glm::vec3 vert = { mesh->mVertices[v].x, mesh->mVertices[v].y, mesh->mVertices[v].z };
-		ourMesh.vertices.push_back(vert);
-
+		localMesh.vertices.push_back(vert);
+		singleMesh.vertices.push_back(vert);
 		//normals and texture coords go here
 	}
 
 	//get indices to verts
 	for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
 		aiFace face = mesh->mFaces[f];
-		for (unsigned int i = 0; i < face.mNumIndices; i++)
-			ourMesh.indices.push_back(face.mIndices[i]);
+		for (unsigned int i = 0; i < face.mNumIndices; i++) {
+			localMesh.indices.push_back(face.mIndices[i]);
+			singleMesh.indices.push_back(face.mIndices[i] + prevVerts);
+		}
 	}
 
-	return ourMesh;
+	return localMesh;
 }

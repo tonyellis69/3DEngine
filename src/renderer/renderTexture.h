@@ -23,6 +23,7 @@ public:
 	unsigned char* getChequePattern();
 	CRenderTexture& operator=(const CRenderTexture& other);
 	void savePNG(std::string filepath);
+	void resizeSafe(int w, int h);
 
 	unsigned int handle;
 	CRenderer* pRenderer;
