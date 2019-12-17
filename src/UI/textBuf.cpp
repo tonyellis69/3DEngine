@@ -109,7 +109,7 @@ void CTextBuffer::render(float fadeInX) {
 	buf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
 	buf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
 	buf.storeLayout(2, 2, 0, 0);
-	writeToTexture2(buf, fadeInX);
+//	writeToTexture2(buf, fadeInX);
 
 }
 

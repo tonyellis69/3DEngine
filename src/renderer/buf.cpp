@@ -22,6 +22,8 @@ void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
 	if (hBuffer == 0) {
 		glGenBuffers(1, &hBuffer);
 	}
+
+
 	//NB any pre-existing data is freed
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 	glBufferData(GL_ARRAY_BUFFER, size, (void*)verts, GL_STATIC_DRAW); //was static
@@ -208,14 +210,14 @@ unsigned int CBuf::getBufSize() {
 
 void CBuf::freeMem() {
 	if (hBuffer != 0) {
-		glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+		//glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 		glDeleteBuffers(1,&hBuffer);
 	}
 	if (hVAO != 0) {
 		glDeleteVertexArrays(1,&hVAO);
 	}
 	if (hIndex != 0) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 		glDeleteBuffers(1, &hIndex);
 	}
 }
@@ -269,7 +271,6 @@ CRenderer * CBuf::getRenderer() {
 
 /** Resize the buffer while preserving its contents. */
 void CBuf::resizeSafe(unsigned int size) {
-
 	//create the larger buffer.
 	unsigned int hNewBuffer;
 	glGenBuffers(1, &hNewBuffer);
@@ -287,16 +288,11 @@ void CBuf::resizeSafe(unsigned int size) {
 	//glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 	glDeleteBuffers(1, &hBuffer);
 
-
-
-
 	//make new buffer 'our' buffer
 
 	hBuffer = hNewBuffer;
 	bufSize = size;
 	storeLayout(attr[0], attr[1], attr[2], attr[3]);
-
-
 }
 
 

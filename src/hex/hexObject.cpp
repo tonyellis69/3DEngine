@@ -25,7 +25,7 @@ void CHexObject::setCallbackObj(IhexObjectCallback* obj) {
 	callbackObj = obj;
 }
 
-/** Set position using hex cube coordinates. */
+/** Set position using individual hex cube coordinates. */
 void CHexObject::setPosition(int x, int y, int z) {
 	hexPosition.x = x;
 	hexPosition.y = y;
@@ -47,6 +47,13 @@ void CHexObject::setPosition(int x, int y) {
 	setPosition(pos.x, pos.y, pos.z);
 }
 
+/** Set position using hex cube coordinates. */
+void CHexObject::setPosition(CHex& hex) {
+	setPosition(hex.x, hex.y, hex.z);
+}
+
+
+
 /** Set the rotation and facing direction of this object. */
 void CHexObject::setDirection(THexDir direction) {
 	facing = direction;
@@ -57,7 +64,7 @@ void CHexObject::setDirection(THexDir direction) {
 
 
 /**	Order this object to move to the next hex on its current travel path. */
-void CHexObject::startTravel() {
+void CHexObject::newMove() {
 	if (travelPath.empty()) {
 		return;
 	}
@@ -101,8 +108,6 @@ bool CHexObject::update(float dT) {
 
 		if (turning) {
 			rotation += rotationalVelocity * 0.01f;
-			//if (rotation < 0)
-			//	rotation = 2 * M_PI - rotation;
 			rotation = glm::mod<float>(rotation, 2 * M_PI);
 			if (abs(rotation - destinationAngle) < 0.1f) {
 				turning = false;
@@ -114,18 +119,14 @@ bool CHexObject::update(float dT) {
 		}
 
 
-
-
 		float speed = 0.01f;
 		glm::vec3 velocity = moveVector * speed;
-		//worldMatrix = glm::translate(worldMatrix, velocity);
 		worldPos += velocity;
 		
-		//glm::vec3 currentPos = glm::vec3(worldMatrix[3]);
 		if (glm::distance(worldPos, worldSpaceDestination) < 0.1f) {
 			moving = false;
 			setPosition(destination.x,destination.y,destination.z);
-			if (destination == travelPath[0])
+			if (!travelPath.empty() && destination == travelPath[0])
 				travelPath.erase(travelPath.begin());
 			return false;
 		}
@@ -141,9 +142,9 @@ void CHexObject::findTravelPath(CHex& target) {
 	//but if we've moving, makes sense that the new path will start
 	//where we end up
 	if (moving)
-		travelPath = callbackObj->getPathCallback(destination, target);
+		travelPath = callbackObj->getPathCB(destination, target);
 	else
-		travelPath = callbackObj->getPathCallback(hexPosition,target);
+		travelPath = callbackObj->getPathCB(hexPosition,target);
 
 }
 

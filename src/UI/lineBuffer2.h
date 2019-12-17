@@ -13,14 +13,17 @@ class ILineBufferCallback;
 class CLineBuffer2 {
 public:
 	CLineBuffer2();
+	~CLineBuffer2();
 	void setCallbackObj(ILineBufferCallback* obj);
 	void setPageSize(int width, int height);
 	void clear();
 	void addTextSprite(TLineFragment& fragment);
 	CRenderTexture& getBuffer();
 	void renderToTextBuf(CRenderTexture& texBuf);
-	int scroll(int scrollAmount);
+	int scrollDown(int scrollAmount);
+	int scrollUp(int scrollAmount);
 	int getOverlap();
+	int getTopOverlap();
 	TCharacterPos getStartText();
 
 private:
@@ -32,7 +35,7 @@ private:
 	ILineBufferCallback* pCallbackObj;
 	CRenderer* pRenderer;
 
-	std::vector<CTextSprite> textSprites;
+	std::vector<CTextSprite*> textSprites;
 
 	CShader* lineBufShader;
 	unsigned int hOrthoMatrix;

@@ -18,6 +18,7 @@ public:
 	void setSize(int width, int height);
 	unsigned int reserve(glm::i32vec2& size);
 	CRenderTexture& getBuffer();
+	void free(int addr);
 
 	CRenderTexture imageBuffer;
 

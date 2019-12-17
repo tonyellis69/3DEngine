@@ -244,6 +244,10 @@ void CBaseApp::AppTasks() {
 		drawSkyDome();
 	}
 
+
+	
+
+
 	Engine.physObjManager.update(float(dT * 10.0f));
 
 
@@ -251,22 +255,25 @@ void CBaseApp::AppTasks() {
 
 	Engine.drawModels();
 	
+	
+
 //	Engine.drawSceneLayers();
 	//Engine.drawRegisteredSprites();
 	draw(); //Do user drawing
 
+	//aftyer here
 	
 
 	//Engine.removeUserScale();
 
 	logWindow->update((float)dT);
+
 	DrawUI(); 
-
-
 
 	//Engine.showFrame();
 	win.swapBuffers();
 	win.pollEvents();
+
 
 }
 

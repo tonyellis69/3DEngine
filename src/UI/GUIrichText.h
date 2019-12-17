@@ -232,6 +232,7 @@ private:
 	void checkHotTextContact(const  int mouseX, const  int mouseY);
 
 	bool scrollDown2(int dist);
+	bool scrollUp2(int dist);
 
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.

@@ -14,13 +14,15 @@ public:
 	void setCallbackObj(IhexObjectCallback* obj);
 	void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);
+	void setPosition(CHex& hex);
 	void setDirection(THexDir direction);
-	void startTravel();
+	void newMove();
 	void setZheight(float height);
 	void setTravelPath(THexList& path);
 	THexList& getTravelPath();
-	bool update(float dT);
+	virtual bool update(float dT) ;
 	void findTravelPath(CHex& target);
+	virtual void chooseTurnAction() {};
 
 	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
@@ -48,7 +50,7 @@ protected:
 
 	THexList travelPath; ///<Route for movement.
 
-private:
+protected:
 	IhexObjectCallback* callbackObj;
 };
 
@@ -57,5 +59,8 @@ using TEntities = std::vector<CHexObject*>;
 
 class IhexObjectCallback {
 public:
-	virtual THexList getPathCallback(CHex& start, CHex& end) = 0; // { return THexList x; }
+	virtual THexList getPathCB(CHex& start, CHex& end) = 0; 
+	virtual CHexObject* getEntityAtCB(CHex& hex) = 0;
+	virtual void onPlayerTurnDoneCB() = 0;
+	virtual CHex getPlayerPositionCB() = 0;
 };

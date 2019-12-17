@@ -222,6 +222,9 @@ public:
 	glm::vec3 defaultLightDir; //TO DO: scrap. Default light is not a spotlight!
 
 	CRenderTexture* texture1x1; ///<1x1 white texture, useful as a default.
+
+	CBuf* tmpPtr;
+
 private:
 
 	GLenum DrawBuffers[1];

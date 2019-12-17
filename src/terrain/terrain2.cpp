@@ -200,7 +200,6 @@ void CTerrain2::removeChunk(int id) {
 
 /** Called every frame, used to maintain terrain in realtime. */
 void CTerrain2::update(float dT) {
-
 	//TO DO: base number on time available, not const value!
 	unsigned int tmp = 10;// chunksToMesh.size(); //10
 	for (int x = 0; x < tmp; x++) {  

@@ -729,22 +729,31 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 void CGUIrichText::update(float dT) {
 	//if (!deliveryBuffer.empty())
 		//deliverByCharacter(dT);
+
+
+
 	
 	if (gapObj != -1)
 		collapseGap(dT);
+
+
+
+	//ok here
+	int j = 6;
 
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)
 	{
 		updateDt = 0;
 		if (isOverrun() && overrunCorrectionOn) {
-				smoothScroll(-smoothScrollStep);
+				//smoothScroll(-smoothScrollStep);
 				//overrunCorrectionOn = isOverrun();
 		} 
 
 
 
 		//lineRender2 stuff;
+
 		if (autoscrollingDown) {
 			autoscrollingDown = scrollDown2(smoothScrollStep);
 			lineBuffer2.renderToTextBuf(textBuf.textTexture);
@@ -755,9 +764,6 @@ void CGUIrichText::update(float dT) {
 
 
 	}
-
-	
-
 	
 	if (!hotFrags.empty() && !lineFadeInOn)
 		 animateHotText(dT);
@@ -806,12 +812,22 @@ bool CGUIrichText::attemptHotTextScroll(int direction) {
 
 /** Scroll the visible text by the given number of pixels, if possible. */
 void CGUIrichText::smoothScroll(int dist) {
-	if (dist < 0) { //scrolling down to the end...
+/*	if (dist < 0) { //scrolling down to the end...
 		if (scrollDownSuccessful(dist))
 			renderLineBuffer();
 	}
 	else if (scrollUpSuccessful(dist)) {
 		renderLineBuffer();		
+	}*/
+
+	//lineBuffer2 stuff////////////////
+	if (dist > 0) {
+		scrollUp2(dist);
+		lineBuffer2.renderToTextBuf(textBuf.textTexture);
+	}
+	else {
+		scrollDown2(abs(dist));
+		lineBuffer2.renderToTextBuf(textBuf.textTexture);
 	}
 }
 
@@ -1214,11 +1230,32 @@ bool CGUIrichText::scrollDown2(int dist) {
 	while (lineBuffer2.getOverlap() < dist) {
 		//add lines to bottom of lineBuffer if we can
 		//else break
+
 		TLine newLine = compileSingleLine(lineBuffer.finalFrag());
+
 		if (newLine.fragments.empty())
 			break;
 	}
-	int result = lineBuffer2.scroll(dist);
+
+	int result = lineBuffer2.scrollDown(dist);
+	return result;
+}
+
+/** Attempt to scroll up by the given distance in pixels. */
+bool CGUIrichText::scrollUp2(int dist) {
+	while (lineBuffer2.getTopOverlap() < dist) {
+		TCharacterPos currentLine = { firstVisibleObject,firstVisibleText };
+		TCharacterPos prevNewline = getPreviousLine(currentLine);
+		if (prevNewline == currentLine) {
+			break;
+		}
+		//found previous line so make it our new first visible line
+		firstVisibleObject = prevNewline.textObj;
+		firstVisibleText = prevNewline.pos;
+		//insert line in line buffer
+		TLine newFirstLine = compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+	}
+	int result = lineBuffer2.scrollUp(dist);
 	return result;
 }
 

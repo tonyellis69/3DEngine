@@ -131,7 +131,7 @@ TBlock CMultiBuf2::split(TBlock block, int size) {
 }
 
 /** Copy the given buffer to a reserved block of memory. */
-void CMultiBuf2::copyToBlock(CBuf& src, int blockAddr, int size) {
+void CMultiBuf2::copyToBlock(CBuf& src, int blockAddr, int size) {	
 	glBindBuffer(GL_COPY_READ_BUFFER, src.getBufHandle());
 	glBindBuffer(GL_COPY_WRITE_BUFFER, buffer.getBufHandle());
 	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, blockAddr, size);
@@ -150,7 +150,7 @@ void CMultiBuf2::memoryPanic() {
 		if (block->second.start + block->second.size >= highestAddr) {
 			//extend this block
 			auto  endBlock = freeBlocks[block->second.start];
-			//freeBlocks[block->second.start].size += newSize - oldSize;
+			freeBlocks[block->second.start].size += newSize - oldSize;
 			endBlock.size += newSize - oldSize;
 			freeBlocksSized.erase(block);
 			freeBlocksSized.insert({ endBlock.size,endBlock });
@@ -162,7 +162,7 @@ void CMultiBuf2::memoryPanic() {
 
 	//still here? then the highest block is a reserved block,
 	//and we can create a new free block right after it
-	TBlock newBlock = { highestAddr + 1,newSize - oldSize };
-	freeBlocks[highestAddr + 1] = newBlock;
+	TBlock newBlock = { highestAddr,newSize - oldSize };
+	freeBlocks[highestAddr ] = newBlock;
 	freeBlocksSized.insert({ newBlock.size,newBlock });
 }

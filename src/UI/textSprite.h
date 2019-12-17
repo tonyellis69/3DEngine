@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -12,8 +13,9 @@
 class CTextSprite {
 public:
 	CTextSprite(int posX, int posY);
+	~CTextSprite();
 	int makeTextVerts(const std::string& text, CFont* font);
-	void renderText(CRenderTexture& buf, glm::vec4& colour);
+	void renderToBuffer(CRenderTexture& buf, glm::vec4& colour);
 
 	unsigned int bufId;
 	glm::i32vec2 positionOnPage;

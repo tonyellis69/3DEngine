@@ -39,6 +39,12 @@ CRenderTexture& C2DimageBuf::getBuffer() {
 	return imageBuffer;
 }
 
+/** Free the block at this address for re-use.*/
+void C2DimageBuf::free(int addr)  {
+	TTexBlock block = reservedBlocks[addr];
+	freeBlocks.push_back(block);
+}
+
 /** Return the index in freeBlocks of a free memory block >= size. */
 int C2DimageBuf::getFreeBlock(int size) {
 	int index = 0;
@@ -50,7 +56,6 @@ int C2DimageBuf::getFreeBlock(int size) {
 	}
 
 	if (index == freeBlocks.size()) {
-		//Couldn't find a texBlock!
 		index = panic();
 	}
 	return index;

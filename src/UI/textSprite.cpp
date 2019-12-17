@@ -3,6 +3,8 @@
 #include "../vertBufs.h"
 #include "../renderer/renderer.h"
 
+#include "../utils/log.h"
+
 #include "glm\gtc\matrix_transform.hpp"
 
 CTextSprite::CTextSprite(int posX, int posY) {
@@ -10,9 +12,14 @@ CTextSprite::CTextSprite(int posX, int posY) {
 	pRenderer = &CRenderer::getInstance();
 }
 
+CTextSprite::~CTextSprite() {
+
+}
+
 
 /** Create the verts for the series of quads that rendering this text will require. */
 int CTextSprite::makeTextVerts( const std::string& text, CFont* font) {
+	
 	std::vector<vBuf::T2DtexVert> textQuads;
 	std::vector<unsigned int> textQuadsIndex;
 	int v = 0;
@@ -38,16 +45,17 @@ int CTextSprite::makeTextVerts( const std::string& text, CFont* font) {
 			blCorner += glm::vec2(glyph->width, 0);
 		}
 	}
-	
+
 	tmpVertBuf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
 	tmpVertBuf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
 	tmpVertBuf.storeLayout(2, 2, 0, 0);
+
 	this->font = font;
 	return blCorner.x;
 }
 
 /** Render our text vertexes to our reserved block on the buffer. */
-void CTextSprite::renderText(CRenderTexture& buf, glm::vec4& colour) {
+void CTextSprite::renderToBuffer(CRenderTexture& buf, glm::vec4& colour) {
 
 	glm::mat4 posM = glm::translate(glm::mat4(1), glm::vec3(0,bufId, 0));
 	
