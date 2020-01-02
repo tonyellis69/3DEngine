@@ -32,10 +32,12 @@ const int chunkTriCacheSize2 = 6;
 class CTerrain2 {
 public:
 	CTerrain2();
+	void setInitialChunkStorageSize(int bytes);
+	void setChunkVertLayout(std::initializer_list<int> attribs);
 	void createLoD1shell(float _LoD1cubeSize, int chunkCubes, int SCchunks, int shellSCs);
 	void addShell(int extent);
 	float getShellSize(unsigned int shellNo);
-	void playerWalk(glm::vec3& move);
+	void onPlayerMove(glm::vec3& move);
 	void removeChunkOverlaps(Tdirection inDirection);
 	void fillShells();
 	void alignOuterShellsWithScroll(const CShell& sender, Tdirection moveDirection);
@@ -68,7 +70,7 @@ public:
 	int chunkCubes;	//<cubes per chunk edge.
 	int SCchunks;  //<SC size in chunks.
 
-	glm::vec3 playerOffset; //<Deterimines if player moved far enough to advance scenery.
+	glm::vec3 playerDisplacement; //<Deterimines if player moved far enough to advance scenery.
 
 	glm::vec3 sampleSpacePos; //<Position of terrain in sample space.
 	float worldToSampleScale; ///<Number of world units to one sample unit

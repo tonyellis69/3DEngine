@@ -8,13 +8,8 @@
 
 
 CLineBuffer2::CLineBuffer2() {
-	pRenderer = &CRenderer::getInstance();
-	lineBufShader = pRenderer->createShader("lineBuf");
-	hOrthoMatrix = lineBufShader->getUniformHandle("orthoMatrix");
-	hTextureUnit = lineBufShader->getUniformHandle("textureUnit");
-	hOffset = lineBufShader->getUniformHandle("blockOffset");
-	hSize = lineBufShader->getUniformHandle("blockSize");
-	
+	initShader();
+	clear();
 }
 
 CLineBuffer2::~CLineBuffer2() {
@@ -31,120 +26,82 @@ void CLineBuffer2::setCallbackObj(ILineBufferCallback* obj) {
 void CLineBuffer2::setPageSize(int width, int height) {
 	this->width = width;
 	this->height = height;
-	textSprites.clear();
-	imageBuf.setSize(this->width, this->height ); 
-	
-	orthoView = glm::ortho<float>((float)width * -0.5f, (float)width * 0.5f, -(float)height * 0.5f, (float)height * 0.5f );
+	clear();
+	spriteBuffer.setSize(this->width, this->height ); 
+	textBuf.resize(width, height);
+	orthoView = glm::ortho<float>(0, (float)width , 0, (float)height ); //moves origin to top left
 }
 
-/** Delete all text sprites and clear the page of any existing text. */
+/** Clear the page of any existing text and reset it. */
 void CLineBuffer2::clear() {
-	//delete text sprites here.
-	//should implicitly clear imageBuf too
-	//reset anything else that needs it
+	spriteBuffer.clear();
+	textSprites.clear();
+	finalFrag = {0, 0, 0, 0, 0, 0, 0, no, true};
+	yPosTracker = 0;
+	pageStart.unset = true;
+	pageEnd.unset = true;
+	insertAtTop = false;
 }
 
 /**	Add this text fragment as a text sprite. */
 void CLineBuffer2::addTextSprite(TLineFragment& fragment) {
-	//return;
-
-	textSprites.push_back(new CTextSprite(fragment.renderStartX, fragment.renderStartY));
-	CTextSprite* sprite = textSprites.back();
-
-
-	TRichTextRec textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
-	//TO DO: textObj should carry an up-to-date pointer to font
-	CFont* font = &CRenderer::getInstance().fontManager.getFont(textObj.style.font);
-	//should only do this once
-
-	
-
-	std::string text = textObj.text.substr(fragment.textPos, fragment.textLength);
-	int lineWidth = sprite->makeTextVerts(text, font);
-	if (lineWidth == 0) {
-		delete textSprites.back();
-		textSprites.pop_back();
-		return;
-	}
-
-	//get here
-
-	sprite->size = glm::i32vec2(lineWidth, fragment.height);
-	sprite->bufId = imageBuf.reserve(sprite->size);
-	sprite->textObj = fragment.textObj;
-	sprite->textPos = fragment.textPos;
-
-
-	sprite->renderToBuffer(getBuffer(),textObj.style.colour);
-
+	setPageStartEnd(fragment);
+	CTextSprite* sprite = createSprite(fragment);
+	textSprites.push_back(sprite);
+	updateFinalFrag(sprite);
+	sprite->createText(spriteBuffer.getBuffer());
 }
 
-CRenderTexture& CLineBuffer2::getBuffer() {
-	return imageBuf.getBuffer();
+void CLineBuffer2::draw() {
+	
 }
 
-/** Draw all the text sprites to the given text buffer. */
-void CLineBuffer2::renderToTextBuf(CRenderTexture& textBuf) {
 
-	pRenderer->rendertToTextureClear(textBuf, glm::vec4(0, 0, 0, 0));
-	pRenderer->setShader(lineBufShader);
-	pRenderer->attachTexture(0, imageBuf.getBuffer().handle);
-	lineBufShader->setTextureUnit(hTextureUnit, 0);
+/** Draw all the text sprites to an internal buffer representing the page. */
+void CLineBuffer2::renderSprites() {
+	pRenderer->rendertToTextureClear(textBuf, glm::vec4(1,1, 1, 1));
+	pRenderer->setShader(textSpriteShader.shader);
+	pRenderer->attachTexture(0, spriteBuffer.getBuffer().handle);
+	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
 
-	glm::vec2 imageBufScale(1.0f / imageBuf.getBuffer().width, 1.0f / imageBuf.getBuffer().height);
-
-	
+	pRenderer->beginRenderToTexture(textBuf);
 	for (auto sprite : textSprites) {
-		glm::vec3 spriteOriginDist = glm::vec3(sprite->size, 0) * 0.5f;
-		glm::vec3 pageOriginDist = glm::vec3(textBuf.width,textBuf.height,0) * 0.5f;
-		glm::vec3 spriteTranslation = spriteOriginDist - pageOriginDist  + glm::vec3(sprite->positionOnPage, 0);
-
-		glm::mat4 trans = glm::translate(glm::mat4(1), spriteTranslation);
-		glm::mat4 shape = glm::scale(trans, spriteOriginDist);
-		glm::mat4 spritePos = orthoView  *shape;
-
-		lineBufShader->setShaderValue(hOrthoMatrix, spritePos);
-		lineBufShader->setShaderValue(hOffset, glm::vec2(0,sprite->bufId) * imageBufScale);
-		lineBufShader->setShaderValue(hSize, ( glm::vec2(sprite->size)) * imageBufScale);
-
-		pRenderer->renderToTextureTriStrip(*pRenderer->screenQuad,textBuf);
+		sprite->draw();
 	}
+	pRenderer->endRenderToTexture();
 }
 
-/** Move all text sprites up by the given amount.*/
+/** Move all text sprites up by the given amount, deleting any that end up outside the page entirely.*/
 int CLineBuffer2::scrollDown(int scrollAmount) {
 	int overlap = getOverlap();
-	int maxScroll = std::min(scrollAmount, overlap);
-	//return;
-	//if (width == 780)
-	//	sysLog << "\nscroll: " << maxScroll;
+	int scrollAchieved = std::min(scrollAmount, overlap);
 	for (auto sprite = textSprites.begin(); sprite != textSprites.end();) {
-		(*sprite)->positionOnPage.y -= maxScroll;
+		(*sprite)->adjustYPos(-scrollAchieved);
 		if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
-			imageBuf.free((*sprite)->bufId);
 			sprite = textSprites.erase(sprite);
 		}
 		else
 			sprite++;
 	}
-	return maxScroll;
+	recalcPageState();
+	return scrollAchieved;
 }
 
-/** Move all text sprites down by the given amount.*/
+/** Move all text sprites down by the given amount, deleting any that end up outside the page entirely.*/
 int CLineBuffer2::scrollUp(int scrollAmount) {
 	int overlap = getTopOverlap();
-	int maxScroll = std::min(scrollAmount, overlap);
+	int scrollAchieved = std::min(scrollAmount, overlap);
 
 	for (auto sprite = textSprites.begin(); sprite != textSprites.end();) {
-		(*sprite)->positionOnPage.y += maxScroll;
+		(*sprite)->adjustYPos(scrollAchieved);
 		if ((*sprite)->positionOnPage.y > height) {
-			imageBuf.free((*sprite)->bufId);
 			sprite = textSprites.erase(sprite);
 		}
 		else
 			sprite++;
 	}
-	return maxScroll;
+	recalcPageState();
+	return scrollAchieved;
 }
 
 /** Return the distance in pixels between the bottom of the page and the bottom of the lowest
@@ -155,7 +112,6 @@ int CLineBuffer2::getOverlap() {
 		overlap = std::max(overlap, sprite->positionOnPage.y + sprite->size.y);
 	}
 	overlap = overlap - height;
-
 	return std::max(0, overlap);
 }
 
@@ -169,23 +125,157 @@ int CLineBuffer2::getTopOverlap() {
 	return abs(overlap);
 }
 
-/** Return a data structure showing the topmost textObj drawn on the page
-	and the position in its text at which drawing commences. */
-TCharacterPos CLineBuffer2::getStartText() {
-	TCharacterPos startText;
-	int earliestTextObj = INT_MAX; int earliesTextPos;
-	for (auto sprite : textSprites) {
-		int currentTextObj = std::min(earliestTextObj, sprite->textObj);
-		if (currentTextObj < earliestTextObj) {
-			earliesTextPos = INT_MAX;
-			earliestTextObj = currentTextObj;
-		}
-		earliesTextPos = std::min(earliesTextPos, sprite->textPos);
-	}
-
-	startText = { earliestTextObj, earliesTextPos };
-	return startText;
+/** Return the texture we draw the sprites to. */
+CRenderTexture* CLineBuffer2::getTextBuf() {
+	return &textBuf;
 }
+
+TLineFragment CLineBuffer2::getFinalFrag() {
+	return finalFrag;
+}
+
+TCharacterPos CLineBuffer2::getPageStart() {
+	return pageStart;
+}
+
+TCharacterPos CLineBuffer2::getPageEnd() {
+	return pageEnd;
+}
+
+void CLineBuffer2::setAddFragmentsAtTop(bool onOff) {
+	insertAtTop = onOff;
+}
+
+///////Private functions
+
+void CLineBuffer2::initShader() {
+	pRenderer = &CRenderer::getInstance();
+	textSpriteShader.shader = pRenderer->textSpriteShader;
+	textSpriteShader.hOrthoMatrix = textSpriteShader.shader->getUniformHandle("orthoMatrix");
+	textSpriteShader.hTextureUnit = textSpriteShader.shader->getUniformHandle("textureUnit");
+	textSpriteShader.hOffset = textSpriteShader.shader->getUniformHandle("blockOffset");
+	textSpriteShader.hSize = textSpriteShader.shader->getUniformHandle("blockSize");
+}
+
+/* If necessary, update finalFrag, our record of the endmost page fragment, with the details of this sprite. 
+	finalFrag is used to find the next line of text when scrolling down. */
+void CLineBuffer2::updateFinalFrag(CTextSprite* sprite) {
+	if (sprite->textObj > finalFrag.textObj) {
+		finalFrag.textObj = sprite->textObj;
+		finalFrag.textPos = sprite->textPos;
+		finalFrag.textLength = sprite->textLength;
+	}
+	else if (sprite->textObj == finalFrag.textObj && sprite->textPos > finalFrag.textPos) {
+		finalFrag.textPos = sprite->textPos;
+		finalFrag.textLength = sprite->textLength;
+	}
+}
+
+
+void CLineBuffer2::recalcPageState() {
+	int earliestTextObj = INT_MAX; int earliesTextPos;
+	int latestTextObj = -1; int latestTextPos;
+	yPosTracker = -1;
+	finalFrag = { 0, 0, 0, 0, 0, 0, 0, no, true };
+
+	for (auto sprite : textSprites) { 
+		if (sprite->positionOnPage.y + sprite->size.y < 0 || sprite->positionOnPage.y > height)
+			continue;
+
+		//find the text closest to the top left corner of the page
+		if (sprite->textObj < earliestTextObj) {
+			earliestTextObj = sprite->textObj;
+			earliesTextPos = sprite->textPos;
+		}
+		else if (sprite->textObj == earliestTextObj && sprite->textPos < earliesTextPos)
+			earliesTextPos = sprite->textPos;
+
+		//find the text closest to the bottom right corner of the page
+		if (sprite->textObj > latestTextObj) {
+			latestTextObj = sprite->textObj;
+			latestTextPos = sprite->textEnd;
+		}
+		else if (sprite->textObj == latestTextObj && sprite->textEnd < latestTextPos)
+			latestTextPos = sprite->textEnd;
+
+		yPosTracker = std::max(yPosTracker, sprite->positionOnPage.y + sprite->size.y);
+		updateFinalFrag(sprite);
+	}
+	pageStart = { earliestTextObj, earliesTextPos };
+	pageEnd = { latestTextObj, latestTextPos };
+}
+
+void CLineBuffer2::setPageStartEnd(TLineFragment& fragment) {
+	if (pageStart.unset)
+		pageStart.setPos(fragment.textObj, fragment.textPos);
+	else
+		if (TCharacterPos(fragment.textObj, fragment.textPos) < pageStart)
+			pageStart = TCharacterPos(fragment.textObj, fragment.textPos);
+
+	pageEnd.setPos(fragment.textObj, fragment.textPos + fragment.textLength);
+}
+
+/** Find the y position at which this sprite should be drawn. */
+int CLineBuffer2::calcSpriteYpos(TLineFragment& fragment) {
+	int spriteYpos = yPosTracker;
+	if (insertAtTop) {
+		spriteYpos = -getTopOverlap() - fragment.height;
+	}
+	else {
+		if (fragment.causesNewLine)
+			yPosTracker += fragment.height;
+	}
+	return spriteYpos;
+}
+
+CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment)
+{
+	TRichTextRec textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
+	CTextSprite* sprite;
+	if (textObj.hotId)
+		sprite = new CHotTextSprite();
+	else
+		sprite = new CTextSprite();
+
+
+	//TO DO: textObj should carry an up-to-date pointer to font
+	CFont* font = &CRenderer::getInstance().fontManager.getFont(textObj.style.font);
+	//should only do this once
+
+	std::string text = textObj.text.substr(fragment.textPos, fragment.textLength);
+
+
+	int lineWidth = sprite->makeTextVerts(text, font);
+
+	sprite->size = glm::i32vec2(lineWidth, fragment.height);
+	sprite->textEnd = fragment.textPos + fragment.textLength;
+	sprite->textLength = fragment.textLength;
+	sprite->setOthoMatrix(&orthoView);
+
+	int spriteYpos = calcSpriteYpos(fragment);
+	sprite->setPosition(fragment.renderStartX, spriteYpos);
+	sprite->textColour = textObj.style.colour;
+
+	if (textObj.hotId)
+		static_cast<CHotTextSprite*>(sprite)->hotTextColour = pCallbackObj->getHotTextSelectedColour();
+
+	sprite->textObj = fragment.textObj;
+	sprite->textPos = fragment.textPos;
+	sprite->setPageBuf(&textBuf);
+	sprite->setShader(&textSpriteShader);
+	sprite->setCallbackObj(this);
+
+	return sprite;
+}
+
+int CLineBuffer2::reserveImageSpace(glm::i32vec2& size) {
+	return spriteBuffer.reserve(size);
+}
+
+void CLineBuffer2::freeSpriteMemory(int bufId) {
+	spriteBuffer.free(bufId);
+}
+
 
 
 

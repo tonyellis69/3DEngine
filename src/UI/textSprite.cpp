@@ -7,13 +7,26 @@
 
 #include "glm\gtc\matrix_transform.hpp"
 
-CTextSprite::CTextSprite(int posX, int posY) {
-	this->positionOnPage = glm::i32vec2(posX,posY);
+CTextSprite::CTextSprite() {
 	pRenderer = &CRenderer::getInstance();
+	bufId = INT_MAX;
 }
 
 CTextSprite::~CTextSprite() {
+	callbackObj->freeSpriteMemory(bufId);
+}
 
+void CTextSprite::createText(CRenderTexture& texture) {
+	if (size.x == 0)
+		return;
+	bufId = callbackObj->reserveImageSpace(size);
+	writeTextToBuffer(texture, textColour);
+	freeVertBuffer();
+}
+
+void CTextSprite::setPosition(int posX, int posY) {
+	positionOnPage = glm::i32vec2(posX, posY);
+	updateMatrix();
 }
 
 
@@ -55,7 +68,7 @@ int CTextSprite::makeTextVerts( const std::string& text, CFont* font) {
 }
 
 /** Render our text vertexes to our reserved block on the buffer. */
-void CTextSprite::renderToBuffer(CRenderTexture& buf, glm::vec4& colour) {
+void CTextSprite::writeTextToBuffer(CRenderTexture& buf, glm::vec4& colour) {
 
 	glm::mat4 posM = glm::translate(glm::mat4(1), glm::vec3(0,bufId, 0));
 	
@@ -71,7 +84,100 @@ void CTextSprite::renderToBuffer(CRenderTexture& buf, glm::vec4& colour) {
 	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
 
 	pRenderer->renderToTextureTris(tmpVertBuf, buf);
+	
+}
+
+void CTextSprite::setPageBuf(CRenderTexture* pageBuf) {
+	this->pageBuf = pageBuf;
+}
+
+void CTextSprite::setOthoMatrix(glm::mat4* orthoMatrix) {
+	this->orthoMatrix = orthoMatrix;
+}
+
+void CTextSprite::setShader(TLineBufferShader* shader) {
+	this->shader = shader;
+}
+
+void CTextSprite::draw() {
+	if (bufId == INT_MAX)
+		return; //TO DO: do this more elegantly with a virtual func?
+
+	shader->shader->setShaderValue(shader->hOrthoMatrix, matrix);
+	shader->shader->setShaderValue(shader->hOffset, glm::vec2(0, bufId));
+	shader->shader->setShaderValue(shader->hSize, glm::vec2(size));
+
+	//pRenderer->renderToTextureTriStrip(*pRenderer->screenQuad, *pageBuf);
+	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
+}
+
+bool CTextSprite::adjustYPos(int change) {
+	positionOnPage.y += change;
+	updateMatrix();
+	return true;
+}
+
+void CTextSprite::freeVertBuffer()
+{
+	tmpVertBuf.freeMem();
+}
+
+void CTextSprite::updateMatrix() {
+	glm::vec3 spriteOriginDist = glm::vec3(size, 0) * 0.5f;
+	glm::vec3 spriteTranslation = spriteOriginDist + glm::vec3(positionOnPage, 0);
+
+	matrix = glm::translate(glm::mat4(1), spriteTranslation);
+	matrix = glm::scale(matrix, spriteOriginDist);
+	matrix = *orthoMatrix * matrix;
 }
 
 
+//////////////////////////Hot text sprite stuff
 
+CHotTextSprite::~CHotTextSprite() {
+	callbackObj->freeSpriteMemory(bufId);
+	callbackObj->freeSpriteMemory(bufId2);
+}
+
+void CHotTextSprite::createText(CRenderTexture& texture) {
+	if (size.x == 0)
+		return;
+
+	bufId = callbackObj->reserveImageSpace(size);
+	writeTextToBuffer(texture, textColour);
+
+	bufId2 = callbackObj->reserveImageSpace(size);
+	write2ndTextToBuffer(texture, hotTextColour);
+	freeVertBuffer();
+}
+
+/** Render the text vertices to a second reserved block in the buffer. This is used
+	for pulsing hot text, etc. */
+void CHotTextSprite::write2ndTextToBuffer(CRenderTexture& spriteBuffer, glm::vec4& colour){
+	glm::mat4 posM = glm::translate(glm::mat4(1), glm::vec3(0, bufId2, 0));
+
+
+	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)spriteBuffer.width, 0, spriteBuffer.height);
+
+	orthoMatrix = orthoMatrix * posM;
+
+	pRenderer->setShader(pRenderer->textShader);
+	pRenderer->attachTexture(0, font->texture); //attach texture to textureUnit (0)
+	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
+	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, colour);
+	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
+
+	pRenderer->renderToTextureTris(tmpVertBuf, spriteBuffer);
+}
+
+void CHotTextSprite::draw() {
+	shader->shader->setShaderValue(shader->hOrthoMatrix, matrix);
+	shader->shader->setShaderValue(shader->hOffset, glm::vec2(0, bufId2));
+	shader->shader->setShaderValue(shader->hSize, glm::vec2(size));
+
+	//give the shader offsets for both sprite images
+	//and a transition value saying how far to blend between the two.
+
+	//pRenderer->renderToTextureTriStrip(*pRenderer->screenQuad, *pageBuf);
+	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
+}

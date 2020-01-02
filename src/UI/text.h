@@ -78,8 +78,19 @@ struct TLineFragDrawRec {
 	glm::vec4 textColour;
 };
 
-struct TCharacterPos {
+//enum TRichTextPtrStatus { rtUnset};
+class TCharacterPos {
+public:
+	TCharacterPos() : unset(true) {}
+	TCharacterPos(int textObj, int textPos);
+	void setPos(int textObj, int textPos);
+
 	int textObj;
 	int pos;
-	bool operator==(const TCharacterPos& rhs) { return textObj == rhs.textObj && pos == rhs.pos; }
+	bool unset; 
+
+	bool operator==(const TCharacterPos& rhs) { 
+		return textObj == rhs.textObj && pos == rhs.pos; 
+	}
+	bool operator<(const TCharacterPos& rhs);
 };

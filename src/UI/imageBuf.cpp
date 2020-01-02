@@ -13,6 +13,10 @@ C2DimageBuf::C2DimageBuf() {
 void C2DimageBuf::setSize(int width, int height) {
 	
 	imageBuffer.resize(width, height  *2 );
+	clear();
+}
+
+void C2DimageBuf::clear() {
 	nextId = 0;
 	freeBlocks.clear();
 	freeBlocks.push_back({ 0,imageBuffer.height });
@@ -42,6 +46,7 @@ CRenderTexture& C2DimageBuf::getBuffer() {
 /** Free the block at this address for re-use.*/
 void C2DimageBuf::free(int addr)  {
 	TTexBlock block = reservedBlocks[addr];
+	reservedBlocks.erase(addr);
 	freeBlocks.push_back(block);
 }
 

@@ -119,7 +119,7 @@ bool CHexObject::update(float dT) {
 		}
 
 
-		float speed = 0.01f;
+		float speed = 0.0035f;
 		glm::vec3 velocity = moveVector * speed;
 		worldPos += velocity;
 		

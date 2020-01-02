@@ -90,7 +90,7 @@ public:
 	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
 	void renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture);
 	void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
-	void beginRenderToTexture(CBaseTexture & texture, glm::i32vec2& offset, glm::i32vec2& size);
+	void beginRenderToTexture(CBaseTexture & texture);
 	void endRenderToTexture();
 	void rendertToTextureClear(CBaseTexture& texture, glm::vec4 & colour);
 	unsigned int getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode);
@@ -158,6 +158,7 @@ public:
 	CShader* texShader; ///<The standard texture shader
 	CShader* billboardShader;
 	CShader* textShader;
+	CShader* textSpriteShader;
 
 	std::vector<CShader*> shaderList; ///<Tracks all shaders
 
@@ -223,7 +224,7 @@ public:
 
 	CRenderTexture* texture1x1; ///<1x1 white texture, useful as a default.
 
-	CBuf* tmpPtr;
+
 
 private:
 

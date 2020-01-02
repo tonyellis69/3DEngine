@@ -10,7 +10,7 @@
 class ILineBufferCallback;
 /** A class that draws multiple blocks of text to a texture buffer for output,
 	in real-time, employing whatever effects these blocks require. */
-class CLineBuffer2 {
+class CLineBuffer2 : public ITextSpriteCallback {
 public:
 	CLineBuffer2();
 	~CLineBuffer2();
@@ -18,17 +18,32 @@ public:
 	void setPageSize(int width, int height);
 	void clear();
 	void addTextSprite(TLineFragment& fragment);
-	CRenderTexture& getBuffer();
-	void renderToTextBuf(CRenderTexture& texBuf);
+	void draw();
+	void renderSprites();
 	int scrollDown(int scrollAmount);
 	int scrollUp(int scrollAmount);
 	int getOverlap();
 	int getTopOverlap();
-	TCharacterPos getStartText();
+	CRenderTexture* getTextBuf();
+	TLineFragment getFinalFrag();
+	TCharacterPos getPageStart();
+	TCharacterPos getPageEnd();
+	void setAddFragmentsAtTop(bool onOff);
 
 private:
-	C2DimageBuf imageBuf; ///<Provides storage for text sprite image buffers.
+	void initShader();
+	void updateFinalFrag(CTextSprite* sprite);
+	void recalcPageState();
+	void setPageStartEnd(TLineFragment& fragment);
+	int calcSpriteYpos(TLineFragment& fragment);
+	CTextSprite* createSprite(TLineFragment& fragment);
+	int reserveImageSpace(glm::i32vec2& size);
+	void freeSpriteMemory(int bufId);
 
+	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
+
+	CRenderTexture textBuf; ///The text buffer we're drawing to.
+	
 	int width;
 	int height;
 
@@ -37,17 +52,23 @@ private:
 
 	std::vector<CTextSprite*> textSprites;
 
-	CShader* lineBufShader;
-	unsigned int hOrthoMatrix;
-	unsigned int hTextureUnit;
-	unsigned int hOffset;
-	unsigned int hSize;
+	TLineBufferShader textSpriteShader;
 	glm::mat4 orthoView;
+
+	TLineFragment finalFrag;
+
+	int yPosTracker; ///<Tracks how far down the page we've got
+	TCharacterPos pageStart; ///<Identifies where in the textObjs this page starts.
+	TCharacterPos pageEnd; ///<Identifies where in the textObjs this page ends.
+	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
 };
 
 class ILineBufferCallback {
 public:
-	virtual TRichTextRec& getTexObjCallback(int objNo) { return TRichTextRec();  }
+	virtual TRichTextRec& getTexObjCallback(int objNo) = 0;
+	virtual glm::vec4& getHotTextColour() = 0;
+	virtual glm::vec4& getHotTextSelectedColour() = 0;
+
 };
 
 

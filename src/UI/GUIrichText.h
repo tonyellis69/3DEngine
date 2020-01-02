@@ -234,6 +234,10 @@ private:
 	bool scrollDown2(int dist);
 	bool scrollUp2(int dist);
 
+	glm::vec4& getHotTextColour();
+	glm::vec4& getHotTextSelectedColour();
+
+
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
 

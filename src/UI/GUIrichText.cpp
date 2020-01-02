@@ -32,7 +32,6 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 		setStyleChange(styleRec);
 	}
 	renderLineBuffer();
-	lineBuffer2.renderToTextBuf(textBuf.textTexture);
 	autoscrollingDown = true;
 }
 
@@ -42,7 +41,7 @@ void CGUIrichText::createPage() {
 	initialisePage();
 	writePageToLineBuffer();
 	renderLineBuffer();
-	lineBuffer2.renderToTextBuf(textBuf.textTexture);
+	//lineBuffer2.renderSprites(textBuf.textTexture);
 }
 
 
@@ -56,7 +55,8 @@ void CGUIrichText::applyStyleSheet() {
 }
 
 void CGUIrichText::DrawSelf() {
-	pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
+	lineBuffer2.renderSprites();
+	pDrawFuncs->drawTexture(drawBox, *lineBuffer2.getTextBuf());
 
 	if (drawBorder) { //should be an overridable basic drawborder routine in the superclass
 		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
@@ -265,9 +265,6 @@ bool CGUIrichText::scrollDownSuccessful(int dist) {
 	firstVisibleObject = firstFrag.textObj;
 	firstVisibleText = firstFrag.textPos;
 	updateFragmentPositions();
-
-
-	lineBuffer2.renderToTextBuf(textBuf.textTexture);
 	return true;
 }
 
@@ -705,7 +702,7 @@ bool CGUIrichText::scrollUpSuccessful(int dist) {
 	}
 
 
-	lineBuffer2.renderToTextBuf(textBuf.textTexture);
+
 	return true;
 }
 
@@ -715,7 +712,7 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 	do {
 		if (pos <= 0) {
 			if (textObj == 0)
-				return TCharacterPos{ 0 };
+				return TCharacterPos(0,0);
 			textObj--;
 			pos = textObjs[textObj].text.size() - 1 + pos;
 		}
@@ -727,46 +724,22 @@ TCharacterPos CGUIrichText::getPrevNewline(int textObj, int pos) {
 
 
 void CGUIrichText::update(float dT) {
-	//if (!deliveryBuffer.empty())
-		//deliverByCharacter(dT);
+		
+	//if (gapObj != -1)
+	//	collapseGap(dT);
 
-
-
-	
-	if (gapObj != -1)
-		collapseGap(dT);
-
-
-
-	//ok here
-	int j = 6;
 
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)
 	{
 		updateDt = 0;
-		if (isOverrun() && overrunCorrectionOn) {
-				//smoothScroll(-smoothScrollStep);
-				//overrunCorrectionOn = isOverrun();
-		} 
-
-
-
-		//lineRender2 stuff;
-
 		if (autoscrollingDown) {
-			autoscrollingDown = scrollDown2(smoothScrollStep);
-			lineBuffer2.renderToTextBuf(textBuf.textTexture);
+			 autoscrollingDown = scrollDown2(smoothScrollStep);
 		}
-
-
-
-
-
 	}
 	
 	if (!hotFrags.empty() && !lineFadeInOn)
-		 animateHotText(dT);
+		;// animateHotText(dT);
 	if (!fadeFrags2.empty())
 		animateFadeText(dT);
 	if (lineFadeInOn) 
@@ -823,11 +796,10 @@ void CGUIrichText::smoothScroll(int dist) {
 	//lineBuffer2 stuff////////////////
 	if (dist > 0) {
 		scrollUp2(dist);
-		lineBuffer2.renderToTextBuf(textBuf.textTexture);
+		
 	}
 	else {
 		scrollDown2(abs(dist));
-		lineBuffer2.renderToTextBuf(textBuf.textTexture);
 	}
 }
 
@@ -1231,7 +1203,16 @@ bool CGUIrichText::scrollDown2(int dist) {
 		//add lines to bottom of lineBuffer if we can
 		//else break
 
-		TLine newLine = compileSingleLine(lineBuffer.finalFrag());
+
+		TLineFragment finalFrag = lineBuffer2.getFinalFrag();
+
+		// textPos = 70ish, endPos = 50ish, hence prob?
+
+		TCharacterPos endPos = lineBuffer2.getPageEnd();
+
+		
+
+		TLine newLine = compileSingleLine(finalFrag);
 
 		if (newLine.fragments.empty())
 			break;
@@ -1243,10 +1224,11 @@ bool CGUIrichText::scrollDown2(int dist) {
 
 /** Attempt to scroll up by the given distance in pixels. */
 bool CGUIrichText::scrollUp2(int dist) {
+	lineBuffer2.setAddFragmentsAtTop(true);
 	while (lineBuffer2.getTopOverlap() < dist) {
-		TCharacterPos currentLine = { firstVisibleObject,firstVisibleText };
-		TCharacterPos prevNewline = getPreviousLine(currentLine);
-		if (prevNewline == currentLine) {
+		//TCharacterPos currentLine = { firstVisibleObject,firstVisibleText };
+		TCharacterPos prevNewline = getPreviousLine(lineBuffer2.getPageStart());
+		if (prevNewline == lineBuffer2.getPageStart()) {
 			break;
 		}
 		//found previous line so make it our new first visible line
@@ -1255,8 +1237,18 @@ bool CGUIrichText::scrollUp2(int dist) {
 		//insert line in line buffer
 		TLine newFirstLine = compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
 	}
+	lineBuffer2.setAddFragmentsAtTop(false);
 	int result = lineBuffer2.scrollUp(dist);
 	return result;
+}
+
+
+glm::vec4& CGUIrichText::getHotTextColour() {
+	return hotTextStyle.colour;
+}
+
+glm::vec4& CGUIrichText::getHotTextSelectedColour() {
+	return selectedHotTextStyle.colour;
 }
 
 void CGUIrichText::setStyleChange(TStyleRec& styleRec) {

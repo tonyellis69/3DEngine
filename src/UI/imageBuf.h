@@ -16,6 +16,7 @@ class C2DimageBuf {
 public:
 	C2DimageBuf();
 	void setSize(int width, int height);
+	void clear();
 	unsigned int reserve(glm::i32vec2& size);
 	CRenderTexture& getBuffer();
 	void free(int addr);

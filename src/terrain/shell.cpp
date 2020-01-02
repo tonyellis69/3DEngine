@@ -43,7 +43,6 @@ void CShell::playerAdvance(Tdirection direction) {
 	//Also, update the player's positionHint in the shell.
 	i32vec3 travelVector = dirToVec(direction);
 	playerChunkPos += travelVector;
-	sysLog << "\n!!!!!!!!!!!!!!!!!!!advancing!!";
 	liveLog << "\nAdvance shell " << shellNo << ":";
 	if (getPlayerChunkExtent(direction) >= minimumChunkExtent) {
 		//1) sufficient terrain in direction, so nothing else to do

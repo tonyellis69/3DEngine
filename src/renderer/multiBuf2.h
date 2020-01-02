@@ -19,23 +19,24 @@ public:
 	void setSize(int numBytes);
 	int copyBuf(CBuf& src, int size);
 	void freeBlock(int addr);
-	int getBlock(int size);
 	void storeLayout(std::initializer_list<int> attribs);
 	unsigned int getVAO();
 
-
-	CBuf buffer; //make private!!!!!
 
 private:
 	int getFreeBlock(int size);
 	TBlock split(TBlock block, int size);
 	void copyToBlock(CBuf& src, int blockAddr, int size);
 	void memoryPanic();
+	void rebuildFreeBlocksSized();
 
 
-	std::multimap<int, TBlock> freeBlocksSized; //ordered by size
-	std::unordered_map<int, TBlock> freeBlocks; //ordered by start
+	std::multimap<int, TBlock> freeBlocksBySize; //ordered by size
+	std::map<int, TBlock> freeBlocks; //ordered by start
 	std::unordered_map<int, TBlock> reservedBlocks; //ordered by start
 
 	int highestAddr;
+
+
+	CBuf buffer; //make private!!!!!
 };

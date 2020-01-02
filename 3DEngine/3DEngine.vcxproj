@@ -209,6 +209,7 @@
     <ClCompile Include="..\src\UI\lineBuffer.cpp" />
     <ClCompile Include="..\src\UI\lineBuffer2.cpp" />
     <ClCompile Include="..\src\UI\rowObject.cpp" />
+    <ClCompile Include="..\src\UI\text.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\renderDrawFuncs.cpp" />
     <ClCompile Include="..\src\UI\textSprite.cpp" />

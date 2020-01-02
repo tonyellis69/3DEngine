@@ -5,15 +5,25 @@
 
 #include "..\\3DEngine\src\utils\log.h"
 
-using namespace glm;
+using glm::vec3;
+using glm::mat4;
+using glm::i32vec3;
 
-CTerrain2::CTerrain2() : playerOffset(0), chunkOrigin(1)  {
-	//multiBuf.setSize(175000000);
-	multiBuf.setSize(27650512);// 25650512);// 26650512); // 30000000);
-	multiBuf.storeLayout({ 3, 3, 0, 0 });
-	//TO DO: temp!!! create a setter!!!
+CTerrain2::CTerrain2()   {
+	playerDisplacement = vec3(0);
+	chunkOrigin = mat4(1);
 };
 
+/** Specify the size of the storage space for chunk vertices. This will silenty resize if more
+	storage is required. */
+void CTerrain2::setInitialChunkStorageSize(int bytes) {
+	multiBuf.setSize(bytes);
+}
+
+/** Specify how chunk vertexes are stored, for use when drawing them. */
+void CTerrain2::setChunkVertLayout(std::initializer_list<int> attribs) {
+	multiBuf.storeLayout(attribs);
+}
 
 /** Create the central shell, establishing some variables. */
 void CTerrain2::createLoD1shell(float _LoD1cubeSize, int _chunkCubes, int _SCchunks, int _shellSCs)  {
@@ -47,37 +57,43 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 }
 
 /** Respond to the player moving by the given vector from their current position. */
-void CTerrain2::playerWalk(glm::vec3 & move) {
-	//if offset > 1 chunk, advance terrain.
-	playerOffset += move;
+void CTerrain2::onPlayerMove(glm::vec3 & move) {
+	//if displacement > 1 chunk, advance terrain.
+	playerDisplacement += move;
 	Tdirection inDirection = none;
 
+	vec3 tmpDisp = playerDisplacement;
+
 	//are we now more than a chunk width from the terrain centre?
-	if (playerOffset.x > LoD1chunkSize) {
+	if (playerDisplacement.x > LoD1chunkSize) {
 		inDirection = east;
-		playerOffset.x = mod(playerOffset.x, LoD1chunkSize);
+		playerDisplacement.x = glm::mod(playerDisplacement.x, LoD1chunkSize);
 	}
-	else if (-playerOffset.x > LoD1chunkSize) {
+	else if (-playerDisplacement.x > LoD1chunkSize) {
 		inDirection = west;
-		playerOffset.x = mod(playerOffset.x, -LoD1chunkSize);
+		playerDisplacement.x = glm::mod(playerDisplacement.x, -LoD1chunkSize);
 	}
-	else if (-playerOffset.z > LoD1chunkSize) {
+	else if (-playerDisplacement.z > LoD1chunkSize) {
 		inDirection = north;
-		playerOffset.z = mod(playerOffset.z, -LoD1chunkSize);
+		playerDisplacement.z = glm::mod(playerDisplacement.z, -LoD1chunkSize);
 	}
-	else if (playerOffset.z > LoD1chunkSize) {
+	else if (playerDisplacement.z > LoD1chunkSize) {
 		inDirection = south;
-		playerOffset.z = mod(playerOffset.z, LoD1chunkSize);
+		playerDisplacement.z = glm::mod(playerDisplacement.z, LoD1chunkSize);
 	}
-	else if (playerOffset.y > LoD1chunkSize) {
+	else if (playerDisplacement.y > LoD1chunkSize) {
 		inDirection = up;
-		playerOffset.y = mod(playerOffset.y, LoD1chunkSize);
+		playerDisplacement.y = glm::mod(playerDisplacement.y, LoD1chunkSize);
 	}
-	else if (-playerOffset.y > LoD1chunkSize) {
+	else if (-playerDisplacement.y > LoD1chunkSize) {
 		inDirection = down;
-		playerOffset.y = mod(playerOffset.y, -LoD1chunkSize);
+		playerDisplacement.y = glm::mod(playerDisplacement.y, -LoD1chunkSize);
 	}
-	
+
+	vec3 test = glm::trunc(tmpDisp / LoD1chunkSize);
+	vec3 test2 = tmpDisp - test * LoD1chunkSize;
+	Tdirection testDir = vecToDir(i32vec3(test));
+
 	if (inDirection != none) {		
 		shells[0].playerAdvance(inDirection);		
 		removeChunkOverlaps(inDirection);

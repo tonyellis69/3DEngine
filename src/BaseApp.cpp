@@ -420,7 +420,7 @@ void CBaseApp::initLogWindow() {
 	created yet, send it to the sysLog (which can write it to a file.) */
 void CBaseApp::logCallback(std::stringstream & logStream) {
 	if (logWindow)
-		logWindow->appendMarkedUpText(logStream.str());
+		 logWindow->appendMarkedUpText(logStream.str());
 	else
 		sysLog << logStream.str();
 }
