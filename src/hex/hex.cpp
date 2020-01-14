@@ -172,7 +172,7 @@ THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
 			&& dirVector.z == moveVectorCube[dir].z)
 			return (THexDir)dir;
 	}
-	fatalLog << "\nNeighbour direction not found!";
+	return hexNone;
 }
 
 /** Return the relative angle of the neighbouring hex, where hexEas = 0; */

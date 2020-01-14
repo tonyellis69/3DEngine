@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 
 
-enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE};
+enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE, hexNone};
 static glm::i32vec3 moveVectorCube[]{ {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0,1,-1}, {1,0,-1} };
 
 const float hexWidth = sqrt(3);

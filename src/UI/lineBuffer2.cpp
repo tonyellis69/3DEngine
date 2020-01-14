@@ -28,8 +28,8 @@ void CLineBuffer2::setPageSize(int width, int height) {
 	this->height = height;
 	clear();
 	spriteBuffer.setSize(this->width, this->height ); 
-	textBuf.resize(width, height);
-	orthoView = glm::ortho<float>(0, (float)width , 0, (float)height ); //moves origin to top left
+	pageBuf.resize(width, height);
+	pageOrthoView = glm::ortho<float>(0, (float)width , 0, (float)height ); //moves origin to top left
 }
 
 /** Clear the page of any existing text and reset it. */
@@ -45,11 +45,11 @@ void CLineBuffer2::clear() {
 
 /**	Add this text fragment as a text sprite. */
 void CLineBuffer2::addTextSprite(TLineFragment& fragment) {
-	setPageStartEnd(fragment);
+	updatePageStartEnd(fragment);
 	CTextSprite* sprite = createSprite(fragment);
 	textSprites.push_back(sprite);
 	updateFinalFrag(sprite);
-	sprite->createText(spriteBuffer.getBuffer());
+	sprite->createTextImage(spriteBuffer.getBuffer());
 }
 
 void CLineBuffer2::draw() {
@@ -59,12 +59,12 @@ void CLineBuffer2::draw() {
 
 /** Draw all the text sprites to an internal buffer representing the page. */
 void CLineBuffer2::renderSprites() {
-	pRenderer->rendertToTextureClear(textBuf, glm::vec4(1,1, 1, 1));
+	pRenderer->rendertToTextureClear(pageBuf, glm::vec4(1,1, 1, 1));
 	pRenderer->setShader(textSpriteShader.shader);
 	pRenderer->attachTexture(0, spriteBuffer.getBuffer().handle);
 	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
 
-	pRenderer->beginRenderToTexture(textBuf);
+	pRenderer->beginRenderToTexture(pageBuf);
 	for (auto sprite : textSprites) {
 		sprite->draw();
 	}
@@ -127,7 +127,7 @@ int CLineBuffer2::getTopOverlap() {
 
 /** Return the texture we draw the sprites to. */
 CRenderTexture* CLineBuffer2::getTextBuf() {
-	return &textBuf;
+	return &pageBuf;
 }
 
 TLineFragment CLineBuffer2::getFinalFrag() {
@@ -171,7 +171,7 @@ void CLineBuffer2::updateFinalFrag(CTextSprite* sprite) {
 	}
 }
 
-
+/** Calculate the various characteristics of the page, such as pageStart and pageEnd. */
 void CLineBuffer2::recalcPageState() {
 	int earliestTextObj = INT_MAX; int earliesTextPos;
 	int latestTextObj = -1; int latestTextPos;
@@ -205,17 +205,19 @@ void CLineBuffer2::recalcPageState() {
 	pageEnd = { latestTextObj, latestTextPos };
 }
 
-void CLineBuffer2::setPageStartEnd(TLineFragment& fragment) {
+/** Update pageStart and pageEnd if the given fragment invalidates the existing values. */
+void CLineBuffer2::updatePageStartEnd(TLineFragment& fragment) {
 	if (pageStart.unset)
 		pageStart.setPos(fragment.textObj, fragment.textPos);
 	else
 		if (TCharacterPos(fragment.textObj, fragment.textPos) < pageStart)
 			pageStart = TCharacterPos(fragment.textObj, fragment.textPos);
 
-	pageEnd.setPos(fragment.textObj, fragment.textPos + fragment.textLength);
+	if (TCharacterPos(fragment.textObj, fragment.textPos + fragment.textLength) > pageEnd)
+		pageEnd.setPos(fragment.textObj, fragment.textPos + fragment.textLength);
 }
 
-/** Find the y position at which this sprite should be drawn. */
+/** Return the y position on the page at which this sprite should be drawn. */
 int CLineBuffer2::calcSpriteYpos(TLineFragment& fragment) {
 	int spriteYpos = yPosTracker;
 	if (insertAtTop) {
@@ -228,52 +230,42 @@ int CLineBuffer2::calcSpriteYpos(TLineFragment& fragment) {
 	return spriteYpos;
 }
 
-CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment)
-{
+CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment) {
 	TRichTextRec textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
 	CTextSprite* sprite;
 	if (textObj.hotId)
 		sprite = new CHotTextSprite();
 	else
 		sprite = new CTextSprite();
-
+	sprite->setCallbackObj(this);
 
 	//TO DO: textObj should carry an up-to-date pointer to font
 	CFont* font = &CRenderer::getInstance().fontManager.getFont(textObj.style.font);
 	//should only do this once
-
 	std::string text = textObj.text.substr(fragment.textPos, fragment.textLength);
+	sprite->makeTextQuads(text, font);
 
+	sprite->setTextObjData(fragment.textObj, fragment.textPos, fragment.textLength);
+	sprite->setPageOthoMatrix(&pageOrthoView);
+	sprite->setPagePosition(fragment.renderStartX, calcSpriteYpos(fragment));
+	sprite->setTextColour(textObj.style.colour);
 
-	int lineWidth = sprite->makeTextVerts(text, font);
-
-	sprite->size = glm::i32vec2(lineWidth, fragment.height);
-	sprite->textEnd = fragment.textPos + fragment.textLength;
-	sprite->textLength = fragment.textLength;
-	sprite->setOthoMatrix(&orthoView);
-
-	int spriteYpos = calcSpriteYpos(fragment);
-	sprite->setPosition(fragment.renderStartX, spriteYpos);
-	sprite->textColour = textObj.style.colour;
-
-	if (textObj.hotId)
-		static_cast<CHotTextSprite*>(sprite)->hotTextColour = pCallbackObj->getHotTextSelectedColour();
-
-	sprite->textObj = fragment.textObj;
-	sprite->textPos = fragment.textPos;
-	sprite->setPageBuf(&textBuf);
+	sprite->setPageTexture(&pageBuf);
 	sprite->setShader(&textSpriteShader);
-	sprite->setCallbackObj(this);
 
 	return sprite;
 }
 
-int CLineBuffer2::reserveImageSpace(glm::i32vec2& size) {
+int CLineBuffer2::reserveSpriteImageSpace(glm::i32vec2& size) {
 	return spriteBuffer.reserve(size);
 }
 
-void CLineBuffer2::freeSpriteMemory(int bufId) {
+void CLineBuffer2::freeSpriteImageSpace(int bufId) {
 	spriteBuffer.free(bufId);
+}
+
+glm::vec4 CLineBuffer2::getHotTextColour() {
+	return pCallbackObj->getHotTextSelectedColour();
 }
 
 

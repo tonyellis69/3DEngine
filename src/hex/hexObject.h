@@ -16,13 +16,15 @@ public:
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
 	void setDirection(THexDir direction);
-	void newMove();
+	bool beginMove();
 	void setZheight(float height);
 	void setTravelPath(THexList& path);
 	THexList& getTravelPath();
 	virtual bool update(float dT) ;
 	void findTravelPath(CHex& target);
 	virtual void chooseTurnAction() {};
+	virtual void beginTurnAction() {};
+	virtual bool resolvingSerialAction();
 
 	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
@@ -51,7 +53,12 @@ protected:
 	THexList travelPath; ///<Route for movement.
 
 protected:
-	IhexObjectCallback* callbackObj;
+	IhexObjectCallback* hexWorld;
+
+	int action; ///<The action this entity is performing this turn.
+
+private:
+
 };
 
 
@@ -63,4 +70,15 @@ public:
 	virtual CHexObject* getEntityAtCB(CHex& hex) = 0;
 	virtual void onPlayerTurnDoneCB() = 0;
 	virtual CHex getPlayerPositionCB() = 0;
+	virtual CHex getPlayerDestinationCB() = 0;
+	virtual bool isEntityDestinationCB(CHex& hex) = 0;
 };
+
+
+//Action flags
+const int actSerial = 0x80000000;
+const int actNone = 0x0;
+const int actChasePlayer = 0x1;
+const int actAttackPlayer = 0x80000002;
+const int actCombatPassive = 0x3;
+const int actTrackPlayer = 0x4;

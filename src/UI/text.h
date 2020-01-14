@@ -93,4 +93,5 @@ public:
 		return textObj == rhs.textObj && pos == rhs.pos; 
 	}
 	bool operator<(const TCharacterPos& rhs);
+	bool operator>(const TCharacterPos& rhs);
 };

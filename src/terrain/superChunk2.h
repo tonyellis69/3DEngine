@@ -33,7 +33,7 @@ public:
 };
 
 
-class ITerrainCallback {
+class ITerrainAppCallback {
 public:
 	virtual bool scIntersectionCheckCallback(glm::vec3& pos, float scSize) { return false; };
 	virtual bool chunkCheckCallback(glm::vec3& chunkPos, float chunkSize) { return false; };
@@ -43,6 +43,18 @@ public:
 	virtual void onTerrainScroll(glm::vec3& movement) {}
 };
 
+class ITerrainCallback {
+public:
+	virtual void realignOuterShells(int shell, Tdirection moveDirection) = 0;
+	virtual void recentreOuterShells(int shellNo, Tdirection moveDirection) = 0;
+	virtual void scrollSampleSpace(Tdirection scrollDir, float shift) = 0;
+	virtual int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos) = 0;
+	virtual void removeChunk(int id) = 0;
+	virtual glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex) = 0;
+};
+
+
+
 /** A container for zero or more chunks occupying a cubic volume of space. */
 class CTerrain2;
 class CSuperChunk2 {
@@ -51,7 +63,8 @@ public:
 	void checkForIntersection();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setSampleSize(float sampleSize);
-	void setCallbackApp(ITerrainCallback* pApp);
+	void setCallbackApp(ITerrainAppCallback* pApp);
+	void setTerrainCallback(ITerrainCallback* pTerrain);
 	void createChunk(glm::i32vec3& index);
 
 	void clearChunks();
@@ -74,14 +87,14 @@ public:
 
 	glm::vec3 sampleSpacePos;
 	
-	static ITerrainCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
+	static ITerrainAppCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
 
 	bool isEmpty; ///<True unless terrain intersects SC.
 
 	//TO DO: this info is the same for all SCs of a shell.
 	//condsider replacing with a pointer to a struct owned by the shell
 	float sampleSize;
-	int SCchunks; //<SC size in chunks.
+	int numSCchunks; //<SC size in chunks.
 	float chunkSampleSize; ///<Chunk size in samplespace
 
 	//std::vector<glm::i32vec3> chunks; ///<The chunks owned by this superchunk
@@ -91,5 +104,8 @@ public:
 	int shellNo; ///TO DO may mean above is redundant
 
 	static CTerrain2* pTerrain; ///<Annoyingly necessary pointer to terrain object.
+	//TO DO Scrap
+
+	ITerrainCallback* pTerrainObj;///<Pointer to terrain callback obj
 };
 

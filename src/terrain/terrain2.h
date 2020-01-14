@@ -27,68 +27,75 @@ struct TSCident {
 
 const int chunkTriCacheSize2 = 6;
 
-//class CSuperChunk;
-
-class CTerrain2 {
+class CTerrain2 : public ITerrainCallback {
 public:
 	CTerrain2();
 	void setInitialChunkStorageSize(int bytes);
 	void setChunkVertLayout(std::initializer_list<int> attribs);
-	void createLoD1shell(float _LoD1cubeSize, int chunkCubes, int SCchunks, int shellSCs);
+	void createCentralShell(float _LoD1cubeSize, int numChunkCubes, int numSCchunks, int shellSCs);
 	void addShell(int extent);
 	float getShellSize(unsigned int shellNo);
 	void onPlayerMove(glm::vec3& move);
-	void removeChunkOverlaps(Tdirection inDirection);
-	void fillShells();
-	void alignOuterShellsWithScroll(const CShell& sender, Tdirection moveDirection);
-	void recentreShellsAfterScroll(const CShell& sender, Tdirection moveDirection);
+	void createTerrain();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setWorldScale(float scale);
-	void setCallbackApp(ITerrainCallback* pApp);
-	void scrollSampleSpace(Tdirection scrollDir, float shift);
-	void initialiseChunks(int numChunks);
-	int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos);
-	int getFreeChunk();
-	void removeChunk(int id);
-
+	void setCallbackApp(ITerrainAppCallback* pApp);
 	void update(float dT);
-
-	glm::vec3 getSCpos(int shellNo,const glm::i32vec3& origIndex);
-	glm::vec3 getSCpos2(int shellNo, const glm::i32vec3& origIndex);
-
 	TSCident getSC(const glm::vec3& pos);
-
 	void getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& buf, unsigned int& noTris);
+	int storeChunkMesh(CBuf& src, int size);
+	void freeChunkMesh(int addr);
+	unsigned int getChunkMeshVAO();
+	void setViewpoint(glm::vec3& pos);
 
-	
-
-	
 	std::vector<CShell> shells;
 
-	float LoD1cubeSize; //<In worldspace.
-	float LoD1chunkSize; //<In worldspace.
-	int chunkCubes;	//<cubes per chunk edge.
-	int SCchunks;  //<SC size in chunks.
-
-	glm::vec3 playerDisplacement; //<Deterimines if player moved far enough to advance scenery.
+	int numChunkCubes;	//<cubes per chunk edge.
+	int numSCchunks;  //<SC size in chunks.
 
 	glm::vec3 sampleSpacePos; //<Position of terrain in sample space.
 	float worldToSampleScale; ///<Number of world units to one sample unit
-	ITerrainCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
+	ITerrainAppCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
 
 	std::vector<Chunk2> chunks; ///<The complete reservoir of chunks.
+	
+	
+	glm::mat4 chunkOrigin; ///<TO DO: keep this, or do some other way?
+
+	
+
+	glm::vec3 playerDisplacement; ///<Player displacement from origin.
+
+	glm::vec3 viewpoint; ///>The position of the terrain viewer relative to origin
+
+private:
+	void initialiseChunks(int numChunks);
+	void removeChunkOverlaps(Tdirection inDirection);
+	void realignOuterShells(int shell, Tdirection moveDirection);
+	void recentreOuterShells(int shellNo, Tdirection moveDirection);
+	void scrollSampleSpace(Tdirection scrollDir, float shift);
+	int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos);
+	int getFreeChunk();
+	void removeChunk(int id);
+	glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex);
+
+	const int approxChunksRequired = 2000; 
+	int chunksToSkinPerFrame;
+	
+	float LoD1cubeSize; //<In worldspace.
+	float LoD1chunkSize; //<In worldspace.
+
+		glm::vec3 playerRelativeDisplacement; //<Deterimines if player moved far enough to advance scenery.
 	std::vector<int> freeChunks;
 	std::queue<int> chunksToMesh;
-
-	glm::mat4 chunkOrigin; ///<TO DO: keep this, or do some other way?
 
 	TChunkTriBuf2 cachedChunkTris[chunkTriCacheSize2]; ///<Chunk triangles recently downloaded from graphics memory.
 	int freeChunkTriCache;
 
-
 	CMultiBuf2 multiBuf;
 
-private:
-
+	glm::vec3 oldViewpoint;
 };
+
+
 

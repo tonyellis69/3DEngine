@@ -192,7 +192,7 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end) {
 			if (getHexCube(next).content == 2)
 				continue; //solid hex
 
-			if (entityCheck(next) == true)
+			if (entityCheck(next) == true /* && next != end*/)
 				continue;
 
 
@@ -253,6 +253,7 @@ THexList CHexArray::walkBack(CHex& start, CHex& end, TCameFrom& cameFrom) {
 bool CHexArray::entityCheck(CHex& hex) {
 	for (auto entity : *entities) {
 		if (entity->destination == hex)
+		//if (entity->hexPosition == hex)
 			return true;
 	}
 	return false;

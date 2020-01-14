@@ -12,7 +12,7 @@ C2DimageBuf::C2DimageBuf() {
 /** Set the size of the main buffer. This will wipe any existing content.*/
 void C2DimageBuf::setSize(int width, int height) {
 	
-	imageBuffer.resize(width, height  *2 );
+	imageBuffer.resize(width, height  * 1.5f );
 	clear();
 }
 
@@ -28,14 +28,12 @@ void C2DimageBuf::clear() {
 unsigned int C2DimageBuf::reserve(glm::i32vec2& size) {
 	int index = getFreeBlock(size.y);
 	
-	if (freeBlocks[index].size > size.y )
-		split(index, size.y);
-	
+	if (freeBlocks[index].size > size.y)
+		split(index, size.y);	
 	int addr = freeBlocks[index].start;
 	reservedBlocks[addr] = freeBlocks[index];
-	highestReservedAddress = std::max(highestReservedAddress, addr + freeBlocks[index].size-1);
+	highestReservedAddress = std::max(highestReservedAddress, addr + freeBlocks[index].size);
 	freeBlocks.erase(freeBlocks.begin() + index);
-	
 	return addr;
 }
 
@@ -75,7 +73,6 @@ void C2DimageBuf::split(unsigned int index, int size) {
 
 /** Buffer has been found to be too small, so resize it.*/
 int C2DimageBuf::panic() {
-
 	int oldSize = imageBuffer.height;
 	imageBuffer.resizeSafe(imageBuffer.width, imageBuffer.height * 1.25f);
 	int newSize = imageBuffer.height;

@@ -1,6 +1,7 @@
 #include "hexObject.h"
 
 #include <cmath>
+#include <algorithm>
 
 #include "..\utils\log.h"
 
@@ -13,7 +14,7 @@ CHexObject::CHexObject() {
 	isRobot = false;
 	worldPos = glm::vec3(0);
 	setZheight(0.05f);
-
+	action = actNone;
 	facing = hexEast;
 	rotation = 0.0f;
 	rotationalVelocity = 0.0f;
@@ -22,7 +23,7 @@ CHexObject::CHexObject() {
 }
 
 void CHexObject::setCallbackObj(IhexObjectCallback* obj) {
-	callbackObj = obj;
+	hexWorld = obj;
 }
 
 /** Set position using individual hex cube coordinates. */
@@ -64,27 +65,31 @@ void CHexObject::setDirection(THexDir direction) {
 
 
 /**	Order this object to move to the next hex on its current travel path. */
-void CHexObject::newMove() {
-	if (travelPath.empty()) {
-		return;
-	}
+bool CHexObject::beginMove() {
+	if (isRobot)
+		int b = 0;
+
+	if (travelPath.empty())
+		return false;
+
+
 	CHex& nextHex = travelPath[0];
 	moving = true;
 	destination = travelPath[0];
 	worldSpaceDestination = cubeToWorldSpace(destination);
 	CHex moveVectorHex = destination - hexPosition;
 	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
+	
 
-
-
+	//rotation
 	destinationDirection =  neighbourDirection(hexPosition, destination);
 	float rotationDir = shortestRotation(facing, destinationDirection);
 	if (rotationDir == 0.0f)
-		return;
-
+		return true;
 	turning = true;
 	rotationalVelocity = (rotationDir > 0) - (rotationDir < 0) ;
 	destinationAngle = dirToAngle(destinationDirection);
+	return true;
 }
 
 /** Set the height at which this object is drawn. */
@@ -104,12 +109,17 @@ THexList& CHexObject::getTravelPath() {
 
 /** Carry out whatever changes have arisen since last update. Return true if this is ongoing. */
 bool CHexObject::update(float dT) {
+//	if (action == actNone)
+	//	return false;
+
+
 	if (moving) {
 
 		if (turning) {
-			rotation += rotationalVelocity * 0.01f;
-			rotation = glm::mod<float>(rotation, 2 * M_PI);
-			if (abs(rotation - destinationAngle) < 0.1f) {
+			rotation += rotationalVelocity * 10.0f * dT;
+			rotation = glm::mod<float>(rotation, 2 * M_PI);			
+			float gap = std::fmod(rotation - destinationAngle + M_PI, 2 * M_PI) - M_PI;
+			if (abs(gap) < 0.1f) {
 				turning = false;
 				setDirection(destinationDirection);
 				return true; //because moving itself not yet resolved
@@ -119,21 +129,36 @@ bool CHexObject::update(float dT) {
 		}
 
 
-		float speed = 0.0035f;
-		glm::vec3 velocity = moveVector * speed;
-		worldPos += velocity;
-		
-		if (glm::distance(worldPos, worldSpaceDestination) < 0.1f) {
+		float speed = 7.0f;
+		glm::vec3 velocity = moveVector * speed * dT;
+		if (glm::distance(worldPos, worldSpaceDestination) < 0.15f) {
+			if (isRobot)
+				sysLog << "\nRobot reached destination!";
 			moving = false;
+			velocity = glm::vec3(0);
 			setPosition(destination.x,destination.y,destination.z);
 			if (!travelPath.empty() && destination == travelPath[0])
 				travelPath.erase(travelPath.begin());
 			return false;
 		}
+		else {
+			if (isRobot) {
+				sysLog << "\nbot worldPos: " << worldPos << " destination " << worldSpaceDestination << " dist "
+					<< glm::distance(worldPos, worldSpaceDestination);
+				sysLog << "\nbot velocity " << velocity;
+			}
+			worldPos += velocity;
+		}
+
 		buildWorldMatrix();
 		return true;
 	}
 	return false;
+}
+
+
+bool CHexObject::resolvingSerialAction() {
+	return action & actSerial;
 }
 
 
@@ -142,9 +167,9 @@ void CHexObject::findTravelPath(CHex& target) {
 	//but if we've moving, makes sense that the new path will start
 	//where we end up
 	if (moving)
-		travelPath = callbackObj->getPathCB(destination, target);
+		travelPath = hexWorld->getPathCB(destination, target);
 	else
-		travelPath = callbackObj->getPathCB(hexPosition,target);
+		travelPath = hexWorld->getPathCB(hexPosition,target);
 
 }
 

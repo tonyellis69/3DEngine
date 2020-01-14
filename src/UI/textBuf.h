@@ -11,10 +11,6 @@
 
 #include "text.h"
 
-
-
-
-
 /** A class that maintains a rectangular buffer of rendered text for displaying. */
 class CTextBuffer {
 public:

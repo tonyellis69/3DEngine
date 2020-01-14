@@ -34,15 +34,16 @@ private:
 	void initShader();
 	void updateFinalFrag(CTextSprite* sprite);
 	void recalcPageState();
-	void setPageStartEnd(TLineFragment& fragment);
+	void updatePageStartEnd(TLineFragment& fragment);
 	int calcSpriteYpos(TLineFragment& fragment);
 	CTextSprite* createSprite(TLineFragment& fragment);
-	int reserveImageSpace(glm::i32vec2& size);
-	void freeSpriteMemory(int bufId);
+	int reserveSpriteImageSpace(glm::i32vec2& size);
+	void freeSpriteImageSpace(int bufId);
+	glm::vec4 getHotTextColour();
 
 	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
-	CRenderTexture textBuf; ///The text buffer we're drawing to.
+	CRenderTexture pageBuf; ///The buffer we're drawing text sprites on.
 	
 	int width;
 	int height;
@@ -52,8 +53,8 @@ private:
 
 	std::vector<CTextSprite*> textSprites;
 
-	TLineBufferShader textSpriteShader;
-	glm::mat4 orthoView;
+	TTextSpriteShader textSpriteShader;
+	glm::mat4 pageOrthoView;
 
 	TLineFragment finalFrag;
 

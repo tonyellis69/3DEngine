@@ -11,46 +11,52 @@
 #include <iostream>
 
 
-
 using namespace glm;
 
-CShell::CShell(int LoD, float chunkSize, int SCchunks, int shellSCs) :
-	LoD(LoD), chunkSize(chunkSize), SCchunks(SCchunks), shellSCs(shellSCs) {
+CShell::CShell(int LoD, float chunkSize, int numSCchunks, int shellSCs) :
+	LoD(LoD), chunkSize(chunkSize), numSCchunks(numSCchunks), shellSCs(shellSCs) {
 
-	SCsize = SCchunks * chunkSize;
+	SCsize = numSCchunks * chunkSize;
 	worldSpaceSize = shellSCs * SCsize;
-	worldSpacePos = vec3(0);
-	minimumChunkExtent = (float(shellSCs-1) / 2.0f) * SCchunks;
-	playerChunkPos = i32vec3(0);
-	
-
+	minRequiredChunkExtent = (float(shellSCs-1) / 2.0f) * numSCchunks;
 	scArray.setSize(shellSCs, shellSCs, shellSCs);
+	init();
+}
 
-	shellColour = vec4(col::randHue(), 1);
+void CShell::init() {
+	playerDisplacementInChunks = i32vec3(0);
+	worldSpacePos = vec3(0);
 
-	//SCs don't have chunks yet, so we can safely say:
 	for (int face = 0; face < 6; face++)
 		faceLayerFull[face] = false;
-	scrolls = 0;
+}
+
+void CShell::setTerrainCallbackObj(ITerrainCallback* obj) {
+	pTerrainObj = obj;
 }
 
 
 /** Respond to the player advancing in the given direction.*/
-void CShell::playerAdvance(Tdirection direction) {
+void CShell::onPlayerAdvance(Tdirection direction) {
+	liveLog << "\nAdvance shell " << shellNo << ":";
+
+
+	playerDisplacementInChunks += dirToVec(direction);
+
 	//Either: (1) there is sufficient terrain in this direction and no need to supply more,
 	//or (2) there's room for more terrain in the outer SC so add to sc, or
 	//(3) the SCs need to be scrolled  to provide more space, and then added to.
-	//Also, update the player's positionHint in the shell.
-	i32vec3 travelVector = dirToVec(direction);
-	playerChunkPos += travelVector;
-	liveLog << "\nAdvance shell " << shellNo << ":";
-	if (getPlayerChunkExtent(direction) >= minimumChunkExtent) {
-		//1) sufficient terrain in direction, so nothing else to do
+	//Also, update the player's position in the shell.
+	
+	if (shellNo == 0)
+		liveLog << "\nDispL " << playerDisplacementInChunks;
+
+	if (chunkExtentFromPlayer(direction) >= minRequiredChunkExtent) {
 		liveLog << " suffient terrain, returning.";
 		return;
 	}
 	
-	//got here
+
 
 	//still here? More terrain is needed in the given direction
 	//Is there room for more chunks in the final SC in the given direction?
@@ -67,14 +73,15 @@ void CShell::playerAdvance(Tdirection direction) {
 
 		Tdirection scrollDir = flipDir(direction);
 		liveLog << " scrolling.";
+		sysLog << "\nscrolling!";
 
-		scrolls++;
 
 		if (shellNo != 0)
-			pTerrain->recentreShellsAfterScroll(*this, direction);
+			pTerrainObj->recentreOuterShells(shellNo, direction);
 
 		if (shellNo == 0) {
-			pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
+			//pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
+			pTerrainObj->scrollSampleSpace(scrollDir, scSampleStep);
 		}
 
 		scroll(scrollDir);
@@ -91,7 +98,8 @@ void CShell::playerAdvance(Tdirection direction) {
 		}
 
 		//move enclosing shells back to ensure terrain still lines up
-		pTerrain->alignOuterShellsWithScroll(*this, scrollDir);
+		//pTerrain->realignOuterShells(*this, scrollDir);
+		pTerrainObj->realignOuterShells(shellNo, scrollDir);
 
 		//now that we've scrolled, return to the default layout of one final double-layer of chunks
 		addToFaceLayer(direction);
@@ -105,30 +113,34 @@ void CShell::playerAdvance(Tdirection direction) {
 			pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
 		}
 
-		if (shellNo == 0)
+		if (shellNo == 0) {
 			pTerrain->pCallbackApp->onTerrainScroll(move);
+			pTerrain->viewpoint += move;
+			pTerrain->playerDisplacement += move;
+
+		}
 	}
 	
 	//didn't get here
 	//The containing shell also needs to respond to the player advancing across the terrain:
 	if (shellNo < pTerrain->shells.size() - 1) {
-		 pTerrain->shells[shellNo + 1].playerAdvance(direction);
+		 pTerrain->shells[shellNo + 1].onPlayerAdvance(direction);
 	}
 
 	
 }
 
 /** Return the number of chunks of terrain lying in the given direction from the player positionHint. */
-int CShell::getPlayerChunkExtent(Tdirection direction) {
+int CShell::chunkExtentFromPlayer(Tdirection direction) {
 	vec3 directionVector = dirToVec(direction);
 	int totallExtent = chunkExtent[direction];
-	int playerTravel = dot(vec3(playerChunkPos), directionVector);
+	int playerTravel = dot(vec3(playerDisplacementInChunks), directionVector);
 	return totallExtent - playerTravel;
 }
 
 /** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
-void CShell::fillEntire() {
-	calculateInnerBounds();
+void CShell::createTerrain() {
+	getInnerSCs();
 	//findAllSCchunks();
 	fillAllUnclippedSCs();
 }
@@ -138,7 +150,7 @@ void CShell::fillEntire() {
 	will change as the terrain advances in a particular direction. */
 void CShell::initChunkExtent() {
 	for (int direction = 0; direction < 6; direction++)
-		this->chunkExtent[direction] = minimumChunkExtent;
+		this->chunkExtent[direction] = minRequiredChunkExtent;
 }
 
 
@@ -146,7 +158,7 @@ void CShell::initChunkExtent() {
 	chunks of the enclosing shell, which will be twice the size.*/
 void CShell::addToFaceLayer(Tdirection direction) {
 	chunkExtent[direction] += 2;
-	int maxChunkExtent = (shellSCs * SCchunks) / 2;
+	int maxChunkExtent = (shellSCs * numSCchunks) / 2;
 	if (chunkExtent[direction] >= maxChunkExtent)
 		faceLayerFull[direction] = true;
 
@@ -164,8 +176,8 @@ void CShell::scroll(Tdirection scrollDirection) {
 	scArray.rotate(rotateVec);
 
 	//reset the chunk extent in this direction
-	chunkExtent[inDirection] = minimumChunkExtent-2; 
-	chunkExtent[scrollDirection] = minimumChunkExtent;
+	chunkExtent[inDirection] = minRequiredChunkExtent-2; 
+	chunkExtent[scrollDirection] = minRequiredChunkExtent;
 
 	faceLayerFull[inDirection] = false;
 
@@ -179,7 +191,8 @@ void CShell::scroll(Tdirection scrollDirection) {
 
 	i32vec3 scrollVec = dirToVec(scrollDirection);
 	//move player position in shell back by one SC's worth of chunks
-	playerChunkPos += scrollVec * SCchunks;
+	playerDisplacementInChunks += scrollVec * numSCchunks;
+	
 }
 
 
@@ -192,18 +205,19 @@ void CShell::initSuperChunks() {
 	while (!scIter.finished()) {
 		scIter->isEmpty = true;
 	
-		scIter->colour = shellColour;
+		//scIter->colour = shellColour;
 		scIter->colour =  vec4(col::randHue(), 1);
 
 		scIter->origIndex = scIter.getIndex();
 	
-		scIter->SCchunks = SCchunks;
+		scIter->numSCchunks = numSCchunks;
 		scIter->setSampleSize(scSampleStep);
 
 		vec3 sampleSpacePosition = calcSCsampleSpacePosition(scIter.getIndex());
 		scIter->setSampleSpacePosition(sampleSpacePosition);
 
 		scIter->pTerrain = pTerrain;
+		scIter->setTerrainCallback(pTerrainObj);
 
 		scIter->shellNo = shellNo;
 
@@ -361,7 +375,7 @@ void CShell::addChunksToFaceSCs2(Tdirection face) {
 	chunks of the inner shell. */
 void CShell::removeEncroachedOnChunks2(Tdirection face) {
 	//1. Find the inner face SC layer
-	TBoxVolume innerFace = innerBounds;
+	TBoxVolume innerFace = getInnerSCs(); //innerBounds;
 	int axis = getAxis(face);
 
 	if (face == north || face == west || face == down)
@@ -409,15 +423,16 @@ TBoxVolume CShell::calcInnerFaceSCVolume(Tdirection face) {
 }
 
 /** Find the innermost superchunks that we are interested in, before the chunks of the inner shell take over. */
-void CShell::calculateInnerBounds() {
+TBoxVolume CShell::getInnerSCs() {
 	innerBounds = { i32vec3(0),i32vec3(0) };
 	if (shellNo == 0)
-		return;
+		return innerBounds;
 
 	CBoxVolume innerShellChunks = pTerrain->shells[shellNo - 1].getChunkVolume2();
 	vec3 avoidSCBoundary(0.5f);
 	innerBounds.bl = getSCat(innerShellChunks.bl - avoidSCBoundary);
 	innerBounds.tr = getSCat(innerShellChunks.tr + avoidSCBoundary);
+	return innerBounds;
 }
 
 /** Return the index of the superchunk at this worldspace position. */
@@ -465,7 +480,7 @@ CBoxVolume CShell::getChunkVolume2() {
 /** Find any SCs now entirely within the inner chunk volume and clear them,
 	so they're empty when they scroll back into use.*/
 void CShell::reinitialiseInnerSCs() {
-	calculateInnerBounds();
+	getInnerSCs();
 	TBoxVolume innerFace = innerBounds;
 
 	for (int x = innerFace.bl.x + 1; x < innerFace.tr.x; x++) {
@@ -505,7 +520,7 @@ void CShell::removeScrolledOutChunks(Tdirection outface) {
 /** Add chunks to an inner face, where they had previously been displaced by the chunks of the
 	inner shell, before it scrolled. */
 void CShell::addInnerFaceChunks2(Tdirection face) {
-	calculateInnerBounds();
+	getInnerSCs();
 	//1. Find the inner face SC layer
 	TBoxVolume innerFace = innerBounds;
 

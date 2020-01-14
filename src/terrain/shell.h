@@ -10,13 +10,17 @@
 class CShellIterator;
 class COuterSCIterator;
 class CFaceIterator;
-class CTerrain2;
+class CTerrain2;  ///TO DO get rid of dependency!
+
+class ITerrainCallback;
 class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
-	void playerAdvance(Tdirection direction);
-	int getPlayerChunkExtent(Tdirection direction);
-	void fillEntire();
+	void init();
+	void setTerrainCallbackObj(ITerrainCallback* obj);
+	void onPlayerAdvance(Tdirection direction);
+	int chunkExtentFromPlayer(Tdirection direction);
+	void createTerrain();
 	void initChunkExtent();
 	void addToFaceLayer(Tdirection direction);
 	void scroll(Tdirection direction);
@@ -36,7 +40,7 @@ public:
 
 	TBoxVolume calcInnerFaceSCVolume(Tdirection face);
 
-	void calculateInnerBounds();
+	TBoxVolume getInnerSCs();
 
 	glm::i32vec3 getSCat(const glm::vec3& pos);
 
@@ -49,15 +53,15 @@ public:
 	glm::i32vec3 getInvRotatedIndex(const glm::i32vec3& origIndex);
 
 	int LoD; //<1=highest, then 2,4,8, etc
-	int SCchunks; //<SC size in chunks.
+	int numSCchunks; //<SC size in chunks.
 	int shellSCs; //<shell size in superChunks.
 
 	float chunkSize; //<In worldspace.
 	float SCsize; //<In worlsspace
 	float worldSpaceSize; 
 	glm::vec3 worldSpacePos;
-	int minimumChunkExtent; //<Terrain must always extend this far from player.
-	glm::i32vec3 playerChunkPos;  //<Player positionHint in chunks, relative to origin
+	int minRequiredChunkExtent; //<Terrain must always extend this far from player.
+	glm::i32vec3 playerDisplacementInChunks;  //<Player positionHint in chunks, relative to origin
 
 	int chunkExtent[6]; //<How far chunks extend from origin in each direction
 	bool faceLayerFull[6]; //<True if there's no room to add chunks to this face layer of SCs
@@ -68,12 +72,17 @@ public:
 	CSCarry scArray;
 	float scSampleStep;
 
-	glm::vec4 shellColour; ///!!!!!!!!!!!temp!
 
 	TBoxVolume innerBounds;
 
-	int scrolls; ///////!!!!temp!
+
+private:
+//	void 
+
+	ITerrainCallback* pTerrainObj; ///<Points to terrain callback object.
+
 };
+
 
 
 class CShellIterator  {

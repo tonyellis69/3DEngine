@@ -14,3 +14,7 @@ void TCharacterPos::setPos(int textObj, int textPos) {
 bool TCharacterPos::operator<(const TCharacterPos& rhs) {
 	return textObj < rhs.textObj || (textObj == rhs.textObj && pos < rhs.pos);
 }
+
+bool TCharacterPos::operator>(const TCharacterPos& rhs) {
+	return textObj > rhs.textObj || (textObj == rhs.textObj && pos > rhs.pos);
+}

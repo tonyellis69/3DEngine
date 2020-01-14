@@ -31,8 +31,6 @@ private:
 	std::vector<TTexBlock> freeBlocks;
 	std::unordered_map<int,TTexBlock> reservedBlocks;
 
-	
-
 	unsigned int nextId;
 
 	int highestReservedAddress;
