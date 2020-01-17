@@ -65,35 +65,34 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 /** Respond to the player moving by the given vector from their current position. */
 void CTerrain2::onPlayerMove(glm::vec3 & move) {
 
+	vec3 oldViewpoint = viewpoint;
+
+	vec3 oldChunks = glm::trunc( (viewpoint - vec3(1000)) / LoD1chunkSize);
+
 	viewpoint += move;
+
+	vec3 newViewpoint = viewpoint;
+
+	vec3 newChunks = glm::trunc( (viewpoint - vec3(1000)) / LoD1chunkSize);
+
+	vec3 terrainAdvanceInChunks2 = newChunks - oldChunks;
 
 	//if displacement > 1 chunk, advance terrain.
 	playerRelativeDisplacement += move;
 
 	vec3 terrainAdvanceInChunks = glm::trunc(playerRelativeDisplacement / LoD1chunkSize);
 
-	vec3 terrainAdvanceInChunks2 = glm::trunc( (viewpoint - oldViewpoint) / LoD1chunkSize);
-	Tdirection advanceDirection2 = vecToDir(i32vec3(terrainAdvanceInChunks2));
-
 	Tdirection advanceDirection = vecToDir(i32vec3(terrainAdvanceInChunks));
 	if (advanceDirection != none) {	
-		liveLog << "\nplayerDisp: " << playerRelativeDisplacement << " vs viewpoint gap: " <<
-			vec3(viewpoint - oldViewpoint);
-		liveLog <<  "\nviewpoint: " << viewpoint << " old viewpoint " << oldViewpoint;
-
-		liveLog << "\nterrainAdvInChunks: " << terrainAdvanceInChunks 
-			<< " vs terrainAdvInChunks2: " << terrainAdvanceInChunks2;
-
-	
+		liveLog << "\nterrainAdv: " << terrainAdvanceInChunks 
+			<< " vs terrainAd2: " << terrainAdvanceInChunks2 <<  ".";
+		liveLog << "\nbecause new viewpoint " << newViewpoint << " old viewpoint " << oldViewpoint;
+		
 
 		shells[0].onPlayerAdvance(advanceDirection);		
 		removeChunkOverlaps(advanceDirection);
-		liveLog << "\nViewpoint now " << viewpoint;
-		//oldViewpoint = (glm::trunc(viewpoint / LoD1chunkSize) * LoD1chunkSize);
-		liveLog << "\nPlayerDisp to become: " << playerRelativeDisplacement - terrainAdvanceInChunks * LoD1chunkSize
-			<< ".";
 	}
-	oldViewpoint = (glm::trunc(viewpoint / LoD1chunkSize) * LoD1chunkSize);
+	
 	playerRelativeDisplacement = playerRelativeDisplacement - terrainAdvanceInChunks * LoD1chunkSize;
 }
 

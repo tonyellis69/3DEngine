@@ -25,6 +25,9 @@ public:
 	virtual void chooseTurnAction() {};
 	virtual void beginTurnAction() {};
 	virtual bool resolvingSerialAction();
+	virtual void beginAttack(CHexObject& target) {};
+	virtual bool attack();
+	bool isNeighbour(CHex& position);
 
 	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
@@ -51,7 +54,11 @@ protected:
 
 
 	THexList travelPath; ///<Route for movement.
+	THexDir targetDirection;
 
+	float animCycle; ///<Records how far through an animation we are.
+
+	float dT;
 protected:
 	IhexObjectCallback* hexWorld;
 
@@ -67,7 +74,7 @@ using TEntities = std::vector<CHexObject*>;
 class IhexObjectCallback {
 public:
 	virtual THexList getPathCB(CHex& start, CHex& end) = 0; 
-	virtual CHexObject* getEntityAtCB(CHex& hex) = 0;
+	virtual CHexObject* getEntityAt(CHex& hex) = 0;
 	virtual void onPlayerTurnDoneCB() = 0;
 	virtual CHex getPlayerPositionCB() = 0;
 	virtual CHex getPlayerDestinationCB() = 0;
@@ -82,3 +89,5 @@ const int actChasePlayer = 0x1;
 const int actAttackPlayer = 0x80000002;
 const int actCombatPassive = 0x3;
 const int actTrackPlayer = 0x4;
+const int actPlayerAttack = 0x80000005;
+const int actPlayerTurnToAttack = 0x80000006;

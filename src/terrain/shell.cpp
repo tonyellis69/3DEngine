@@ -116,6 +116,7 @@ void CShell::onPlayerAdvance(Tdirection direction) {
 		if (shellNo == 0) {
 			pTerrain->pCallbackApp->onTerrainScroll(move);
 			pTerrain->viewpoint += move;
+			pTerrain->oldViewpoint += move;
 			pTerrain->playerDisplacement += move;
 
 		}

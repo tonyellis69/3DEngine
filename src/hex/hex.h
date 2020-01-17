@@ -52,6 +52,7 @@ CHex worldSpaceToHex(glm::vec3& worldSpace);
 int cubeDistance(CHex& cubeA, CHex& cubeB);
 THexList* hexLine(CHex& cubeA, CHex& cubeB);
 THexDir neighbourDirection(CHex& hex, CHex& neighbour);
+bool isNeighbour(CHex& hex, CHex& neighbour);
 float dirToAngle(THexDir direction);
 glm::vec3 directionToVec(THexDir direction);
 CHex getNeighbour(CHex& hex, THexDir direction);

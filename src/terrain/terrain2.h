@@ -67,6 +67,7 @@ public:
 	glm::vec3 playerDisplacement; ///<Player displacement from origin.
 
 	glm::vec3 viewpoint; ///>The position of the terrain viewer relative to origin
+	glm::vec3 oldViewpoint;
 
 private:
 	void initialiseChunks(int numChunks);
@@ -94,7 +95,7 @@ private:
 
 	CMultiBuf2 multiBuf;
 
-	glm::vec3 oldViewpoint;
+	
 };
 
 

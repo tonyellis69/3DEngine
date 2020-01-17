@@ -66,9 +66,6 @@ void CHexObject::setDirection(THexDir direction) {
 
 /**	Order this object to move to the next hex on its current travel path. */
 bool CHexObject::beginMove() {
-	if (isRobot)
-		int b = 0;
-
 	if (travelPath.empty())
 		return false;
 
@@ -111,7 +108,7 @@ THexList& CHexObject::getTravelPath() {
 bool CHexObject::update(float dT) {
 //	if (action == actNone)
 	//	return false;
-
+	this->dT = dT;
 
 	if (moving) {
 
@@ -131,9 +128,11 @@ bool CHexObject::update(float dT) {
 
 		float speed = 7.0f;
 		glm::vec3 velocity = moveVector * speed * dT;
+		if (!isRobot)
+			int b = 0;
+
 		if (glm::distance(worldPos, worldSpaceDestination) < 0.15f) {
-			if (isRobot)
-				sysLog << "\nRobot reached destination!";
+	
 			moving = false;
 			velocity = glm::vec3(0);
 			setPosition(destination.x,destination.y,destination.z);
@@ -173,10 +172,48 @@ void CHexObject::findTravelPath(CHex& target) {
 
 }
 
+bool CHexObject::attack() {
+	//advance the attack animation
+//use a 1-0 counter to say where we are in the animation
+	float travel = animCycle * 2.0f - 1.0f;
+	float sign = travel > 0 ? 1.0f : -1.0f;
+	//	travel = cos(travel * M_PI * 0.5f);
+
+		//travel = pow(4.0 * animCycle * (1.0 - animCycle), 5) ;
+
+	travel = 1.0f - pow(abs(travel), 0.6f);
+
+	travel *= hexWidth;
+
+	glm::vec3 travelVec = moveVector * travel;
+
+
+	worldPos = cubeToWorldSpace(hexPosition) + travelVec;
+
+	buildWorldMatrix();
+	animCycle += dT * 3.0f;
+	if (animCycle > 1.0f) {
+		action = actNone;
+		setPosition(hexPosition); //ensures we don't drift.
+		//onEndOfAction();
+		//TO DO: try to make onEndOfAction virtual and thus automatic
+		return false;
+	}
+	else {
+
+		return true;
+	}
+}
+
+
 /** Construct this object's world matrix from its known position and rotation.*/
 void CHexObject::buildWorldMatrix() {
 	worldMatrix = glm::translate(glm::mat4(1), worldPos);
 	worldMatrix = glm::rotate(worldMatrix, rotation, glm::vec3(0, 0, -1));
+}
+
+bool CHexObject::isNeighbour(CHex& position) {
+	return ::isNeighbour(hexPosition, position);
 }
 
 

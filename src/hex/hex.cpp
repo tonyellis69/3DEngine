@@ -175,6 +175,14 @@ THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
 	return hexNone;
 }
 
+
+
+bool isNeighbour(CHex& hex, CHex& neighbour) {
+	if (cubeDistance(hex, neighbour) == 1.0f)
+		return true;
+	return false;
+}
+
 /** Return the relative angle of the neighbouring hex, where hexEas = 0; */
 float dirToAngle(THexDir direction) {
 	return (float)direction * M_PI / 3.0f;
