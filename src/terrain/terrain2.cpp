@@ -10,7 +10,6 @@ using glm::mat4;
 using glm::i32vec3;
 
 CTerrain2::CTerrain2()   {
-	playerRelativeDisplacement = vec3(0);
 	playerDisplacement = vec3(0);
 	viewpoint = vec3(0);
 	chunkOrigin = mat4(1);
@@ -62,38 +61,20 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 	return shells[shellNo].worldSpaceSize;
 }
 
-/** Respond to the player moving by the given vector from their current position. */
+/** Respond to the player moving by the given vector from their current position. 
+	if displacement > 1 chunk, advance the terrain .*/
 void CTerrain2::onPlayerMove(glm::vec3 & move) {
-
-	vec3 oldViewpoint = viewpoint;
-
-	vec3 oldChunks = glm::trunc( (viewpoint - vec3(1000)) / LoD1chunkSize);
-
+	vec3 oldChunkPos = glm::floor(viewpoint / LoD1chunkSize);
 	viewpoint += move;
+	vec3 newChunkPos = glm::floor(viewpoint / LoD1chunkSize);
 
-	vec3 newViewpoint = viewpoint;
-
-	vec3 newChunks = glm::trunc( (viewpoint - vec3(1000)) / LoD1chunkSize);
-
-	vec3 terrainAdvanceInChunks2 = newChunks - oldChunks;
-
-	//if displacement > 1 chunk, advance terrain.
-	playerRelativeDisplacement += move;
-
-	vec3 terrainAdvanceInChunks = glm::trunc(playerRelativeDisplacement / LoD1chunkSize);
-
+	vec3 terrainAdvanceInChunks = newChunkPos - oldChunkPos;
 	Tdirection advanceDirection = vecToDir(i32vec3(terrainAdvanceInChunks));
-	if (advanceDirection != none) {	
-		liveLog << "\nterrainAdv: " << terrainAdvanceInChunks 
-			<< " vs terrainAd2: " << terrainAdvanceInChunks2 <<  ".";
-		liveLog << "\nbecause new viewpoint " << newViewpoint << " old viewpoint " << oldViewpoint;
-		
 
+	if (advanceDirection != none) {	
 		shells[0].onPlayerAdvance(advanceDirection);		
 		removeChunkOverlaps(advanceDirection);
 	}
-	
-	playerRelativeDisplacement = playerRelativeDisplacement - terrainAdvanceInChunks * LoD1chunkSize;
 }
 
 

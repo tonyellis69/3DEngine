@@ -19,7 +19,7 @@ public:
 	void init();
 	void setTerrainCallbackObj(ITerrainCallback* obj);
 	void onPlayerAdvance(Tdirection direction);
-	int chunkExtentFromPlayer(Tdirection direction);
+	int chunkExtentFromViewpoint(Tdirection direction);
 	void createTerrain();
 	void initChunkExtent();
 	void addToFaceLayer(Tdirection direction);
@@ -61,7 +61,7 @@ public:
 	float worldSpaceSize; 
 	glm::vec3 worldSpacePos;
 	int minRequiredChunkExtent; //<Terrain must always extend this far from player.
-	glm::i32vec3 playerDisplacementInChunks;  //<Player positionHint in chunks, relative to origin
+	//glm::i32vec3 playerDisplacementInChunks;  //<Player positionHint in chunks, relative to origin
 
 	int chunkExtent[6]; //<How far chunks extend from origin in each direction
 	bool faceLayerFull[6]; //<True if there's no room to add chunks to this face layer of SCs

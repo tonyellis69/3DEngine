@@ -40,6 +40,8 @@ public:
 	virtual void draw();
 	bool adjustYPos(int change);
 	void freeQuadBuffer();
+	virtual void setHotId(unsigned int hotId) {}
+	virtual unsigned int getHotId() { return -1; }
 
 	unsigned int bufId;
 	
@@ -80,9 +82,12 @@ public:
 	void createTextImage(CRenderTexture& texture);
 	void setTextColour(glm::vec4& colour);
 	void draw();
+	void setHotId(unsigned int hotId);
+	unsigned int getHotId();
 
 	glm::vec4 hotTextColour;
 private:
 	CBuf tmpVertBuf2;
 	unsigned int bufId2;
+	unsigned int hotId;
 };

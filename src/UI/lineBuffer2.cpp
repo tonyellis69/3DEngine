@@ -36,6 +36,7 @@ void CLineBuffer2::setPageSize(int width, int height) {
 void CLineBuffer2::clear() {
 	spriteBuffer.clear();
 	textSprites.clear();
+	hotTexts.clear();
 	finalFrag = {0, 0, 0, 0, 0, 0, 0, no, true};
 	yPosTracker = 0;
 	pageStart.unset = true;
@@ -58,7 +59,10 @@ void CLineBuffer2::draw() {
 
 
 /** Draw all the text sprites to an internal buffer representing the page. */
-void CLineBuffer2::renderSprites() {
+void CLineBuffer2::renderSprites(float dT) {
+	updateHotTextPeriods(dT);
+
+
 	pRenderer->rendertToTextureClear(pageBuf, glm::vec4(1,1, 1, 1));
 	pRenderer->setShader(textSpriteShader.shader);
 	pRenderer->attachTexture(0, spriteBuffer.getBuffer().handle);
@@ -177,6 +181,7 @@ void CLineBuffer2::recalcPageState() {
 	int latestTextObj = -1; int latestTextPos;
 	yPosTracker = -1;
 	finalFrag = { 0, 0, 0, 0, 0, 0, 0, no, true };
+	std::set<unsigned int> hotFragTally;
 
 	for (auto sprite : textSprites) { 
 		if (sprite->positionOnPage.y + sprite->size.y < 0 || sprite->positionOnPage.y > height)
@@ -200,9 +205,18 @@ void CLineBuffer2::recalcPageState() {
 
 		yPosTracker = std::max(yPosTracker, sprite->positionOnPage.y + sprite->size.y);
 		updateFinalFrag(sprite);
+		hotFragTally.insert(sprite->getHotId());
 	}
 	pageStart = { earliestTextObj, earliesTextPos };
 	pageEnd = { latestTextObj, latestTextPos };
+
+	for (auto hotFrag = hotTexts.begin(); hotFrag != hotTexts.end(); ) {
+		if (hotFragTally.find(hotFrag->first) == hotFragTally.end() ) {
+			hotFrag = hotTexts.erase(hotFrag);
+		}
+		else 
+			++hotFrag;		
+	}
 }
 
 /** Update pageStart and pageEnd if the given fragment invalidates the existing values. */
@@ -233,8 +247,11 @@ int CLineBuffer2::calcSpriteYpos(TLineFragment& fragment) {
 CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment) {
 	TRichTextRec textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
 	CTextSprite* sprite;
-	if (textObj.hotId)
+	if (textObj.hotId) {
 		sprite = new CHotTextSprite();
+		hotTexts.insert({ textObj.hotId,0.5f });
+		sprite->setHotId(textObj.hotId);
+	}
 	else
 		sprite = new CTextSprite();
 	sprite->setCallbackObj(this);
@@ -266,6 +283,16 @@ void CLineBuffer2::freeSpriteImageSpace(int bufId) {
 
 glm::vec4 CLineBuffer2::getHotTextColour() {
 	return pCallbackObj->getHotTextSelectedColour();
+}
+
+
+
+void CLineBuffer2::updateHotTextPeriods(float dT) {
+	int numHotTexts = hotTexts.size() + 2;
+	for (auto hotText : hotTexts) {
+		hotText.second +=  dT * (1.0f / numHotTexts );
+		hotText.second = glm::fract(hotText.second);
+	}
 }
 
 

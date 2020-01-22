@@ -176,8 +176,18 @@ void CHotTextSprite::draw() {
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(0, bufId2));
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hSize, glm::vec2(size));
 
+	//for now, just pass a 0-1 alpha value
+
 	//give the shader offsets for both sprite images
 	//and a transition value saying how far to blend between the two.
 
 	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
+}
+
+void CHotTextSprite::setHotId(unsigned int hotId)  {
+	this->hotId = hotId;
+}
+
+unsigned int CHotTextSprite::getHotId() {
+	return hotId;
 }

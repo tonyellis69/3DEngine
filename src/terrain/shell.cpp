@@ -24,7 +24,6 @@ CShell::CShell(int LoD, float chunkSize, int numSCchunks, int shellSCs) :
 }
 
 void CShell::init() {
-	playerDisplacementInChunks = i32vec3(0);
 	worldSpacePos = vec3(0);
 
 	for (int face = 0; face < 6; face++)
@@ -40,18 +39,13 @@ void CShell::setTerrainCallbackObj(ITerrainCallback* obj) {
 void CShell::onPlayerAdvance(Tdirection direction) {
 	liveLog << "\nAdvance shell " << shellNo << ":";
 
-
-	playerDisplacementInChunks += dirToVec(direction);
-
 	//Either: (1) there is sufficient terrain in this direction and no need to supply more,
 	//or (2) there's room for more terrain in the outer SC so add to sc, or
 	//(3) the SCs need to be scrolled  to provide more space, and then added to.
 	//Also, update the player's position in the shell.
-	
-	if (shellNo == 0)
-		liveLog << "\nDispL " << playerDisplacementInChunks;
 
-	if (chunkExtentFromPlayer(direction) >= minRequiredChunkExtent) {
+
+	if (chunkExtentFromViewpoint(direction) >= minRequiredChunkExtent) {
 		liveLog << " suffient terrain, returning.";
 		return;
 	}
@@ -80,16 +74,11 @@ void CShell::onPlayerAdvance(Tdirection direction) {
 			pTerrainObj->recentreOuterShells(shellNo, direction);
 
 		if (shellNo == 0) {
-			//pTerrain->scrollSampleSpace(scrollDir, scSampleStep);
 			pTerrainObj->scrollSampleSpace(scrollDir, scSampleStep);
 		}
 
 		scroll(scrollDir);
 
-		/*if (shellNo == 0) {
-			shellColour = vec4(col::randHue(), 1);
-			pTerrain->shells[0].shellColour = vec4(0, 0, 1, 1.0f);
-		}*/
 		
 		vec3 move = dirToVec(scrollDir) * SCsize;
 		if (shellNo == 0) {
@@ -131,12 +120,14 @@ void CShell::onPlayerAdvance(Tdirection direction) {
 	
 }
 
-/** Return the number of chunks of terrain lying in the given direction from the player positionHint. */
-int CShell::chunkExtentFromPlayer(Tdirection direction) {
+/** Return the number of chunks of terrain lying in the given direction from the viewpoint. */
+int CShell::chunkExtentFromViewpoint(Tdirection direction) {
 	vec3 directionVector = dirToVec(direction);
-	int totallExtent = chunkExtent[direction];
-	int playerTravel = dot(vec3(playerDisplacementInChunks), directionVector);
-	return totallExtent - playerTravel;
+	
+	vec3 viewpointDisplacementInChunks = (pTerrain->viewpoint - worldSpacePos) / chunkSize;
+	int displacementInDirection = dot(viewpointDisplacementInChunks, directionVector);
+
+	return chunkExtent[direction] - displacementInDirection;
 }
 
 /** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
@@ -191,9 +182,6 @@ void CShell::scroll(Tdirection scrollDirection) {
 		reinitialiseInnerSCs();
 
 	i32vec3 scrollVec = dirToVec(scrollDirection);
-	//move player position in shell back by one SC's worth of chunks
-	playerDisplacementInChunks += scrollVec * numSCchunks;
-	
 }
 
 

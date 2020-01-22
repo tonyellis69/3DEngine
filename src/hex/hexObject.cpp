@@ -9,7 +9,6 @@
 
 
 CHexObject::CHexObject() {
-	zHeight = 0;
 	moving = false;
 	isRobot = false;
 	worldPos = glm::vec3(0);
@@ -19,6 +18,9 @@ CHexObject::CHexObject() {
 	rotation = 0.0f;
 	rotationalVelocity = 0.0f;
 	turning = false;
+	proximityCutoff = 0.15f;
+	moveSpeed = 7.0f;
+	lungeSpeed = 3.0f;
 	buildWorldMatrix();
 }
 
@@ -35,7 +37,7 @@ void CHexObject::setPosition(int x, int y, int z) {
 
 	glm::i32vec2 axial = hexPosition.getAxial();
 	
-	worldPos.x = sqrt(3) * axial.x + sqrt(3) / 2.0f * axial.y;
+	worldPos.x = hexWidth * axial.x + hexWidth / 2.0f * axial.y;
 	worldPos.y = -3.0f / 2.0f * axial.y;
 	worldPos.z = zHeight;
 
@@ -53,8 +55,6 @@ void CHexObject::setPosition(CHex& hex) {
 	setPosition(hex.x, hex.y, hex.z);
 }
 
-
-
 /** Set the rotation and facing direction of this object. */
 void CHexObject::setDirection(THexDir direction) {
 	facing = direction;
@@ -63,29 +63,13 @@ void CHexObject::setDirection(THexDir direction) {
 }
 
 
-
-/**	Order this object to move to the next hex on its current travel path. */
+/**	Initialise this object to start moving to the next hex on its current travel path when it gets
+	updated. This may include rotating to face that hex. */
 bool CHexObject::beginMove() {
-	if (travelPath.empty())
+	if (travelPath.empty() || hexWorld->entityMovingTo(travelPath[0]) )
 		return false;
-
-
-	CHex& nextHex = travelPath[0];
-	moving = true;
-	destination = travelPath[0];
-	worldSpaceDestination = cubeToWorldSpace(destination);
-	CHex moveVectorHex = destination - hexPosition;
-	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
-	
-
-	//rotation
-	destinationDirection =  neighbourDirection(hexPosition, destination);
-	float rotationDir = shortestRotation(facing, destinationDirection);
-	if (rotationDir == 0.0f)
-		return true;
-	turning = true;
-	rotationalVelocity = (rotationDir > 0) - (rotationDir < 0) ;
-	destinationAngle = dirToAngle(destinationDirection);
+	initMoveToAdjacent(travelPath[0]);
+	initTurnToAdjacent(travelPath[0]);
 	return true;
 }
 
@@ -104,107 +88,58 @@ THexList& CHexObject::getTravelPath() {
 	return travelPath;
 }
 
-/** Carry out whatever changes have arisen since last update. Return true if this is ongoing. */
-bool CHexObject::update(float dT) {
-//	if (action == actNone)
-	//	return false;
-	this->dT = dT;
+bool CHexObject::isResolvingSerialAction() {
+	return action & actSerial;
+}
 
+bool CHexObject::isNeighbour(CHex& position) {
+	return ::isNeighbour(hexPosition, position);
+}
+
+bool CHexObject::updateMove(float dT) {
 	if (moving) {
-
 		if (turning) {
-			rotation += rotationalVelocity * 10.0f * dT;
-			rotation = glm::mod<float>(rotation, 2 * M_PI);			
-			float gap = std::fmod(rotation - destinationAngle + M_PI, 2 * M_PI) - M_PI;
-			if (abs(gap) < 0.1f) {
-				turning = false;
-				setDirection(destinationDirection);
-				return true; //because moving itself not yet resolved
-			}
-			buildWorldMatrix();
+			updateRotation(dT);
 			return true;
 		}
-
-
-		float speed = 7.0f;
-		glm::vec3 velocity = moveVector * speed * dT;
-		if (!isRobot)
-			int b = 0;
-
-		if (glm::distance(worldPos, worldSpaceDestination) < 0.15f) {
-	
-			moving = false;
-			velocity = glm::vec3(0);
-			setPosition(destination.x,destination.y,destination.z);
-			if (!travelPath.empty() && destination == travelPath[0])
-				travelPath.erase(travelPath.begin());
-			return false;
-		}
-		else {
-			if (isRobot) {
-				sysLog << "\nbot worldPos: " << worldPos << " destination " << worldSpaceDestination << " dist "
-					<< glm::distance(worldPos, worldSpaceDestination);
-				sysLog << "\nbot velocity " << velocity;
-			}
-			worldPos += velocity;
-		}
-
-		buildWorldMatrix();
-		return true;
+		return updateMovement(dT);
 	}
 	return false;
 }
 
 
-bool CHexObject::resolvingSerialAction() {
-	return action & actSerial;
-}
-
-
-void CHexObject::findTravelPath(CHex& target) {
+void CHexObject::calcTravelPath(CHex& target) {
 	//ordinarily, just find the path from where we are now.
 	//but if we've moving, makes sense that the new path will start
 	//where we end up
 	if (moving)
-		travelPath = hexWorld->getPathCB(destination, target);
+		travelPath = hexWorld->calcPath(destination, target);
 	else
-		travelPath = hexWorld->getPathCB(hexPosition,target);
-
+		travelPath = hexWorld->calcPath(hexPosition,target);
 }
 
-bool CHexObject::attack() {
-	//advance the attack animation
-//use a 1-0 counter to say where we are in the animation
-	float travel = animCycle * 2.0f - 1.0f;
-	float sign = travel > 0 ? 1.0f : -1.0f;
-	//	travel = cos(travel * M_PI * 0.5f);
+/** Advance the lunge animation. */
+bool CHexObject::updateLunge(float dT) {
+	float lungeDistance = animCycle * 2.0f - 1.0f;
+	//float sign = lungeDistance > 0 ? 1.0f : -1.0f;
 
-		//travel = pow(4.0 * animCycle * (1.0 - animCycle), 5) ;
+	lungeDistance = 1.0f - pow(abs(lungeDistance), 0.6f);
+	lungeDistance *= hexWidth;
+	glm::vec3 lungeVec = moveVector * lungeDistance;
 
-	travel = 1.0f - pow(abs(travel), 0.6f);
-
-	travel *= hexWidth;
-
-	glm::vec3 travelVec = moveVector * travel;
-
-
-	worldPos = cubeToWorldSpace(hexPosition) + travelVec;
-
+	worldPos = cubeToWorldSpace(hexPosition) + lungeVec;
 	buildWorldMatrix();
-	animCycle += dT * 3.0f;
+
+	animCycle += dT * lungeSpeed;
 	if (animCycle > 1.0f) {
-		action = actNone;
+		//action = actNone;
 		setPosition(hexPosition); //ensures we don't drift.
-		//onEndOfAction();
-		//TO DO: try to make onEndOfAction virtual and thus automatic
 		return false;
 	}
 	else {
-
 		return true;
 	}
 }
-
 
 /** Construct this object's world matrix from its known position and rotation.*/
 void CHexObject::buildWorldMatrix() {
@@ -212,9 +147,69 @@ void CHexObject::buildWorldMatrix() {
 	worldMatrix = glm::rotate(worldMatrix, rotation, glm::vec3(0, 0, -1));
 }
 
-bool CHexObject::isNeighbour(CHex& position) {
-	return ::isNeighbour(hexPosition, position);
+
+
+
+/* Initialise a move action to the given hex. */
+void CHexObject::initMoveToAdjacent(CHex& adjacent) {
+	moving = true;
+	destination = travelPath[0];
+	worldSpaceDestination = cubeToWorldSpace(destination);
+	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
 }
+
+/** Initialise a rotation action to face the given hex. */
+bool CHexObject::initTurnToAdjacent(CHex& adjacent) {
+	destinationAngle = 0;
+	destinationDirection = neighbourDirection(hexPosition, adjacent);
+	float rotationDir = shortestRotation(facing, destinationDirection);
+	if (rotationDir == 0.0f)
+		return false;
+	moving = true;
+	turning = true;
+	rotationalVelocity = (rotationDir > 0) - (rotationDir < 0);
+	destinationAngle = dirToAngle(destinationDirection);
+	return true;
+}
+
+///////////////private functions
+
+/** Apply dT seconds of the rotation this object is undergoing. */
+bool CHexObject::updateRotation(float dT){	
+	float gap = std::fmod(rotation - destinationAngle + M_PI, 2 * M_PI) - M_PI;
+	if (abs(gap) < 0.1f) {
+		turning = false;
+		setDirection(destinationDirection);
+		return false; 
+	}
+	else {
+		rotation += rotationalVelocity * 10.0f * dT;
+		rotation = glm::mod<float>(rotation, 2 * M_PI);
+	}
+	buildWorldMatrix();
+	return true;
+}
+
+/**	Apply dT seconds of the movement this object is undergoing. */
+bool CHexObject::updateMovement(float dT) {
+	glm::vec3 velocity = moveVector * moveSpeed * dT;
+
+	if (glm::distance(worldPos, worldSpaceDestination) < proximityCutoff) {
+		moving = false;
+		velocity = glm::vec3(0);
+		setPosition(destination.x, destination.y, destination.z);
+		if (!travelPath.empty() && destination == travelPath[0])
+			travelPath.erase(travelPath.begin());
+		return false;
+	}
+	else {
+		worldPos += velocity;
+	}
+
+	buildWorldMatrix();
+	return true;
+}
+
 
 
 

@@ -20,14 +20,14 @@ public:
 	void setZheight(float height);
 	void setTravelPath(THexList& path);
 	THexList& getTravelPath();
-	virtual bool update(float dT) ;
-	void findTravelPath(CHex& target);
+	virtual bool update(float dT) { return false; };
+	void calcTravelPath(CHex& target);
 	virtual void chooseTurnAction() {};
 	virtual void beginTurnAction() {};
-	virtual bool resolvingSerialAction();
-	virtual void beginAttack(CHexObject& target) {};
-	virtual bool attack();
+	virtual bool isResolvingSerialAction();
 	bool isNeighbour(CHex& position);
+
+	bool updateMove(float dT);
 
 	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
@@ -37,8 +37,14 @@ public:
 
 	bool isRobot;
 	CHex destination; ///<The hex we're travelling to.
+
 protected:
 	void buildWorldMatrix();
+	virtual bool updateLunge(float dT);
+	void initMoveToAdjacent(CHex& adjacent);
+	bool initTurnToAdjacent(CHex& adjacent);
+
+	bool updateRotation(float dT);
 
 	float zHeight; ///<Height above XY plane where drawn.
 	
@@ -54,17 +60,25 @@ protected:
 
 
 	THexList travelPath; ///<Route for movement.
-	THexDir targetDirection;
+	//exDir targetDirection;
 
 	float animCycle; ///<Records how far through an animation we are.
 
-	float dT;
-protected:
 	IhexObjectCallback* hexWorld;
 
 	int action; ///<The action this entity is performing this turn.
+	
+	float proximityCutoff;
+	float moveSpeed;
+	float lungeSpeed;
 
 private:
+	virtual void beginAttack(CHexObject& target) {};
+	
+
+
+	bool updateMovement(float dT);
+
 
 };
 
@@ -73,10 +87,11 @@ using TEntities = std::vector<CHexObject*>;
 
 class IhexObjectCallback {
 public:
-	virtual THexList getPathCB(CHex& start, CHex& end) = 0; 
+	virtual THexList calcPath(CHex& start, CHex& end) = 0; 
 	virtual CHexObject* getEntityAt(CHex& hex) = 0;
+	virtual CHexObject* entityMovingTo(CHex& hex) = 0;
 	virtual void onPlayerTurnDoneCB() = 0;
-	virtual CHex getPlayerPositionCB() = 0;
+	virtual CHex getPlayerPosition() = 0;
 	virtual CHex getPlayerDestinationCB() = 0;
 	virtual bool isEntityDestinationCB(CHex& hex) = 0;
 };

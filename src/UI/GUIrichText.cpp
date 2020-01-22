@@ -55,7 +55,7 @@ void CGUIrichText::applyStyleSheet() {
 }
 
 void CGUIrichText::DrawSelf() {
-	lineBuffer2.renderSprites();
+	lineBuffer2.renderSprites(dT);
 	pDrawFuncs->drawTexture(drawBox, *lineBuffer2.getTextBuf());
 
 	if (drawBorder) { //should be an overridable basic drawborder routine in the superclass
@@ -727,7 +727,7 @@ void CGUIrichText::update(float dT) {
 		
 	//if (gapObj != -1)
 	//	collapseGap(dT);
-
+	this->dT = dT;
 
 	updateDt += dT;
 	if (updateDt > correctOverrunDelay)

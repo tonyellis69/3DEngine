@@ -243,4 +243,6 @@ private:
 
 	CLineBuffer2 lineBuffer2;
 	bool autoscrollingDown; ///<If true, we scroll down if there's any text below.
+
+	float dT;
 };

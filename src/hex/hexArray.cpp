@@ -252,8 +252,8 @@ THexList CHexArray::walkBack(CHex& start, CHex& end, TCameFrom& cameFrom) {
 /** Returns true if there's an entity occupying this hex. */
 bool CHexArray::entityCheck(CHex& hex) {
 	for (auto entity : *entities) {
-		if (entity->destination == hex)
-		//if (entity->hexPosition == hex)
+		//if (entity->destination == hex)
+		if (entity->hexPosition == hex)
 			return true;
 	}
 	return false;

@@ -19,7 +19,7 @@ public:
 	void clear();
 	void addTextSprite(TLineFragment& fragment);
 	void draw();
-	void renderSprites();
+	void renderSprites(float dT);
 	int scrollDown(int scrollAmount);
 	int scrollUp(int scrollAmount);
 	int getOverlap();
@@ -40,6 +40,7 @@ private:
 	int reserveSpriteImageSpace(glm::i32vec2& size);
 	void freeSpriteImageSpace(int bufId);
 	glm::vec4 getHotTextColour();
+	void updateHotTextPeriods(float dT);
 
 	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
@@ -62,6 +63,8 @@ private:
 	TCharacterPos pageStart; ///<Identifies where in the textObjs this page starts.
 	TCharacterPos pageEnd; ///<Identifies where in the textObjs this page ends.
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
+
+	std::map<unsigned int, float> hotTexts;
 };
 
 class ILineBufferCallback {

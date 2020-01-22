@@ -86,7 +86,6 @@ private:
 	float LoD1cubeSize; //<In worldspace.
 	float LoD1chunkSize; //<In worldspace.
 
-		glm::vec3 playerRelativeDisplacement; //<Deterimines if player moved far enough to advance scenery.
 	std::vector<int> freeChunks;
 	std::queue<int> chunksToMesh;
 
