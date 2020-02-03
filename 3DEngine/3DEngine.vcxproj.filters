@@ -33,14 +33,14 @@
     <Filter Include="Header Files\utils">
       <UniqueIdentifier>{fc742f06-bc1e-46d4-a14e-c2059b7adfd5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\win">
-      <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\importer">
       <UniqueIdentifier>{19bf425d-5c6f-4142-b721-0326346c1ca7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\hex">
       <UniqueIdentifier>{8c60de7b-8f87-46d3-bc94-c5a78907ca8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win">
+      <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -418,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\text.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\hexRenderer.cpp">
+      <Filter>Source Files\hex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -828,6 +831,12 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\textSprite.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\hexRenderer.h">
+      <Filter>Source Files\hex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\IHexRenderer.h">
+      <Filter>Source Files\hex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

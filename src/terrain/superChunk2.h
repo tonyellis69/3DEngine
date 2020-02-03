@@ -46,8 +46,14 @@ public:
 class ITerrainCallback {
 public:
 	virtual void realignOuterShells(int shell, Tdirection moveDirection) = 0;
+	
 	virtual void recentreOuterShells(int shellNo, Tdirection moveDirection) = 0;
 	virtual void scrollSampleSpace(Tdirection scrollDir, float shift) = 0;
+
+	virtual void preScrollUpdate(int shellNo, Tdirection direction) = 0;
+	
+	
+	
 	virtual int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos) = 0;
 	virtual void removeChunk(int id) = 0;
 	virtual glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex) = 0;

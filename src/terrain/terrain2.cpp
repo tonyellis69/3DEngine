@@ -3,6 +3,8 @@
 #include <iostream>
 #include <numeric>      // std::iota
 
+#include <glm/gtc/matrix_transform.hpp>	
+
 #include "..\\3DEngine\src\utils\log.h"
 
 using glm::vec3;
@@ -72,11 +74,12 @@ void CTerrain2::onPlayerMove(glm::vec3 & move) {
 	Tdirection advanceDirection = vecToDir(i32vec3(terrainAdvanceInChunks));
 
 	if (advanceDirection != none) {	
-		shells[0].onPlayerAdvance(advanceDirection);		
+		shells[0].onPlayerAdvance(advanceDirection);
+		//for (int shellNo=0; shellNo < shells.size(); shellNo++)
+		//	shells[shellNo].onPlayerAdvance(advanceDirection);	
 		removeChunkOverlaps(advanceDirection);
 	}
 }
-
 
 
 /** Fill all shells with chunks where they are intersected by the terrain. */
@@ -238,6 +241,20 @@ void CTerrain2::recentreOuterShells(int shellNo, Tdirection moveDirection) {
 	for (int shell = shellNo; shell < shells.size(); shell++) {
 		shells[shell].worldSpacePos += move;
 	}
+}
+
+
+void CTerrain2::preScrollUpdate(int shellNo, Tdirection direction) {
+	if (shellNo == 0) {
+		Tdirection scrollDir = flipDir(direction);
+		scrollSampleSpace(scrollDir, shells[0].scSampleStep);
+
+		vec3 move = dirToVec(scrollDir) * shells[0].SCsize;
+		//chunkOrigin = glm::translate(chunkOrigin, move);
+		//liveLog << "\nchunkOrigin moved to " << vec3(chunkOrigin[3]);
+	}
+	else
+		recentreOuterShells(shellNo, direction);
 }
 
 /** Move the terrain's position in sample space. */

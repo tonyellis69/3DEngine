@@ -74,6 +74,9 @@ private:
 	void removeChunkOverlaps(Tdirection inDirection);
 	void realignOuterShells(int shell, Tdirection moveDirection);
 	void recentreOuterShells(int shellNo, Tdirection moveDirection);
+
+	void preScrollUpdate(int shellNo, Tdirection direction);
+
 	void scrollSampleSpace(Tdirection scrollDir, float shift);
 	int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos);
 	int getFreeChunk();

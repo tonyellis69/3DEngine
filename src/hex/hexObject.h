@@ -6,15 +6,19 @@
 #include "../renderer/buf.h"
 #include "hex.h"
 
+#include "../hex/IHexRenderer.h"
+
 class IhexObjectCallback;
 /** A class for defining moveable objects in the hex world.*/
 class CHexObject {
 public:
 	CHexObject();
-	void setCallbackObj(IhexObjectCallback* obj);
+	void setHexWorld(IhexObjectCallback* obj);
+	static void setHexRenderer(IHexRenderer* rendrObj);
 	void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
+	void setBuffer(CBuf* buffer);
 	void setDirection(THexDir direction);
 	bool beginMove();
 	void setZheight(float height);
@@ -26,8 +30,9 @@ public:
 	virtual void beginTurnAction() {};
 	virtual bool isResolvingSerialAction();
 	bool isNeighbour(CHex& position);
-
 	bool updateMove(float dT);
+	virtual void receiveDamage(CHexObject& attacker, int damage);
+	virtual void draw();
 
 	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
@@ -38,13 +43,16 @@ public:
 	bool isRobot;
 	CHex destination; ///<The hex we're travelling to.
 
+	int shields[6] = { 0 }; //TO DO: might not suit base class
+
 protected:
 	void buildWorldMatrix();
 	virtual bool updateLunge(float dT);
 	void initMoveToAdjacent(CHex& adjacent);
 	bool initTurnToAdjacent(CHex& adjacent);
-
 	bool updateRotation(float dT);
+
+	void hitTarget();
 
 	float zHeight; ///<Height above XY plane where drawn.
 	
@@ -66,11 +74,20 @@ protected:
 
 	IhexObjectCallback* hexWorld;
 
+	inline static IHexRenderer* hexRendr;
+
 	int action; ///<The action this entity is performing this turn.
 	
 	float proximityCutoff;
 	float moveSpeed;
 	float lungeSpeed;
+
+	int hitPoints;
+	int meleeDamage;
+	CHexObject* attackTarget;
+
+	glm::vec4 colour;
+	THexDraw drawData;
 
 private:
 	virtual void beginAttack(CHexObject& target) {};
@@ -91,9 +108,11 @@ public:
 	virtual CHexObject* getEntityAt(CHex& hex) = 0;
 	virtual CHexObject* entityMovingTo(CHex& hex) = 0;
 	virtual void onPlayerTurnDoneCB() = 0;
+	virtual CHexObject* getPlayerObj() = 0;
 	virtual CHex getPlayerPosition() = 0;
 	virtual CHex getPlayerDestinationCB() = 0;
 	virtual bool isEntityDestinationCB(CHex& hex) = 0;
+	virtual int diceRoll(int dice) = 0;
 };
 
 
@@ -106,3 +125,5 @@ const int actCombatPassive = 0x3;
 const int actTrackPlayer = 0x4;
 const int actPlayerAttack = 0x80000005;
 const int actPlayerTurnToAttack = 0x80000006;
+const int actDead = 0x7;
+const int actDither = 0x8;

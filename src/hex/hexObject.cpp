@@ -21,12 +21,23 @@ CHexObject::CHexObject() {
 	proximityCutoff = 0.15f;
 	moveSpeed = 7.0f;
 	lungeSpeed = 3.0f;
+	hitPoints = 1;
+	meleeDamage = 1;
+
+	drawData = { &worldMatrix,&colour,buf };
+
 	buildWorldMatrix();
 }
 
-void CHexObject::setCallbackObj(IhexObjectCallback* obj) {
+void CHexObject::setHexWorld(IhexObjectCallback* obj) {
 	hexWorld = obj;
 }
+
+void CHexObject::setHexRenderer(IHexRenderer* rendrObj) {
+	hexRendr = rendrObj;
+}
+
+
 
 /** Set position using individual hex cube coordinates. */
 void CHexObject::setPosition(int x, int y, int z) {
@@ -53,6 +64,11 @@ void CHexObject::setPosition(int x, int y) {
 /** Set position using hex cube coordinates. */
 void CHexObject::setPosition(CHex& hex) {
 	setPosition(hex.x, hex.y, hex.z);
+}
+
+void CHexObject::setBuffer(CBuf* buffer) {
+	buf = buffer;
+	drawData.buf = buf;
 }
 
 /** Set the rotation and facing direction of this object. */
@@ -107,6 +123,14 @@ bool CHexObject::updateMove(float dT) {
 	return false;
 }
 
+void CHexObject::receiveDamage(CHexObject& attacker, int damage) {
+	hitPoints -= damage;
+}
+
+void CHexObject::draw(){
+	hexRendr->drawLines(drawData);
+}
+
 
 void CHexObject::calcTravelPath(CHex& target) {
 	//ordinarily, just find the path from where we are now.
@@ -132,8 +156,8 @@ bool CHexObject::updateLunge(float dT) {
 
 	animCycle += dT * lungeSpeed;
 	if (animCycle > 1.0f) {
-		//action = actNone;
 		setPosition(hexPosition); //ensures we don't drift.
+		hitTarget();
 		return false;
 	}
 	else {
@@ -188,6 +212,11 @@ bool CHexObject::updateRotation(float dT){
 	}
 	buildWorldMatrix();
 	return true;
+}
+
+/** Deliver damage to our current target. */
+void CHexObject::hitTarget() {
+	attackTarget->receiveDamage(*this, meleeDamage);
 }
 
 /**	Apply dT seconds of the movement this object is undergoing. */

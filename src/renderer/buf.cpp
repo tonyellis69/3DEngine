@@ -212,13 +212,16 @@ void CBuf::freeMem() {
 	if (hBuffer != 0) {
 		//glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
 		glDeleteBuffers(1,&hBuffer);
+		hBuffer = 0;
 	}
 	if (hVAO != 0) {
 		glDeleteVertexArrays(1,&hVAO);
+		hVAO = 0;
 	}
 	if (hIndex != 0) {
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 		glDeleteBuffers(1, &hIndex);
+		hIndex = 0;
 	}
 }
 

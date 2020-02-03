@@ -19,6 +19,7 @@ CShell::CShell(int LoD, float chunkSize, int numSCchunks, int shellSCs) :
 	SCsize = numSCchunks * chunkSize;
 	worldSpaceSize = shellSCs * SCsize;
 	minRequiredChunkExtent = (float(shellSCs-1) / 2.0f) * numSCchunks;
+	maxChunkExtent = (shellSCs * numSCchunks) / 2;
 	scArray.setSize(shellSCs, shellSCs, shellSCs);
 	init();
 }
@@ -35,90 +36,53 @@ void CShell::setTerrainCallbackObj(ITerrainCallback* obj) {
 }
 
 
-/** Respond to the player advancing in the given direction.*/
+/** Respond to the player advancing in the given direction. */
 void CShell::onPlayerAdvance(Tdirection direction) {
 	liveLog << "\nAdvance shell " << shellNo << ":";
 
-	//Either: (1) there is sufficient terrain in this direction and no need to supply more,
-	//or (2) there's room for more terrain in the outer SC so add to sc, or
-	//(3) the SCs need to be scrolled  to provide more space, and then added to.
-	//Also, update the player's position in the shell.
-
-
+	//Either:
+	//(1) Return because there is sufficient terrain in this direction
 	if (chunkExtentFromViewpoint(direction) >= minRequiredChunkExtent) {
 		liveLog << " suffient terrain, returning.";
 		return;
 	}
 	
-
-
-	//still here? More terrain is needed in the given direction
-	//Is there room for more chunks in the final SC in the given direction?
+	//(2) there's room for more terrain in the outer SC, so add it
 	if (!faceLayerFull[direction]) {
-		
-		//(2) add chunks to the face layer SCs in this direction!;
-		addToFaceLayer(direction);
+		addToFaceLayer(direction); ////////////
 		liveLog << " adding to face layer.";
-	
 	}
-	else {
-		//(3) scroll the SCs, then add a layer 
-		//NB Think of scroll direction (scrollDir) as the direction of rotation of the conveyor belt of terrain
-
-		Tdirection scrollDir = flipDir(direction);
+	else { //or (3) the SCs need to be scrolled  to provide more space, and then added to.
 		liveLog << " scrolling.";
-		sysLog << "\nscrolling!";
-
-
-		if (shellNo != 0)
-			pTerrainObj->recentreOuterShells(shellNo, direction);
-
-		if (shellNo == 0) {
-			pTerrainObj->scrollSampleSpace(scrollDir, scSampleStep);
-		}
-
-		scroll(scrollDir);
-
-		
-		vec3 move = dirToVec(scrollDir) * SCsize;
-		if (shellNo == 0) {
-			pTerrain->chunkOrigin = glm::translate(pTerrain->chunkOrigin, move);
-			liveLog << "\nchunkOrigin moved to " << vec3(pTerrain->chunkOrigin[3]);
-		}
-
-		//move enclosing shells back to ensure terrain still lines up
-		//pTerrain->realignOuterShells(*this, scrollDir);
-		pTerrainObj->realignOuterShells(shellNo, scrollDir);
-
-		//now that we've scrolled, return to the default layout of one final double-layer of chunks
-		addToFaceLayer(direction);
-
-		removeScrolledOutChunks(scrollDir);
-		//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
-		//needs to add some to cover that area of terrain
-		if (shellNo < pTerrain->shells.size() - 1) {
-			//if (scrolls == 2)
-			//	pTerrain->shells[shellNo + 1].shellColour = vec4(1, 1, 1, 1.0f);
-			pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
-		}
-
-		if (shellNo == 0) {
-			pTerrain->pCallbackApp->onTerrainScroll(move);
-			pTerrain->viewpoint += move;
-			pTerrain->oldViewpoint += move;
-			pTerrain->playerDisplacement += move;
-
-		}
+		scroll(direction);
 	}
-	
-	//didn't get here
+
 	//The containing shell also needs to respond to the player advancing across the terrain:
 	if (shellNo < pTerrain->shells.size() - 1) {
-		 pTerrain->shells[shellNo + 1].onPlayerAdvance(direction);
+		pTerrain->shells[shellNo + 1].onPlayerAdvance(direction);
 	}
-
-	
 }
+
+/** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
+void CShell::createTerrain() {
+	getInnerSCs();
+	fillAllUnclippedSCs();
+}
+
+/** Set chunks to initially extend as far as the minimum chunk extent in all directions. The extent
+	will change as the terrain advances in a particular direction. */
+void CShell::initChunkExtent() {
+	for (int direction = 0; direction < 6; direction++)
+		this->chunkExtent[direction] = minRequiredChunkExtent;
+}
+
+
+/////public-private divide 
+
+
+
+
+
 
 /** Return the number of chunks of terrain lying in the given direction from the viewpoint. */
 int CShell::chunkExtentFromViewpoint(Tdirection direction) {
@@ -130,39 +94,69 @@ int CShell::chunkExtentFromViewpoint(Tdirection direction) {
 	return chunkExtent[direction] - displacementInDirection;
 }
 
-/** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
-void CShell::createTerrain() {
-	getInnerSCs();
-	//findAllSCchunks();
-	fillAllUnclippedSCs();
-}
 
 
-/** Set chunks to initially extend as far as the minimum chunk extent in all directions. The extent
-	will change as the terrain advances in a particular direction. */
-void CShell::initChunkExtent() {
-	for (int direction = 0; direction < 6; direction++)
-		this->chunkExtent[direction] = minRequiredChunkExtent;
-}
+
 
 
 /** Extend the terrain by two layers of chunks in the given direction. Two because we have to replace entire
 	chunks of the enclosing shell, which will be twice the size.*/
 void CShell::addToFaceLayer(Tdirection direction) {
 	chunkExtent[direction] += 2;
-	int maxChunkExtent = (shellSCs * numSCchunks) / 2;
 	if (chunkExtent[direction] >= maxChunkExtent)
 		faceLayerFull[direction] = true;
 
-	//add the new chunks
-
 	addChunksToFaceSCs2(direction);
+}
+
+
+/** Scroll the superChunks away from the given direction to create space for more terrain there,
+	then fill that space with terrain. */
+void CShell::scroll(Tdirection direction) {
+	Tdirection scrollDir = flipDir(direction);
+
+	pTerrainObj->preScrollUpdate(shellNo, direction);
+
+	vec3 move = dirToVec(scrollDir) * SCsize;
+	if (shellNo == 0) {
+		pTerrain->chunkOrigin = glm::translate(pTerrain->chunkOrigin, move);
+		liveLog << "\nchunkOrigin moved to " << vec3(pTerrain->chunkOrigin[3]);
+	}
+
+	rotateSCs(scrollDir);
+
+
+
+
+	//move enclosing shells back to ensure terrain still lines up
+	pTerrainObj->realignOuterShells(shellNo, scrollDir);
+
+	//now that we've scrolled, return to the default layout of one final double-layer of chunks
+	addToFaceLayer(direction);
+
+	removeScrolledOutChunks(scrollDir);
+	//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
+	//needs to add some to cover that area of terrain
+	if (shellNo < pTerrain->shells.size() - 1) {
+		pTerrain->shells[shellNo + 1].addInnerFaceChunks2(scrollDir);
+	}
+
+	if (shellNo == 0) {
+		pTerrain->pCallbackApp->onTerrainScroll(move);
+		pTerrain->viewpoint += move;
+		pTerrain->oldViewpoint += move;
+		pTerrain->playerDisplacement += move;
+	}
+
 
 }
 
+
+
+
 /** Rotate the SC ordering, moving them one step in the given direction, and moving the outgoing layer
 	of SCs to become the new 'in' face. */
-void CShell::scroll(Tdirection scrollDirection) {
+void CShell::rotateSCs(Tdirection scrollDirection) {
 	Tdirection inDirection = flipDir(scrollDirection);
 	i32vec3 rotateVec = dirToVec(inDirection);
 	scArray.rotate(rotateVec);
@@ -489,6 +483,7 @@ glm::i32vec3 CShell::getRotatedIndex(const glm::i32vec3& origIndex) {
 glm::i32vec3 CShell::getInvRotatedIndex(const glm::i32vec3& origIndex) {
 	return scArray.getInvRotatedIndex(origIndex);
 }
+
 
 
 

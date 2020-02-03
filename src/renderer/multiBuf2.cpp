@@ -37,9 +37,12 @@ unsigned int CMultiBuf2::getVAO() {
 
 /**	Free the reserved block at the given address, so that it can be resused. */
 void CMultiBuf2::freeBlock(int addr) {
+	
 	TBlock freedBlock = reservedBlocks[addr];
 	reservedBlocks.erase(addr);
 
+	freeBlocks[addr] = freedBlock;
+/*
 	//Get the free blocks either side of this one, if they exist
 	auto next = freeBlocks.find(freedBlock.start + freedBlock.size);
 	auto prev = next;
@@ -60,7 +63,7 @@ void CMultiBuf2::freeBlock(int addr) {
 	}
 	
 	freeBlocks[freedBlock.start] = freedBlock;
-
+	*/
 	//Removing just these blocks from freeBlocksBySize is hard, so wipe the whole thing.
 	if (!freeBlocksBySize.empty())
 		freeBlocksBySize.clear();
@@ -75,7 +78,8 @@ int CMultiBuf2::getFreeBlock(int size) {
 	auto largerBlock = freeBlocksBySize.lower_bound(size);
 
 	//if we can't find a free block, panic
-	if (largerBlock == freeBlocksBySize.end()) { 
+	//if (largerBlock == freeBlocksBySize.end()) { 
+	while  (largerBlock == freeBlocksBySize.end()) {
 		memoryPanic();
 		largerBlock = freeBlocksBySize.lower_bound(size);
 	}
@@ -118,9 +122,12 @@ void CMultiBuf2::copyToBlock(CBuf& src, int blockAddr, int size) {
 
 /** We've run out of memory. Create a larger buffer and copy everything to that.*/
 void CMultiBuf2::memoryPanic() {
+	sysLog << "\nBuffer before " << buffer.hBuffer;
 	unsigned int oldSize = buffer.getBufSize();
 	unsigned int newSize = oldSize * 1.1;
 	buffer.resizeSafe(newSize);
+
+	sysLog << "\nBuffer after " << buffer.hBuffer;
 
 	//Ensure a free block points to our new spare memory:
 

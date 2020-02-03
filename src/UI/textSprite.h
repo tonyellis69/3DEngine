@@ -13,7 +13,9 @@ struct TTextSpriteShader {
 	unsigned int hOrthoMatrix;
 	unsigned int hTextureUnit;
 	unsigned int hOffset;
+	unsigned int hOffset2;
 	unsigned int hSize;
+	unsigned int hAlpha;
 	CShader* shader;
 };
 
@@ -29,7 +31,7 @@ public:
 	virtual void setTextColour(glm::vec4& colour);
 
 	void makeTextQuads(const std::string& text, CFont* font);
-	void renderTextQuads(CRenderTexture& buf, int storageId, glm::vec4& colour);
+	void renderTextQuads(CRenderTexture& buf, glm::i32vec2& storageId, glm::vec4& colour);
 	virtual void write2ndTextToBuffer(CRenderTexture& buf, glm::vec4& colour) {};
 	void setCallbackObj(ITextSpriteCallback* obj) {
 		callbackObj = obj;
@@ -43,7 +45,8 @@ public:
 	virtual void setHotId(unsigned int hotId) {}
 	virtual unsigned int getHotId() { return -1; }
 
-	unsigned int bufId;
+	//unsigned int bufId;
+	glm::i32vec2 bufId;
 	
 	glm::i32vec2 positionOnPage;
 	glm::i32vec2 size;
@@ -71,9 +74,10 @@ private:
 
 class ITextSpriteCallback {
 public:
-	virtual int reserveSpriteImageSpace(glm::i32vec2& size) = 0;
-	virtual void freeSpriteImageSpace(int bufId) = 0;
+	virtual glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size) = 0;
+	virtual void freeSpriteImageSpace(glm::i32vec2& bufId) = 0;
 	virtual glm::vec4 getHotTextColour() = 0;
+	virtual float getHotPeriod(unsigned int hotId) = 0;
 };
 
 class CHotTextSprite : public CTextSprite {
@@ -87,7 +91,7 @@ public:
 
 	glm::vec4 hotTextColour;
 private:
-	CBuf tmpVertBuf2;
-	unsigned int bufId2;
+	//CBuf tmpVertBuf2;
+	glm::i32vec2 bufId2;
 	unsigned int hotId;
 };

@@ -9,7 +9,8 @@
 
 CTextSprite::CTextSprite() {
 	pRenderer = &CRenderer::getInstance();
-	bufId = INT_MAX;
+	bufId = { INT_MAX,INT_MAX };
+	
 }
 
 CTextSprite::~CTextSprite() {
@@ -22,7 +23,7 @@ void CTextSprite::createTextImage(CRenderTexture& texture) {
 		return;
 	bufId = callbackObj->reserveSpriteImageSpace(size);
 	renderTextQuads(texture, bufId , textColour);
-	freeQuadBuffer();
+	//freeQuadBuffer();
 }
 
 /** Store data about where this sprite's text is found in its textObj. */
@@ -82,8 +83,8 @@ void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
 }
 
 /** Render our temporary text quads to a texture for storage. */
-void CTextSprite::renderTextQuads(CRenderTexture& storageTexture, int storageId, glm::vec4& colour) {
-	glm::mat4 storageLocation = glm::translate(glm::mat4(1), glm::vec3(0, storageId, 0));
+void CTextSprite::renderTextQuads(CRenderTexture& storageTexture, glm::i32vec2& storageId, glm::vec4& colour) {
+	glm::mat4 storageLocation = glm::translate(glm::mat4(1), glm::vec3( storageId, 0));
 	glm::mat4 storageMatrix = glm::ortho<float>(0, (float)storageTexture.width, 0, storageTexture.height)
 		* storageLocation;
 
@@ -112,12 +113,14 @@ void CTextSprite::setShader(TTextSpriteShader* shader) {
 
 /** Draw this sprite's cached text image to the page texture.*/
 void CTextSprite::draw() {
-	if (bufId == INT_MAX)
+	if (bufId.y == INT_MAX)
 		return; //TO DO: do this more elegantly with a virtual func?
 
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hOrthoMatrix, matrix);
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(0, bufId));
+	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(bufId));
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hSize, glm::vec2(size));
+
+	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, 0.0f);
 
 	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
 }
@@ -162,7 +165,7 @@ void CHotTextSprite::createTextImage(CRenderTexture& storageTexture) {
 
 	bufId2 = callbackObj->reserveSpriteImageSpace(size);
 	renderTextQuads(storageTexture, bufId2, hotTextColour);
-	freeQuadBuffer();
+	//freeQuadBuffer();
 }
 
 void CHotTextSprite::setTextColour(glm::vec4& colour) {
@@ -173,13 +176,23 @@ void CHotTextSprite::setTextColour(glm::vec4& colour) {
 
 void CHotTextSprite::draw() {
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hOrthoMatrix, matrix);
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(0, bufId2));
+	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(bufId));
+	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset2, glm::vec2(bufId2));
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hSize, glm::vec2(size));
 
-	//for now, just pass a 0-1 alpha value
+	
+	float alpha;
+	
 
 	//give the shader offsets for both sprite images
-	//and a transition value saying how far to blend between the two.
+	
+	//get period for hotId (getter can multiply it up
+	//get working as alpha
+	//then use as mix between two samples
+
+	alpha = callbackObj->getHotPeriod(hotId);
+
+	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, alpha);
 
 	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
 }

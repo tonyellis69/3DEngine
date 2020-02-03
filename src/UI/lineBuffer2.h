@@ -1,5 +1,7 @@
 #pragma once
 
+#include <random>
+
 //include "../renderer/renderer.h"
 #include "text.h"
 #include "imageBuf.h"
@@ -32,15 +34,17 @@ public:
 
 private:
 	void initShader();
-	void updateFinalFrag(CTextSprite* sprite);
+	void updateFinalFrag(CTextSprite& sprite);
 	void recalcPageState();
 	void updatePageStartEnd(TLineFragment& fragment);
 	int calcSpriteYpos(TLineFragment& fragment);
 	CTextSprite* createSprite(TLineFragment& fragment);
-	int reserveSpriteImageSpace(glm::i32vec2& size);
-	void freeSpriteImageSpace(int bufId);
+	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
+	void freeSpriteImageSpace(glm::i32vec2& bufId);
 	glm::vec4 getHotTextColour();
 	void updateHotTextPeriods(float dT);
+	float getHotPeriod(unsigned int hotId);
+	float randomPeriod();
 
 	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
@@ -52,7 +56,8 @@ private:
 	ILineBufferCallback* pCallbackObj;
 	CRenderer* pRenderer;
 
-	std::vector<CTextSprite*> textSprites;
+	//std::vector<CTextSprite*> textSprites;
+	std::vector< std::unique_ptr<CTextSprite> > textSprites;
 
 	TTextSpriteShader textSpriteShader;
 	glm::mat4 pageOrthoView;
@@ -65,6 +70,8 @@ private:
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
 
 	std::map<unsigned int, float> hotTexts;
+
+	std::mt19937 randEngine;
 };
 
 class ILineBufferCallback {

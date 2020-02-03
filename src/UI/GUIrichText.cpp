@@ -1151,7 +1151,6 @@ void CGUIrichText::appendText(const std::string& newText) {
 
 /** Append the given text to the current body of text. */
 void CGUIrichText::addText(std::string newText) {
-
 	textObjs.back().text += newText;
 
 	compileFragmentsToEnd(lineBuffer.finalFrag());
