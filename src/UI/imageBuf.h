@@ -31,11 +31,15 @@ public:
 
 	CRenderTexture imageBuffer;
 
+	std::unordered_map<int, int> reservedBlocksPerRow;
+
+
 private:
 	int getFreeBlock(const glm::i32vec2& size);
 	void splitHorizontal(unsigned int index, int height);
 	void splitVertical(unsigned int index, int width);
 	int panic();
+	void mergeFreeBlocks(int row);
 
 	std::vector<TTexBlock> freeBlocks;
 	//std::unordered_map<int,TTexBlock> reservedBlocks;

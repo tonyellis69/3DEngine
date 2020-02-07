@@ -14,7 +14,8 @@ CTextSprite::CTextSprite() {
 }
 
 CTextSprite::~CTextSprite() {
-	callbackObj->freeSpriteImageSpace(bufId);
+	if (bufId.x != INT_MAX)
+		callbackObj->freeSpriteImageSpace(bufId);
 }
 
 /** Draw this sprite's text to the given texture. */
@@ -151,8 +152,10 @@ void CTextSprite::updateMatrix() {
 //////////////////////////Hot text sprite stuff
 
 CHotTextSprite::~CHotTextSprite() {
-	callbackObj->freeSpriteImageSpace(bufId);
-	callbackObj->freeSpriteImageSpace(bufId2);
+	if (bufId.x != INT_MAX) {
+		callbackObj->freeSpriteImageSpace(bufId);
+		callbackObj->freeSpriteImageSpace(bufId2);
+	}
 }
 
 /** Draw the two alternating text images to the given storage texture. */

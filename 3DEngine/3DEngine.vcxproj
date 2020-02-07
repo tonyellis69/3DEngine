@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\VMtest\src\daemon.cpp" />
     <ClCompile Include="..\..\VMtest\src\stack.cpp" />
+    <ClCompile Include="..\..\VMtest\src\tigObj.cpp" />
     <ClCompile Include="..\..\VMtest\src\var.cpp" />
     <ClCompile Include="..\..\VMtest\src\vm.cpp" />
     <ClCompile Include="..\..\VMtest\src\vmConsole.cpp" />
@@ -223,7 +224,9 @@
   <ItemGroup>
     <ClInclude Include="..\..\3DTest\src\worldUI.h" />
     <ClInclude Include="..\..\VMtest\src\daemon.h" />
+    <ClInclude Include="..\..\VMtest\src\ITigObj.h" />
     <ClInclude Include="..\..\VMtest\src\stack.h" />
+    <ClInclude Include="..\..\VMtest\src\tigObj.h" />
     <ClInclude Include="..\..\VMtest\src\var.h" />
     <ClInclude Include="..\..\VMtest\src\vm.h" />
     <ClInclude Include="..\..\VMtest\src\vmConsole.h" />

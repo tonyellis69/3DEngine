@@ -83,7 +83,6 @@ int CLineBuffer2::scrollDown(int scrollAmount) {
 	for (auto sprite = textSprites.begin(); sprite != textSprites.end();) {
 		(*sprite)->adjustYPos(-scrollAchieved);
 		if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
-			//delete *sprite;
 		 sprite = textSprites.erase(sprite);
 		}
 		else
@@ -96,7 +95,7 @@ int CLineBuffer2::scrollDown(int scrollAmount) {
 /** Move all text sprites down by the given amount, deleting any that end up outside the page entirely.*/
 int CLineBuffer2::scrollUp(int scrollAmount) {
 
-	spriteBuffer.tmpSave();
+	//spriteBuffer.tmpSave();
 
 	int overlap = getTopOverlap();
 	int scrollAchieved = std::min(scrollAmount, overlap);
@@ -104,7 +103,6 @@ int CLineBuffer2::scrollUp(int scrollAmount) {
 	for (auto sprite = textSprites.begin(); sprite != textSprites.end();) {
 		(*sprite)->adjustYPos(scrollAchieved);
 		if ((*sprite)->positionOnPage.y > height) {
-			//delete *sprite;
 			sprite = textSprites.erase(sprite);
 		}
 		else

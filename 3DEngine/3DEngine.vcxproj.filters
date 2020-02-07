@@ -422,6 +422,9 @@
     <ClCompile Include="..\src\hex\hexRenderer.cpp">
       <Filter>Source Files\hex</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\VMtest\src\tigObj.cpp">
+      <Filter>vm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -837,6 +840,12 @@
     </ClInclude>
     <ClInclude Include="..\src\hex\IHexRenderer.h">
       <Filter>Source Files\hex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\tigObj.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\ITigObj.h">
+      <Filter>vm</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
