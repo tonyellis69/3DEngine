@@ -8,15 +8,25 @@
 #include "textSprite.h"
 #include "../renderer/shader.h"
 
+struct THotRec {
+	CHotTextSprite* sprite;
+	unsigned int hotId;
+};
 
-class ILineBufferCallback;
+enum TSelectionState {selNone,selWarmup,selLit, selWarmdown};
+struct THotState {
+	float period;
+	TSelectionState selectionState;
+};
+
+class ILineBuffer;
 /** A class that draws multiple blocks of text to a texture buffer for output,
 	in real-time, employing whatever effects these blocks require. */
 class CLineBuffer2 : public ITextSpriteCallback {
 public:
 	CLineBuffer2();
 	~CLineBuffer2();
-	void setCallbackObj(ILineBufferCallback* obj);
+	void setCallbackObj(ILineBuffer* obj);
 	void setPageSize(int width, int height);
 	void clear();
 	void addTextSprite(TLineFragment& fragment);
@@ -31,6 +41,7 @@ public:
 	TCharacterPos getPageStart();
 	TCharacterPos getPageEnd();
 	void setAddFragmentsAtTop(bool onOff);
+	void onMouseMove(glm::i32vec2& mousePos);
 
 private:
 	void initShader();
@@ -44,7 +55,9 @@ private:
 	glm::vec4 getHotTextColour();
 	void updateHotTextPeriods(float dT);
 	float getHotPeriod(unsigned int hotId);
-	float randomPeriod();
+	float randomPeriod(float start);
+	void freeHotTextSprite(CHotTextSprite* sprite);
+	void onMousedHotTextChange();
 
 	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
@@ -53,7 +66,7 @@ private:
 	int width;
 	int height;
 
-	ILineBufferCallback* pCallbackObj;
+	ILineBuffer* pCallbackObj;
 	CRenderer* pRenderer;
 
 	//std::vector<CTextSprite*> textSprites;
@@ -69,18 +82,24 @@ private:
 	TCharacterPos pageEnd; ///<Identifies where in the textObjs this page ends.
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
 
-	std::map<unsigned int, float> hotTexts;
+	std::map<unsigned int, THotState> hotTexts; ///<The hotIds and periods of all displayed hot texts
+	std::vector<THotRec> hotTextSprites; ///<Pointers to and hot ids of all hot text sprites
 
 	std::mt19937 randEngine;
+
+	int mousedHotText;
+	int prevMousedHotText;
 };
 
-class ILineBufferCallback {
+class ILineBuffer {
 public:
 	virtual TRichTextRec& getTexObjCallback(int objNo) = 0;
 	virtual glm::vec4& getHotTextColour() = 0;
 	virtual glm::vec4& getHotTextSelectedColour() = 0;
-
+	virtual void hotTextMouseOver(int hotId) = 0;
 };
+
+
 
 
 

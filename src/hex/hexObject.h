@@ -8,9 +8,11 @@
 
 #include "../hex/IHexRenderer.h"
 
+#include "../VMtest/src/ITigObj.h"
+
 class IhexObjectCallback;
 /** A class for defining moveable objects in the hex world.*/
-class CHexObject {
+class CHexObject : public CTigObjptr {
 public:
 	CHexObject();
 	void setHexWorld(IhexObjectCallback* obj);
@@ -53,6 +55,8 @@ protected:
 	bool updateRotation(float dT);
 
 	void hitTarget();
+
+	void tigCall(int memberId) {};
 
 	float zHeight; ///<Height above XY plane where drawn.
 	

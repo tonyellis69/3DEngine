@@ -18,7 +18,7 @@ public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
 	void init();
 	void setTerrainCallbackObj(ITerrainCallback* obj);
-	void onPlayerAdvance(Tdirection direction);
+	bool updateShellTerrain(Tdirection direction);
 	void createTerrain();
 	void initChunkExtent();
 	
@@ -32,7 +32,7 @@ public:
 	CFaceIterator getFaceIterator(Tdirection face);
 	TBoxVolume getInnerBounds();
 	void reinitialiseFaceSCs(Tdirection face);
-	void addChunksToFaceSCs2(Tdirection face);
+	void addChunksToFaceSCs(Tdirection face);
 	void removeEncroachedOnChunks2(Tdirection face);
 	void removeScrolledOutChunks(Tdirection face);
 	void addInnerFaceChunks2(Tdirection face);
@@ -43,7 +43,7 @@ public:
 
 	glm::i32vec3 getSCat(const glm::vec3& pos);
 
-	CBoxVolume getChunkVolume2();
+	CBoxVolume calcWorldSpaceChunkExtent();
 
 	void reinitialiseInnerSCs();
 

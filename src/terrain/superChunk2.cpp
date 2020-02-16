@@ -196,10 +196,11 @@ void CSuperChunk2::clearScrolledOutChunks(Tdirection face, int overlap) {
 
 /** If clippee is partially or entirely inside this volume, return true
 	and with the proportion of overlap in clipVol, expressed as a unit volume. */
-bool CBoxVolume::isClippedBy(CBoxVolume& clipVol){
+std::tuple<bool, CBoxVolume> CBoxVolume::findOverlap(CBoxVolume clipVol)
+{
 	vec3 SCboundaryFix(1.0f);
 	if (any(lessThan(clipVol.tr, bl + SCboundaryFix)) || any(greaterThan(clipVol.bl, tr - SCboundaryFix)))
-		return false;
+		return { false,clipVol };
 
 	vec3 volSize(clipVol.tr - clipVol.bl);
 
@@ -210,7 +211,7 @@ bool CBoxVolume::isClippedBy(CBoxVolume& clipVol){
 	unitBl = unitBl / volSize;
 	unitTr = unitTr / volSize;
 	clipVol.set(unitBl, unitTr);
-	return true;
+	return { true, clipVol };
 }
 
 

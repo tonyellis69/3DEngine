@@ -14,8 +14,10 @@ CTextSprite::CTextSprite() {
 }
 
 CTextSprite::~CTextSprite() {
-	if (bufId.x != INT_MAX)
+	if (bufId.x != INT_MAX) {
 		callbackObj->freeSpriteImageSpace(bufId);
+		//callbackObj->freeHotTextSprite(this);
+	}
 }
 
 /** Draw this sprite's text to the given texture. */
@@ -24,7 +26,7 @@ void CTextSprite::createTextImage(CRenderTexture& texture) {
 		return;
 	bufId = callbackObj->reserveSpriteImageSpace(size);
 	renderTextQuads(texture, bufId , textColour);
-	//freeQuadBuffer();
+	freeQuadBuffer();
 }
 
 /** Store data about where this sprite's text is found in its textObj. */
@@ -153,8 +155,9 @@ void CTextSprite::updateMatrix() {
 
 CHotTextSprite::~CHotTextSprite() {
 	if (bufId.x != INT_MAX) {
-		callbackObj->freeSpriteImageSpace(bufId);
-		callbackObj->freeSpriteImageSpace(bufId2);
+		//callbackObj->freeSpriteImageSpace(bufId);
+		//callbackObj->freeSpriteImageSpace(bufId2);
+		callbackObj->freeHotTextSprite(this);
 	}
 }
 
@@ -168,7 +171,7 @@ void CHotTextSprite::createTextImage(CRenderTexture& storageTexture) {
 
 	bufId2 = callbackObj->reserveSpriteImageSpace(size);
 	renderTextQuads(storageTexture, bufId2, hotTextColour);
-	//freeQuadBuffer();
+	freeQuadBuffer();
 }
 
 void CHotTextSprite::setTextColour(glm::vec4& colour) {

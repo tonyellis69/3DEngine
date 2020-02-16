@@ -63,9 +63,6 @@ public:
 	glm::mat4 chunkOrigin; ///<TO DO: keep this, or do some other way?
 
 	
-
-	glm::vec3 playerDisplacement; ///<Player displacement from origin.
-
 	glm::vec3 viewpoint; ///>The position of the terrain viewer relative to origin
 	glm::vec3 oldViewpoint;
 
@@ -82,6 +79,8 @@ private:
 	int getFreeChunk();
 	void removeChunk(int id);
 	glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex);
+	void scrollViewpoint(Tdirection scrollDir);
+	void rebuildOuterShell(int shellNo, Tdirection scrollOutFace);
 
 	const int approxChunksRequired = 2000; 
 	int chunksToSkinPerFrame;

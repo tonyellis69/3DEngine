@@ -63,7 +63,8 @@ CGUIbase::CGUIbase()  {
 	setGUIcallback(this);
 	if (rootUI) {
 		setStyleSheet(rootUI->styleSheet);
-		controlCursor.rowCol = glm::i32vec2(0); // styleSheet->controlBorder);
+		controlCursor.rowCol = glm::i32vec2(0);
+		msgObj = rootUI->msgObj;
 
 	}
 
@@ -379,6 +380,10 @@ glm::i32vec2& CGUIbase::getSize() {
 /** Set the layout style to use for placing subsequent controls. */
 void CGUIbase::setLayout(CGUIlayout & layout) {
 	currentLayoutStyle = layout;
+}
+
+void CGUIbase::setMessageObject(IGUImsg* msgObj) {
+	this->msgObj = msgObj;
 }
 
 

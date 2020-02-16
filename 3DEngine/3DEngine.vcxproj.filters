@@ -847,5 +847,14 @@
     <ClInclude Include="..\..\VMtest\src\ITigObj.h">
       <Filter>vm</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\terrain\iterrain.h">
+      <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\VMtest\src\Ivm.h">
+      <Filter>vm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\iGuiMsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

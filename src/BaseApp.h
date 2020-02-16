@@ -38,9 +38,10 @@
 #include <iostream> //for cerr
 //using namespace std;
 
+#include "UI\iGuiMsg.h"
 
 //class CVMapp;
-class CBaseApp : public Icallback, ILogCallback {
+class CBaseApp : public Icallback, ILogCallback, IGUImsg {
 public:
 	CBaseApp(void);
 	~CBaseApp(void);

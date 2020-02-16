@@ -75,17 +75,17 @@ extern CLog  liveLog;
 class CFatalLog : public CLog {
 public:
 template <typename T>
-	friend CLog& operator<<(CFatalLog& log, const T& in);
-
+	friend CFatalLog& operator<<(CFatalLog& log, const T& in);
 };
 
 template <typename T>
-CLog& operator<<(CFatalLog& log, const T& in) {
+//CLog& operator<<(CFatalLog& log, const T& in) {
+CFatalLog& operator<<(CFatalLog & log, const T & in) {
 
 	if (log.callbackObj) {
-		CLog tmpLog;
-		tmpLog << in;
-		log.callbackObj->logFatalCallback(tmpLog.ss);
+		log.ss << in;
+		log.callbackObj->logFatalCallback(log.ss);
+		log.ss.str("");
 		return log;
 	}
 

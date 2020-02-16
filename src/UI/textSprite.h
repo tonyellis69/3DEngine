@@ -24,7 +24,7 @@ class ITextSpriteCallback;
 class CTextSprite {
 public:
 	CTextSprite();
-	~CTextSprite();
+	virtual ~CTextSprite();
 	virtual void createTextImage(CRenderTexture& texture);
 	void setTextObjData(int textObj, int textPos, int textLength);
 	void setPagePosition(int posX, int posY);
@@ -72,17 +72,11 @@ private:
 	glm::mat4* pageOrthoViewMatrix;
 };
 
-class ITextSpriteCallback {
-public:
-	virtual glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size) = 0;
-	virtual void freeSpriteImageSpace(glm::i32vec2& bufId) = 0;
-	virtual glm::vec4 getHotTextColour() = 0;
-	virtual float getHotPeriod(unsigned int hotId) = 0;
-};
+
 
 class CHotTextSprite : public CTextSprite {
 public:
-	~CHotTextSprite();
+	 ~CHotTextSprite();
 	void createTextImage(CRenderTexture& texture);
 	void setTextColour(glm::vec4& colour);
 	void draw();
@@ -90,8 +84,18 @@ public:
 	unsigned int getHotId();
 
 	glm::vec4 hotTextColour;
+	glm::i32vec2 bufId2;
 private:
 	//CBuf tmpVertBuf2;
-	glm::i32vec2 bufId2;
+
 	unsigned int hotId;
+};
+
+class ITextSpriteCallback {
+public:
+	virtual glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size) = 0;
+	virtual void freeSpriteImageSpace(glm::i32vec2& bufId) = 0;
+	virtual void freeHotTextSprite(CHotTextSprite* sprite) = 0;
+	virtual glm::vec4 getHotTextColour() = 0;
+	virtual float getHotPeriod(unsigned int hotId) = 0;
 };

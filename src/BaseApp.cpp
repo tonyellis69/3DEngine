@@ -56,6 +56,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	GUIroot.setDefaultFont(smallSysFont); //TO DO: stylesheet will replace this
 	initialiseSystemStylesheet();
 	GUIroot.setStyleSheet(&sysStyleSheet);
+	GUIroot.setMessageObject(this); //Makes this the default for all gui messages
 
 	RegisterUIfunctors();
 

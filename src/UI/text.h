@@ -62,7 +62,14 @@ const unsigned int richGap = 32;
 const unsigned int richBookmark = 64;
 
 struct TRichTextRec : textRec {
-	TRichTextRec();
+	TRichTextRec() {
+		hotId = 0;
+		flags = 0;
+		period = 0;
+		gap = 0;
+		lineRef = 0;
+	}
+
 	unsigned int hotId;
 	int gap;
 	int lineRef;

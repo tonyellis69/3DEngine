@@ -225,6 +225,7 @@
     <ClInclude Include="..\..\3DTest\src\worldUI.h" />
     <ClInclude Include="..\..\VMtest\src\daemon.h" />
     <ClInclude Include="..\..\VMtest\src\ITigObj.h" />
+    <ClInclude Include="..\..\VMtest\src\Ivm.h" />
     <ClInclude Include="..\..\VMtest\src\stack.h" />
     <ClInclude Include="..\..\VMtest\src\tigObj.h" />
     <ClInclude Include="..\..\VMtest\src\var.h" />
@@ -299,6 +300,7 @@
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
     <ClInclude Include="..\src\terrain\chunk2.h" />
+    <ClInclude Include="..\src\terrain\iterrain.h" />
     <ClInclude Include="..\src\terrain\scArray.h" />
     <ClInclude Include="..\src\terrain\shell.h" />
     <ClInclude Include="..\src\terrain\superChunk2.h" />
@@ -349,6 +351,7 @@
     <ClInclude Include="..\src\UI\GUIstyleSheet.h" />
     <ClInclude Include="..\src\UI\GUIswatchContainer.h" />
     <ClInclude Include="..\src\UI\GUItextbox2.h" />
+    <ClInclude Include="..\src\UI\iGuiMsg.h" />
     <ClInclude Include="..\src\UI\imageBuf.h" />
     <ClInclude Include="..\src\UI\lineBuffer.h" />
     <ClInclude Include="..\src\UI\lineBuffer2.h" />

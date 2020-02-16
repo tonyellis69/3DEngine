@@ -9,7 +9,6 @@
 
 #include "text.h"
 
-enum TMouseWheelMode {scroll,hotText};
 
 enum TStyleChange {
 	styleNone, styleBold, styleHotOn, styleHotOff, styleSuspendedHotOn, styleSuspendedHotOff, styleStyle,
@@ -44,7 +43,8 @@ struct TFXfragment {
 };
 
 /** A more versatile multiline text display class. */
-class CGUIrichText : public ILineBufferCallback, public CGUIlabel2 {
+class CGUIrichText : public ILineBuffer, public CGUIbase
+{
 public:
 	CGUIrichText(int x, int y, int w, int h);
 	void applyStyleSheet();
@@ -64,7 +64,6 @@ public:
 	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
 
-	bool scrollDownSuccessful(int dist);
 	void createPage();
 	void updateFragmentPositions();
 	void renderLineBuffer();
@@ -75,7 +74,7 @@ public:
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	bool OnMouseMove(const int mouseX, const int mouseY, int key);
 	void msgHotTextChange(glm::i32vec2& adjustedMousePos);
-	void msgHighlight();
+
 	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	bool OnLMouseUp(const int mouseX, const int mouseY, int key);
 
@@ -85,18 +84,14 @@ public:
 
 
 	TCharacterPos getPreviousLine(TCharacterPos& startText);
-	bool scrollUpSuccessful(int dist);
+
 	TCharacterPos getPrevNewline(int textObj, int pos);
 	void update(float dT);
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
-	bool attemptHotTextScroll(int direction);
 	void smoothScroll(int pixels);
 	void removeScrolledOffText();
-	void setMouseWheelMode(TMouseWheelMode mode);
-	void updateHotTextSelection();
-	void hotTextScroll(int direction);
-	void selectTopHotText();
+
 	std::vector<unsigned int> purgeHotText();
 	std::vector<unsigned int> purgeHotText(unsigned int id);
 	std::vector<unsigned int> getHotTextIds();
@@ -128,15 +123,8 @@ public:
 	bool solidifyTempText();
 	void unhotDuplicates();
 	void removeMarked();
-	void insertGapObj(int beforeObj, int afterObj);
-	void animateHotText(float dT);
-	void animateFadeText(float dT);
-	void animateLineFadeIn(float dT);
-	void collapseGap(float dT);
-
+	
 	void deliverByCharacter(float dT);
-
-	bool isOverrun();
 
 	void requestLineFadeIn(bool onOff);
 
@@ -170,13 +158,10 @@ public:
 
 	float correctOverrunDelay; ///<Delay before we next scroll
 	bool overrunCorrectionOn; ///<If true, scroll down to correct overrun
-	int SCRAP_THISoverrunHotTextObj;
 
-	int scrollHeight; ///<Pixels to smoothscroll before actually scrolling the text one line.
 	int smoothScrollStep;
-	TMouseWheelMode mouseWheelMode; ///<Either scrolling or hot text selecting.
+	
 
-	//TtextStyle defaultTextStyle; ///<The one we start with.
 	TtextStyle currentTextStyle; ///<The one most recently set by the user, and to which we revert after any markup effects.
 
 	
@@ -185,17 +170,12 @@ public:
 	std::map<std::string, TtextStyle>* styles; ///<List of available styles
 	TtextStyle hotTextStyle;
 	TtextStyle selectedHotTextStyle;
-
-	//TO DO: try to scrap
-	int textureHeight; ///<Height of the texture being drawn to.
-	int textureWidth; ///<Guess.
-
 	
 	CLog* transcriptLog; ///<If exists, send prerendered text here. 
 
 	bool suspended; ///<If true, suspend activity such as highlighting.
 	
-		std::mt19937 randEngine; ///<Random number engine.
+	std::mt19937 randEngine; ///<Random number engine.
 	static std::uniform_real_distribution<> randomPeriod;
 	
 
@@ -206,15 +186,15 @@ public:
 
 	CLineBuffer lineBuffer; ///<Holds the current line fragments, organised into lines.
 
-	std::vector<TFXfragment> hotFrags; ///<Indexes of fragments that are hot text.
-	std::vector<TFXfragment> fadeFrags2; ///<Currently visible fade-in text fragments
+	//std::vector<TFXfragment> hotFrags; ///<Indexes of fragments that are hot text.
+	//std::vector<TFXfragment> fadeFrags2; ///<Currently visible fade-in text fragments
 	
-	int gapObj; ///<Current gap obj if any.
+	//int gapObj; ///<Current gap obj if any.
 
 
-	bool enableLineFadeIn; ///<False = line fade-in not allowed at all.
-	bool lineFadeInOn; ///<Each line will be faded in instead of drawn instantly.
-	float lineFadeSpeed; ///<Around 260. Smaller is slower
+	//bool enableLineFadeIn; ///<False = line fade-in not allowed at all.
+	//bool lineFadeInOn; ///<Each line will be faded in instead of drawn instantly.
+	//float lineFadeSpeed; ///<Around 260. Smaller is slower
 
 private:
 	void prepForFirstText();
@@ -237,6 +217,8 @@ private:
 	glm::vec4& getHotTextColour();
 	glm::vec4& getHotTextSelectedColour();
 
+	void hotTextMouseOver(int hotId);
+
 
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
@@ -245,4 +227,6 @@ private:
 	bool autoscrollingDown; ///<If true, we scroll down if there's any text below.
 
 	float dT;
+
+	int currentHotText;
 };

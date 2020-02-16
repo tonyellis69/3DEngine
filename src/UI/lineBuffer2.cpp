@@ -19,7 +19,7 @@ CLineBuffer2::~CLineBuffer2() {
 	
 }
 
-void CLineBuffer2::setCallbackObj(ILineBufferCallback* obj) {
+void CLineBuffer2::setCallbackObj(ILineBuffer* obj) {
 	pCallbackObj = obj;
 }
 
@@ -39,11 +39,14 @@ void CLineBuffer2::clear() {
 	spriteBuffer.clear();
 	textSprites.clear();
 	hotTexts.clear();
+	hotTextSprites.clear();
 	finalFrag = {0, 0, 0, 0, 0, 0, 0, no, true};
 	yPosTracker = 0;
 	pageStart.unset = true;
 	pageEnd.unset = true;
 	insertAtTop = false;
+	mousedHotText = -1;
+	prevMousedHotText = -1;
 }
 
 /**	Add this text fragment as a text sprite. */
@@ -154,6 +157,22 @@ void CLineBuffer2::setAddFragmentsAtTop(bool onOff) {
 	insertAtTop = onOff;
 }
 
+
+void CLineBuffer2::onMouseMove(glm::i32vec2& mousePos) {
+	mousedHotText = -1;
+	for (auto hotTextSprite : hotTextSprites) {
+		CHotTextSprite* sprite = hotTextSprite.sprite;
+		if (all(greaterThan(mousePos, sprite->positionOnPage))
+			&& all(lessThan(mousePos, sprite->positionOnPage + sprite->size))) {		
+			mousedHotText = hotTextSprite.hotId;
+			break;
+		}
+	}
+	
+	if (mousedHotText != prevMousedHotText)
+		onMousedHotTextChange();
+}
+
 ///////Private functions
 
 void CLineBuffer2::initShader() {
@@ -223,6 +242,8 @@ void CLineBuffer2::recalcPageState() {
 		else 
 			++hotFrag;		
 	}
+
+
 }
 
 /** Update pageStart and pageEnd if the given fragment invalidates the existing values. */
@@ -256,9 +277,10 @@ CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment) {
 	if (textObj.hotId) {
 		sprite = new CHotTextSprite();
 		if (hotTexts.empty())
-			hotTexts.insert({ textObj.hotId, 0 }); 
+			hotTexts.insert({ textObj.hotId, {0} });
 		else
-			hotTexts.insert({ textObj.hotId, randomPeriod() }); 
+			hotTexts.insert({ textObj.hotId, {randomPeriod(0)} });
+		hotTextSprites.push_back({ (CHotTextSprite*) sprite, textObj.hotId });
 		sprite->setHotId(textObj.hotId);
 	}
 	else
@@ -300,35 +322,75 @@ glm::vec4 CLineBuffer2::getHotTextColour() {
 void CLineBuffer2::updateHotTextPeriods(float dT) {
 	float numHotTexts = hotTexts.size() + 4;
 	for (auto& hotText : hotTexts) {
-		hotText.second += dT / (numHotTexts);
-		hotText.second = glm::fract(hotText.second);
+		if (hotText.second.selectionState == selLit)
+			continue;
+		hotText.second.period += dT / (numHotTexts);
+		hotText.second.period = glm::fract(hotText.second.period);
 	}
 }
 
 /** Return the amimation period for the given hot text. */
 float CLineBuffer2::getHotPeriod(unsigned int hotId) {
+	//if (hotTexts[hotId].selectionState == selLit)
+	//	return 0.5f;
 	
+
 	float numHotTexts = hotTexts.size() + 4;
-
 	float hotOnMultiplier = 1.5f;
+	float period = hotTexts[hotId].period * (numHotTexts  / hotOnMultiplier);
 
-	float period = hotTexts[hotId] * (numHotTexts  / hotOnMultiplier);
-
-	period = std::clamp(period, 0.0f, 1.0f);
-	
+	period = std::clamp(period, 0.0f, 1.0f);	
 	period = period * 2.0f - 1.0f;
 
 	float curve = 2.0f;
 
+	period = 1.0f - pow(abs(period), curve);
 
-	return 1.0f - pow(abs(period), curve);
+	if (hotTexts[hotId].selectionState == selWarmup && period >= 0.9f) {
+		hotTexts[hotId].selectionState = selLit;
+		return 1.0f;
+	}
 
+	if (hotTexts[hotId].selectionState == selWarmdown && period <= 0.1f) {
+		hotTexts[hotId].selectionState = selNone;
+		hotTexts[hotId].period = randomPeriod(hotTexts[hotId].period);
+	}
+
+	return period;
 }
 
 /** Return a random number between 0 and 1. */
-float CLineBuffer2::randomPeriod() {
-	std::uniform_real_distribution period{ 0.0f, 10.0f };
+float CLineBuffer2::randomPeriod(float start) {
+	std::uniform_real_distribution period{ start, 10.0f };
 	return period(randEngine);
+}
+
+/** Free whatever memory this hot text sprite is using. */
+void CLineBuffer2::freeHotTextSprite(CHotTextSprite* sprite) {
+	freeSpriteImageSpace(sprite->bufId);
+	freeSpriteImageSpace(sprite->bufId2);
+
+	for (auto hotRec = hotTextSprites.begin(); hotRec != hotTextSprites.end(); ) {
+		if (hotRec->sprite == sprite) {
+			hotTextSprites.erase(hotRec);
+			break;
+		}
+		else
+			hotRec++;
+	}
+
+
+}
+
+void CLineBuffer2::onMousedHotTextChange() {
+	if (prevMousedHotText != -1) {
+		hotTexts[prevMousedHotText].selectionState = selWarmdown;
+	}
+
+	prevMousedHotText = mousedHotText;
+	hotTexts[mousedHotText] = { 0,selWarmup };
+
+	pCallbackObj->hotTextMouseOver(mousedHotText);
 }
 
 

@@ -12,7 +12,6 @@ using glm::mat4;
 using glm::i32vec3;
 
 CTerrain2::CTerrain2()   {
-	playerDisplacement = vec3(0);
 	viewpoint = vec3(0);
 	chunkOrigin = mat4(1);
 	chunksToSkinPerFrame = 10;
@@ -74,9 +73,11 @@ void CTerrain2::onPlayerMove(glm::vec3 & move) {
 	Tdirection advanceDirection = vecToDir(i32vec3(terrainAdvanceInChunks));
 
 	if (advanceDirection != none) {	
-		shells[0].onPlayerAdvance(advanceDirection);
-		//for (int shellNo=0; shellNo < shells.size(); shellNo++)
-		//	shells[shellNo].onPlayerAdvance(advanceDirection);	
+		//shells[0].updateShellTerrain(advanceDirection);
+		for (int shellNo = 0; shellNo < shells.size(); shellNo++) {
+			if (shells[shellNo].updateShellTerrain(advanceDirection) == false)
+				break;
+		}
 		removeChunkOverlaps(advanceDirection);
 	}
 }
@@ -250,8 +251,8 @@ void CTerrain2::preScrollUpdate(int shellNo, Tdirection direction) {
 		scrollSampleSpace(scrollDir, shells[0].scSampleStep);
 
 		vec3 move = dirToVec(scrollDir) * shells[0].SCsize;
-		//chunkOrigin = glm::translate(chunkOrigin, move);
-		//liveLog << "\nchunkOrigin moved to " << vec3(chunkOrigin[3]);
+		chunkOrigin = glm::translate(chunkOrigin, move);
+		liveLog << "\nchunkOrigin moved to " << vec3(chunkOrigin[3]);
 	}
 	else
 		recentreOuterShells(shellNo, direction);
@@ -309,4 +310,20 @@ glm::vec3 CTerrain2::getSCworldPos(int shellNo, const glm::i32vec3& origIndex) {
 	i32vec3 rotatedIndex = shells[shellNo].getInvRotatedIndex(origIndex);;
 	return (shells[shellNo].worldSpacePos + vec3(rotatedIndex) * shells[shellNo].SCsize) -
 		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
+}
+
+/** Update the viewpioint position in response to a scroll. */
+void CTerrain2::scrollViewpoint(Tdirection scrollDir) {
+	glm::vec3& move = dirToVec(scrollDir) * shells[0].SCsize;
+	pCallbackApp->onTerrainScroll(move);
+	viewpoint += move;
+	oldViewpoint += move;
+}
+
+/**	If we've removed scrolled out chunks, the rear inner face of the enclosing shell 
+	needs to add some to cover that area of terrain. */
+void CTerrain2::rebuildOuterShell(int shellNo, Tdirection scrollOutFace) {
+	if (shellNo < shells.size() - 1) {
+		shells[shellNo + 1].addInnerFaceChunks2(scrollOutFace);
+	}
 }

@@ -13,9 +13,9 @@
 
 #include "glm\glm.hpp"
 
-#include <string_view>
+//#include <string_view>
 
-
+#include "iGuiMsg.h"
 
 class guiRect {
 public:
@@ -178,6 +178,7 @@ public:
 	virtual void position(CGUIbase* control);
 	glm::i32vec2& getSize();
 	void setLayout(CGUIlayout& layout);
+	void setMessageObject(IGUImsg* msgObj);
 
 	bool IsOnControl(const CGUIbase& Control,const  int mouseX, const  int mouseY);
 	virtual bool MouseMsg(unsigned int Msg, int mouseX, int mouseY, int key);
@@ -331,6 +332,7 @@ public:
 protected:
 	bool enabled; ///<False if this control has been deactivated.
 	static CFont* defaultFont;
+	IGUImsg* msgObj; ///<The object we send messages to.
 
 private:
 	void defaultMouseMoveResponse(int mouseX, int mouseY, int key);
