@@ -168,28 +168,22 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 
 
 
-/** Remove any chunks beyond the overlap boundary in this direction. */
-void CSuperChunk2::clearScrolledOutChunks(Tdirection face, int overlap) {
+/** Remove any chunks in the outermost layers of this face. */
+void CSuperChunk2::clearOuterLayerChunks(Tdirection face, int layersToKeep) {
 	int axis = getAxis(face);
+	int limitA = layersToKeep; int limitB = numSCchunks;
+	if (face == north || face == west || face == down) {
+		limitA = 0; limitB = numSCchunks - layersToKeep;
+	}
 
 	for (auto id = scChunks.begin(); id != scChunks.end();) {
-		i32vec3* chunkIndex = &pTerrain->chunks[*id].index;
-		if (face == north || face == west || face == down) {
-			if ((*chunkIndex)[axis] < numSCchunks - overlap) {
-				pTerrainObj->removeChunk(*id);
-				id = scChunks.erase(id);
-			}
-			else
-				++id;
+		i32vec3 chunkIndexPos = pTerrainObj->getChunkIndex(*id);
+		if (chunkIndexPos[axis] >= limitA && chunkIndexPos[axis] < limitB) {
+			pTerrainObj->removeChunk(*id);
+			id = scChunks.erase(id);
 		}
-		else {
-			if ((*chunkIndex)[axis] >= overlap) {
-				pTerrainObj->removeChunk(*id);
-				id = scChunks.erase(id);
-			}
-			else
-				++id;
-		}
+		else
+			++id;
 	}
 }
 

@@ -116,7 +116,7 @@ int CLineBuffer2::scrollUp(int scrollAmount) {
 }
 
 /** Return the distance in pixels between the bottom of the page and the bottom of the lowest
-	text sprite.*/
+	text sprite only if it's an overflow. */
 int CLineBuffer2::getOverlap() {
 	int overlap = 0;
 	for (auto &sprite : textSprites) {
@@ -124,6 +124,17 @@ int CLineBuffer2::getOverlap() {
 	}
 	overlap = overlap - height;
 	return std::max(0, overlap);
+}
+
+/** Return the distance in pixels between the bottom of the page and the bottom of the lowest
+	text sprite only if it's an underflow.*/
+int CLineBuffer2::getUnderrun() {
+	int underrun = 0;
+	for (auto& sprite : textSprites) {
+		underrun = std::max(underrun, sprite->positionOnPage.y + sprite->size.y);
+	}
+	underrun = height - underrun;
+	return std::max(0, underrun);
 }
 
 /** Return the distance in pixels between the top of the page and the top of the highest

@@ -68,9 +68,8 @@ public:
 	void updateFragmentPositions();
 	void renderLineBuffer();
 	void compileFragmentsToEnd(TLineFragment lineFragment);
-	int processNextFragment(TLineFragment& fragment);
-	TLine compileSingleLine(TLineFragment lineFragment);
-	void checkLineOverrun(int yStart);
+
+	TLineFragment compileSingleLine(TLineFragment lineFragment);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	bool OnMouseMove(const int mouseX, const int mouseY, int key);
 	void msgHotTextChange(glm::i32vec2& adjustedMousePos);
@@ -126,8 +125,6 @@ public:
 	
 	void deliverByCharacter(float dT);
 
-	void requestLineFadeIn(bool onOff);
-
 	bool clearToBookMark();
 
 	bool isDisplayFinished();
@@ -141,8 +138,7 @@ public:
 
 	~CGUIrichText();
 
-	int overrunningPixels;
-	int underrun;
+
 	int maxResizeHeight;
 	int longestLine;
 	int shortestSpaceBreak; ///<Only spacebreak after this many pixels.
@@ -204,7 +200,7 @@ private:
 	std::string findNextTag( std::string& remainingTxt, TStyleRec& styleRec);
 	void setStyleChange(TStyleRec& styleRec);
 	void appendText(const std::string& newText);
-	void addText(std::string newText);
+
 
 	void initialisePage();
 	void writePageToLineBuffer();
@@ -228,5 +224,6 @@ private:
 
 	float dT;
 
+	int oldHotText;
 	int currentHotText;
 };

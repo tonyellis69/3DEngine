@@ -35,6 +35,7 @@ public:
 	int scrollDown(int scrollAmount);
 	int scrollUp(int scrollAmount);
 	int getOverlap();
+	int getUnderrun();
 	int getTopOverlap();
 	CRenderTexture* getTextBuf();
 	TLineFragment getFinalFrag();

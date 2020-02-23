@@ -327,3 +327,7 @@ void CTerrain2::rebuildOuterShell(int shellNo, Tdirection scrollOutFace) {
 		shells[shellNo + 1].addInnerFaceChunks2(scrollOutFace);
 	}
 }
+
+glm::i32vec3 CTerrain2::getChunkIndex(int chunkId) {
+	return chunks[chunkId].index;
+}

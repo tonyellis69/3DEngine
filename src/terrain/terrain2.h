@@ -81,6 +81,7 @@ private:
 	glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex);
 	void scrollViewpoint(Tdirection scrollDir);
 	void rebuildOuterShell(int shellNo, Tdirection scrollOutFace);
+	glm::i32vec3 getChunkIndex(int chunkId);
 
 	const int approxChunksRequired = 2000; 
 	int chunksToSkinPerFrame;

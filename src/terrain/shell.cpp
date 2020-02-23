@@ -108,14 +108,14 @@ void CShell::scroll(Tdirection direction) {
 	pTerrainObj->preScrollUpdate(shellNo, direction);
 
 	Tdirection scrollDir = flipDir(direction);
-	rotateSCs(scrollDir);
+	rotateSCs(scrollDir);  ///////!!!!!!!!!!!!!!do next!!!!!!!!!!!!!!! (mainly sub routines)
 
 	//move enclosing shells back to ensure terrain still lines up
 	pTerrainObj->realignOuterShells(shellNo, scrollDir);
 
 	//now that we've scrolled, return to the default layout of one final double-layer of chunks
 	addToFaceLayer(direction);
-	removeScrolledOutChunks(scrollDir);//!!!!!!!!!next!!!!!!!!!!!!!!!!!!
+	removeOutfaceChunks(scrollDir);
 
 	//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
 	//needs to add some to cover that area of terrain
@@ -202,7 +202,7 @@ vec3 CShell::calcSCsampleSpacePosition(i32vec3& scIndex) {
 void CShell::findAllSCchunks() {
 	COuterSCIterator sc = getOuterSCiterator();
 	CBoxVolume chunkVol = calcWorldSpaceChunkExtent();
-	bool overlapping; CBoxVolume overlapVolume;
+	bool isOverlapping; CBoxVolume overlapVolume;
 	while (!sc.finished()) {
 		sc->checkForIntersection();
 		if (!sc->isEmpty) {
@@ -213,7 +213,7 @@ void CShell::findAllSCchunks() {
 			CBoxVolume SCvol;
 			vec3 pos = vec3(sc.getIndex()) * SCsize - shellOrigin;
 			SCvol.set(pos, pos + vec3(SCsize));
-			auto [isOverlapping, overlapVolume] = chunkVol.findOverlap(SCvol);
+			std::tie(isOverlapping, overlapVolume) = chunkVol.findOverlap(SCvol);
 			if (isOverlapping) {
 				sc->addChunks(overlapVolume);
 			}
@@ -239,7 +239,7 @@ void CShell::fillAllUnclippedSCs() {
 		SCvol.set(pos, pos + vec3(SCsize));
 		innerTest = SCvol;
 
-		auto [isOverlapping, overlapVolume] = chunkVol.findOverlap(SCvol);
+		std::tie(isOverlapping, overlapVolume) = chunkVol.findOverlap(SCvol);
 		if (isOverlapping) {
 			if (shellNo > 0) {			
 				innerVol = pTerrain->shells[shellNo - 1].calcWorldSpaceChunkExtent();
@@ -306,13 +306,13 @@ void CShell::addChunksToFaceSCs(Tdirection face) {
 	CBoxVolume currentSCvolume;
 	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f) - worldSpacePos;
 
-	for (auto faceSCiter = getFaceIterator(face); !faceSCiter.finished(); faceSCiter++) {
-		if (!faceSCiter->isEmpty) {
-			vec3 SCpos = vec3(faceSCiter.getIndex()) * SCsize - shellOrigin;
+	for (auto faceSC = getFaceIterator(face); !faceSC.finished(); faceSC++) {
+		if (!faceSC->isEmpty) {
+			vec3 SCpos = vec3(faceSC.getIndex()) * SCsize - shellOrigin;
 			currentSCvolume.set(SCpos, SCpos + vec3(SCsize));		
-			auto [overlapping, overlapVolume] = chunkVolume.findOverlap(currentSCvolume);
+			std::tie(overlapping, overlapVolume) = chunkVolume.findOverlap(currentSCvolume);
 			if (overlapping) {
-				faceSCiter->addChunks(overlapVolume);
+				faceSC->addChunks(overlapVolume);
 			}
 		}
 	}
@@ -343,7 +343,7 @@ void CShell::removeEncroachedOnChunks2(Tdirection face) {
 			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
 				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin;
 				SCvol.set(pos, pos + vec3(SCsize));
-				auto [isOverlapping, overlapVolume] = innerChunkVol.findOverlap(SCvol);
+				std::tie(isOverlapping, overlapVolume) = innerChunkVol.findOverlap(SCvol);
 				if (isOverlapping) {
 					scArray.element(x, y, z)->clearChunks(overlapVolume);
 				}
@@ -455,14 +455,15 @@ glm::i32vec3 CShell::getInvRotatedIndex(const glm::i32vec3& origIndex) {
 
 
 
-/** Notify SCs on the outface to remove any chunks that have now scrolled beyond the 
-	chunk extent. */
-void CShell::removeScrolledOutChunks(Tdirection outface) {
-	int overlap = 2;
+/** We've scrolled, so notify SCs on the new outface to remove all but their 
+	innnermost two layers of chunks, as the rest of this terrain will now 
+	be provided by the enclosing shell. */
+void CShell::removeOutfaceChunks(Tdirection outface) {
+	int layersToKeep = 2;
 	CFaceIterator faceIter = getFaceIterator(outface);
 	while (!faceIter.finished()) {
 		if (faceIter->isEmpty == false) {
-			faceIter->clearScrolledOutChunks(outface, overlap);
+			faceIter->clearOuterLayerChunks(outface, layersToKeep);
 		}
 		faceIter++;
 	}

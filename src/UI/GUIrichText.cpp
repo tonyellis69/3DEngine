@@ -228,7 +228,8 @@ void CGUIrichText::updateFragmentPositions() {
 
 /** Draw all current line fragments to the text display buffer. */
 void CGUIrichText::renderLineBuffer() {
-	overrunningPixels = 0;
+	return;
+	//overrunningPixels = 0;
 	if (lineBuffer.isEmpty())
 		return;
 
@@ -280,7 +281,7 @@ void CGUIrichText::renderLineBuffer() {
 
 	}
 	if (finalY > getHeight()) {
-		overrunningPixels = finalY - getHeight();
+		;//overrunningPixels = finalY - getHeight();
 	}
 
 
@@ -290,134 +291,23 @@ void CGUIrichText::renderLineBuffer() {
 /** Starting with the given line fragment, compile our text objects into line fragments 
 	until we run out or overflow the page. */
 void CGUIrichText::compileFragmentsToEnd(TLineFragment lineFragment) {
-	underrun = 0;
 	do {
-		int currObjNo = lineFragment.textObj;
-		bool startOnNewLine = false;
-		if (lineFragment.causesNewLine != no) {
-			startOnNewLine = true;
-		}
-
-		int fragId = processNextFragment(lineFragment);
-		
-		if (fragId == -1) {
-			checkLineOverrun(lineBuffer.getYextent());
-			return;
-		}
-
-		if (startOnNewLine) {
-			lineBuffer.addLine();
-		}
-
-		lineBuffer.appendFragment(fragId);
-		lineBuffer2.addTextSprite(lineFragment);
-
-		int yExtent = lineBuffer.getYextent();
-		checkLineOverrun(yExtent);
-
-		if (yExtent > getHeight() && lineFragment.causesNewLine != no) { //we've run past the buffer entirely, so no sense writing any more
-			return;
-		}
-	
-
+		//lineFragment = getNextLineFragment(lineFragment);
+		//lineBuffer2.addTextSprite(lineFragment);
+		lineFragment = compileSingleLine(lineFragment);
 	} while (!lineFragment.finalFrag);
 }
 
-/** Return the fragment following the given one, having registered any hot text or other special cases. */
-int CGUIrichText::processNextFragment(TLineFragment& lineFragment) {
-	
-	bool displaced = false;
-	int indent = 0;
-	int fragId = -1;
-
-	//start at the given fragment's y position (plus scrolling) and x reset for now
-	i32vec2 offset(0, lineFragment.renderStartY); 
-
-	bool startOnNewLine = false;
-	if (lineFragment.causesNewLine != no) {
-		startOnNewLine = true;
-	}
-
-	lineFragment = getNextLineFragment(lineFragment);
-	//if there is no more text, lineFragment is now zeroed 
-	//otherwise it has been set to the next fragment
-	//either way we have modified the parameter 
-	//but in the latter case, we create a new frags[] entry before we leave
-	
-	//didn't get here
-
-	if (lineFragment.finalFrag && lineFragment.textLength == 0)
-		return fragId; //final fragment has no text? Go home. (TO DO: but should this happen?)
-	int currObjNo = lineFragment.textObj;
-	TRichTextRec currentObj = textObjs[lineFragment.textObj];
-	CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
-	longestLine = std::max(longestLine, lineFragment.renderEndX);
-
-	std::string renderLine = currentObj.text.substr(lineFragment.textPos, lineFragment.textLength);
-
-	TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour };
-
-	if (currentObj.flags & richGap) { 
-		lineFragment.height = currentObj.gap; 
-		lineFragment.causesNewLine = newline;
-	}
-
-	
-	
-
-	offset.x = lineFragment.renderStartX + indent;
-	for (int c = 0; c < renderLine.size(); c++) { //find the length of the fragment
-		if (renderLine[c] == '\n')
-			continue;
-		offset.x += currentFont->table[renderLine[c]]->width; //get the x-extent of the fragment in offset
-		//TO DO: not very intuitive, needs its own variable
-	}
-
-	if (startOnNewLine) { //TO DO scrap asap!
-		offset.y += currentFont->lineHeight; //ensure starting y is *below* last line if the last frag caused a new line
-	}
-
-
-	//NB!!! we don't even use offset to create this fragment! It's used for making hotFrags etc and thus entirely replaceable
-	lineFragment.renderStartY = offset.y;
-	fragId = lineBuffer.copyFragment(lineFragment);
-	
-	if (lineFragment.causesNewLine != no) {
-		offset = glm::i32vec2(0, offset.y + currentFont->lineHeight);
-		indent = 0;// was insetX; an adjustment hack no longer used. Tidy!
-	}
-	else {
-		indent = 0;
-	}
-
-	
-	return fragId;
-}
 
 /** Create one line of line fragments from our text, starting after the given one. */
-TLine CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
-	TLine line;
+TLineFragment CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
 	do {
-		int id = processNextFragment(lineFragment);
-		if (id == -1)
+		lineFragment = getNextLineFragment(lineFragment);
+		if (lineFragment.finalFrag && lineFragment.textLength == 0)
 			break;
-		line.fragments.push_back(id);
-		line.height = std::max(line.height, lineFragment.height);
-		line.width = std::max(line.width, lineFragment.renderEndX);
 		lineBuffer2.addTextSprite(lineFragment);
 	} while (lineFragment.causesNewLine == no);
-
-	return line;
-}
-
-
-/** Record how much the given line overruns (or underruns) the bottom of the view, if at all. */
-void CGUIrichText::checkLineOverrun(int lineEndY) {
-	overrunningPixels = 0;
-	if (lineEndY > getHeight()) {
-		overrunningPixels = lineEndY - getHeight(); //was true;
-	}
-	underrun = getHeight() - lineEndY;
+	return lineFragment;
 }
 
 
@@ -510,6 +400,8 @@ TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLine
 	nextLineFrag.renderEndX = renderX;
 	if (textObj + 1 == textObjs.size() && c == richTextData->text.size() )
 		nextLineFrag.finalFrag = true;
+
+	longestLine = std::max(longestLine, nextLineFrag.renderEndX);
 	
 	return nextLineFrag;
 }
@@ -520,11 +412,13 @@ bool CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {
 	return true;
 }
 
-/** Announce that the currently selected hot text has changed. */
+/** Announce that the currently selected hot text has changed. */ 
 void CGUIrichText::msgHotTextChange(glm::i32vec2& adjustedMousePos) {
 	CMessage msg = { uiMsgHotTextChange };
-	if (selectedHotObj != -1) {
-		msg.value = textObjs[selectedHotObj].hotId;
+	//if (selectedHotObj != -1) {
+	if (currentHotText != -1) {
+		//msg.value = textObjs[selectedHotObj].hotId; //formerly!
+		msg.value = currentHotText;// textObjs[currentHotText].hotId;
 		msg.x = adjustedMousePos.x; msg.y = adjustedMousePos.y;
 	}
 	else
@@ -563,7 +457,7 @@ bool CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 
 /** Check for losing mouse while hot text selected. */
 bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
-	if (selectedHotObj == -1) //no hot text selected, so mousing off doesn't matter
+	if (currentHotText == -1) //no hot text selected, so mousing off doesn't matter
 		return true;
 	clearSelection();
 	CMessage msg = { uiMsgHotTextChange };
@@ -639,15 +533,15 @@ void CGUIrichText::update(float dT) {
 
 bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
 	int direction = wheelDelta > 0 ? 1 : -1;
-	if (selectedHotObj != -1) {
+	/*if (selectedHotObj != -1) {
 		CMessage msg;
 		msg.Msg = uiMouseWheel;
-		msg.value = textObjs[selectedHotObj].hotId;
+	//	msg.value = textObjs[selectedHotObj].hotId;
 		msg.value2 = direction;
 		pDrawFuncs->handleUImsg(*this, msg);
 		return true;
 	}
-
+	*/
 	smoothScroll(direction * smoothScrollStep);
 	return true;
 }
@@ -731,9 +625,9 @@ void CGUIrichText::clear() {
 
 /** Unselect any selected hot text. */
 void CGUIrichText::clearSelection() {
-	if (selectedHotObj == -1)
+	if (currentHotText == -1)
 		return;
-	selectedHotObj = -1;
+	currentHotText = -1;
 }
 
 void CGUIrichText::updateAppearance() {
@@ -766,9 +660,11 @@ void CGUIrichText::resizeByRatio() {
 	int newHeight = getHeight(); int newWidth = getWidth();
 	bool previouslyOverrun = false;
 
+	int overrun = lineBuffer2.getOverlap();
+	int underrun2 = lineBuffer2.getUnderrun();
 
-	while (overrunningPixels || underrun) {
-		if (overrunningPixels) {
+	while (overrun || underrun2) {
+		if (overrun) {
 			previouslyOverrun = true;
 			newHeight = getHeight() + heightModifier; //add space for one more line and see where that gets us
 		}
@@ -776,22 +672,23 @@ void CGUIrichText::resizeByRatio() {
 			if (previouslyOverrun) { //if we're now underrunning, get out to avoid loop
 				break;
 			}
-			newHeight = getHeight() - underrun; //we know how line to shrink by
+			newHeight = getHeight() - underrun2; //we know how line to shrink by
 		}
 		newWidth = newHeight * ratio;
 
 		resize(newWidth, newHeight);
 		createPage(); //updates the overrunningPixels/underrun registers. Does the text fit now?
+		overrun = lineBuffer2.getOverlap();
+		underrun2 = lineBuffer2.getUnderrun();
 	}
 
 	//tidy any remaining underrun
-	newHeight = getHeight() - underrun;
+	newHeight = getHeight() - underrun2;
 	resize(newWidth, newHeight);
 }
 
 /** Adjust width to fit longest visible line, then adjust height as needed. */
 void CGUIrichText::resizeByWidth() {
-	int rightBorder = 10; //don't seem to need this anymore 02/02/2019
 	int resizeW = getWidth();
 	if (resizeW != longestLine) {
 		resizeW = longestLine; // +rightBorder;
@@ -799,8 +696,9 @@ void CGUIrichText::resizeByWidth() {
 	setWidth(resizeW);
 
 	//do we need to adjust height too?
-	int resizeGuess = overrunningPixels;
-	while (overrunningPixels) {
+	int overrun = lineBuffer2.getOverlap();	
+	int resizeGuess = overrun;
+	while (overrun) {
 		if (getHeight() + resizeGuess > maxResizeHeight) {  //can't resize beyond maxResizeHeight
 			break;
 		}
@@ -808,10 +706,12 @@ void CGUIrichText::resizeByWidth() {
 			setHeight(getHeight() + resizeGuess);
 		resizeGuess *= 2;
 		createPage();
+		overrun = lineBuffer2.getOverlap();
 	}
 
-	if (underrun > 0) {
-		setHeight(getHeight() - underrun);
+	int underrun2 = lineBuffer2.getUnderrun();
+	if (underrun2 > 0) {
+		setHeight(getHeight() - underrun2);
 	}
 }
 
@@ -832,7 +732,7 @@ void CGUIrichText::prepForFirstText() {
 	currentTextObj = 0;
 	firstVisibleText = 0;
 	firstVisibleObject = 0;
-	selectedHotObj = -1;
+	currentHotText = -1;
 	shortestSpaceBreak = 0;
 	suspended = false;
 	setBusy(false);
@@ -850,7 +750,6 @@ void CGUIrichText::prepForFirstText() {
 void CGUIrichText::prepForScrolling() {
 	correctOverrunDelay = 0.001f;
 	overrunCorrectionOn = true;
-	overrunningPixels = 0;
 	smoothScrollStep = 8;
 }
 
@@ -909,22 +808,14 @@ std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& sty
 
 /** Append newText to the current body of text and show the updated page. */
 void CGUIrichText::appendText(const std::string& newText) {
-	requestLineFadeIn(true); //move to renderLineBuffer, that's where it happens
-
-	addText(newText);
-
-	//if (enableLineFadeIn) //ditto
-		//setBusy(true); //because it will take a little while to fade-in this text.
+	textObjs.back().text += newText;
+	//compileFragmentsToEnd(lineBuffer.finalFrag());
+	compileFragmentsToEnd(lineBuffer2.getFinalFrag());
 
 	if (transcriptLog)
 		*transcriptLog << newText;
 }
 
-/** Append the given text to the current body of text. */
-void CGUIrichText::addText(std::string newText) {
-	textObjs.back().text += newText;
-	compileFragmentsToEnd(lineBuffer.finalFrag());
-}
 
 void CGUIrichText::initialisePage() {
 	longestLine = 0;
@@ -945,6 +836,19 @@ void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 
 	lineBuffer2.onMouseMove(localMouse);
+
+	//TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//It might be simpler to just handle hot text change here
+	//instead of via callback as present. Any benefit to that?
+
+
+
+
+	//original process was:
+	//if (oldSelectedHotObj != selectedHotObj) {
+	//	msgHotTextChange(i32vec2{ mouseX,mouseY - distToFragTop });
+	//}
+
 }
 
 /** Attempt to scroll down by the given distance in pixels. */
@@ -955,9 +859,9 @@ bool CGUIrichText::scrollDown2(int dist) {
 		TLineFragment finalFrag = lineBuffer2.getFinalFrag();
 		TCharacterPos endPos = lineBuffer2.getPageEnd();
 
-		TLine newLine = compileSingleLine(finalFrag);
+		compileSingleLine(finalFrag);
 
-		if (newLine.fragments.empty())
+		if (finalFrag.finalFrag)
 			break;
 	}
 
@@ -978,7 +882,7 @@ bool CGUIrichText::scrollUp2(int dist) {
 		firstVisibleObject = prevNewline.textObj;
 		firstVisibleText = prevNewline.pos;
 		//insert line in line buffer
-		TLine newFirstLine = compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+		compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
 	}
 	lineBuffer2.setAddFragmentsAtTop(false);
 	int result = lineBuffer2.scrollUp(dist);
@@ -997,6 +901,21 @@ glm::vec4& CGUIrichText::getHotTextSelectedColour() {
 /** Respond to hot text being moused over (or off) .*/
 void CGUIrichText::hotTextMouseOver(int hotId) {
 	currentHotText = hotId;
+
+	if (currentHotText == oldHotText)
+		return;
+
+	oldHotText = currentHotText;
+	if (currentHotText == -1) {
+		int b = 0;
+	}
+
+
+	i32vec2 localMouse = screenToLocalCoords(rootUI->mousePos.x, rootUI->mousePos.y);
+	int distToFragTop = 10;
+	msgHotTextChange(i32vec2{ localMouse.x,localMouse.y - distToFragTop });
+	
+
 }
 
 void CGUIrichText::setStyleChange(TStyleRec& styleRec) {
@@ -1211,18 +1130,7 @@ void CGUIrichText::deliverByCharacter(float dT) {
 }
 
 
-/** Activate/deactivate line fade-in mode, if it is enabled. */
-void CGUIrichText::requestLineFadeIn(bool isOn) {
-	//if (!enableLineFadeIn) //TO DO: why???? Just do it!
-		//return;
-//	lineFadeInOn = isOn;
-//	if (lineFadeInOn) {
-	//	lineBuffer.setLineFadeIn(0); //create lines intitially zero faded-in
-		//busy = true;
-//	}
-	//else
-		//lineBuffer.setLineFadeIn(1.0); //create lines fully drawn
-}
+
 
 /** Clear all text after the last bookmark, if it exists. */
 bool CGUIrichText::clearToBookMark() {

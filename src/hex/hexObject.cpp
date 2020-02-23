@@ -7,31 +7,29 @@
 
 #include <glm/gtc/matrix_transform.hpp>	
 
+#include "..\TC\Debug\tigConst.h" //temp!!!!
 
 CHexObject::CHexObject() {
 	moving = false;
-	isRobot = false;
+
 	worldPos = glm::vec3(0);
 	setZheight(0.05f);
-	action = actNone;
+
 	facing = hexEast;
 	rotation = 0.0f;
 	rotationalVelocity = 0.0f;
 	turning = false;
 	proximityCutoff = 0.15f;
 	moveSpeed = 7.0f;
-	lungeSpeed = 3.0f;
-	hitPoints = 1;
-	meleeDamage = 1;
+
+;
 
 	drawData = { &worldMatrix,&colour,buf };
 
 	buildWorldMatrix();
 }
 
-void CHexObject::setHexWorld(IhexObjectCallback* obj) {
-	hexWorld = obj;
-}
+
 
 void CHexObject::setHexRenderer(IHexRenderer* rendrObj) {
 	hexRendr = rendrObj;
@@ -82,7 +80,7 @@ void CHexObject::setDirection(THexDir direction) {
 /**	Initialise this object to start moving to the next hex on its current travel path when it gets
 	updated. This may include rotating to face that hex. */
 bool CHexObject::beginMove() {
-	if (travelPath.empty() || hexWorld->entityMovingTo(travelPath[0]) )
+	if (travelPath.empty() )
 		return false;
 	initMoveToAdjacent(travelPath[0]);
 	initTurnToAdjacent(travelPath[0]);
@@ -104,9 +102,7 @@ THexList& CHexObject::getTravelPath() {
 	return travelPath;
 }
 
-bool CHexObject::isResolvingSerialAction() {
-	return action & actSerial;
-}
+
 
 bool CHexObject::isNeighbour(CHex& position) {
 	return ::isNeighbour(hexPosition, position);
@@ -123,47 +119,13 @@ bool CHexObject::updateMove(float dT) {
 	return false;
 }
 
-void CHexObject::receiveDamage(CHexObject& attacker, int damage) {
-	hitPoints -= damage;
-}
+
 
 void CHexObject::draw(){
 	hexRendr->drawLines(drawData);
 }
 
 
-void CHexObject::calcTravelPath(CHex& target) {
-	//ordinarily, just find the path from where we are now.
-	//but if we've moving, makes sense that the new path will start
-	//where we end up
-	if (moving)
-		travelPath = hexWorld->calcPath(destination, target);
-	else
-		travelPath = hexWorld->calcPath(hexPosition,target);
-}
-
-/** Advance the lunge animation. */
-bool CHexObject::updateLunge(float dT) {
-	float lungeDistance = animCycle * 2.0f - 1.0f;
-	//float sign = lungeDistance > 0 ? 1.0f : -1.0f;
-
-	lungeDistance = 1.0f - pow(abs(lungeDistance), 0.6f);
-	lungeDistance *= hexWidth;
-	glm::vec3 lungeVec = moveVector * lungeDistance;
-
-	worldPos = cubeToWorldSpace(hexPosition) + lungeVec;
-	buildWorldMatrix();
-
-	animCycle += dT * lungeSpeed;
-	if (animCycle > 1.0f) {
-		setPosition(hexPosition); //ensures we don't drift.
-		hitTarget();
-		return false;
-	}
-	else {
-		return true;
-	}
-}
 
 /** Construct this object's world matrix from its known position and rotation.*/
 void CHexObject::buildWorldMatrix() {
@@ -182,10 +144,14 @@ void CHexObject::initMoveToAdjacent(CHex& adjacent) {
 	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
 }
 
-/** Initialise a rotation action to face the given hex. */
+//TO DO: need a function that returns the approximate direction for *any* hex
+	//not just an adjacent one
+/** Initialise a rotation action to face the given adjacent hex. */
 bool CHexObject::initTurnToAdjacent(CHex& adjacent) {
 	destinationAngle = 0;
 	destinationDirection = neighbourDirection(hexPosition, adjacent);
+	if (destinationDirection == hexNone)
+		return false;
 	float rotationDir = shortestRotation(facing, destinationDirection);
 	if (rotationDir == 0.0f)
 		return false;
@@ -214,10 +180,6 @@ bool CHexObject::updateRotation(float dT){
 	return true;
 }
 
-/** Deliver damage to our current target. */
-void CHexObject::hitTarget() {
-	attackTarget->receiveDamage(*this, meleeDamage);
-}
 
 /**	Apply dT seconds of the movement this object is undergoing. */
 bool CHexObject::updateMovement(float dT) {

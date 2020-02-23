@@ -60,7 +60,7 @@ public:
 	//void getTris(const glm::vec3& pos, TChunkVert*& buf, unsigned int& noTris);
 
 	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
-	void clearScrolledOutChunks(Tdirection face, int maxChunks);
+	void clearOuterLayerChunks(Tdirection face, int maxChunks);
 	void restoreClippedChunks(TBoxVolume& innerChunkVolume);
 	
 	int getChunkAt(glm::i32vec3& pos);

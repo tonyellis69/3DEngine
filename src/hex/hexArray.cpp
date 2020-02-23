@@ -39,10 +39,7 @@ void CHexArray::init(int w, int h) {
 	}
 }
 
-/** Provides a list of enities to check for collision with in pathfinding. */
-void CHexArray::setEntityList(TEntities* pEntities) {
-	entities = pEntities;
-}
+
 
 /** Return a reference to the hex at the given offset coordinates. */
 CHexElement& CHexArray::getHexOffset(int x, int y) {
@@ -249,12 +246,3 @@ THexList CHexArray::walkBack(CHex& start, CHex& end, TCameFrom& cameFrom) {
 	return path;
 }
 
-/** Returns true if there's an entity occupying this hex. */
-bool CHexArray::entityCheck(CHex& hex) {
-	for (auto entity : *entities) {
-		//if (entity->destination == hex)
-		if (entity->hexPosition == hex)
-			return true;
-	}
-	return false;
-}

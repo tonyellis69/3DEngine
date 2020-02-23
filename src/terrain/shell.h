@@ -34,7 +34,7 @@ public:
 	void reinitialiseFaceSCs(Tdirection face);
 	void addChunksToFaceSCs(Tdirection face);
 	void removeEncroachedOnChunks2(Tdirection face);
-	void removeScrolledOutChunks(Tdirection face);
+	void removeOutfaceChunks(Tdirection face);
 	void addInnerFaceChunks2(Tdirection face);
 
 	TBoxVolume calcInnerFaceSCVolume(Tdirection face);

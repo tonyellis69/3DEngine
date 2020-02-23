@@ -76,8 +76,6 @@ private:
 
 class IhexRendererCallback {
 	public:
-
-	virtual TEntities* getEntities() { return NULL; }
 	virtual CHexObject* getCursorObj() { return NULL; }
 	virtual THexList* getPlayerPath() { return NULL; }
 	virtual CHexObject* getPlayerObj() { return NULL; }

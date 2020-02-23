@@ -1,10 +1,10 @@
 #pragma once
 
 #include <vector>
-#include "..\Delegate.h"
-#include "..\renderer\texManager.h"
+#include "Delegate.h"
+#include "renderer\texManager.h"
 #include "font.h"
-#include "..\renderer\buf.h"
+#include "renderer\buf.h"
 #include "rowObject.h"
 #include "GUIdragDrop.h"
 #include "GUIstyleSheet.h"

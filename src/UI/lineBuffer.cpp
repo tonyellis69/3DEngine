@@ -49,6 +49,7 @@ bool CLineBuffer::isEmpty() {
 }
 
 TLineFragment CLineBuffer::finalFrag() {
+	
 	if (lines.empty()) {
 		return TLineFragment{ 0,0,0,0,0,0,0,no,0 };
 	}
