@@ -18,7 +18,6 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
 	prepForFirstText();
 	prepForScrolling();
 	setResizeMode(resizeByWidthMode);
-	initTextDelivery();
 }
 
 /** Append new text to the current body of text and show the updated page. */
@@ -32,7 +31,9 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 		}
 		setStyleChange(styleRec);
 	}
-	renderLineBuffer();
+
+	//createPage(); //shouldn't have to recompile page because of one added clause!
+
 	autoscrollingDown = true;
 }
 
@@ -256,7 +257,7 @@ void CGUIrichText::renderLineBuffer() {
 			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
 			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour * line.fadeInX };
 			//textBuf.addFragment(frag.renderStartX, frag.renderStartY, dataRec);
-			finalY = frag.renderStartY + frag.height;
+			//finalY = frag.renderStartY + frag.height;
 
 			//create an index of hot text fragments
 			if (currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
@@ -290,11 +291,12 @@ void CGUIrichText::renderLineBuffer() {
 
 /** Starting with the given line fragment, compile our text objects into line fragments 
 	until we run out or overflow the page. */
-void CGUIrichText::compileFragmentsToEnd(TLineFragment lineFragment) {
+void CGUIrichText::compileFragmentsToEnd(TPagePos fragmentStart) {
+	TLineFragment lineFragment = { fragmentStart.textPos.textObj,fragmentStart.textPos.pos,0,
+		0,0,fragmentStart.screenPos.x,no,0 };
 	do {
-		//lineFragment = getNextLineFragment(lineFragment);
-		//lineBuffer2.addTextSprite(lineFragment);
 		lineFragment = compileSingleLine(lineFragment);
+
 	} while (!lineFragment.finalFrag);
 }
 
@@ -313,96 +315,11 @@ TLineFragment CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
 
 /** Return the text fragment following the given one. */
 TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLineFrag) {
-	
-	TLineFragment nextLineFrag{}; //initialise all to 0
-	int textObj = currentLineFrag.textObj;
-		unsigned int textStartPos = currentLineFrag.textPos + currentLineFrag.textLength;
-			if (textStartPos >= textObjs[textObj].text.size()) {
-			if (textObj + 1 == textObjs.size()) {
-			nextLineFrag.finalFrag = true;
-			
-			return nextLineFrag;
-		}
-		textObj++;
-		textStartPos = 0;
-	}
-	
-	nextLineFrag.textObj = textObj;
-	nextLineFrag.textPos = textStartPos;
+	TLineFragment nextLineFrag = findNextFragmentStart(currentLineFrag);
+	if (nextLineFrag.finalFrag)
+		return nextLineFrag;
 
-	TRichTextRec* richTextData = &textObjs[textObj];
-
-	CFont* currentFont = pDrawFuncs->getFont(richTextData->style.font);
-
-	nextLineFrag.height = currentFont->lineHeight;
-
-	//didn't get here
-
-	//catch unbreakable full stops, etc, in the next object that could wrap this fragment onto the next line
-	//disqualify them, however, if they are preceeded by whitespace
-	int lookAheadCharWidth = 0;
-	if (textObj + 1 < textObjs.size()) {
-		char lookAheadChar = textObjs[textObj + 1].text[0];
-		if (ispunct(lookAheadChar) && textObjs[textObj].text.size() > 0 
-			&& !isspace(textObjs[textObj].text.back())   )
-			lookAheadCharWidth = currentFont->table[lookAheadChar]->width;
-	}
-
-
-	switch(currentLineFrag.causesNewLine) {
-		case(wordwrap): nextLineFrag.renderStartX = 0; break;
-		case(newline): nextLineFrag.renderStartX = richTextData->firstLineIndent; break;
-		case(no): nextLineFrag.renderStartX = currentLineFrag.renderEndX; break;
-	}
-	int renderX = nextLineFrag.renderStartX;
-
-	//didn't get here
-	
-
-	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
-	for (c = textStartPos; c < richTextData->text.size(); c++) {
-		unsigned char character = (unsigned char)richTextData->text[c];
-		renderX += currentFont->table[character]->width;
-		if (richTextData->text[c] == '\n') {
-			c++;
-			nextLineFrag.causesNewLine = newline;
-			break;
-		}
-		if ((isspace(character) || character == '-') && renderX > shortestSpaceBreak) {
-			breakPoint = c + 1;
-			breakPointX = renderX;
-			//break; //pretty sure this works without break as long as we go to next clause
-		}
-		if (renderX > getWidth() || renderX + lookAheadCharWidth > getWidth()) {
-			
-			if (breakPointX > 0) {
-				c = breakPoint;
-				renderX = breakPointX;
-				nextLineFrag.causesNewLine = wordwrap;
-				break;
-			}
-			else if (resizeMode == resizeNone)
-			{ ///////////////////////////////Experimental! not fully tested attempt to handle overlong lines
-				//Problem: prevents the pop-up menus from expanding to fit their contents
-				//solution: have a no-resizing mode
-				renderX = breakPointX;
-				nextLineFrag.causesNewLine = wordwrap;
-				break;
-
-			}
-
-		}
-
-
-	}
-
-	nextLineFrag.textLength = c - textStartPos;
-	nextLineFrag.renderEndX = renderX;
-	if (textObj + 1 == textObjs.size() && c == richTextData->text.size() )
-		nextLineFrag.finalFrag = true;
-
-	longestLine = std::max(longestLine, nextLineFrag.renderEndX);
-	
+	nextLineFrag = findFragmentEnd(nextLineFrag);
 	return nextLineFrag;
 }
 
@@ -469,9 +386,9 @@ bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 
 
 /** Return the first lineFragment of the previous line, if any. */
-TCharacterPos CGUIrichText::getPreviousLine(TCharacterPos& startText) {
-	int origStartText = startText.pos;
-	int origStartObject = startText.textObj;
+TCharacterPos CGUIrichText::getPreviousLine(TPagePos& startText) {
+	int origStartText = startText.textPos.pos;
+	int origStartObject = startText.textPos.textObj;
 
 	//find previous newline - we can work forward from ther
 	TCharacterPos prevNewline = getPrevNewline(origStartObject, origStartText - 1);//-1 ensures we skip a newline that caused this line
@@ -480,7 +397,7 @@ TCharacterPos CGUIrichText::getPreviousLine(TCharacterPos& startText) {
 
 
 	//any word wraps between here and where we started?
-	TLineFragment lineFragment{ prevNewline.textObj,prevNewline.pos,0,0,0,0,0,no,0 };
+	TLineFragment lineFragment{ prevNewline.textObj,prevNewline.pos,0,0,0,0,no,0 };
 	do {
 		if (lineFragment.causesNewLine == wordwrap) {
 			lastLineStart.pos = lineFragment.textPos + lineFragment.textLength;
@@ -753,15 +670,6 @@ void CGUIrichText::prepForScrolling() {
 	smoothScrollStep = 8;
 }
 
-/** Initialise line fade-in etc. */
-void CGUIrichText::initTextDelivery() {
-	charInterval = 0;
-	charDelay = 0.01f;
-	//nableLineFadeIn = false; // true; //TO DO scrap!!!
-	//lineFadeInOn = false;
-	//lineFadeSpeed = 1.0f;// 30;// 20.0f;
-}
-
 std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& styleRec) {
 	int cut = 0;
 	styleRec = { styleNone, 0, "" };
@@ -809,11 +717,110 @@ std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& sty
 /** Append newText to the current body of text and show the updated page. */
 void CGUIrichText::appendText(const std::string& newText) {
 	textObjs.back().text += newText;
-	//compileFragmentsToEnd(lineBuffer.finalFrag());
-	compileFragmentsToEnd(lineBuffer2.getFinalFrag());
+
+	if (newText == "A short first line. ")
+		int b = 0;
+
+	compileFragmentsToEnd(lineBuffer2.getPageEnd());
 
 	if (transcriptLog)
 		*transcriptLog << newText;
+}
+
+TLineFragment CGUIrichText::findNextFragmentStart(const TLineFragment& currentFragment) {
+	TLineFragment nextLineFrag{}; //initialise all to 0
+	int textObj = currentFragment.textObj;
+	unsigned int textStartPos = currentFragment.textPos + currentFragment.textLength;
+	if (textStartPos >= textObjs[textObj].text.size()) {
+		if (textObj + 1 == textObjs.size()) {
+			nextLineFrag.finalFrag = true;
+			return nextLineFrag;
+		}
+		textObj++;
+		textStartPos = 0;
+	}
+
+	nextLineFrag.textObj = textObj;
+	nextLineFrag.textPos = textStartPos;
+	nextLineFrag.renderStartX = findNextFragmentXPos(currentFragment);
+	return nextLineFrag;
+}
+
+/** Catch unbreakable full stops, etc, in the next object.
+	disqualify them, however, if they are preceeded by whitespace. */
+int CGUIrichText::findNextUnbreakableChar(int textObj, CFont* font) {
+	int unbreakableCharWidth = 0;
+	if (textObj + 1 < textObjs.size()) {
+		char lookAheadChar = textObjs[textObj + 1].text[0];
+		if (ispunct(lookAheadChar) && textObjs[textObj].text.size() > 0
+			&& !isspace(textObjs[textObj].text.back()))
+			unbreakableCharWidth = font->table[lookAheadChar]->width;
+	}
+	return unbreakableCharWidth;
+}
+
+int CGUIrichText::findNextFragmentXPos(const TLineFragment& currentLineFrag) {
+	switch (currentLineFrag.causesNewLine) {
+	case(wordwrap): return 0;
+	case(newline): return  textObjs[currentLineFrag.textObj].firstLineIndent;
+	case(no): return currentLineFrag.renderEndX;
+	}
+}
+
+TLineFragment CGUIrichText::findFragmentEnd( TLineFragment fragment) {
+	int textObj = fragment.textObj;
+	unsigned int textStartPos = fragment.textPos;
+	int renderX = fragment.renderStartX;
+
+	CFont* font = pDrawFuncs->getFont(textObjs[textObj].style.font);
+
+	std::string& text = textObjs[textObj].text;
+
+	int unbreakableCharWidth = findNextUnbreakableChar(textObj, font);
+	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
+	for (c = textStartPos; c < text.size(); c++) {
+		unsigned char character = (unsigned char)text[c];
+		renderX += font->table[character]->width;
+		if (text[c] == '\n') {
+			c++;
+			fragment.causesNewLine = newline;
+		//	fragment.renderStartX = 0;
+			break;
+		}
+		if ((isspace(character) || character == '-') && renderX > shortestSpaceBreak) {
+			breakPoint = c + 1;
+			breakPointX = renderX;
+			//break; //pretty sure this works without break as long as we go to next clause
+		}
+		if (renderX > getWidth() || renderX + unbreakableCharWidth > getWidth()) {
+
+			if (breakPointX > 0) {
+				c = breakPoint;
+				renderX = breakPointX;
+				fragment.causesNewLine = wordwrap;
+				break;
+			}
+			else if (resizeMode == resizeNone)
+			{ ///////////////////////////////Experimental! not fully tested attempt to handle overlong lines
+				//Problem: prevents the pop-up menus from expanding to fit their contents
+				//solution: have a no-resizing mode
+				renderX = breakPointX;
+				fragment.causesNewLine = wordwrap;
+				break;
+			}
+		}
+	}
+
+	fragment.textLength = c - textStartPos;
+	fragment.renderEndX = renderX;
+	if (textObj + 1 == textObjs.size() && c == text.size())
+		fragment.finalFrag = true;
+
+	fragment.height = font->lineHeight;
+
+	longestLine = std::max(longestLine, fragment.renderEndX);
+
+	return fragment;
 }
 
 
@@ -824,8 +831,9 @@ void CGUIrichText::initialisePage() {
 }
 
 void CGUIrichText::writePageToLineBuffer() {
-	TLineFragment startingFragment = { firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 };
-	compileFragmentsToEnd(startingFragment);
+	TPagePos pageStart;
+	pageStart.textPos = { firstVisibleObject, firstVisibleText };
+	compileFragmentsToEnd(pageStart);
 }
 
 void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
@@ -834,35 +842,31 @@ void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
 	}
 
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
-
 	lineBuffer2.onMouseMove(localMouse);
-
-	//TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//It might be simpler to just handle hot text change here
-	//instead of via callback as present. Any benefit to that?
-
-
-
-
-	//original process was:
-	//if (oldSelectedHotObj != selectedHotObj) {
-	//	msgHotTextChange(i32vec2{ mouseX,mouseY - distToFragTop });
-	//}
-
 }
 
 /** Attempt to scroll down by the given distance in pixels. */
 bool CGUIrichText::scrollDown2(int dist) {
 	while (lineBuffer2.getOverlap() < dist) {
+		
 		//add lines to bottom of lineBuffer if we can
 		//else break
-		TLineFragment finalFrag = lineBuffer2.getFinalFrag();
-		TCharacterPos endPos = lineBuffer2.getPageEnd();
-
-		compileSingleLine(finalFrag);
-
-		if (finalFrag.finalFrag)
+		
+		TPagePos endPos = lineBuffer2.getPageEnd();
+		//we recreate the previous fragment to provide a starting point
+		TLineFragment recreatedFrag;
+		//recreatedFrag.causesNewLine = finalFrag.causesNewLine;
+		recreatedFrag.causesNewLine = lineBuffer2.doesPageEndWithNewline() ? newline : no;
+		recreatedFrag.textObj = endPos.textPos.textObj;
+		recreatedFrag.textPos = endPos.textPos.pos;
+		recreatedFrag.textLength = 0;
+		recreatedFrag.finalFrag = true;
+	
+		recreatedFrag = compileSingleLine(recreatedFrag);
+		if (recreatedFrag.finalFrag)
 			break;
+		//TO DO all that needs to be returned is whether we've run out of text Objs
+		//can this be simplified?
 	}
 
 	int result = lineBuffer2.scrollDown(dist);
@@ -875,14 +879,14 @@ bool CGUIrichText::scrollUp2(int dist) {
 	while (lineBuffer2.getTopOverlap() < dist) {
 
 		TCharacterPos prevNewline = getPreviousLine(lineBuffer2.getPageStart());
-		if (prevNewline == lineBuffer2.getPageStart()) {
+		if (prevNewline == lineBuffer2.getPageStart().textPos) {
 			break;
 		}
 		//found previous line so make it our new first visible line
 		firstVisibleObject = prevNewline.textObj;
 		firstVisibleText = prevNewline.pos;
 		//insert line in line buffer
-		compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,0,no,0 });
+		compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,no,0 });
 	}
 	lineBuffer2.setAddFragmentsAtTop(false);
 	int result = lineBuffer2.scrollUp(dist);
@@ -906,10 +910,6 @@ void CGUIrichText::hotTextMouseOver(int hotId) {
 		return;
 
 	oldHotText = currentHotText;
-	if (currentHotText == -1) {
-		int b = 0;
-	}
-
 
 	i32vec2 localMouse = screenToLocalCoords(rootUI->mousePos.x, rootUI->mousePos.y);
 	int distToFragTop = 10;

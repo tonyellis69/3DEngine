@@ -9,13 +9,10 @@
 
 CLineBuffer2::CLineBuffer2() {
 	initShader();
-	clear();
-
 }
 
 CLineBuffer2::~CLineBuffer2() {
-	//for (auto &sprite : textSprites)
-//delete &sprite;
+
 	
 }
 
@@ -40,10 +37,10 @@ void CLineBuffer2::clear() {
 	textSprites.clear();
 	hotTexts.clear();
 	hotTextSprites.clear();
-	finalFrag = {0, 0, 0, 0, 0, 0, 0, no, true};
-	yPosTracker = 0;
-	pageStart.unset = true;
-	pageEnd.unset = true;
+	pageStart.screenPos = { 0,0 };
+	pageStart.textPos = { 0,0 };
+	pageEnd.screenPos = { 0,0 };
+	pageEnd.textPos = { 0,0 };
 	insertAtTop = false;
 	mousedHotText = -1;
 	prevMousedHotText = -1;
@@ -51,11 +48,10 @@ void CLineBuffer2::clear() {
 
 /**	Add this text fragment as a text sprite. */
 void CLineBuffer2::addTextSprite(TLineFragment& fragment) {
-	updatePageStartEnd(fragment);
 	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
-	updateFinalFrag(*sprite);
 	sprite->createTextImage(spriteBuffer.getBuffer());
 	textSprites.push_back(std::move(sprite));
+	recalcPageState();
 }
 
 void CLineBuffer2::draw() {
@@ -99,7 +95,6 @@ int CLineBuffer2::scrollDown(int scrollAmount) {
 int CLineBuffer2::scrollUp(int scrollAmount) {
 
 	//spriteBuffer.tmpSave();
-
 	int overlap = getTopOverlap();
 	int scrollAchieved = std::min(scrollAmount, overlap);
 
@@ -152,15 +147,12 @@ CRenderTexture* CLineBuffer2::getTextBuf() {
 	return &pageBuf;
 }
 
-TLineFragment CLineBuffer2::getFinalFrag() {
-	return finalFrag;
-}
 
-TCharacterPos CLineBuffer2::getPageStart() {
+TPagePos CLineBuffer2::getPageStart() {
 	return pageStart;
 }
 
-TCharacterPos CLineBuffer2::getPageEnd() {
+TPagePos CLineBuffer2::getPageEnd() {
 	return pageEnd;
 }
 
@@ -197,54 +189,54 @@ void CLineBuffer2::initShader() {
 	textSpriteShader.hAlpha = textSpriteShader.shader->getUniformHandle("alpha");
 }
 
-/* If necessary, update finalFrag, our record of the endmost page fragment, with the details of this sprite. 
-	finalFrag is used to find the next line of text when scrolling down. */
-void CLineBuffer2::updateFinalFrag(CTextSprite& sprite) {
-	if (sprite.textObj > finalFrag.textObj) {
-		finalFrag.textObj = sprite.textObj;
-		finalFrag.textPos = sprite.textPos;
-		finalFrag.textLength = sprite.textLength;
-	}
-	else if (sprite.textObj == finalFrag.textObj && sprite.textPos > finalFrag.textPos) {
-		finalFrag.textPos = sprite.textPos;
-		finalFrag.textLength = sprite.textLength;
-	}
-}
-
 /** Calculate the various characteristics of the page, such as pageStart and pageEnd. */
 void CLineBuffer2::recalcPageState() {
-	int earliestTextObj = INT_MAX; int earliesTextPos;
-	int latestTextObj = -1; int latestTextPos;
-	yPosTracker = -1;
-	finalFrag = { 0, 0, 0, 0, 0, 0, 0, no, true };
+	pageStart.textPos = { INT_MAX, 0 };
+	pageEnd.textPos = { -1, 0 };
+	pageEnd.screenPos.y = -1;
+	pageEndNewline = false;
 	std::set<unsigned int> hotFragTally;
 
+	//pageStart.setScreenX(0); //temp! Mostly true but better to calcualte
+
 	for (auto &sprite : textSprites) { 
-		if (sprite->positionOnPage.y + sprite->size.y < 0 || sprite->positionOnPage.y > height)
-			continue;
+		if (sprite->positionOnPage.y + sprite->size.y < 0 /*|| sprite->positionOnPage.y > height*/)
+				continue;
 
 		//find the text closest to the top left corner of the page
-		if (sprite->textObj < earliestTextObj) {
-			earliestTextObj = sprite->textObj;
-			earliesTextPos = sprite->textPos;
+		if (sprite->textObj < pageStart.textPos.textObj) {
+			pageStart.textPos = { sprite->textObj, sprite->textPos };
+			pageStart.setScreenY(sprite->positionOnPage.y);
 		}
-		else if (sprite->textObj == earliestTextObj && sprite->textPos < earliesTextPos)
-			earliesTextPos = sprite->textPos;
+		else if (sprite->textObj == pageStart.textPos.textObj && sprite->textPos < pageStart.textPos.pos) {
+			pageStart.textPos.pos = sprite->textPos;
+			pageStart.setScreenY(sprite->positionOnPage.y);
+		}
 
 		//find the text closest to the bottom right corner of the page
-		if (sprite->textObj > latestTextObj) {
-			latestTextObj = sprite->textObj;
-			latestTextPos = sprite->textEnd;
+		if (sprite->textObj > pageEnd.textPos.textObj) {
+			pageEnd.textPos = { sprite->textObj,sprite->textEnd };
+			pageEnd.setScreenX(sprite->positionOnPage.x + sprite->size.x);
+			pageEndNewline = sprite->causesNewLine;
 		}
-		else if (sprite->textObj == latestTextObj && sprite->textEnd < latestTextPos)
-			latestTextPos = sprite->textEnd;
+		else if (sprite->textObj == pageEnd.textPos.textObj && sprite->textEnd > pageEnd.textPos.pos) {
+			pageEnd.textPos.pos = sprite->textEnd;
+			pageEnd.setScreenX(sprite->positionOnPage.x + sprite->size.x);
+			pageEndNewline = sprite->causesNewLine;
+		}
 
-		yPosTracker = std::max(yPosTracker, sprite->positionOnPage.y + sprite->size.y);
-		updateFinalFrag(*sprite);
+		if (sprite->positionOnPage.y >= pageEnd.screenPos.y) {
+			pageEnd.screenPos.y = sprite->positionOnPage.y;
+			if (sprite->causesNewLine) 
+				pageEnd.screenPos.y += sprite->size.y;
+		}
+
+		if (sprite->causesNewLine) {
+			pageEnd.setScreenX(0);
+		}
+
 		hotFragTally.insert(sprite->getHotId());
 	}
-	pageStart = { earliestTextObj, earliesTextPos };
-	pageEnd = { latestTextObj, latestTextPos };
 
 	for (auto hotFrag = hotTexts.begin(); hotFrag != hotTexts.end(); ) {
 		if (hotFragTally.find(hotFrag->first) == hotFragTally.end() ) {
@@ -253,34 +245,8 @@ void CLineBuffer2::recalcPageState() {
 		else 
 			++hotFrag;		
 	}
-
-
 }
 
-/** Update pageStart and pageEnd if the given fragment invalidates the existing values. */
-void CLineBuffer2::updatePageStartEnd(TLineFragment& fragment) {
-	if (pageStart.unset)
-		pageStart.setPos(fragment.textObj, fragment.textPos);
-	else
-		if (TCharacterPos(fragment.textObj, fragment.textPos) < pageStart)
-			pageStart = TCharacterPos(fragment.textObj, fragment.textPos);
-
-	if (TCharacterPos(fragment.textObj, fragment.textPos + fragment.textLength) > pageEnd)
-		pageEnd.setPos(fragment.textObj, fragment.textPos + fragment.textLength);
-}
-
-/** Return the y position on the page at which this sprite should be drawn. */
-int CLineBuffer2::calcSpriteYpos(TLineFragment& fragment) {
-	int spriteYpos = yPosTracker;
-	if (insertAtTop) {
-		spriteYpos = -getTopOverlap() - fragment.height;
-	}
-	else {
-		if (fragment.causesNewLine)
-			yPosTracker += fragment.height;
-	}
-	return spriteYpos;
-}
 
 CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment) {
 	TRichTextRec textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
@@ -307,11 +273,18 @@ CTextSprite* CLineBuffer2::createSprite(TLineFragment& fragment) {
 
 	sprite->setTextObjData(fragment.textObj, fragment.textPos, fragment.textLength);
 	sprite->setPageOthoMatrix(&pageOrthoView);
-	sprite->setPagePosition(fragment.renderStartX, calcSpriteYpos(fragment));
+
+	if (insertAtTop) {
+		sprite->setPagePosition(0, pageStart.screenPos.y - fragment.height);
+	} else
+		sprite->setPagePosition(pageEnd.screenPos.x, pageEnd.screenPos.y);
+
 	sprite->setTextColour(textObj.style.colour);
 
 	sprite->setPageTexture(&pageBuf);
 	sprite->setShader(&textSpriteShader);
+
+	sprite->causesNewLine = fragment.causesNewLine;
 
 	return sprite;
 }
@@ -378,7 +351,7 @@ float CLineBuffer2::randomPeriod(float start) {
 
 /** Free whatever memory this hot text sprite is using. */
 void CLineBuffer2::freeHotTextSprite(CHotTextSprite* sprite) {
-	freeSpriteImageSpace(sprite->bufId);
+//	freeSpriteImageSpace(sprite->bufId); //dealt with by base destructor!
 	freeSpriteImageSpace(sprite->bufId2);
 
 	for (auto hotRec = hotTextSprites.begin(); hotRec != hotTextSprites.end(); ) {
@@ -389,8 +362,6 @@ void CLineBuffer2::freeHotTextSprite(CHotTextSprite* sprite) {
 		else
 			hotRec++;
 	}
-
-
 }
 
 void CLineBuffer2::onMousedHotTextChange() {

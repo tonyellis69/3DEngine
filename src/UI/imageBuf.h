@@ -29,6 +29,8 @@ public:
 
 	}
 
+	void debug();
+
 	CRenderTexture imageBuffer;
 
 	std::unordered_map<int, int> reservedBlocksPerRow;

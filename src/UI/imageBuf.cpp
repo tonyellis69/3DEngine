@@ -32,7 +32,6 @@ void C2DimageBuf::clear() {
 
 /** Reserve a chunk of image memory, and return the identifying id. */
 glm::i32vec2 C2DimageBuf::reserve( glm::i32vec2 size) {
-
 	size.x = std::min(size.x, imageBuffer.width);
 
 	int index = getFreeBlock(size);
@@ -42,7 +41,6 @@ glm::i32vec2 C2DimageBuf::reserve( glm::i32vec2 size) {
 
 	if (freeBlocks[index].size.x > size.x)
 		 splitVertical(index, size.x);
-
 
 	glm::i32vec2 addr = freeBlocks[index].start;
 	reservedBlocks2[addr] = freeBlocks[index];
@@ -64,6 +62,12 @@ void C2DimageBuf::free(glm::i32vec2& start)  {
 	reservedBlocksPerRow[start.y]--;
 	if (reservedBlocksPerRow[start.y] == 0)
 		mergeFreeBlocks(start.y);
+
+}
+
+void C2DimageBuf::debug()
+{
+
 }
 
 /** Return the index in freeBlocks of a free memory block >= size. */

@@ -67,8 +67,7 @@ public:
 	void createPage();
 	void updateFragmentPositions();
 	void renderLineBuffer();
-	void compileFragmentsToEnd(TLineFragment lineFragment);
-
+	void compileFragmentsToEnd(TPagePos fragmentStart);
 	TLineFragment compileSingleLine(TLineFragment lineFragment);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
 	bool OnMouseMove(const int mouseX, const int mouseY, int key);
@@ -82,7 +81,7 @@ public:
 	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
 
 
-	TCharacterPos getPreviousLine(TCharacterPos& startText);
+	TCharacterPos getPreviousLine(TPagePos& startText);
 
 	TCharacterPos getPrevNewline(int textObj, int pos);
 	void update(float dT);
@@ -191,15 +190,20 @@ public:
 	//bool enableLineFadeIn; ///<False = line fade-in not allowed at all.
 	//bool lineFadeInOn; ///<Each line will be faded in instead of drawn instantly.
 	//float lineFadeSpeed; ///<Around 260. Smaller is slower
-
+	CLineBuffer2 lineBuffer2;
 private:
 	void prepForFirstText();
 	void prepForScrolling();
-	void initTextDelivery();
+
 
 	std::string findNextTag( std::string& remainingTxt, TStyleRec& styleRec);
 	void setStyleChange(TStyleRec& styleRec);
 	void appendText(const std::string& newText);
+
+	TLineFragment findNextFragmentStart(const TLineFragment& fragment);
+	int findNextUnbreakableChar(int textObj, CFont* font);
+	int findNextFragmentXPos(const TLineFragment& fragment);
+	TLineFragment findFragmentEnd( TLineFragment fragment);
 
 
 	void initialisePage();
@@ -219,7 +223,7 @@ private:
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
 
-	CLineBuffer2 lineBuffer2;
+	
 	bool autoscrollingDown; ///<If true, we scroll down if there's any text below.
 
 	float dT;

@@ -56,6 +56,7 @@ public:
 	int textPos;
 	int textEnd;
 	int textLength;
+	bool causesNewLine;
 
 protected:
 	CRenderer* pRenderer;

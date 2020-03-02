@@ -10,7 +10,7 @@
 CTextSprite::CTextSprite() {
 	pRenderer = &CRenderer::getInstance();
 	bufId = { INT_MAX,INT_MAX };
-	
+	causesNewLine = false;
 }
 
 CTextSprite::~CTextSprite() {

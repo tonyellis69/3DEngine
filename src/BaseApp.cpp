@@ -66,6 +66,9 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	//pTimer = &Engine.Time; //last vestige of watch.h - get rid of!
 	initLogWindow();
 
+	//TO DO: temp
+	//logWindow->setVisible(true);
+
 	vm.setApp(this);
 
 	sysLog <<  "BaseApp constructor finished. Yay!\n";

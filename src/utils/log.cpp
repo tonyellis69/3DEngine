@@ -63,3 +63,9 @@ CLog& operator<<(CLog& log, const glm::i32vec3& in) {
 	return log;
 }
 
+CLog& operator<<(CLog& log, const glm::i32vec2& in) {
+	log.ss << "x " << in.x << " y " << in.y;
+	return log;
+}
+
+

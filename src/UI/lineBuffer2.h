@@ -38,18 +38,21 @@ public:
 	int getUnderrun();
 	int getTopOverlap();
 	CRenderTexture* getTextBuf();
-	TLineFragment getFinalFrag();
-	TCharacterPos getPageStart();
-	TCharacterPos getPageEnd();
+	TPagePos getPageStart();
+	TPagePos getPageEnd();
 	void setAddFragmentsAtTop(bool onOff);
 	void onMouseMove(glm::i32vec2& mousePos);
+	bool doesPageEndWithNewline() {
+		return pageEndNewline;
+	}
+
+	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
+
+
 
 private:
 	void initShader();
-	void updateFinalFrag(CTextSprite& sprite);
 	void recalcPageState();
-	void updatePageStartEnd(TLineFragment& fragment);
-	int calcSpriteYpos(TLineFragment& fragment);
 	CTextSprite* createSprite(TLineFragment& fragment);
 	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
 	void freeSpriteImageSpace(glm::i32vec2& bufId);
@@ -60,8 +63,8 @@ private:
 	void freeHotTextSprite(CHotTextSprite* sprite);
 	void onMousedHotTextChange();
 
-	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
-
+		
+	
 	CRenderTexture pageBuf; ///The buffer we're drawing text sprites on.
 	
 	int width;
@@ -76,11 +79,9 @@ private:
 	TTextSpriteShader textSpriteShader;
 	glm::mat4 pageOrthoView;
 
-	TLineFragment finalFrag;
+	TPagePos pageStart; ///<Identifies where in the textObjs this page starts.
+	TPagePos pageEnd;  ///<Identifies where in the textObjs this page ends.
 
-	int yPosTracker; ///<Tracks how far down the page we've got
-	TCharacterPos pageStart; ///<Identifies where in the textObjs this page starts.
-	TCharacterPos pageEnd; ///<Identifies where in the textObjs this page ends.
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
 
 	std::map<unsigned int, THotState> hotTexts; ///<The hotIds and periods of all displayed hot texts
@@ -90,6 +91,8 @@ private:
 
 	int mousedHotText;
 	int prevMousedHotText;
+
+	bool pageEndNewline; ///<Records if page ends by forcing a newline.
 };
 
 class ILineBuffer {

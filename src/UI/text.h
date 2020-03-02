@@ -36,7 +36,6 @@ struct TLineFragment {
 	int textPos;
 	int textLength;
 	int renderStartX;
-	int renderStartY;
 	int height;
 	int renderEndX;
 	TNewLine causesNewLine;
@@ -101,4 +100,22 @@ public:
 	}
 	bool operator<(const TCharacterPos& rhs);
 	bool operator>(const TCharacterPos& rhs);
+};
+
+class TPagePos {
+public:
+	TPagePos() { textPos = { 0,0 }; screenPos = { 0,0 }; }
+	void setScreenX(int x) {
+		screenPos.x = x;
+		
+	}
+	void setScreenY(int y) {
+		screenPos.y = y;
+	}
+	TCharacterPos textPos;
+	glm::i32vec2 screenPos;
+
+private:
+	
+
 };

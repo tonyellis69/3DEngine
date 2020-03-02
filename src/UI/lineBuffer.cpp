@@ -51,7 +51,7 @@ bool CLineBuffer::isEmpty() {
 TLineFragment CLineBuffer::finalFrag() {
 	
 	if (lines.empty()) {
-		return TLineFragment{ 0,0,0,0,0,0,0,no,0 };
+		return TLineFragment{ 0,0,0,0,0,0,no,0 };
 	}
 	
 	return frags[lines.back().fragments.back()];
@@ -60,13 +60,14 @@ TLineFragment CLineBuffer::finalFrag() {
 
 /** Update the positions of all fragments based on scroll offset etc */
 void CLineBuffer::updateFragmentPositions() {
-	int lineY = 0;
+/*	int lineY = 0;
 	for (auto &line : lines) {
 		for (auto fragId : line.fragments) {
 			frags[fragId].renderStartY = lineY + yOffset;
 		}
 		lineY += line.height;
 	}
+	*/
 }
 
 void CLineBuffer::setYoffset(int value) {
