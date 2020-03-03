@@ -374,9 +374,6 @@
     <ClCompile Include="..\src\renderer\material2.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\lineBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\terrain\chunk2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -407,9 +404,6 @@
     <ClCompile Include="..\src\renderer\multiBuf2.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\lineBuffer2.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\imageBuf.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -424,6 +418,9 @@
     </ClCompile>
     <ClCompile Include="..\..\VMtest\src\tigObj.cpp">
       <Filter>vm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\lineBuffer.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -787,9 +784,6 @@
     <ClInclude Include="..\src\terrain\chunk2.h">
       <Filter>terrain2</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\lineBuffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\physics\terrainPhysObj2.h">
       <Filter>physics</Filter>
     </ClInclude>
@@ -826,9 +820,6 @@
     <ClInclude Include="..\src\renderer\multiBuf2.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\lineBuffer2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\imageBuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -854,6 +845,9 @@
       <Filter>vm</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\iGuiMsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\lineBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

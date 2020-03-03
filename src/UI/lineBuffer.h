@@ -1,80 +1,109 @@
 #pragma once
 
-#include <vector>
+#include <random>
 
+//include "../renderer/renderer.h"
 #include "text.h"
+#include "imageBuf.h"
+#include "textSprite.h"
+#include "../renderer/shader.h"
 
-//enum TNewLine { no, wordwrap, newline };
-/** A partial or complete line of text, with its rendered (x) dimensions. 
-struct TLineFragment {
-	int textObj;
-	int textPos;
-	int textLength;
-	int renderStartX;
-	int renderStartY;
-	int height;
-	int renderEndX;
-	TNewLine causesNewLine;
-	bool finalFrag;
-};
-*/
-
-struct TLine  {
-	int height; int width;
-	std::vector<int> fragments;
-	float fadeInX;
+struct THotRec {
+	CHotTextSprite* sprite;
+	unsigned int hotId;
 };
 
-struct TFragPos {
-	int fragId;
-	int lineNo;
+enum TSelectionState {selNone,selWarmup,selLit, selWarmdown};
+struct THotState {
+	float period;
+	TSelectionState selectionState;
 };
 
-/** A data structure for maintaining line fragments, referenced by index. */
-class CLineBuffer {
+class ILineBuffer;
+/** A class that draws multiple blocks of text to a texture buffer for output,
+	in real-time, employing whatever effects these blocks require. */
+class CLineBuffer : public ITextSpriteCallback {
 public:
 	CLineBuffer();
+	~CLineBuffer();
+	void setCallbackObj(ILineBuffer* obj);
+	void setPageSize(int width, int height);
 	void clear();
-	void addLine();
-	void appendLine(TLine& line);
-	void appendFragment(int  fragId);
-	bool isEmpty();
-	TLineFragment finalFrag();
-	void updateFragmentPositions();
-	void setYoffset(int value);
-	void adjustYoffset(int adjust);
-	int getFinalRow() {
-		return lines.size() - 1;
-	}
-	int getLineBase(int lineNo);
-	int getLineTop(int lineNo);
-	void removeLine(int lineNo);
-	TLine& getLine(int lineNo);
-	void insert(int slot, TLine& line);
-	void initFrags();
-	int getFreeFragment();
-	int copyFragment(TLineFragment& fragment);
-	TLineFragment& getFragment(int id) {
-		return frags[id];
-	}
-	int getYextent();
-	TLineFragment& trimTop(int dist);
-	std::vector<TLineFragment>& getFrags() {
-		return frags;
-	}
-	TFragPos getFirstFrag(int objNo);
-	TFragPos getLastFrag(int objNo);
-	void removeObjLine(int objNo);
-	void setLineFadeIn(float fadeIn) {
-		lineFadeIn = fadeIn;
+	void addTextSprite(TLineFragment& fragment);
+	void draw();
+	void renderSprites(float dT);
+	int scrollDown(int scrollAmount);
+	int scrollUp(int scrollAmount);
+	int getOverlap();
+	int getUnderrun();
+	int getTopOverlap();
+	CRenderTexture* getTextBuf();
+	TPagePos getPageStart();
+	TPagePos getPageEnd();
+	void setAddFragmentsAtTop(bool onOff);
+	void onMouseMove(glm::i32vec2& mousePos);
+	bool doesPageEndWithNewline() {
+		return pageEndNewline;
 	}
 
-	std::vector<TLine> lines;
+	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
-	int yOffset; ///<Vertical adjustment for fragments.
 
-	std::vector<TLineFragment> frags;
-	std::vector<int> freeFrags;
 
-	float lineFadeIn; ///<Extent of fade-in for added lines. 
+private:
+	void initShader();
+	void recalcPageState();
+	CTextSprite* createSprite(TLineFragment& fragment);
+	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
+	void freeSpriteImageSpace(glm::i32vec2& bufId);
+	glm::vec4 getHotTextColour();
+	void updateHotTextPeriods(float dT);
+	float getHotPeriod(unsigned int hotId);
+	float randomPeriod(float start);
+	void freeHotTextSprite(CHotTextSprite* sprite);
+	void onMousedHotTextChange();
+
+		
+	
+	CRenderTexture pageBuf; ///The buffer we're drawing text sprites on.
+	
+	int width;
+	int height;
+
+	ILineBuffer* pCallbackObj;
+	CRenderer* pRenderer;
+
+	//std::vector<CTextSprite*> textSprites;
+	std::vector< std::unique_ptr<CTextSprite> > textSprites;
+
+	TTextSpriteShader textSpriteShader;
+	glm::mat4 pageOrthoView;
+
+	TPagePos pageStart; ///<Identifies where in the textObjs this page starts.
+	TPagePos pageEnd;  ///<Identifies where in the textObjs this page ends.
+
+	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
+
+	std::map<unsigned int, THotState> hotTexts; ///<The hotIds and periods of all displayed hot texts
+	std::vector<THotRec> hotTextSprites; ///<Pointers to and hot ids of all hot text sprites
+
+	std::mt19937 randEngine;
+
+	int mousedHotText;
+	int prevMousedHotText;
+
+	bool pageEndNewline; ///<Records if page ends by forcing a newline.
 };
+
+class ILineBuffer {
+public:
+	virtual TRichTextRec& getTexObjCallback(int objNo) = 0;
+	virtual glm::vec4& getHotTextColour() = 0;
+	virtual glm::vec4& getHotTextSelectedColour() = 0;
+	virtual void hotTextMouseOver(int hotId) = 0;
+};
+
+
+
+
+

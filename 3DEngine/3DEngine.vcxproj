@@ -209,7 +209,6 @@
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
     <ClCompile Include="..\src\UI\imageBuf.cpp" />
     <ClCompile Include="..\src\UI\lineBuffer.cpp" />
-    <ClCompile Include="..\src\UI\lineBuffer2.cpp" />
     <ClCompile Include="..\src\UI\rowObject.cpp" />
     <ClCompile Include="..\src\UI\text.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
@@ -354,7 +353,6 @@
     <ClInclude Include="..\src\UI\iGuiMsg.h" />
     <ClInclude Include="..\src\UI\imageBuf.h" />
     <ClInclude Include="..\src\UI\lineBuffer.h" />
-    <ClInclude Include="..\src\UI\lineBuffer2.h" />
     <ClInclude Include="..\src\UI\rowObject.h" />
     <ClInclude Include="..\src\UI\text.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />

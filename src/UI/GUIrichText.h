@@ -2,9 +2,11 @@
 
 #include <random>
 
-#include "GUIlabel2.h"
+#include "font.h"
+
+#include "GUIbase.h"
+
 #include "lineBuffer.h"
-#include "lineBuffer2.h"
 #include "..\3DEngine\src\utils\log.h"
 
 #include "text.h"
@@ -24,15 +26,10 @@ struct TStyleRec {
 
 
 enum TTextDelivery { noDelivery, byClause, byCharacter };
-
 enum TTempText {tempNone,tempOn,tempOff };
-
-
-
 enum TOverrunMode {overScrollMode, overResizeMode};
 enum TResizeMode {resizeByRatioMode, resizeByWidthMode, resizeNone };
 
-;
 
 /** Records the id and other details of a fragment used for special
 	effects, such as hot text. */
@@ -65,8 +62,6 @@ public:
 	void setText(std::string newText);
 
 	void createPage();
-	void updateFragmentPositions();
-	void renderLineBuffer();
 	void compileFragmentsToEnd(TPagePos fragmentStart);
 	TLineFragment compileSingleLine(TLineFragment lineFragment);
 	TLineFragment getNextLineFragment(const TLineFragment & currentLineFragment);
@@ -179,18 +174,7 @@ public:
 	float charInterval;
 	float charDelay;
 
-	CLineBuffer lineBuffer; ///<Holds the current line fragments, organised into lines.
-
-	//std::vector<TFXfragment> hotFrags; ///<Indexes of fragments that are hot text.
-	//std::vector<TFXfragment> fadeFrags2; ///<Currently visible fade-in text fragments
-	
-	//int gapObj; ///<Current gap obj if any.
-
-
-	//bool enableLineFadeIn; ///<False = line fade-in not allowed at all.
-	//bool lineFadeInOn; ///<Each line will be faded in instead of drawn instantly.
-	//float lineFadeSpeed; ///<Around 260. Smaller is slower
-	CLineBuffer2 lineBuffer2;
+	CLineBuffer lineBuffer2;
 private:
 	void prepForFirstText();
 	void prepForScrolling();

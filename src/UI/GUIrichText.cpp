@@ -41,7 +41,6 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 void CGUIrichText::createPage() {
 	initialisePage();
 	writePageToLineBuffer();
-	renderLineBuffer();
 }
 
 void CGUIrichText::applyStyleSheet() {
@@ -222,72 +221,7 @@ void CGUIrichText::setText(std::string newText) {
 }
 
 
-/** Update the position details of each fragment, based on line number, line height, and scroll offset. */
-void CGUIrichText::updateFragmentPositions() {
-	lineBuffer.updateFragmentPositions();
-}
 
-/** Draw all current line fragments to the text display buffer. */
-void CGUIrichText::renderLineBuffer() {
-	return;
-	//overrunningPixels = 0;
-	if (lineBuffer.isEmpty())
-		return;
-
-	updateFragmentPositions();//TO DO: temp!!!! only do after a change, not every time we update text buffer
-	//hotFrags.clear();
-	//fadeFrags2.clear();
-	
-
-	int currObjNo = lineBuffer.frags[lineBuffer.getLine(0).fragments[0]].textObj;
-	int finalY = 0; int lineNo = 0;
-	for (auto line : lineBuffer.lines) {
-		for (auto fragId: line.fragments) {
-			TLineFragment& frag = lineBuffer.getFragment(fragId);
-			if (frag.textObj != currObjNo) { //is this line fragment the start of a new text object?
-				//if (textBuf.notEmpty()) { //yes? Render the last of the old text object (if any) before we go any further
-					//textBuf.render();
-					//textBuf.init(KEEP_EXISTING_IMAGE);
-				//}
-				currObjNo = frag.textObj;
-			}
-
-			TRichTextRec currentObj = textObjs[frag.textObj];
-			std::string renderLine = currentObj.text.substr(frag.textPos, frag.textLength);
-			CFont* currentFont = pDrawFuncs->getFont(currentObj.style.font);
-			TLineFragDrawRec dataRec = { &renderLine, currentFont, currentObj.style.colour * line.fadeInX };
-			//textBuf.addFragment(frag.renderStartX, frag.renderStartY, dataRec);
-			//finalY = frag.renderStartY + frag.height;
-
-			//create an index of hot text fragments
-			if (currentObj.hotId && !(currentObj.flags & richSuspended) && renderLine[0] != '\n') {
-				
-				//hotFrags.push_back({ fragId,renderLine, frag.textObj });
-				textObjs[currentTextObj].period = randomPeriod(randEngine);
-			}
-
-			//create an index of fade-in fragments
-			if (currentObj.flags & richFadeIn && currentObj.period < 1 && renderLine[0] != '\n') {
-				//fadeFrags2.push_back({ fragId,renderLine, frag.textObj });
-				textObjs[currentTextObj].period = 0;
-			}
-
-			//track gaps - lazily assuming there's only one for now
-			if (currentObj.flags & richGap) {
-				//gapObj = frag.textObj;
-				currentObj.lineRef = lineNo;
-			}
-		}
-		lineNo++;
-
-	}
-	if (finalY > getHeight()) {
-		;//overrunningPixels = finalY - getHeight();
-	}
-
-
-	//textBuf.render();
-}
 
 /** Starting with the given line fragment, compile our text objects into line fragments 
 	until we run out or overflow the page. */
@@ -826,7 +760,6 @@ TLineFragment CGUIrichText::findFragmentEnd( TLineFragment fragment) {
 
 void CGUIrichText::initialisePage() {
 	longestLine = 0;
-	lineBuffer.clear();
 	lineBuffer2.setPageSize(getWidth(), getHeight());
 }
 
@@ -1033,7 +966,7 @@ bool CGUIrichText::collapseTempText() {
 		return false;
 	removeTempText();
 	//createPage();
-	renderLineBuffer();
+	//renderLineBuffer();
 	return true;
 }
 
@@ -1058,7 +991,7 @@ bool CGUIrichText::solidifyTempText() {
 				//we don't and shouldn't record it internally.
 			}
 			if (obj == 0 || !(textObjs[obj - 1].flags & richTemp)) {
-				renderLineBuffer();
+				//renderLineBuffer();
 				break;
 			}
 		}
@@ -1082,7 +1015,7 @@ void CGUIrichText::unhotDuplicates() {
 
 	}
 	//updatePage();
-	renderLineBuffer();
+	//renderLineBuffer();
 }
 
 //TO DO: scrap asap
@@ -1126,7 +1059,7 @@ void CGUIrichText::deliverByCharacter(float dT) {
 
 	//appendMarkedUpText(text);
 	textObjs.back().text += text;
-	renderLineBuffer();
+	//renderLineBuffer();
 }
 
 
