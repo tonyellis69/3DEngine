@@ -224,25 +224,28 @@ void CGUIrichText::setText(std::string newText) {
 
 
 /** Starting with the given line fragment, compile our text objects into line fragments 
-	until we run out or overflow the page. */
+	until we run out, or overflow the page. */
 void CGUIrichText::compileFragmentsToEnd(TPagePos fragmentStart) {
 	TLineFragment lineFragment = { fragmentStart.textPos.textObj,fragmentStart.textPos.pos,0,
 		0,0,fragmentStart.screenPos.x,no,0 };
+	
 	do {
 		lineFragment = compileSingleLine(lineFragment);
 
-	} while (!lineFragment.finalFrag);
+	} while (!lineFragment.finalFrag);  //check if rwHead = eof here instead
 }
 
 
 /** Create one line of line fragments from our text, starting after the given one. */
 TLineFragment CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
-	do {
+	//set interal rwHead to TPagePos.textPos here
+
+	do { //check for rwHead = eof 
 		lineFragment = getNextLineFragment(lineFragment);
-		if (lineFragment.finalFrag && lineFragment.textLength == 0)
+		if (lineFragment.finalFrag && lineFragment.textLength == 0) //can prob scrap
 			break;
 		lineBuffer2.addTextSprite(lineFragment);
-	} while (lineFragment.causesNewLine == no);
+	} while (lineFragment.causesNewLine == no); //move check inside loop
 	return lineFragment;
 }
 
@@ -250,8 +253,10 @@ TLineFragment CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
 /** Return the text fragment following the given one. */
 TLineFragment CGUIrichText::getNextLineFragment(const TLineFragment& currentLineFrag) {
 	TLineFragment nextLineFrag = findNextFragmentStart(currentLineFrag);
-	if (nextLineFrag.finalFrag)
-		return nextLineFrag;
+	if (nextLineFrag.finalFrag) //return now to avoid parsing beyond end of text
+		return nextLineFrag; //this check should be redundant once we check for eof before we call
+
+
 
 	nextLineFrag = findFragmentEnd(nextLineFrag);
 	return nextLineFrag;
@@ -384,15 +389,6 @@ void CGUIrichText::update(float dT) {
 
 bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
 	int direction = wheelDelta > 0 ? 1 : -1;
-	/*if (selectedHotObj != -1) {
-		CMessage msg;
-		msg.Msg = uiMouseWheel;
-	//	msg.value = textObjs[selectedHotObj].hotId;
-		msg.value2 = direction;
-		pDrawFuncs->handleUImsg(*this, msg);
-		return true;
-	}
-	*/
 	smoothScroll(direction * smoothScrollStep);
 	return true;
 }
@@ -652,9 +648,6 @@ std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& sty
 void CGUIrichText::appendText(const std::string& newText) {
 	textObjs.back().text += newText;
 
-	if (newText == "A short first line. ")
-		int b = 0;
-
 	compileFragmentsToEnd(lineBuffer2.getPageEnd());
 
 	if (transcriptLog)
@@ -665,14 +658,19 @@ TLineFragment CGUIrichText::findNextFragmentStart(const TLineFragment& currentFr
 	TLineFragment nextLineFrag{}; //initialise all to 0
 	int textObj = currentFragment.textObj;
 	unsigned int textStartPos = currentFragment.textPos + currentFragment.textLength;
+
+	//advance rwHead here - we'll have already checked we're not at text end
+
 	if (textStartPos >= textObjs[textObj].text.size()) {
-		if (textObj + 1 == textObjs.size()) {
+		if (textObj + 1 == textObjs.size()) { //this test should become redundant
 			nextLineFrag.finalFrag = true;
 			return nextLineFrag;
 		}
 		textObj++;
 		textStartPos = 0;
 	}
+
+	
 
 	nextLineFrag.textObj = textObj;
 	nextLineFrag.textPos = textStartPos;

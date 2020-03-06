@@ -34,7 +34,7 @@ CHex CHex::operator-(CHex& hex2) {
 }
 
 bool CHex::operator==(CHex& hex2) {
-	return (x == hex2.x) && (y == hex2.y) && (z == hex2.z);
+	return (x == hex2.x && y == hex2.y && z == hex2.z);
 }
 
 bool CHex::operator!=(CHex& hex2) {
