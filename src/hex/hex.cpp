@@ -211,3 +211,11 @@ float shortestRotation(THexDir start, THexDir end) {
 
 	return dist * M_PI / 3.0f;
 }
+
+/** Return the angle the end hex lies at, relative to the start hex. */
+float hexAngle(CHex& start, CHex& end) {
+	glm::vec3 angleVec = cubeToWorldSpace(end) - cubeToWorldSpace(start);
+	angleVec = glm::normalize(angleVec);
+	
+	return glm::acos(glm::dot(angleVec,glm::vec3(1,0,0)) );
+}

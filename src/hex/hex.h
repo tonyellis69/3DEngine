@@ -11,7 +11,7 @@
 enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE, hexNone};
 static glm::i32vec3 moveVectorCube[]{ {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0,1,-1}, {1,0,-1} };
 
-const float hexWidth = sqrt(3);
+const float hexWidth = sqrt(3.0f);
 const float hexHeight = 2;
 
 static glm::vec3 moveVector3D[]{ {hexWidth,0,0}, {hexWidth * 0.5f,-1.5f,0}, 
@@ -58,3 +58,4 @@ glm::vec3 directionToVec(THexDir direction);
 CHex getNeighbour(CHex& hex, THexDir direction);
 bool badHex(CHex& hex);
 float shortestRotation(THexDir start, THexDir end);
+float hexAngle(CHex& start, CHex& end);

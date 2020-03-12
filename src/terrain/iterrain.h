@@ -23,18 +23,19 @@ public:
 
 };
 
-class ITerrainCallback {
+class ITerrain {
 public:
 	virtual void realignOuterShells(int shell, Tdirection moveDirection) = 0;
 	
 	virtual void recentreOuterShells(int shellNo, Tdirection moveDirection) = 0;
 	virtual void scrollSampleSpace(Tdirection scrollDir, float shift) = 0;
 
-	virtual void preScrollUpdate(int shellNo, Tdirection direction) = 0;
+	virtual void shellPreScrollUpdate(int shellNo, Tdirection direction) = 0;
 	virtual glm::i32vec3 getChunkIndex(int chunkId) = 0;
 	virtual int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos) = 0;
 	virtual void removeChunk(int id) = 0;
 	virtual glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex) = 0;
 	virtual void scrollViewpoint(Tdirection scrollDir) = 0;
 	virtual void rebuildOuterShell(int shellNo, Tdirection scrollOutFace) = 0;
+	virtual ITerrainAppCallback* getTerrainApp() = 0;
 };

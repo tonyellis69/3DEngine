@@ -12,7 +12,7 @@ using namespace glm;
 ITerrainAppCallback* CSuperChunk2::pCallbackApp = NULL;
 CTerrain2* CSuperChunk2::pTerrain;
 
-void CSuperChunk2::checkForIntersection() {
+void CSuperChunk2::checkForTerrainIntersection() {
 	isEmpty = pCallbackApp->scIntersectionCheckCallback(sampleSpacePos, sampleSize);
 }
 
@@ -29,7 +29,7 @@ void CSuperChunk2::setCallbackApp(ITerrainAppCallback * pApp) {
 	pCallbackApp = pApp;
 }
 
-void CSuperChunk2::setTerrainCallback(ITerrainCallback* pTerrain) {
+void CSuperChunk2::setTerrainCallback(ITerrain* pTerrain) {
 	pTerrainObj = pTerrain;
 }
 

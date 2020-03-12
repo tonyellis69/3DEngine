@@ -203,6 +203,8 @@ private:
 
 	void hotTextMouseOver(int hotId);
 
+	bool endOfText(TCharacterPos textPos);
+
 
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.
@@ -214,4 +216,6 @@ private:
 
 	int oldHotText;
 	int currentHotText;
+
+	TCharacterPos readPoint; ///<Where we've got in text while finding fragments.
 };

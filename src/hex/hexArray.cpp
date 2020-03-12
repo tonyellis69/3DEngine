@@ -232,6 +232,28 @@ bool CHexArray::outsideArray(CHex& hex) {
 	return false;
 }
 
+/** Returns the hex at which the line from start, passing through target,
+	hits a solid object. */
+CHex CHexArray::findLineEnd(CHex& start, CHex& target) {
+	int N = cubeDistance(start, target);
+
+	glm::vec3 A(start.x, start.y, start.z);
+	A += glm::vec3(1e-6, 2e-6, -3e-6);
+	glm::vec3 B(target.x, target.y, target.z);
+
+	glm::vec3 travelVector = (B - A) / float(N);
+
+	CHex travelHex;
+	float dist = 1.0f;
+	do {
+		glm::vec3 travelPoint = A + (travelVector * dist);
+		travelHex = hexRound(travelPoint);
+		dist += 1.0f;
+	} while (getHexCube(travelHex).content != 2 && entityCheck(travelHex) == false);
+
+	return travelHex;
+}
+
 ///////////////PRIVATE//////////////
 
 /** Utility func to return a journey from a pathfinding results list.*/

@@ -23,7 +23,7 @@ public:
 	THexList dijkstraPath(CHex& start, CHex& end);
 	THexList aStarPath(CHex& start, CHex& end);
 	bool outsideArray(CHex& hex);
-
+	CHex findLineEnd(CHex& start, CHex& target);
 		 
 	int width;
 	int height;

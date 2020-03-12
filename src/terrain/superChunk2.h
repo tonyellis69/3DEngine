@@ -43,11 +43,11 @@ class CTerrain2;
 class CSuperChunk2 {
 public:
 	CSuperChunk2()  {};
-	void checkForIntersection();
+	void checkForTerrainIntersection();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setSampleSize(float sampleSize);
 	void setCallbackApp(ITerrainAppCallback* pApp);
-	void setTerrainCallback(ITerrainCallback* pTerrain);
+	void setTerrainCallback(ITerrain* pTerrain);
 	void createChunk(glm::i32vec3& index);
 
 	void clearChunks();
@@ -89,6 +89,6 @@ public:
 	static CTerrain2* pTerrain; ///<Annoyingly necessary pointer to terrain object.
 	//TO DO Scrap
 
-	ITerrainCallback* pTerrainObj;///<Pointer to terrain callback obj
+	ITerrain* pTerrainObj;///<Pointer to terrain callback obj
 };
 

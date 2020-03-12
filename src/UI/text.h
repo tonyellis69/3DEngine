@@ -39,7 +39,6 @@ struct TLineFragment {
 	int height;
 	int renderEndX;
 	TNewLine causesNewLine;
-	bool finalFrag;
 };
 
 /** Stores the style details of a homogenous piece of text, ie, one with the same
@@ -87,13 +86,14 @@ struct TLineFragDrawRec {
 //enum TRichTextPtrStatus { rtUnset};
 class TCharacterPos {
 public:
-	TCharacterPos() : unset(true) {}
+	TCharacterPos() {
+		textObj = 0; pos = 0;
+	}
 	TCharacterPos(int textObj, int textPos);
 	void setPos(int textObj, int textPos);
 
 	int textObj;
 	int pos;
-	bool unset; 
 
 	bool operator==(const TCharacterPos& rhs) { 
 		return textObj == rhs.textObj && pos == rhs.pos; 

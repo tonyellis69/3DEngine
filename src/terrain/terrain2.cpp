@@ -36,31 +36,29 @@ void CTerrain2::createCentralShell(float LoD1cubeSize, int numChunkCubes, int nu
 	this->numSCchunks = numSCchunks;
 
 	LoD1chunkSize = numChunkCubes * LoD1cubeSize;
+
+	//TO DO: replace this and below with one call to a private initialiseShell(extent) func
+
 	shells.push_back({1, LoD1chunkSize, numSCchunks, numShellSCs });
 	shells.back().pTerrain = this; //TO DO: scrap!
 	shells.back().setTerrainCallbackObj(this);
 	shells.back().shellNo = 0;
 	shells.back().initSuperChunks();
-
 }
 
 /** Add an outer shell to the existing shells, consisting of extent layers of SCs. */
 void CTerrain2::addShell(int extent) {	
+	int newShellSCs = shells.back().shellSCs + extent; 
 	int newShellLoD = shells.back().LoD * 2;
 	float newShellChunkSize = shells.back().chunkSize * 2;
-	int newShellSCs = shells.back().shellSCs + extent; 
 	shells.push_back({ newShellLoD, newShellChunkSize, numSCchunks, newShellSCs });
 	shells.back().shellNo = shells.size() -1;
 	shells.back().pTerrain = this;
 	shells.back().setTerrainCallbackObj(this);
 	shells.back().initSuperChunks();
-	shells.back().getInnerSCs();
 }
 
-/** Return the worldspace size of the given shell. */
-float CTerrain2::getShellSize(unsigned int shellNo) {
-	return shells[shellNo].worldSpaceSize;
-}
+
 
 /** Respond to the player moving by the given vector from their current position. 
 	if displacement > 1 chunk, advance the terrain .*/
@@ -73,7 +71,6 @@ void CTerrain2::onPlayerMove(glm::vec3 & move) {
 	Tdirection advanceDirection = vecToDir(i32vec3(terrainAdvanceInChunks));
 
 	if (advanceDirection != none) {	
-		//shells[0].updateShellTerrain(advanceDirection);
 		for (int shellNo = 0; shellNo < shells.size(); shellNo++) {
 			if (shells[shellNo].updateShellTerrain(advanceDirection) == false)
 				break;
@@ -87,7 +84,7 @@ void CTerrain2::onPlayerMove(glm::vec3 & move) {
 void CTerrain2::createTerrain() {
 	initialiseChunks(approxChunksRequired);
 	for (auto& shell : shells) {
-		shell.initChunkExtent();
+		shell.initChunkExtentToMinimum();
 		shell.createTerrain();
 	}
 }
@@ -205,8 +202,17 @@ unsigned int CTerrain2::getChunkMeshVAO() {
 
 /** Sets the position of the viewer of this terrain, relative to its origin. */
 void CTerrain2::setViewpoint(glm::vec3& pos) {
-	viewpoint = pos; //Origin of terrain is 0,0,0 apparently!
+	viewpoint = pos; 
 	oldViewpoint = pos;
+}
+
+ITerrainAppCallback* CTerrain2::getTerrainApp(){
+	return pCallbackApp;
+}
+
+/** Return the worldspace size of the given shell. */
+float CTerrain2::getShellSize(unsigned int shellNo) {
+	return shells[shellNo].worldSpaceSize;
 }
 
 //////////Private functions
@@ -215,7 +221,6 @@ void CTerrain2::setViewpoint(glm::vec3& pos) {
 void CTerrain2::initialiseChunks(int numChunks) {
 	chunks.resize(numChunks);
 	freeChunks.resize(numChunks);
-	//inUseChunks.clear();
 	iota(begin(freeChunks), end(freeChunks), 0);
 }
 
@@ -245,7 +250,7 @@ void CTerrain2::recentreOuterShells(int shellNo, Tdirection moveDirection) {
 }
 
 
-void CTerrain2::preScrollUpdate(int shellNo, Tdirection direction) {
+void CTerrain2::shellPreScrollUpdate(int shellNo, Tdirection direction) {
 	if (shellNo == 0) {
 		Tdirection scrollDir = flipDir(direction);
 		scrollSampleSpace(scrollDir, shells[0].scSampleStep);

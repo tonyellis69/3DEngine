@@ -12,44 +12,22 @@ class COuterSCIterator;
 class CFaceIterator;
 class CTerrain2;  ///TO DO get rid of dependency!
 
-class ITerrainCallback;
+class ITerrain;
 class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
-	void init();
-	void setTerrainCallbackObj(ITerrainCallback* obj);
+	void setTerrainCallbackObj(ITerrain* obj);
 	bool updateShellTerrain(Tdirection direction);
 	void createTerrain();
-	void initChunkExtent();
-	
-	void rotateSCs(Tdirection direction);
+	void initChunkExtentToMinimum();
 	void initSuperChunks();
-	glm::vec3  calcSCsampleSpacePosition(glm::i32vec3& scIndex);
-	void findAllSCchunks();
-	void fillAllUnclippedSCs();
-	CShellIterator getIterator();
-	COuterSCIterator getOuterSCiterator();
-	CFaceIterator getFaceIterator(Tdirection face);
-	TBoxVolume getInnerBounds();
-	void reinitialiseFaceSCs(Tdirection face);
-	void addChunksToFaceSCs(Tdirection face);
 	void removeEncroachedOnChunks2(Tdirection face);
-	void removeOutfaceChunks(Tdirection face);
 	void addInnerFaceChunks2(Tdirection face);
-
-	TBoxVolume calcInnerFaceSCVolume(Tdirection face);
-
-	TBoxVolume getInnerSCs();
-
+	TBoxVolume calcInnerOverlap();
 	glm::i32vec3 getSCat(const glm::vec3& pos);
-
-	CBoxVolume calcWorldSpaceChunkExtent();
-
-	void reinitialiseInnerSCs();
-
-	glm::i32vec3 getRotatedIndex(const glm::i32vec3& origIndex);
-
 	glm::i32vec3 getInvRotatedIndex(const glm::i32vec3& origIndex);
+	COuterSCIterator getOuterSCiterator();
+	TBoxVolume getInnerBounds();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int numSCchunks; //<SC size in chunks.
@@ -59,11 +37,7 @@ public:
 	float SCsize; //<In worlsspace
 	float worldSpaceSize; 
 	glm::vec3 worldSpacePos;
-	int minRequiredChunkExtent; //<Terrain must always extend this far from player.
-	int maxChunkExtent; //<Maximum chunks that can extend from the origin before reaching the shell boundary.
-
 	int chunkExtent[6]; //<How far chunks extend from origin in each direction
-	bool faceLayerFull[6]; //<True if there's no room to add chunks to this face layer of SCs
 
 	CTerrain2* pTerrain; ///<Pointer to parent terrain object
 	unsigned int shellNo;
@@ -72,17 +46,37 @@ public:
 	float scSampleStep;
 
 
-	TBoxVolume innerBounds;
+	
 
 
 private:
+	void init();
+	void rotateSCs(Tdirection direction);
+	glm::vec3 calcSCsampleSpacePosition(glm::i32vec3& scIndex);
+	void findAllSCchunks();
+	void fillUnoverlappedSCs();
 	int chunkExtentFromViewpoint(Tdirection direction);
 	void addToFaceLayer(Tdirection direction);
 
 	void scroll(Tdirection direction);
 
-	ITerrainCallback* pTerrainObj; ///<Points to terrain callback object.
+	void reinitialiseFaceSCs(Tdirection face);
+	void addChunksToFaceSCs(Tdirection face);
+	void removeOutfaceChunks(Tdirection face);
+	CBoxVolume calcWorldSpaceChunkExtent();
+	void clearInnerSCs();
+	glm::i32vec3 getRotatedIndex(const glm::i32vec3& origIndex);
 
+
+	CShellIterator getIterator();
+	CFaceIterator getFaceIterator(Tdirection face);
+
+	ITerrain* pTerrainObj; ///<Points to terrain callback object.
+
+	int minRequiredChunkExtent; //<Terrain must always extend this far from player.
+	int maxChunkExtent; //<Maximum chunks that can extend from the origin before reaching the shell boundary.
+
+	bool faceLayerFull[6]; //<True if there's no room to add chunks to this face layer of SCs
 };
 
 

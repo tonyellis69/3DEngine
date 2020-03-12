@@ -27,14 +27,13 @@ struct TSCident {
 
 const int chunkTriCacheSize2 = 6;
 
-class CTerrain2 : public ITerrainCallback {
+class CTerrain2 : public ITerrain {
 public:
 	CTerrain2();
 	void setInitialChunkStorageSize(int bytes);
 	void setChunkVertLayout(std::initializer_list<int> attribs);
 	void createCentralShell(float _LoD1cubeSize, int numChunkCubes, int numSCchunks, int shellSCs);
 	void addShell(int extent);
-	float getShellSize(unsigned int shellNo);
 	void onPlayerMove(glm::vec3& move);
 	void createTerrain();
 	void setSampleSpacePosition(glm::vec3& pos);
@@ -47,6 +46,8 @@ public:
 	void freeChunkMesh(int addr);
 	unsigned int getChunkMeshVAO();
 	void setViewpoint(glm::vec3& pos);
+	ITerrainAppCallback* getTerrainApp();
+	float getShellSize(unsigned int shellNo);
 
 	std::vector<CShell> shells;
 
@@ -72,7 +73,7 @@ private:
 	void realignOuterShells(int shell, Tdirection moveDirection);
 	void recentreOuterShells(int shellNo, Tdirection moveDirection);
 
-	void preScrollUpdate(int shellNo, Tdirection direction);
+	void shellPreScrollUpdate(int shellNo, Tdirection direction);
 
 	void scrollSampleSpace(Tdirection scrollDir, float shift);
 	int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos);

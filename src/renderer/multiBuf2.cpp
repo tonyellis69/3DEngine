@@ -122,12 +122,9 @@ void CMultiBuf2::copyToBlock(CBuf& src, int blockAddr, int size) {
 
 /** We've run out of memory. Create a larger buffer and copy everything to that.*/
 void CMultiBuf2::memoryPanic() {
-	sysLog << "\nBuffer before " << buffer.hBuffer;
 	unsigned int oldSize = buffer.getBufSize();
 	unsigned int newSize = oldSize * 1.1;
 	buffer.resizeSafe(newSize);
-
-	sysLog << "\nBuffer after " << buffer.hBuffer;
 
 	//Ensure a free block points to our new spare memory:
 
