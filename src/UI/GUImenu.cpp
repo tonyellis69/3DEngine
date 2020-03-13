@@ -9,7 +9,7 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	setHeight(h);
 	itemFont = defaultFont;
 	textColour = UIblack;
-	focusColour = uiLightGrey;
+	focusColour = style::uiLightGrey;
 	type = uiMenu;
 	vItemPad =  4;
 	hItemPad = 1;
@@ -26,8 +26,8 @@ CGUImenu::CGUImenu(int x, int y, int w, int h) {
 	hItemInteriorPadding = 4;
 	focusStyle = menuHighlightBar;
 
-	setBackColour1(uiWhite);
-	setBackColour2(uiWhite);
+	setBackColour1(style::uiWhite);
+	setBackColour2(style::uiWhite);
 	minItemsShown = 8;
 	maxItemsShown = 1000;
 	resizeHorizontal = false;
@@ -230,7 +230,7 @@ CGUImenuItem::CGUImenuItem(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 	hasHighlight = false;
 	highlightStyle = menuHighlightBar;
 	focusStyle = menuHighlightBar;
-	highlightColour = uiVeryLightGrey;
+	highlightColour = style::uiVeryLightGrey;
 }
 
 void CGUImenuItem::DrawSelf() {

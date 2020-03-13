@@ -383,9 +383,6 @@
     <ClCompile Include="..\src\UI\GUIscrollbar2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\themeServer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\importer\importer.cpp">
       <Filter>Source Files\importer</Filter>
     </ClCompile>

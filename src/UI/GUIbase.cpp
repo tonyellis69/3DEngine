@@ -62,12 +62,13 @@ CGUIbase::CGUIbase()  {
 	anchorTop = false;
 	setGUIcallback(this);
 	if (rootUI) {
-		setStyleSheet(rootUI->styleSheet);
+
 		controlCursor.rowCol = glm::i32vec2(0);
 		msgObj = rootUI->msgObj;
 
 	}
-
+	resizeMin = style::resizeMin;
+	resizeMax = style::resizeMax;
 	resizesForChildren = glm::bvec2(false);
 	
 }
@@ -129,19 +130,9 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 }
 */
 
-void CGUIbase::setStyleSheet(CGUIstyleSheet* styleSheet) {
-	this->styleSheet = styleSheet;
-	resizeMin = styleSheet->resizeMin;
-	resizeMax = styleSheet->resizeMax;
-}
 
-/** Apply the current stylesheet to all child controls and their controls, recursively. */
-void CGUIbase::propagateStylesheet() {
-	for (auto control : controls) {
-		control->propagateStylesheet();
-	}
-	applyStyleSheet();
-}
+
+
 
 /** Set the given control's abstract position as a child control, as defined by its
 	requirements and by this, its parent control. */
@@ -157,8 +148,8 @@ void CGUIbase::positionLogical(CGUIbase * control) {
 glm::i32vec2 CGUIbase::layoutControlsCoarse() {
 	glm::i32vec2 rowCol = glm::i32vec2(0);
 	glm::i32vec2 maxSize = glm::i32vec2(0);
-	glm::i32vec2 currentPos = glm::i32vec2(styleSheet->controlBorder);
-	int currentRowHeight = styleSheet->controlBorder; 
+	glm::i32vec2 currentPos = glm::i32vec2(style::controlBorder);
+	int currentRowHeight = style::controlBorder; 
 	for (auto control : controls) {
 		control->setLocalPos(currentPos.x, currentPos.y);
 		currentRowHeight = std::max(currentRowHeight, currentPos.y + control->getSize().y);
@@ -166,15 +157,15 @@ glm::i32vec2 CGUIbase::layoutControlsCoarse() {
 		if (control->positionHint.rowCol.x < control->positionHint.layoutstyle.cols - 1) {
 			currentPos.x += control->getSize().x;
 			maxSize.x = std::max(maxSize.x, currentPos.x);
-			currentPos.x += styleSheet->controlSpacing;
+			currentPos.x += style::controlSpacing;
 		}
 		else { //no? Then place it at the start of a new row
 			maxSize.x = std::max(maxSize.x, currentPos.x + control->getSize().x);
-			currentPos = glm::i32vec2(styleSheet->controlBorder, currentRowHeight + styleSheet->controlSpacing);
+			currentPos = glm::i32vec2(style::controlBorder, currentRowHeight + style::controlSpacing);
 
 		}
 	}
-	maxSize = glm::i32vec2(maxSize.x, currentRowHeight) + glm::i32vec2(styleSheet->controlBorder);
+	maxSize = glm::i32vec2(maxSize.x, currentRowHeight) + glm::i32vec2(style::controlBorder);
 	return maxSize;
 }
 
@@ -235,7 +226,7 @@ glm::i32vec4 CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	//build a model of the row we're looking at:
 	std::vector<CGUIbase*> rowControls;
 	int ctrlsInRow = 0; int totalWidths = 0; int expansiveCtrls = 0;
-	float availableParentWidth = (float)getSize().x - styleSheet->controlBorder * 2;
+	float availableParentWidth = (float)getSize().x - style::controlBorder * 2;
 
 	for (auto control : controls) {
 		if (control->positionHint.rowCol.y == cellControl->positionHint.rowCol.y) {
@@ -249,7 +240,7 @@ glm::i32vec4 CGUIbase::calcCellSize(CGUIbase* cellControl) {
 		}
 	}
 
-	availableParentWidth -= styleSheet->controlSpacing * (ctrlsInRow - 1);
+	availableParentWidth -= style::controlSpacing * (ctrlsInRow - 1);
 	int defaultCellSize = availableParentWidth / ctrlsInRow;
 
 	float cellToCtrlRatio; 
@@ -278,12 +269,12 @@ glm::i32vec4 CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	size.x = cellWidths[cellControl];
 
 	//calc cell starting position based on preceding cell widths
-	pos.x = styleSheet->controlBorder;
+	pos.x = style::controlBorder;
 	for (auto control : rowControls) {
 		if (control == cellControl)
 			break;
 		pos.x += cellWidths[control];
-		pos.x += styleSheet->controlSpacing;
+		pos.x += style::controlSpacing;
 	}
 	pos.y = cellControl->getLocalPos().y;
 	return glm::i32vec4(pos, size);
@@ -320,12 +311,12 @@ glm::i32vec4 CGUIbase::calcCellSizeMin(CGUIbase* cellControl) {
 	size.x = cellWidths[cellControl];
 
 	//calc cell starting position based on preceding cell widths
-	pos.x = styleSheet->controlBorder;
+	pos.x = style::controlBorder;
 	for (auto control : rowControls) {
 		if (control == cellControl)
 			break;
 		pos.x += cellWidths[control];
-		pos.x += styleSheet->controlSpacing;
+		pos.x += style::controlSpacing;
 	}
 	pos.y = cellControl->getLocalPos().y;
 	return glm::i32vec4(pos, size);

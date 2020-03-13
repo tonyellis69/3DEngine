@@ -225,8 +225,8 @@ CGUIswatchGroup::CGUIswatchGroup(int x, int y, int w, int h)
 	nameTextbox->anchorLeft = true;
 	nameTextbox->anchorRight = 5;
 	nameTextbox->setBorderOn(false);
-	nameTextbox->setBackColour1(uiLightGrey);
-	nameTextbox->setBackColour2(uiLightGrey);
+	nameTextbox->setBackColour1(style::uiLightGrey);
+	nameTextbox->setBackColour2(style::uiLightGrey);
 	Add(nameTextbox);
 	nameTextbox->setBorderOn(true);
 }
@@ -239,7 +239,7 @@ void CGUIswatchGroup::DrawSelf() {
 	for (auto swatch : swatches) {
 		vec4 colour = vec4(swatch) / 255.0f;
 		pDrawFuncs->drawRect2(swatchBox, colour, colour);
-		pDrawFuncs->drawBorder2(swatchBox, uiLightGrey);
+		pDrawFuncs->drawBorder2(swatchBox, style::uiLightGrey);
 		if (columnCount < totalColumns) {
 			columnCount++;
 			swatchBox.pos.x += swatchSize + swatchGap;
@@ -403,6 +403,6 @@ void CGUIdragDropSwatch::drawSelf(int mouseX, int mouseY) {
 	guiRect swatchBox = { mouseX, mouseY, swatchSize,swatchSize };
 	vec4 realColour = vec4(colour) / 255.0f;
 	pDrawFuncs->drawRect2(swatchBox, realColour, realColour);
-	pDrawFuncs->drawBorder2(swatchBox, uiLightGrey);
+	pDrawFuncs->drawBorder2(swatchBox, style::uiLightGrey);
 
 }

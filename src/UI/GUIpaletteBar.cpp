@@ -326,7 +326,7 @@ void CGUIpaletteBar::DrawSelf() {
 		indicatorRect.pos = { paletteImage->drawBox.pos.x + paletteImageProportion,paletteImage->getHeight() - 10 };
 		indicatorRect.size = { 2,10 };
 
-		pDrawFuncs->drawRect2(indicatorRect,uiBlack,uiBlack);
+		pDrawFuncs->drawRect2(indicatorRect,style::uiBlack,style::uiBlack);
 	}
 }
 

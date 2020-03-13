@@ -36,17 +36,17 @@ void CGUIcheckButton::DrawSelf( ) {
 	checkBox.pos = drawBox.pos + i32vec2(drawBox.size.x - (checkBox.size.x+inset), inset);
 	if (Set)
 		//pDrawFuncs->drawIcon(checked, iconPos,drawBox.pos.y + (drawBox.size.y >> 1));
-		pDrawFuncs->drawRect2(checkBox, uiBlack, uiBlack);
+		pDrawFuncs->drawRect2(checkBox, style::uiBlack, style::uiBlack);
 	else
 		//pDrawFuncs->drawIcon(unChecked, iconPos, drawBox.pos.y + (drawBox.size.y >> 1));
-		pDrawFuncs->drawRect2(checkBox, uiWhite, uiWhite);
+		pDrawFuncs->drawRect2(checkBox, style::uiWhite, style::uiWhite);
 	
 	if (MouseOver == this)
 		//setBorderColour(UIdarkGrey);
-		pDrawFuncs->drawBorder2(checkBox, uiDarkGrey);
+		pDrawFuncs->drawBorder2(checkBox, style::uiDarkGrey);
 	else
 		//setBorderColour(UIlightGrey);
-		pDrawFuncs->drawBorder2(checkBox, uiLightGrey);
+		pDrawFuncs->drawBorder2(checkBox, style::uiLightGrey);
 	//pDrawFuncs->drawCtrlBorder(*this);
 }
 

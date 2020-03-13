@@ -53,7 +53,7 @@ void CGUIradio::DrawSelf( ) {
 	//pDrawFuncs->drawText(lblPos,screenPos.y + (height >> 1),w,(char*)Text.c_str());
 	//draw the icon
 	//pDrawFuncs->setIconset(iconset);
-//	pDrawFuncs->setDrawColours(UIwhite,UIwhite);
+//	pDrawFuncs->setDrawColours(style::uiWhite,style::uiWhite);
 	//if (Set)
 //		pDrawFuncs->drawIcon(2, iconPos,screenPos.y + (height >> 1));
 	//else

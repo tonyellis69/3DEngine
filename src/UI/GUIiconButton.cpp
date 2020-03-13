@@ -45,17 +45,17 @@ void CGUIsysIconButton::DrawSelf( ) {
 	if (MouseOver == this)
 		//pDrawFuncs->setDrawColours(UIdarkGrey, UIdarkGrey);
 		//setBorderColour(UIdarkGrey);
-		pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
+		pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
 	else
 		//pDrawFuncs->setDrawColours(UIlightGrey, UIlightGrey);
 		//setBorderColour(UIlightGrey);
-		pDrawFuncs->drawBorder2(drawBox, uiLightGrey);
+		pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
 	//pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
 	//pDrawFuncs->drawCtrlBorder(*this);
 
 	//draw icon
 //	pDrawFuncs->setIconset(iconset);
-//	pDrawFuncs->setDrawColoursConditional(UIwhite,UIwhite,enabled);
+//	pDrawFuncs->setDrawColoursConditional(style::uiWhite,style::uiWhite,enabled);
 //	pDrawFuncs->drawIcon(icon, screenPos.x + (width >> 1),screenPos.y + (height >> 1));
 }
 

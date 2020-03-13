@@ -46,9 +46,9 @@ void CGUIdropdownMenu::DrawSelf() {
 	pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&) backColour2);
 
 	if(MouseOver == this)
-		pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
+		pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
 	else
-		pDrawFuncs->drawBorder2(drawBox, uiLightGrey);
+		pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
 
 }
 

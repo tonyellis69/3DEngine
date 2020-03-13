@@ -23,10 +23,10 @@ CGUIbutton::CGUIbutton(const std::string& text, unsigned int styleWord) :
 }
 
 void CGUIbutton::applyStyleSheet() {
-	setBackColour1(styleSheet->defaultButtonBackColour1);
-	setBackColour2(styleSheet->defaultButtonBackColour2);
-	setBorderColour(styleSheet->defaultBorderColour);
-	setBorderColourFocusColour(styleSheet->defaultBorderFocusColour);
+	setBackColour1(style::defaultButtonBackColour1);
+	setBackColour2(style::defaultButtonBackColour2);
+	setBorderColour(style::defaultBorderColour);
+	setBorderColourFocusColour(style::defaultBorderFocusColour);
 
 	label->applyStyleSheet();
 }
@@ -47,12 +47,12 @@ CGUIbutton::CGUIbutton(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 void CGUIbutton::resizeToFit() {
 	//base size on label:
 	i32vec2 newSize;
-	newSize.x = label->getWidth() + 2 * styleSheet->buttonLabelSurround;
-	newSize.y = label->getHeight() + 2 * styleSheet->buttonLabelSurround;
+	newSize.x = label->getWidth() + 2 * style::buttonLabelSurround;
+	newSize.y = label->getHeight() + 2 * style::buttonLabelSurround;
 
 	if (fitToPresets) {
 		int currentWidth = newSize.x;
-		for (auto preset : styleSheet->buttonPresets) {
+		for (auto preset : style::buttonPresets) {
 			newSize = preset;
 			if (preset.x > currentWidth) {
 				break;

@@ -47,7 +47,7 @@ void CGUIimageGrid::DrawSelf( ) {
 
 	UIrect cellBounds;
 
-//	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
+//	pDrawFuncs->setDrawColours(style::uiWhite, style::uiWhite);
 	cellBounds.width = cellSize;
 	cellBounds.height = cellSize;
 //	pDrawFuncs->setScale(cellScale,cellScale);
@@ -167,7 +167,7 @@ CGUIgridMouse::CGUIgridMouse() {
 void CGUIgridMouse::DrawSelf( ) {
 	//imageBounds.x = mouse->getScreenPos().x;
 	//imageBounds.y = mouse->getScreenPos().y;
-//	pDrawFuncs->setDrawColours(UIwhite, UIwhite);
+//	pDrawFuncs->setDrawColours(style::uiWhite, style::uiWhite);
 //	if (tilesheet == NULL)
 	//	pDrawFuncs->drawImage(dragData,imageBounds);
 	//else {

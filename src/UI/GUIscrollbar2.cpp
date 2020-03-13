@@ -28,21 +28,21 @@ CGUIbaseScrollbar2::CGUIbaseScrollbar2(ScrollbarOrientationType2 axis) {
 	type = scrollbar;
 	//setLocalPos(x, y);
 	if (orientation == scrlHorizontal) {
-		setWidth(styleSheet->scrollbarLength); setHeight(styleSheet->scrollbarWidth);
+		setWidth(style::scrollbarLength); setHeight(style::scrollbarWidth);
 	}
 	else {
-		setHeight(styleSheet->scrollbarLength); setWidth(styleSheet->scrollbarWidth);
+		setHeight(style::scrollbarLength); setWidth(style::scrollbarWidth);
 	}
 
-	SliderSize = styleSheet->scrollbarSliderSize;
+	SliderSize = style::scrollbarSliderSize;
 	Max = 100; Min = 1; Value = 1;
 	clickIncrement = 10;
 
 	lastMouseDownX = lastMouseDownY = 0;
 	id = uiScrollbarID;
 	
-	setBackColour1(styleSheet->defaultScrollbarBackColour);
-	setBackColour2(styleSheet->defaultScrollbarBackColour);
+	setBackColour1(style::defaultScrollbarBackColour);
+	setBackColour2(style::defaultScrollbarBackColour);
 }
 
 void CGUIbaseScrollbar2::applyStyleSheet() {

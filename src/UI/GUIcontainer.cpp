@@ -89,7 +89,7 @@ bool CGUIsysContainer::MouseWheelMsg(const  int mouseX, const  int mouseY, int w
 }
 
 void CGUIsysContainer::DrawSelf( ) {
-	pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
+	pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
 }
 
 

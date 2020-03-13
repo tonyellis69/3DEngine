@@ -83,7 +83,7 @@ public:
 
 	void initialiseSystemStylesheet();
 
-	CGUIstyleSheet sysStyleSheet;
+	//CGUIstyleSheet sysStyleSheet;
 
 	CGUIrichText* logWindow; ///<Points to the system log window.
 

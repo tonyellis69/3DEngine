@@ -49,14 +49,14 @@ CGUIlabel::CGUIlabel(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 }*/
 
 void CGUIlabel::applyStyleSheet() {
-	setFont(styleSheet->defaultFont);
-	setTextColour(styleSheet->defaultFontColour);
-	setBorderColour(styleSheet->defaultBorderColour);
+	setFont(style::defaultFont);
+	setTextColour(style::defaultFontColour);
+	setBorderColour(style::defaultBorderColour);
 }
 
 void CGUIlabel::setFont(CFont* newFont) {
 	textData.font = newFont;
-	int fontSize = textData.font->lineHeight + 2 * styleSheet->labelTextSurround;
+	int fontSize = textData.font->lineHeight + 2 * style::labelTextSurround;
 	resizeMin = i32vec2(fontSize);
 }
 
@@ -204,9 +204,9 @@ void CGUIlabel::resizeToFit() {
 	//the aesthetic of their UI, but they start with default values.
 	//Find the font height, then calculate the width needed for the given text
 	i32vec2 newSize;
-	newSize.y = textData.font->lineHeight + 2* styleSheet->labelTextSurround;
+	newSize.y = textData.font->lineHeight + 2* style::labelTextSurround;
 	calcLineRenderedWidth();
-	newSize.x = lineRenderedWidth + 2 * styleSheet->labelTextSurround;
+	newSize.x = lineRenderedWidth + 2 * style::labelTextSurround;
 	newSize = clamp(newSize, resizeMin, resizeMax);
 	resize(newSize.x, newSize.y);
 }

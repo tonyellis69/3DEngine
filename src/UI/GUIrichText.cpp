@@ -44,7 +44,7 @@ void CGUIrichText::createPage() {
 }
 
 void CGUIrichText::applyStyleSheet() {
-	setTextColour(styleSheet->defaultFontColour); //TO DO: prob redundant now
+	//setTextColour(style::defaultFontColour); //TO DO: prob redundant now
 	refreshCurrentTextStyles();
 }
 
@@ -183,7 +183,11 @@ bool CGUIrichText::setTextStyle(std::string styleName) {
 
 /** Update the set of text styles to use */
 void CGUIrichText::refreshCurrentTextStyles() {
-	styles = &styleSheet->getTheme(currentTheme).styles;
+	//styles = &style::getTheme(currentTheme).styles;
+
+	styles = (std::map<std::string, TtextStyle> *) &style::themes2.at(currentTheme).styles;
+
+	
 
 	for (auto style : *styles) {
 		if (style.first == "default")
@@ -193,6 +197,8 @@ void CGUIrichText::refreshCurrentTextStyles() {
 		else if (style.first == "hotSelected")
 			selectedHotTextStyle = style.second;
 	}
+
+	setTextStyle("default");
 }
 
 

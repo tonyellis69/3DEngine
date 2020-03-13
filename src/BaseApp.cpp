@@ -10,7 +10,7 @@
 
 //using namespace watch;
 
-
+CFont* style::defaultFont;
 
 CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	homeDir = getExePath();
@@ -55,7 +55,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	loadSystemFonts();
 	GUIroot.setDefaultFont(smallSysFont); //TO DO: stylesheet will replace this
 	initialiseSystemStylesheet();
-	GUIroot.setStyleSheet(&sysStyleSheet);
+//	GUIroot.setStyleSheet(&sysStyleSheet);
 	GUIroot.setMessageObject(this); //Makes this the default for all gui messages
 
 	RegisterUIfunctors();
@@ -467,8 +467,11 @@ string CBaseApp::getExePath() {
 void CBaseApp::initialiseSystemStylesheet() {
 	//TO DO: ultimately it might be best to load fonts into font manager here too, 
 	//scrap the systemFont* member. More streamlined, less duplication
-	sysStyleSheet.defaultFont = &renderer.fontManager.getFont("smallSysFont");
-	//sysStyleSheet.defaultFontColour = uiBlack;
+	//sysStyleSheet.defaultFont = &renderer.fontManager.getFont("smallSysFont");
+
+	style::defaultFont = &renderer.fontManager.getFont("smallSysFont");
+
+	//sysStyleSheet.defaultFontColour = style::uiBlack;
 
 	//kludigly create default text styles for rich text controls
 	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextStyle);

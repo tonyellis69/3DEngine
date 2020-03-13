@@ -15,8 +15,8 @@ CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
 	type = uiTextbox;
 	setTextColour(0, 0, 0, 1);
 	setText("textbox");
-	setBackColour1(uiWhite);
-	setBackColour2(uiWhite);
+	setBackColour1(style::uiWhite);
+	setBackColour2(style::uiWhite);
 }
 
 void CGUItextbox2::setFont(CFont* newFont) {
@@ -43,8 +43,8 @@ void CGUItextbox2::DrawSelf() {
 	pDrawFuncs->setClip(Clipbox);
 
 	//draw box
-	//setBackColour1(UIwhite);
-//	setBackColour2(UIwhite);
+	//setBackColour1(style::uiWhite);
+//	setBackColour2(style::uiWhite);
 //	pDrawFuncs->drawCtrlRect(*this);
 	pDrawFuncs->drawRect2(drawBox, (vec4&)backColour1, (vec4&)backColour2);
 
@@ -59,11 +59,11 @@ void CGUItextbox2::DrawSelf() {
 	if (drawBorder) {
 		if (MouseOver == this || KeyCapture == this) {
 			//setBorderColour(UIdarkGrey);
-			pDrawFuncs->drawBorder2(drawBox, uiDarkGrey);
+			pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
 		}
 		else {
 			//setBorderColour(UIlightGrey);
-			pDrawFuncs->drawBorder2(drawBox, uiLightGrey);
+			pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
 		}
 		//pDrawFuncs->drawCtrlBorder(*this);
 	}

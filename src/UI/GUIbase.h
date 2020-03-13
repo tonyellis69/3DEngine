@@ -165,9 +165,9 @@ public:
 	CGUIbase(int x, int y, int w, int h);
 	virtual ~CGUIbase(void);
 	//CGUIbase* add(UItype ctrlType, std::string text);
-	virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
-	virtual void applyStyleSheet() {};
-	void propagateStylesheet();
+	//virtual void setStyleSheet(CGUIstyleSheet* styleSheet);
+	//virtual void applyStyleSheet() {};
+	//void propagateStylesheet();
 	void positionLogical(CGUIbase * control);
 	glm::i32vec2 layoutControlsCoarse();
 	void layoutFine();
@@ -237,7 +237,7 @@ public:
 
 	void setDefaultFont(CFont* font);
 
-	CGUIstyleSheet* styleSheet; ///<The stylesheet used by this control.
+	//CGUIstyleSheet* styleSheet; ///<The stylesheet used by this control.
 
 	glm::i32vec2 localToScreenCoords(int x, int y);
 	glm::i32vec2 screenToLocalCoords(int x, int y);
@@ -404,10 +404,21 @@ public:
 			return ctrl;
 		}
 
-			T* ctrl = new T(s, style);
+			T* ctrl = new T(s, style); //pretty damn sure this is just leftover code
 			Add(ctrl);
 			autoPosition(ctrl);
 			return ctrl;
+
+		return NULL;
+	}
+
+	/** Add a control supplying styling but no text.*/
+	template <typename T>
+	T* add(int style) {
+		T* ctrl = new T(style);
+		Add(ctrl);
+		autoPosition(ctrl);
+		return ctrl;
 
 		return NULL;
 	}
