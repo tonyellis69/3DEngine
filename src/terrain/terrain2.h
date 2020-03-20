@@ -68,10 +68,10 @@ public:
 	glm::vec3 oldViewpoint;
 
 private:
-	void initialiseChunks(int numChunks);
-	void removeChunkOverlaps(Tdirection inDirection);
+	void initialiseChunkPool(int numChunks);
+	void removeShellOverlaps(Tdirection inDirection);
 	void realignOuterShells(int shell, Tdirection moveDirection);
-	void recentreOuterShells(int shellNo, Tdirection moveDirection);
+	void recentreOnInnerShells(int shellNo, Tdirection moveDirection);
 
 	void shellPreScrollUpdate(int shellNo, Tdirection direction);
 

@@ -16,6 +16,7 @@ CTerrain2::CTerrain2()   {
 	chunkOrigin = mat4(1);
 	chunksToSkinPerFrame = 10;
 	oldViewpoint = vec3(0);
+	CSuperChunk2::pTerrainObj = this;;
 };
 
 /** Specify the size of the storage space for chunk vertices. This will silenty resize if more
@@ -34,55 +35,50 @@ void CTerrain2::createCentralShell(float LoD1cubeSize, int numChunkCubes, int nu
 	this->LoD1cubeSize = LoD1cubeSize;
 	this->numChunkCubes = numChunkCubes;
 	this->numSCchunks = numSCchunks;
-
 	LoD1chunkSize = numChunkCubes * LoD1cubeSize;
 
-	//TO DO: replace this and below with one call to a private initialiseShell(extent) func
-
-	shells.push_back({1, LoD1chunkSize, numSCchunks, numShellSCs });
-	shells.back().pTerrain = this; //TO DO: scrap!
-	shells.back().setTerrainCallbackObj(this);
-	shells.back().shellNo = 0;
-	shells.back().initSuperChunks();
+	addShell(numShellSCs);
 }
 
 /** Add an outer shell to the existing shells, consisting of extent layers of SCs. */
 void CTerrain2::addShell(int extent) {	
-	int newShellSCs = shells.back().shellSCs + extent; 
-	int newShellLoD = shells.back().LoD * 2;
-	float newShellChunkSize = shells.back().chunkSize * 2;
-	shells.push_back({ newShellLoD, newShellChunkSize, numSCchunks, newShellSCs });
-	shells.back().shellNo = shells.size() -1;
-	shells.back().pTerrain = this;
+	int LoD = 1 << shells.size(); //1 2 4 8 etc
+	float chunkSize = LoD1chunkSize * (LoD);
+
+	if (shells.size() > 0)
+		extent += shells.back().shellSCs;
+	shells.push_back({ LoD, chunkSize, numSCchunks, extent });
+	shells.back().pTerrain = this; //TO DO: scrap!
 	shells.back().setTerrainCallbackObj(this);
+	shells.back().shellNo = shells.size()-1;
 	shells.back().initSuperChunks();
+	shells.back().initChunkExtentToMinimum();
 }
 
 
-
-/** Respond to the player moving by the given vector from their current position. 
-	if displacement > 1 chunk, advance the terrain .*/
+/** Respond to the player moving by the given vector. If the  
+	cumulative viewpoint displacement > 1 chunk, advance the terrain .*/
 void CTerrain2::onPlayerMove(glm::vec3 & move) {
-	vec3 oldChunkPos = glm::floor(viewpoint / LoD1chunkSize);
+	vec3 oldPosInChunks = glm::floor(viewpoint / LoD1chunkSize);
 	viewpoint += move;
-	vec3 newChunkPos = glm::floor(viewpoint / LoD1chunkSize);
+	vec3 newPosInChunks = glm::floor(viewpoint / LoD1chunkSize);
 
-	vec3 terrainAdvanceInChunks = newChunkPos - oldChunkPos;
-	Tdirection advanceDirection = vecToDir(i32vec3(terrainAdvanceInChunks));
+	i32vec3 terrainAdvanceInChunks = newPosInChunks - oldPosInChunks;
+	Tdirection advanceDirection = vecToDir(terrainAdvanceInChunks);
 
 	if (advanceDirection != none) {	
-		for (int shellNo = 0; shellNo < shells.size(); shellNo++) {
-			if (shells[shellNo].updateShellTerrain(advanceDirection) == false)
+		for (auto & shell : shells) {
+			if (shell.advanceShellTerrain(advanceDirection) == false)
 				break;
 		}
-		removeChunkOverlaps(advanceDirection);
+		removeShellOverlaps(advanceDirection);
 	}
 }
 
 
 /** Fill all shells with chunks where they are intersected by the terrain. */
 void CTerrain2::createTerrain() {
-	initialiseChunks(approxChunksRequired);
+	initialiseChunkPool(approxChunksRequired);
 	for (auto& shell : shells) {
 		shell.initChunkExtentToMinimum();
 		shell.createTerrain();
@@ -218,16 +214,16 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 //////////Private functions
 
 /** Prepare all chunks for use. */
-void CTerrain2::initialiseChunks(int numChunks) {
+void CTerrain2::initialiseChunkPool(int numChunks) {
 	chunks.resize(numChunks);
 	freeChunks.resize(numChunks);
 	iota(begin(freeChunks), end(freeChunks), 0);
 }
 
 /** Iterate through the shells, removing any chunks now overlapped by chunks of an inner shell. */
-void CTerrain2::removeChunkOverlaps(Tdirection inDirection) {
+void CTerrain2::removeShellOverlaps(Tdirection inDirection) {
 	for (unsigned int shell = 1; shell < shells.size(); shell++) {
-		shells[shell].removeEncroachedOnChunks2(inDirection);
+		shells[shell].removeOverlappedInnerFaceChunks(inDirection);
 	}
 }
 
@@ -242,14 +238,16 @@ void CTerrain2::realignOuterShells(int shellNo, Tdirection moveDirection) {
 
 /** Move this shell and any enclosing shells one SC length in the given direction. This is called to keep their
 	terrain in line with any inner shells after scrolling. It also prevents the shell from drifting away from shell 0.*/
-void CTerrain2::recentreOuterShells(int shellNo, Tdirection moveDirection) {
+void CTerrain2::recentreOnInnerShells(int shellNo, Tdirection moveDirection) {
 	vec3 move = dirToVec(moveDirection) * shells[shellNo].SCsize;
 	for (int shell = shellNo; shell < shells.size(); shell++) {
 		shells[shell].worldSpacePos += move;
 	}
 }
 
-
+/** Prepare for the given shell to scroll. Shells 1 and above must be moved, so that after scrolling their terrain still
+	lines up with their inner shells. Shell 0 doesn't move, keeping the whole model centred, instead sample space is s
+	scrolled. */
 void CTerrain2::shellPreScrollUpdate(int shellNo, Tdirection direction) {
 	if (shellNo == 0) {
 		Tdirection scrollDir = flipDir(direction);
@@ -260,7 +258,7 @@ void CTerrain2::shellPreScrollUpdate(int shellNo, Tdirection direction) {
 		liveLog << "\nchunkOrigin moved to " << vec3(chunkOrigin[3]);
 	}
 	else
-		recentreOuterShells(shellNo, direction);
+		recentreOnInnerShells(shellNo, direction);
 }
 
 /** Move the terrain's position in sample space. */
@@ -269,7 +267,7 @@ void CTerrain2::scrollSampleSpace(Tdirection scrollDir, float shift) {
 	sampleSpacePos += vec;
 }
 
-/** Return a chunk initialised with the given index. */
+/** Return a chunk initialised to the region of sample space given by its index. */
 int CTerrain2::createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos) {
 	int id = getFreeChunk();
 	chunks[id].index = index;
@@ -282,7 +280,7 @@ int CTerrain2::createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int she
 	return id;
 }
 
-/** Return the id of a free chunk, creating more chunks if necessary. */
+/** Return the id of a chunk free for use, creating more chunks if necessary. */
 int CTerrain2::getFreeChunk() {
 	int id;
 	if (freeChunks.size() > 0) {
@@ -301,7 +299,7 @@ int CTerrain2::getFreeChunk() {
 	return id;
 }
 
-/** Move this chunk  to the free pile. */
+/** Take this chunk out of service, returning it to the free pile. */
 void CTerrain2::removeChunk(int id) {
 	if (chunks[id].status == chSkinned)
 		pCallbackApp->deleteChunkMesh(chunks[id]);
@@ -317,7 +315,7 @@ glm::vec3 CTerrain2::getSCworldPos(int shellNo, const glm::i32vec3& origIndex) {
 		vec3(shells[shellNo].shellSCs * shells[shellNo].SCsize * 0.5f);
 }
 
-/** Update the viewpioint position in response to a scroll. */
+/** Update the viewpioint position in response to a scroll, so that the view remains the same. */
 void CTerrain2::scrollViewpoint(Tdirection scrollDir) {
 	glm::vec3& move = dirToVec(scrollDir) * shells[0].SCsize;
 	pCallbackApp->onTerrainScroll(move);
@@ -325,8 +323,8 @@ void CTerrain2::scrollViewpoint(Tdirection scrollDir) {
 	oldViewpoint += move;
 }
 
-/**	If we've removed scrolled out chunks, the rear inner face of the enclosing shell 
-	needs to add some to cover that area of terrain. */
+/**	If we've removed scrolled-out chunks from this shell following a scroll, the rear
+	inner face of the enclosing shell now needs to add chunks to cover that area of terrain. */
 void CTerrain2::rebuildOuterShell(int shellNo, Tdirection scrollOutFace) {
 	if (shellNo < shells.size() - 1) {
 		shells[shellNo + 1].addInnerFaceChunks2(scrollOutFace);

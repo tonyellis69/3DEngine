@@ -204,7 +204,6 @@
     <ClCompile Include="..\src\UI\GUIroot.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar.cpp" />
     <ClCompile Include="..\src\UI\GUIscrollbar2.cpp" />
-    <ClCompile Include="..\src\UI\GUIstyleSheet.cpp" />
     <ClCompile Include="..\src\UI\GUIswatchContainer.cpp" />
     <ClCompile Include="..\src\UI\GUItextbox2.cpp" />
     <ClCompile Include="..\src\UI\imageBuf.cpp" />

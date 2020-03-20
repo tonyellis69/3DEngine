@@ -29,7 +29,7 @@ public:
 	void moveCamera(glm::vec3& move);
 	void setCameraAspectRatio(glm::vec2 ratio);
 	CHex pickHex(int screenX, int screenY);
-	CBuf* addBuffer(const std::string& name);
+	CBuf* createMeshBuffer(const std::string& name);
 	CBuf* getBuffer(const std::string& name);
 	void setCursorPath(CHex& playerPos, CHex& cursorPos);
 	void setCursorPath(THexList& path);

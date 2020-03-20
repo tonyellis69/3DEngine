@@ -15,7 +15,7 @@ void CMesh::calculateVertexNormals() {
 }
 
 /** Write the vert data to the given graphics buffer object. */
-void CMesh::writeToBufferv3i(CBuf& buf) {
+void CMesh::exportToBuffer(CBuf& buf) {
 	buf.storeVertexes(vertices.data(), sizeof(glm::vec3) * vertices.size(), vertices.size());
 	buf.storeIndex(indices.data(), indices.size());
 	buf.storeLayout(3, 0, 0, 0);

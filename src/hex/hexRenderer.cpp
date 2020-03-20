@@ -257,7 +257,7 @@ CHex CHexRenderer::pickHex(int screenX, int screenY) {
 
 
 /** Create a buffer identified by the given name, and return a pointer to it. */
-CBuf* CHexRenderer::addBuffer(const std::string& name) {
+CBuf* CHexRenderer::createMeshBuffer(const std::string& name) {
 	return &modelBuffers[name];
 }
 

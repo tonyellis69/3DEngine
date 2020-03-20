@@ -12,46 +12,53 @@
 
 using namespace glm;
 
+/** Construct a shell of the given proportions and initialise it. */
 CShell::CShell(int LoD, float chunkSize, int numSCchunks, int shellSCs) :
 	LoD(LoD), chunkSize(chunkSize), numSCchunks(numSCchunks), shellSCs(shellSCs) {
 
 	SCsize = numSCchunks * chunkSize;
 	worldSpaceSize = shellSCs * SCsize;
-	minRequiredChunkExtent = (float(shellSCs-1) / 2.0f) * numSCchunks;
+	minRequiredChunkExtent = (float(shellSCs-1) / 2.0f) * numSCchunks; //chunks must always extend this far
 	maxChunkExtent = (shellSCs * numSCchunks) / 2;
 	scArray.setSize(shellSCs, shellSCs, shellSCs);
+
 	init();
 }
 
 void CShell::init() {
 	worldSpacePos = vec3(0);
-
 	for (int face = 0; face < 6; face++)
 		faceLayerFull[face] = false;
 }
 
 void CShell::setTerrainCallbackObj(ITerrain* obj) {
 	pTerrainObj = obj;
+
 }
 
-/** Update the terrain in the given direction as required. This is typically called 
-	after the viewpoint has moved. */
-bool CShell::updateShellTerrain(Tdirection direction) {
+/** Update the terrain at the far end of this shell in the given direction, as
+	determined by how close the viewpoint has got to it. Either (1) there is 
+	still a permissable depth of terrain for this level of detail, so return false, or
+	(2) there's not, but (a) there's room for more chunks in the outlying face of SCs,
+	so add them, or (b), we scroll, shifting the viewpoint back and creating a new,
+	empty face layer of SCs into which we add chunks.
+		(a) and (b) both require that we add or remove chunks where this shell
+		overlaps inner and outer shells.*/
+bool CShell::advanceShellTerrain(Tdirection direction) {
 	liveLog << "\nAdvance shell " << shellNo << ":";
 
-	//Either:
-	//(1) Return because there is sufficient terrain in this direction
+	//1
 	if (chunkExtentFromViewpoint(direction) >= minRequiredChunkExtent) {
 		liveLog << " suffient terrain, returning.";
 		return false ;
 	}
 	
-	//(2) there's room for more terrain in the outer SC, so add it
+	//2a
 	if (!faceLayerFull[direction]) {
 		addToFaceLayer(direction); 
 		liveLog << " adding to face layer.";
 	}
-	else { //or (3) the SCs need to be scrolled  to provide more space, and then added to.
+	else { //2b
 		liveLog << " scrolling.";
 		scroll(direction);
 	}
@@ -59,32 +66,21 @@ bool CShell::updateShellTerrain(Tdirection direction) {
 	return true;
 }
 
-/** Fill the SCs with chunks where they are intersected by terrain, as far as chunkExtent from the origin .*/
+/** Fill this shell with chunks where it is intersected by terrain.*/
 void CShell::createTerrain() {
-	fillUnoverlappedSCs();
+	fillSCsToChunkExtent();
 }
 
-
-/** Any SC setup required when a shell is created. */
+/** Perform the SC setup required when a shell is created. */
 void CShell::initSuperChunks() {
-	scArray.element(0, 0, 0)->setCallbackApp(pTerrainObj->getTerrainApp());
+	CSuperChunk2::pCallbackApp = pTerrainObj->getTerrainApp();
 	scSampleStep = SCsize / pTerrain->worldToSampleScale;
 	CShellIterator scIter = getIterator();
 	while (!scIter.finished()) {
-		scIter->isEmpty = true;
-		scIter->colour = vec4(col::randHue(), 1);
-		scIter->origIndex = scIter.getIndex();
-		scIter->numSCchunks = numSCchunks;
-		scIter->setSampleSize(scSampleStep);
-		vec3 sampleSpacePosition = calcSCsampleSpacePosition(scIter.getIndex());
-		scIter->setSampleSpacePosition(sampleSpacePosition);
-		scIter->pTerrain = pTerrain;
-		scIter->setTerrainCallback(pTerrainObj);
-		scIter->shellNo = shellNo;
+		scIter->setBasics(shellNo, scIter.getIndex(), numSCchunks);
+		scIter->setSampleInfo(scSampleStep, calcSCsampleSpacePosition(scIter.getIndex()) );
 		scIter++;
 	}
-
-	initChunkExtentToMinimum();
 }
 
 /** Set chunks to initially extend as far as the minimum chunk extent in all directions. The extent
@@ -94,50 +90,23 @@ void CShell::initChunkExtentToMinimum() {
 		this->chunkExtent[direction] = minRequiredChunkExtent;
 }
 
-
-
 /** For the given inner face, find and remove any chunks overlapped by the
-	chunks of the inner shell. */
-void CShell::removeEncroachedOnChunks2(Tdirection face) {
-	//1. Find the inner face SC layer
-	TBoxVolume innerFace = calcInnerOverlap(); //innerBounds;
-	int axis = getAxis(face);
-
-	if (face == north || face == west || face == down)
-		innerFace.tr[axis] = innerFace.bl[axis] + 1;
-	else
-		innerFace.bl[axis] = innerFace.tr[axis] - 1;
-
-
-	CBoxVolume innerChunkVol = pTerrain->shells[shellNo - 1].calcWorldSpaceChunkExtent();
-	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f) - worldSpacePos;
-
-	CBoxVolume SCvol;
-	bool isOverlapping; CBoxVolume overlapVolume;
-	for (int x = innerFace.bl.x; x <= innerFace.tr.x; x++) {
-		for (int y = innerFace.bl.y; y <= innerFace.tr.y; y++) {
-			for (int z = innerFace.bl.z; z <= innerFace.tr.z; z++) {
-				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin;
-				SCvol.set(pos, pos + vec3(SCsize));
-				std::tie(isOverlapping, overlapVolume) = innerChunkVol.findOverlap(SCvol);
-				if (isOverlapping) {
-					scArray.element(x, y, z)->clearChunks(overlapVolume);
-				}
-			}
-		}
-	}
+	chunks of the inner shell following a scroll. */
+void CShell::removeOverlappedInnerFaceChunks(Tdirection face) {
+	TBoxVolume innerFaceVolume = findOverlappedInnerFaceSCs(face);
+	removeOverlappedChunksInVolume(innerFaceVolume);
 }
 
-
-/** Add chunks to an inner face, where they had previously been displaced by the chunks of the
-	inner shell, before it scrolled. */
+/** Add chunks to this inner face, to fill the gap left by the chunks of the
+	inner shell that were removed when it scrolled. */
 void CShell::addInnerFaceChunks2(Tdirection face) {
 	//1. Find the inner face SC layer
-	TBoxVolume innerFace = calcInnerOverlap();
+	TBoxVolume innerFace = findInnerOverlappedSCVolume();
 
-
-	//Check we don't go beyond our own chunk extent:
 	int axis = getAxis(face);
+	
+	//Check we don't go beyond our own chunk extent:
+
 	if (face == north || face == west || face == down) {
 		innerFace.tr[axis] = innerFace.bl[axis];
 		if (innerFace.bl[axis] > 1)
@@ -148,6 +117,11 @@ void CShell::addInnerFaceChunks2(Tdirection face) {
 		if (innerFace.tr[axis] < shellSCs - 2)
 			innerFace.tr[axis] = innerFace.tr[axis] + 1;
 	}
+	
+
+
+	//TO DO: turn above into innerFaceVolume = findOverlappedInnerFaceChunks(face)
+	//turn below into addChunksToOverlappedVolume(innerFaceVolume)
 
 	CBoxVolume innerChunkVol = pTerrain->shells[shellNo - 1].calcWorldSpaceChunkExtent();
 	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f);
@@ -168,7 +142,7 @@ void CShell::addInnerFaceChunks2(Tdirection face) {
 }
 
 /** Find the innermost superchunks that we are interested in, before the chunks of the inner shell take over. */
-TBoxVolume CShell::calcInnerOverlap() {
+TBoxVolume CShell::findInnerOverlappedSCVolume() {
 	TBoxVolume innerVol = { i32vec3(0),i32vec3(0) };
 	if (shellNo == 0)
 		return innerVol;
@@ -196,7 +170,7 @@ COuterSCIterator  CShell::getOuterSCiterator() {
 }
 
 TBoxVolume  CShell::getInnerBounds() {
-	return calcInnerOverlap();
+	return findInnerOverlappedSCVolume();
 }
 
 
@@ -312,7 +286,7 @@ void CShell::findAllSCchunks() {
 
 /** Fill SCs with chunks where they are intersected by terrain within this shell's chunk extent,
 	but not where they are overlapped by the chunk extent of the inner shell, if any. */
-void CShell::fillUnoverlappedSCs() {
+void CShell::fillSCsToChunkExtent() {
 	COuterSCIterator sc = getOuterSCiterator();
 	CBoxVolume chunkVol = calcWorldSpaceChunkExtent();
 	CBoxVolume innerVol;
@@ -418,7 +392,7 @@ CBoxVolume CShell::calcWorldSpaceChunkExtent() {
 	so they're empty when they scroll back into use.*/
 void CShell::clearInnerSCs() {
 	//calcInnerOverlap();
-	TBoxVolume innerFace = calcInnerOverlap();
+	TBoxVolume innerFace = findInnerOverlappedSCVolume();
 
 	for (int x = innerFace.bl.x + 1; x < innerFace.tr.x; x++) {
 		for (int y = innerFace.bl.y + 1; y < innerFace.tr.y; y++) {
@@ -432,6 +406,37 @@ void CShell::clearInnerSCs() {
 /** Convert the given index to its rotated equivalent. */
 glm::i32vec3 CShell::getRotatedIndex(const glm::i32vec3& origIndex) {
 	return scArray.getRotatedIndex(origIndex);
+}
+
+TBoxVolume CShell::findOverlappedInnerFaceSCs(Tdirection face) {
+	TBoxVolume innerVol = findInnerOverlappedSCVolume();
+	int axis = getAxis(face);
+	if (face == north || face == west || face == down)
+		innerVol.tr[axis] = innerVol.bl[axis] + 1;
+	else
+		innerVol.bl[axis] = innerVol.tr[axis] - 1;
+	return innerVol;
+}
+
+void CShell::removeOverlappedChunksInVolume(TBoxVolume innerVol) {
+	CBoxVolume innerChunkVol = pTerrain->shells[shellNo - 1].calcWorldSpaceChunkExtent();
+	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f) - worldSpacePos;
+
+	CBoxVolume SCvol;
+	bool isOverlapping; CBoxVolume overlapVolume;
+	for (int x = innerVol.bl.x; x <= innerVol.tr.x; x++) {
+		for (int y = innerVol.bl.y; y <= innerVol.tr.y; y++) {
+			for (int z = innerVol.bl.z; z <= innerVol.tr.z; z++) {
+				vec3 pos = vec3(x, y, z) * SCsize - shellOrigin;
+				SCvol.set(pos, pos + vec3(SCsize));
+				std::tie(isOverlapping, overlapVolume) = innerChunkVol.findOverlap(SCvol);
+				if (isOverlapping) {
+					scArray.element(x, y, z)->clearChunks(overlapVolume);
+				}
+			}
+		}
+	}
+
 }
 
 

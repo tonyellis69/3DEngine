@@ -14,7 +14,7 @@ enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 class CMesh {
 public:
 	void calculateVertexNormals();
-	void writeToBufferv3i(CBuf& buf);
+	void exportToBuffer(CBuf& buf);
 	void clear();
 
 	std::vector<glm::vec3> vertices;

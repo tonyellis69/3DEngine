@@ -356,9 +356,6 @@
     <ClCompile Include="..\src\utils\idContainer.cpp">
       <Filter>Header Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIstyleSheet.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\utils\log.cpp">
       <Filter>Header Files\utils</Filter>
     </ClCompile>

@@ -217,5 +217,17 @@ float hexAngle(CHex& start, CHex& end) {
 	glm::vec3 angleVec = cubeToWorldSpace(end) - cubeToWorldSpace(start);
 	angleVec = glm::normalize(angleVec);
 	
-	return glm::acos(glm::dot(angleVec,glm::vec3(1,0,0)) );
+	float angle = glm::acos(glm::dot(angleVec,glm::vec3(1,0,0)) );
+	if (angleVec.y > 0)
+		angle = 2 * M_PI - angle;
+	return angle;
+}
+
+/** Return the nearest hex direction to the given angle. */
+THexDir angleToDir(float angle) {
+	angle += M_PI / 6.0f;
+	angle = fmod(angle, 2 * M_PI);
+
+	THexDir dir = THexDir(angle / (M_PI / 3.0f));
+	return dir;
 }

@@ -16,14 +16,15 @@ class ITerrain;
 class CShell {
 public:
 	CShell(int LoD, float chunkSize, int SCsize, int shellSCs);
+	void init();
 	void setTerrainCallbackObj(ITerrain* obj);
-	bool updateShellTerrain(Tdirection direction);
+	bool advanceShellTerrain(Tdirection direction);
 	void createTerrain();
 	void initChunkExtentToMinimum();
 	void initSuperChunks();
-	void removeEncroachedOnChunks2(Tdirection face);
+	void removeOverlappedInnerFaceChunks(Tdirection face);
 	void addInnerFaceChunks2(Tdirection face);
-	TBoxVolume calcInnerOverlap();
+	TBoxVolume findInnerOverlappedSCVolume();
 	glm::i32vec3 getSCat(const glm::vec3& pos);
 	glm::i32vec3 getInvRotatedIndex(const glm::i32vec3& origIndex);
 	COuterSCIterator getOuterSCiterator();
@@ -50,11 +51,11 @@ public:
 
 
 private:
-	void init();
+
 	void rotateSCs(Tdirection direction);
 	glm::vec3 calcSCsampleSpacePosition(glm::i32vec3& scIndex);
 	void findAllSCchunks();
-	void fillUnoverlappedSCs();
+	void fillSCsToChunkExtent();
 	int chunkExtentFromViewpoint(Tdirection direction);
 	void addToFaceLayer(Tdirection direction);
 
@@ -66,6 +67,9 @@ private:
 	CBoxVolume calcWorldSpaceChunkExtent();
 	void clearInnerSCs();
 	glm::i32vec3 getRotatedIndex(const glm::i32vec3& origIndex);
+
+	TBoxVolume findOverlappedInnerFaceSCs(Tdirection face);
+	void removeOverlappedChunksInVolume(TBoxVolume volume);
 
 
 	CShellIterator getIterator();

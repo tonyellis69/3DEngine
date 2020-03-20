@@ -27,7 +27,7 @@ class ITerrain {
 public:
 	virtual void realignOuterShells(int shell, Tdirection moveDirection) = 0;
 	
-	virtual void recentreOuterShells(int shellNo, Tdirection moveDirection) = 0;
+	virtual void recentreOnInnerShells(int shellNo, Tdirection moveDirection) = 0;
 	virtual void scrollSampleSpace(Tdirection scrollDir, float shift) = 0;
 
 	virtual void shellPreScrollUpdate(int shellNo, Tdirection direction) = 0;

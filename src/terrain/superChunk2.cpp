@@ -9,8 +9,22 @@
 
 using namespace glm;
 
-ITerrainAppCallback* CSuperChunk2::pCallbackApp = NULL;
+//ITerrainAppCallback* CSuperChunk2::pCallbackApp = NULL;
 CTerrain2* CSuperChunk2::pTerrain;
+
+void CSuperChunk2::setBasics(int shellNo, glm::i32vec3& index, int numSCchunks) {
+	isEmpty = true;
+	colour = vec4(col::randHue(), 1);
+	origIndex = index;
+	this->numSCchunks = numSCchunks;
+	pTerrain = (CTerrain2*) pTerrainObj; //scrap!!!!!!!
+	this->shellNo = shellNo;
+}
+
+void CSuperChunk2::setSampleInfo(float sampSize, glm::vec3& samplePos) {
+	setSampleSize(sampSize);
+	setSampleSpacePosition(samplePos);
+}
 
 void CSuperChunk2::checkForTerrainIntersection() {
 	isEmpty = pCallbackApp->scIntersectionCheckCallback(sampleSpacePos, sampleSize);
@@ -25,9 +39,7 @@ void CSuperChunk2::setSampleSize(float sampleSize) {
 	chunkSampleSize = sampleSize / numSCchunks;
 }
 
-void CSuperChunk2::setCallbackApp(ITerrainAppCallback * pApp) {
-	pCallbackApp = pApp;
-}
+
 
 void CSuperChunk2::setTerrainCallback(ITerrain* pTerrain) {
 	pTerrainObj = pTerrain;

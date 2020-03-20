@@ -83,7 +83,7 @@ bool CHexObject::beginMove() {
 	if (travelPath.empty() )
 		return false;
 	initMoveToAdjacent(travelPath[0]);
-	initTurnToAdjacent(travelPath[0]);
+	//initTurnToAdjacent(travelPath[0]);
 	return true;
 }
 
@@ -131,6 +131,7 @@ void CHexObject::draw(){
 void CHexObject::buildWorldMatrix() {
 	worldMatrix = glm::translate(glm::mat4(1), worldPos);
 	worldMatrix = glm::rotate(worldMatrix, rotation, glm::vec3(0, 0, -1));
+	//NB: we use a CW system for angles
 }
 
 
@@ -169,12 +170,14 @@ bool CHexObject::updateRotation(float dT){
 	float gap = std::fmod(rotation - destinationAngle + M_PI, 2 * M_PI) - M_PI;
 	if (abs(gap) < 0.1f) {
 		turning = false;
-		setDirection(destinationDirection);
+		//setDirection(destinationDirection);
+		facing = angleToDir(rotation);
 		return false; 
 	}
 	else {
 		rotation += rotationalVelocity * 10.0f * dT;
 		rotation = glm::mod<float>(rotation, 2 * M_PI);
+		
 	}
 	buildWorldMatrix();
 	return true;
