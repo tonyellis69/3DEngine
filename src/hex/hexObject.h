@@ -31,9 +31,9 @@ public:
 	virtual void calcTravelPath(CHex& target) {};
 	bool isNeighbour(CHex& position);
 	bool updateMove(float dT);
+	bool updateRotationOnly(float dT);
 	virtual void draw();
 
-	bool moving; ///<True if we're in the process of travelling to destination.
 	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
 	glm::mat4 worldMatrix; ///<Position and orientation in the 3D universe.
 	CHex hexPosition; ///<Position on a hex grid in cube coordinates.

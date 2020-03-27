@@ -22,6 +22,7 @@ struct TBoxVolume {
 class CBoxVolume;
 class CBoxVolume {
 public:
+	CBoxVolume() : bl(0), tr(0) {};
 	void set(glm::vec3& bl, glm::vec3& tr) {
 		this->bl = bl;
 		this->tr = tr;
@@ -29,6 +30,8 @@ public:
 	std::tuple<bool, CBoxVolume> findOverlap(CBoxVolume clippee);
 
 	bool doesNotEntirelyEnvelop(CBoxVolume& clippee);
+
+	std::tuple<bool, CBoxVolume> findNotOrPartiallyOverlapped(CBoxVolume clipVol);
 
 	glm::vec3 bl;
 	glm::vec3 tr;

@@ -24,11 +24,10 @@ public:
 	void initSuperChunks();
 	void removeOverlappedInnerFaceChunks(Tdirection face);
 	void addInnerFaceChunks2(Tdirection face);
-	TBoxVolume findInnerOverlappedSCVolume();
+	TBoxVolume findInnerFacesSCvolume();
 	glm::i32vec3 getSCat(const glm::vec3& pos);
 	glm::i32vec3 getInvRotatedIndex(const glm::i32vec3& origIndex);
 	COuterSCIterator getOuterSCiterator();
-	TBoxVolume getInnerBounds();
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int numSCchunks; //<SC size in chunks.
@@ -46,18 +45,12 @@ public:
 	CSCarry scArray;
 	float scSampleStep;
 
-
-	
-
-
 private:
-
 	void rotateSCs(Tdirection direction);
 	glm::vec3 calcSCsampleSpacePosition(glm::i32vec3& scIndex);
-	void findAllSCchunks();
 	void fillSCsToChunkExtent();
 	int chunkExtentFromViewpoint(Tdirection direction);
-	void addToFaceLayer(Tdirection direction);
+	void addChunksToFaceLayer(Tdirection direction);
 
 	void scroll(Tdirection direction);
 
@@ -70,6 +63,9 @@ private:
 
 	TBoxVolume findOverlappedInnerFaceSCs(Tdirection face);
 	void removeOverlappedChunksInVolume(TBoxVolume volume);
+
+	TBoxVolume findOverlappedInnerFaceChunks(Tdirection face);
+	void addChunksToOverlappedVolume(TBoxVolume volume);
 
 
 	CShellIterator getIterator();

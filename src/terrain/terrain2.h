@@ -73,7 +73,7 @@ private:
 	void realignOuterShells(int shell, Tdirection moveDirection);
 	void recentreOnInnerShells(int shellNo, Tdirection moveDirection);
 
-	void shellPreScrollUpdate(int shellNo, Tdirection direction);
+	void prepShellForScroll(int shellNo, Tdirection direction);
 
 	void scrollSampleSpace(Tdirection scrollDir, float shift);
 	int createChunk(glm::i32vec3& index, glm::vec3& sampleCorner, int shellNo, glm::vec3& terrainPos);
@@ -81,7 +81,7 @@ private:
 	void removeChunk(int id);
 	glm::vec3 getSCworldPos(int shellNo, const glm::i32vec3& origIndex);
 	void scrollViewpoint(Tdirection scrollDir);
-	void rebuildOuterShell(int shellNo, Tdirection scrollOutFace);
+	void rebuildOuterShellInnerFace(int shellNo, Tdirection scrollOutFace);
 	glm::i32vec3 getChunkIndex(int chunkId);
 
 	const int approxChunksRequired = 2000; 

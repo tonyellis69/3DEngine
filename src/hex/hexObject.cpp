@@ -10,8 +10,6 @@
 #include "..\TC\Debug\tigConst.h" //temp!!!!
 
 CHexObject::CHexObject() {
-	moving = false;
-
 	worldPos = glm::vec3(0);
 	setZheight(0.05f);
 
@@ -83,7 +81,6 @@ bool CHexObject::beginMove() {
 	if (travelPath.empty() )
 		return false;
 	initMoveToAdjacent(travelPath[0]);
-	//initTurnToAdjacent(travelPath[0]);
 	return true;
 }
 
@@ -103,20 +100,26 @@ THexList& CHexObject::getTravelPath() {
 }
 
 
-
 bool CHexObject::isNeighbour(CHex& position) {
 	return ::isNeighbour(hexPosition, position);
 }
 
 bool CHexObject::updateMove(float dT) {
-	if (moving) {
 		if (turning) {
 			updateRotation(dT);
 			return true;
 		}
 		return updateMovement(dT);
-	}
 	return false;
+}
+
+bool CHexObject::updateRotationOnly(float dT) {
+	if ( turning) {
+		if (!updateRotation(dT)) {
+			return false;
+		}
+	}
+	return true;
 }
 
 
@@ -139,7 +142,7 @@ void CHexObject::buildWorldMatrix() {
 
 /* Initialise a move action to the given hex. */
 void CHexObject::initMoveToAdjacent(CHex& adjacent) {
-	moving = true;
+	//moving = true;
 	destination = travelPath[0];
 	worldSpaceDestination = cubeToWorldSpace(destination);
 	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
@@ -153,12 +156,17 @@ bool CHexObject::initTurnToAdjacent(CHex& adjacent) {
 	destinationDirection = neighbourDirection(hexPosition, adjacent);
 	if (destinationDirection == hexNone)
 		return false;
-	float rotationDir = shortestRotation(facing, destinationDirection);
-	if (rotationDir == 0.0f)
+
+	float dist = 2 * M_PI + dirToAngle(destinationDirection) - rotation;
+	dist = fmod(dist, 2 * M_PI);
+	if (dist > M_PI)
+		dist = -(2 * M_PI - dist);
+		
+	if (dist == 0.0f)
 		return false;
-	moving = true;
+	//moving = true;
 	turning = true;
-	rotationalVelocity = (rotationDir > 0) - (rotationDir < 0);
+	rotationalVelocity = (dist > 0) - (dist < 0);
 	destinationAngle = dirToAngle(destinationDirection);
 	return true;
 }
@@ -189,7 +197,6 @@ bool CHexObject::updateMovement(float dT) {
 	glm::vec3 velocity = moveVector * moveSpeed * dT;
 
 	if (glm::distance(worldPos, worldSpaceDestination) < proximityCutoff) {
-		moving = false;
 		velocity = glm::vec3(0);
 		setPosition(destination.x, destination.y, destination.z);
 		if (!travelPath.empty() && destination == travelPath[0])

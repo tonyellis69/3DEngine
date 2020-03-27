@@ -254,5 +254,35 @@ bool CBoxVolume::doesNotEntirelyEnvelop(CBoxVolume& clipVol) {
 	clipVol.set(unitBl, unitTr);
 	return true;
 }
+//TO DO: make above redundant
+
+std::tuple<bool, CBoxVolume> CBoxVolume::findNotOrPartiallyOverlapped(CBoxVolume clipVol) {
+	vec3 SCboundaryFix(1.0f);
+	if (all(lessThan(clipVol.tr, tr + SCboundaryFix)) && all(greaterThan(clipVol.bl, bl - SCboundaryFix)))
+		return { false, clipVol };
+
+	vec3 volSize(clipVol.tr - clipVol.bl);
+
+	//find overlap
+	vec3 boundaryFix(1);
+	vec3 unitBl = max(clipVol.bl, bl);
+	vec3 unitTr = min(clipVol.tr, tr);
+
+	unitBl = unitBl - clipVol.bl;
+	unitTr = unitTr - clipVol.bl;
+
+	for (int axis = 0; axis < 3; axis++)
+		if (unitBl[axis] == unitTr[axis]) {
+			unitBl[axis] = volSize[axis];
+			unitTr[axis] = 0;
+		}
 
 
+	unitBl = unitBl + boundaryFix;
+	unitTr = unitTr - boundaryFix;
+
+	unitBl = unitBl / volSize;
+	unitTr = unitTr / volSize;
+	clipVol.set(unitBl, unitTr);
+	return { true, clipVol };
+}

@@ -248,7 +248,7 @@ void CTerrain2::recentreOnInnerShells(int shellNo, Tdirection moveDirection) {
 /** Prepare for the given shell to scroll. Shells 1 and above must be moved, so that after scrolling their terrain still
 	lines up with their inner shells. Shell 0 doesn't move, keeping the whole model centred, instead sample space is s
 	scrolled. */
-void CTerrain2::shellPreScrollUpdate(int shellNo, Tdirection direction) {
+void CTerrain2::prepShellForScroll(int shellNo, Tdirection direction) {
 	if (shellNo == 0) {
 		Tdirection scrollDir = flipDir(direction);
 		scrollSampleSpace(scrollDir, shells[0].scSampleStep);
@@ -256,6 +256,8 @@ void CTerrain2::shellPreScrollUpdate(int shellNo, Tdirection direction) {
 		vec3 move = dirToVec(scrollDir) * shells[0].SCsize;
 		chunkOrigin = glm::translate(chunkOrigin, move);
 		liveLog << "\nchunkOrigin moved to " << vec3(chunkOrigin[3]);
+		
+		scrollViewpoint(scrollDir);
 	}
 	else
 		recentreOnInnerShells(shellNo, direction);
@@ -325,7 +327,7 @@ void CTerrain2::scrollViewpoint(Tdirection scrollDir) {
 
 /**	If we've removed scrolled-out chunks from this shell following a scroll, the rear
 	inner face of the enclosing shell now needs to add chunks to cover that area of terrain. */
-void CTerrain2::rebuildOuterShell(int shellNo, Tdirection scrollOutFace) {
+void CTerrain2::rebuildOuterShellInnerFace(int shellNo, Tdirection scrollOutFace) {
 	if (shellNo < shells.size() - 1) {
 		shells[shellNo + 1].addInnerFaceChunks2(scrollOutFace);
 	}
