@@ -64,8 +64,8 @@ private:
 	TBoxVolume findOverlappedInnerFaceSCs(Tdirection face);
 	void removeOverlappedChunksInVolume(TBoxVolume volume);
 
-	TBoxVolume findOverlappedInnerFaceChunks(Tdirection face);
-	void addChunksToOverlappedVolume(TBoxVolume volume);
+	TBoxVolume findOverlappedInnerFaceSCsmultiLayer(Tdirection face);
+	void addChunksAtOrOutsideInnerShell(TBoxVolume volume);
 
 
 	CShellIterator getIterator();

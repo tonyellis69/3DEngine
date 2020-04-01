@@ -1,5 +1,7 @@
 #include "GUIrichText.h"
 
+#include <string_view>
+
 #include "glm\glm.hpp"
 # define PI           3.14159265358979323846  /* pi */
 
@@ -551,7 +553,9 @@ void CGUIrichText::resizeByWidth() {
 	if (resizeW != longestLine) {
 		resizeW = longestLine; // +rightBorder;
 	}
+	resizeW = min(resizeW, resizeMax.x);
 	setWidth(resizeW);
+	createPage();
 
 	//do we need to adjust height too?
 	int overrun = lineBuffer2.getOverlap();	
@@ -614,26 +618,32 @@ void CGUIrichText::prepForScrolling() {
 std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& styleRec) {
 	int cut = 0;
 	styleRec = { styleNone, 0, "" };
-	size_t found = remainingTxt.find('\\');
+	std::string_view remainingTxtView = remainingTxt;
+	size_t found = remainingTxtView.find('\\');
 	if (found != std::string::npos) {
 		cut = 1;
-		if (remainingTxt[found + 1] == 'h' || remainingTxt[found + 1] == 'S') {
+		if (remainingTxtView[found + 1] == 'h' || remainingTxtView[found + 1] == 'S') {
 		
-			if (remainingTxt[found + 2] == '{') {
-				size_t end = remainingTxt.find("}", found);
-				std::string id = remainingTxt.substr(found + 3, end - (found + 3));
+			if (remainingTxtView.size() > found + 2 && remainingTxtView[found + 2] == '{') {
+				//size_t end = remainingTxt.find("}", found);
+				//std::string id = remainingTxt.substr(found + 3, end - (found + 3));
+				std::string id(remainingTxtView.substr(found + 3));
 				size_t sz, sz2;
 				styleRec.hotId = std::stoi(id, &sz);
-				cut = 4 + id.size();
 
-				if (remainingTxt[found + 1] == 'h')
+				//parse remainingTxt from sz on, returning point at which we hit '}'
+				//make cut = this
+
+				cut = 4 + sz;// id.size();
+
+				if (remainingTxtView[found + 1] == 'h')
 					styleRec.styleChange = styleHotOn;
 				else
 					styleRec.styleChange = styleSuspendedHotOn;
 			}
 			else {
 				cut = 2;
-				if (remainingTxt[found + 1] == 'h')
+				if (remainingTxtView[found + 1] == 'h')
 					styleRec.styleChange = styleHotOff;
 				else
 					styleRec.styleChange = styleSuspendedHotOff;
@@ -641,16 +651,16 @@ std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& sty
 		}
 
 		//other markup checks here
-		if (remainingTxt.substr(found + 1, 6) == "style{") {
+		if (remainingTxtView.substr(found + 1, 6) == "style{") {
 			styleRec.styleChange = styleStyle;
-			size_t end = remainingTxt.find("}", found);
-			styleRec.styleName = remainingTxt.substr(found + 7, end - (found + 7));
+			size_t end = remainingTxtView.find("}", found);
+			styleRec.styleName = remainingTxtView.substr(found + 7, end - (found + 7));
 			cut = 8 + styleRec.styleName.size();
 		}
 	}
 
-	std::string writeTxt = remainingTxt.substr(0, found);
-	remainingTxt = remainingTxt.substr(writeTxt.size() + cut, std::string::npos);
+	std::string writeTxt(remainingTxtView.substr(0, found));
+	remainingTxt = remainingTxtView.substr(writeTxt.size() + cut, std::string::npos);
 
 	return writeTxt;
 }
@@ -669,7 +679,8 @@ TLineFragment CGUIrichText::findNextFragmentStart(const TLineFragment& currentFr
 	int textObj = currentFragment.textObj;
 	unsigned int textStartPos = currentFragment.textPos + currentFragment.textLength;
 
-	readPoint.pos += currentFragment.textLength;
+	//readPoint.pos += currentFragment.textLength;
+	readPoint.pos = currentFragment.textPos + currentFragment.textLength;
 	if (readPoint.pos >= textObjs[textObj].text.size()) {
 		readPoint.pos = 0;
 		readPoint.textObj++;

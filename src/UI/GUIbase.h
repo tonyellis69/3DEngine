@@ -334,6 +334,9 @@ protected:
 	static CFont* defaultFont;
 	IGUImsg* msgObj; ///<The object we send messages to.
 
+	inline static glm::i32vec2 mousePos; ///<Current mouse screen position.
+
+
 private:
 	void defaultMouseMoveResponse(int mouseX, int mouseY, int key);
 

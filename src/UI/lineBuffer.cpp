@@ -59,7 +59,7 @@ void CLineBuffer::draw() {
 void CLineBuffer::renderSprites(float dT) {
 	updateHotTextPeriods(dT);
 
-	pRenderer->rendertToTextureClear(pageBuf, glm::vec4(1,1, 1, 1));
+	pRenderer->rendertToTextureClear(pageBuf, glm::vec4(0,1, 1, 0));
 	pRenderer->setShader(textSpriteShader.shader);
 	pRenderer->attachTexture(0, spriteBuffer.getBuffer().handle);
 	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
