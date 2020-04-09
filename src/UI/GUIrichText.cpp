@@ -17,6 +17,17 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
 														transcriptLog(NULL),
 														CGUIbase(x,y,w,h) 
 {
+
+	TTempTestRec rootObj;
+	rootObj.hotCall = std::make_unique< TTempHotCallRec>();
+	rootObj.hotCall->dummy = 42;
+	rootObj.otherParam = "77";
+
+	tempObjs.push_back((rootObj));
+	TTempTestRec newObj = tempObjs[0];
+	tempObjs.push_back(newObj);
+
+
 	prepForFirstText();
 	prepForScrolling();
 	setResizeMode(resizeByWidthMode);
@@ -59,8 +70,8 @@ void CGUIrichText::DrawSelf() {
 	}
 }
 
-TRichTextRec& CGUIrichText::getTexObjCallback(int objNo) {
-	return textObjs[objNo];
+TRichTextRec* CGUIrichText::getTexObjCallback(int objNo) {
+	return &textObjs[objNo];
 }
 
 void CGUIrichText::setFont(CFont* newFont) {
@@ -303,6 +314,8 @@ bool CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
 	msg2.value = currentHotText; //NB, was done with msg.value = textObjs[selectedHotObj].hotId;
 	msgObj->GUImsg(uniqueID, msg2);
 
+	THotCallRec hotCall = hotCallRecs[currentHotText];
+
 	return true;
 }
 
@@ -473,6 +486,7 @@ std::vector<unsigned int> CGUIrichText::getHotTextIds() {
 /** Remove all text from the control. */
 void CGUIrichText::clear() {
 	textObjs.clear();
+	hotCallRecs.clear();
 	firstVisibleText = 0;
 	TRichTextRec defaultStyle;
 	defaultStyle.style = currentTextStyle;
@@ -583,6 +597,11 @@ void CGUIrichText::setResizeMode(TResizeMode mode) {
 	longestLine = 0;
 }
 
+/** Assign the virtual machine to send hot text calls to. */
+void CGUIrichText::setHotTextVM(Ivm* vm) {
+	pVM = vm;
+}
+
 CGUIrichText::~CGUIrichText() {
 
 }
@@ -625,16 +644,7 @@ std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& sty
 		if (remainingTxtView[found + 1] == 'h' || remainingTxtView[found + 1] == 'S') {
 		
 			if (remainingTxtView.size() > found + 2 && remainingTxtView[found + 2] == '{') {
-				//size_t end = remainingTxt.find("}", found);
-				//std::string id = remainingTxt.substr(found + 3, end - (found + 3));
-				std::string id(remainingTxtView.substr(found + 3));
-				size_t sz, sz2;
-				styleRec.hotId = std::stoi(id, &sz);
-
-				//parse remainingTxt from sz on, returning point at which we hit '}'
-				//make cut = this
-
-				cut = 4 + sz;// id.size();
+				std::tie(styleRec.hotId, cut) = extractHotParams(remainingTxtView.substr(found));
 
 				if (remainingTxtView[found + 1] == 'h')
 					styleRec.styleChange = styleHotOn;
@@ -663,6 +673,28 @@ std::string CGUIrichText::findNextTag( std::string& remainingTxt, TStyleRec& sty
 	remainingTxt = remainingTxtView.substr(writeTxt.size() + cut, std::string::npos);
 
 	return writeTxt;
+}
+
+std::tuple<unsigned int, size_t> CGUIrichText::extractHotParams(std::string_view& textView) {
+	int tagStartOffset = 3; //for '\h{'
+	size_t endTagPos = textView.substr(tagStartOffset).find('}');
+
+	std::string idStr(textView.substr(tagStartOffset, 25)); //25 = short string optimisation
+	size_t sz;
+	unsigned int hotId = std::stoi(idStr, &sz);
+
+	if (endTagPos != sz) { //trap for 1-digit hot texts, which I should probably scrap anyway
+		int offset = sz;
+		unsigned int objId = std::stoi(idStr.substr(offset), &sz);
+		offset += sz;
+		unsigned int memberId = std::stoi(idStr.substr(offset), &sz);
+		offset += sz+1;
+		std::string params = idStr.substr(offset, endTagPos - offset);
+		hotCallRecs[hotId] = { objId, memberId, params };
+		textObjs[currentTextObj].hotCall = std::make_shared<THotCallRec>( objId, memberId, params );
+	}
+
+	return { hotId, tagStartOffset + endTagPos + 1 };
 }
 
 /** Append newText to the current body of text and show the updated page. */
@@ -730,6 +762,9 @@ TLineFragment CGUIrichText::findFragmentEnd( TLineFragment fragment) {
 
 	std::string& text = textObjs[textObj].text;
 
+	if (text == "Test1")
+		int b = 0;
+
 	int unbreakableCharWidth = findNextUnbreakableChar(textObj, font);
 	int breakPoint = textStartPos; int breakPointX = renderX; unsigned int c;
 	for (c = textStartPos; c < text.size(); c++) {
@@ -782,6 +817,7 @@ TLineFragment CGUIrichText::findFragmentEnd( TLineFragment fragment) {
 void CGUIrichText::initialisePage() {
 	longestLine = 0;
 	lineBuffer2.setPageSize(getWidth(), getHeight());
+	//hotCallRecs.clear();
 }
 
 void CGUIrichText::writePageToLineBuffer() {
@@ -945,6 +981,7 @@ void CGUIrichText::setFadeText(bool onOff) {
 	If objNo is textless, just return it. */
 int CGUIrichText::getStyleChangeTextObjAt(int objNo) {
 	if (textObjs[currentTextObj].text.size() > 0 || textObjs[currentTextObj].flags & richBookmark) {
+		//TRichTextRec newObj = std::move(textObjs[objNo]);
 		TRichTextRec newObj = textObjs[objNo];
 		newObj.text.clear();
 		newObj.period = 0;
@@ -1101,7 +1138,7 @@ bool CGUIrichText::clearToBookMark() {
 		return false;
 	for (int obj = textObjs.size() - 1; obj >= 0; obj--) {
 		if (textObjs[obj].flags & richBookmark) {
-			textObjs.erase(textObjs.begin() + obj, textObjs.end());
+			 textObjs.erase(textObjs.begin() + obj, textObjs.end());
 			currentTextObj = textObjs.size() - 1;
 			createPage();
 			break;

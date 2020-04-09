@@ -19,6 +19,7 @@ CHexRenderer::CHexRenderer() : hexModel(6) {
 	camera.setPos(glm::vec3(0, -0, 12));
 	cameraPitch = 45;
 	camera.pitch(cameraPitch);
+	followCam = false;
 
 	floorplanLineColour = glm::vec4(0.3, 1, 0.3, 1);
 	floorplanSpaceColour = glm::vec4(0.6431, 0.7412, 0.9882, 0.03);
@@ -273,4 +274,33 @@ void CHexRenderer::setCursorPath(CHex& playerPos, CHex& cursorPos) {
 /** Set path directly. */
 void CHexRenderer::setCursorPath(THexList& path) {
 	cursorPath = path;
+}
+
+
+void CHexRenderer::toggleFollowCam() {
+	followCam = !followCam;
+
+	if (followCam) {
+		//find camera vector to xy plane
+		glm::vec3 camVector = camera.getTargetDir();
+		camVector = glm::normalize(camVector);
+
+		glm::vec3 planeN(0, 0, 1); //normal of plane on which hexes lie.
+		float d = 0; //distance of plane from origin
+		float t = -(glm::dot(camera.getPos(), planeN) + d)
+			/ glm::dot(camVector, planeN);
+		//t = distance from camera to plane for target vector
+
+		glm::vec3 p = camera.getPos() + camVector * t; //extend vector to find where it hits plane.
+
+		followCamVec = camera.getPos() - p;
+	}
+
+}
+
+/** Position the camera so that it's displaced from the given target by 
+	whatever the followCamVec currently is. */
+void CHexRenderer::followTarget(glm::vec3& target) {
+	glm::vec3 newPos = target + followCamVec;
+	camera.setPos(newPos);
 }

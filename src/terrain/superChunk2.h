@@ -28,10 +28,14 @@ public:
 		this->tr = tr;
 	}
 	std::tuple<bool, CBoxVolume> findOverlap(CBoxVolume clippee);
-
-	bool doesNotEntirelyEnvelop(CBoxVolume& clippee);
-
 	std::tuple<bool, CBoxVolume> findNotOrPartiallyOverlapped(CBoxVolume clipVol);
+
+	CBoxVolume operator* (glm::vec3& B) {
+		CBoxVolume ref = *this;
+		ref.bl *= B;
+		ref.tr *= B;
+		return ref;
+	}
 
 	glm::vec3 bl;
 	glm::vec3 tr;
@@ -51,7 +55,7 @@ public:
 	void checkForTerrainIntersection();
 	void setSampleSpacePosition(glm::vec3& pos);
 	void setSampleSize(float sampleSize);
-	void setTerrainCallback(ITerrain* pTerrain);
+	void setTerrainObj(ITerrain* pTerrain);
 	void createChunk(glm::i32vec3& index);
 
 	void clearChunks();
@@ -63,18 +67,14 @@ public:
 
 	//void getTris(const glm::vec3& pos, TChunkVert*& buf, unsigned int& noTris);
 
-	void clearOverlappedChunks(TBoxVolume& innerChunkVolume);
 	void clearOuterLayerChunks(Tdirection face, int maxChunks);
-	void restoreClippedChunks(TBoxVolume& innerChunkVolume);
-	
-	int getChunkAt(glm::i32vec3& pos);
 
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp
 
 	glm::vec3 sampleSpacePos;
 	
-	inline static ITerrainAppCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
+	inline static ITerrainAppCallback* pTerrainApp; ///<Pointer to the app used for callbacks.
 
 	bool isEmpty; ///<True unless terrain intersects SC.
 
@@ -84,14 +84,10 @@ public:
 	int numSCchunks; //<SC size in chunks.
 	float chunkSampleSize; ///<Chunk size in samplespace
 
-	//std::vector<glm::i32vec3> chunks; ///<The chunks owned by this superchunk
 	std::vector<int> scChunks; ///<Ids of the chunks owned by this superChunk;
 
 	float cubeSize; ///<The size of this shell's marching cubes.
 	int shellNo; ///TO DO may mean above is redundant
-
-	static CTerrain2* pTerrain; ///<Annoyingly necessary pointer to terrain object.
-	//TO DO Scrap
 
 	inline static ITerrain* pTerrainObj;///<Pointer to terrain callback obj
 };

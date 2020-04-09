@@ -11,6 +11,8 @@
 
 #include "text.h"
 
+#include "..\VMtest\src\Ivm.h"
+
 
 enum TStyleChange {
 	styleNone, styleBold, styleHotOn, styleHotOff, styleSuspendedHotOn, styleSuspendedHotOff, styleStyle,
@@ -31,13 +33,7 @@ enum TOverrunMode {overScrollMode, overResizeMode};
 enum TResizeMode {resizeByRatioMode, resizeByWidthMode, resizeNone };
 
 
-/** Records the id and other details of a fragment used for special
-	effects, such as hot text. */
-struct TFXfragment {
-	int fragId;
-	std::string text;
-	int textObj;
-};
+
 
 /** A more versatile multiline text display class. */
 class CGUIrichText : public ILineBuffer, public CGUIbase
@@ -47,7 +43,7 @@ public:
 	void applyStyleSheet();
 	void appendMarkedUpText(const std::string& text);
 	void DrawSelf();
-	TRichTextRec& getTexObjCallback(int objNo);
+	TRichTextRec* getTexObjCallback(int objNo);
 	void setFont(CFont* newFont);
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
@@ -129,6 +125,7 @@ public:
 	bool isBusy() {
 		return busy;
 	}
+	void setHotTextVM(Ivm* vm);
 
 	~CGUIrichText();
 
@@ -181,6 +178,7 @@ private:
 
 
 	std::string findNextTag( std::string& remainingTxt, TStyleRec& styleRec);
+	std::tuple<unsigned int, size_t> extractHotParams(std::string_view& text);
 	void setStyleChange(TStyleRec& styleRec);
 	void appendText(const std::string& newText);
 
@@ -218,4 +216,10 @@ private:
 	int currentHotText;
 
 	TCharacterPos readPoint; ///<Where we've got in text while finding fragments.
+
+	std::map<int, THotCallRec> hotCallRecs; ///<Stores the details of current hot text func calls.
+
+	Ivm* pVM; ///<Interface to virtual machine for hot text calls.
+
+	std::vector<TTempTestRec> tempObjs;
 };

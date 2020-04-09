@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "glm/glm.hpp"
 
@@ -59,6 +60,18 @@ const unsigned int richFadeIn = 16;
 const unsigned int richGap = 32;
 const unsigned int richBookmark = 64;
 
+struct THotCallRec {
+	THotCallRec(unsigned int obj, unsigned int memb, const std::string& params) {
+		objId = obj;
+		memberId = memb;
+		paramStr = params;
+	}
+	THotCallRec() {};
+	unsigned int objId;
+	unsigned int memberId;
+	std::string paramStr;
+};
+
 struct TRichTextRec : textRec {
 	TRichTextRec() {
 		hotId = 0;
@@ -66,6 +79,7 @@ struct TRichTextRec : textRec {
 		period = 0;
 		gap = 0;
 		lineRef = 0;
+		
 	}
 
 	unsigned int hotId;
@@ -73,7 +87,25 @@ struct TRichTextRec : textRec {
 	int lineRef;
 	unsigned int flags;
 	float period;
+	std::shared_ptr<THotCallRec> hotCall;
+};
 
+struct TTempHotCallRec {
+	int dummy;
+};
+struct TTempTestRec {
+	TTempTestRec() {
+		//std::string otherParam = 0;
+	}
+	TTempTestRec(const TTempTestRec& B) {
+		otherParam = B.otherParam;
+		//hotCall = std::move(B.hotCall);
+	}
+	TTempTestRec* copy() {
+		return this;
+	}
+	std::string otherParam;
+	std::unique_ptr<TTempHotCallRec> hotCall;
 };
 
 /** Holds the minimum data the textBuffer needs to draw: text, font, text colour. */

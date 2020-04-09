@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "glm/glm.hpp"
 
 #include "../renderer/buf.h"
@@ -10,7 +12,7 @@ struct THexDraw;
 class IHexRenderer {
 public:
 	virtual void drawLines(THexDraw& drawData) = 0;
-
+	virtual CBuf* getBuffer(const std::string& bufName) = 0;
 
 
 };

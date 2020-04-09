@@ -245,27 +245,26 @@ void CLineBuffer::recalcPageState() {
 
 
 CTextSprite* CLineBuffer::createSprite(TLineFragment& fragment) {
-	TRichTextRec textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
+	TRichTextRec* textObj = pCallbackObj->getTexObjCallback(fragment.textObj);
 	CTextSprite* sprite;
-	if (textObj.hotId) {
+	if (textObj->hotId) {
 		sprite = new CHotTextSprite();
 		if (hotTexts.empty())
-			hotTexts.insert({ textObj.hotId, {0} });
+			hotTexts.insert({ textObj->hotId, {0} });
 		else
-			hotTexts.insert({ textObj.hotId, {randomPeriod(0)} });
-		hotTextSprites.push_back({ (CHotTextSprite*) sprite, textObj.hotId });
-		sprite->setHotId(textObj.hotId);
+			hotTexts.insert({ textObj->hotId, {randomPeriod(0)} });
+		hotTextSprites.push_back({ (CHotTextSprite*) sprite, textObj->hotId });
+		sprite->setHotId(textObj->hotId);
 	}
 	else
 		sprite = new CTextSprite();
 	sprite->setCallbackObj(this);
 
 	//TO DO: textObj should carry an up-to-date pointer to font
-	CFont* font = &CRenderer::getInstance().fontManager.getFont(textObj.style.font);
+	CFont* font = &CRenderer::getInstance().fontManager.getFont(textObj->style.font);
 	//should only do this once
-	std::string text = textObj.text.substr(fragment.textPos, fragment.textLength);
+	std::string text = textObj->text.substr(fragment.textPos, fragment.textLength);
 	sprite->makeTextQuads(text, font);
-
 
 	sprite->setTextObjData(fragment.textObj, fragment.textPos, fragment.textLength);
 	sprite->setPageOthoMatrix(&pageOrthoView);
@@ -275,7 +274,7 @@ CTextSprite* CLineBuffer::createSprite(TLineFragment& fragment) {
 	} else
 		sprite->setPagePosition(pageEnd.screenPos.x, pageEnd.screenPos.y);
 
-	sprite->setTextColour(textObj.style.colour);
+	sprite->setTextColour(textObj->style.colour);
 
 	sprite->setPageTexture(&pageBuf);
 	sprite->setShader(&textSpriteShader);
@@ -348,6 +347,7 @@ float CLineBuffer::randomPeriod(float start) {
 /** Free whatever memory this hot text sprite is using. */
 void CLineBuffer::freeHotTextSprite(CHotTextSprite* sprite) {
 //	freeSpriteImageSpace(sprite->bufId); //dealt with by base destructor!
+
 	freeSpriteImageSpace(sprite->bufId2);
 
 	for (auto hotRec = hotTextSprites.begin(); hotRec != hotTextSprites.end(); ) {

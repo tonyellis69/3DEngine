@@ -38,4 +38,8 @@ public:
 	virtual void scrollViewpoint(Tdirection scrollDir) = 0;
 	virtual void rebuildOuterShellInnerFace(int shellNo, Tdirection scrollOutFace) = 0;
 	virtual ITerrainAppCallback* getTerrainApp() = 0;
+	virtual glm::vec3 getChunkOrigin() = 0;
+	virtual float getChunkSize(int shell) = 0;
+	virtual void setChunkColour(int chunkId, glm::vec4& colour) = 0;
+	
 };

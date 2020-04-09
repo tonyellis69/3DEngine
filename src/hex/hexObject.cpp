@@ -67,6 +67,10 @@ void CHexObject::setBuffer(CBuf* buffer) {
 	drawData.buf = buf;
 }
 
+void CHexObject::setBuffer(const std::string& bufName) {
+	drawData.buf = hexRendr->getBuffer(bufName);
+}
+
 /** Set the rotation and facing direction of this object. */
 void CHexObject::setDirection(THexDir direction) {
 	facing = direction;

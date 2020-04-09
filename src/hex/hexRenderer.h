@@ -34,6 +34,12 @@ public:
 	void setCursorPath(CHex& playerPos, CHex& cursorPos);
 	void setCursorPath(THexList& path);
 	THexList& getCursorPath() { return cursorPath; }
+	void toggleFollowCam();
+	bool following() {
+		return followCam;
+	}
+
+	void followTarget(glm::vec3& target);
 
 private:
 	void tmpCreateHexagonModel();
@@ -64,6 +70,8 @@ private:
 
 	CCamera camera;
 	float cameraPitch;
+	bool followCam;
+	glm::vec3 followCamVec; ///<Vector from target point on plane to camera
 
 	CHexArray* hexArray;
 

@@ -56,7 +56,7 @@ public:
 
 	glm::vec3 sampleSpacePos; //<Position of terrain in sample space.
 	float worldToSampleScale; ///<Number of world units to one sample unit
-	ITerrainAppCallback* pCallbackApp; ///<Pointer to the app used for callbacks.
+	ITerrainAppCallback* pTerrainApp; ///<Pointer to the app used for callbacks.
 
 	std::vector<Chunk2> chunks; ///<The complete reservoir of chunks.
 	
@@ -83,6 +83,15 @@ private:
 	void scrollViewpoint(Tdirection scrollDir);
 	void rebuildOuterShellInnerFace(int shellNo, Tdirection scrollOutFace);
 	glm::i32vec3 getChunkIndex(int chunkId);
+	glm::vec3 getChunkOrigin() {
+		return chunkOrigin[3];
+	}
+	float getChunkSize(int shellNo) {
+		return shells[shellNo].chunkSize;
+	}
+	void setChunkColour(int chunkId, glm::vec4& colour) {
+		chunks[chunkId].colour = colour;
+	}
 
 	const int approxChunksRequired = 2000; 
 	int chunksToSkinPerFrame;

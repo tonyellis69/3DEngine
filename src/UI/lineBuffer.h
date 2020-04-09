@@ -97,7 +97,7 @@ private:
 
 class ILineBuffer {
 public:
-	virtual TRichTextRec& getTexObjCallback(int objNo) = 0;
+	virtual TRichTextRec* getTexObjCallback(int objNo) = 0;
 	virtual glm::vec4& getHotTextColour() = 0;
 	virtual glm::vec4& getHotTextSelectedColour() = 0;
 	virtual void hotTextMouseOver(int hotId) = 0;

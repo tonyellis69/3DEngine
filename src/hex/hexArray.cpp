@@ -189,7 +189,7 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end) {
 			if (getHexCube(next).content == 2)
 				continue; //solid hex
 
-			if (entityCheck(next) == true /* && next != end*/)
+			if (entityBlockCheck(next) == true /* && next != end*/)
 				continue;
 
 
@@ -249,9 +249,28 @@ CHex CHexArray::findLineEnd(CHex& start, CHex& target) {
 		glm::vec3 travelPoint = A + (travelVector * dist);
 		travelHex = hexRound(travelPoint);
 		dist += 1.0f;
-	} while (getHexCube(travelHex).content != 2 && entityCheck(travelHex) == false);
+	} while (getHexCube(travelHex).content != 2 && entityBlockCheck(travelHex) == false);
 
 	return travelHex;
+}
+
+/** Return index coordinates as a cubic position. */
+CHex CHexArray::indexToCube(int x, int y) {
+	x -= width / 2;
+	y -= height / 2;
+	return offsetToCube(x,y);
+}
+
+CHex CHexArray::indexToCube(glm::i32vec2& index) {
+	return indexToCube(index.x, index.y);
+}
+
+/** Convert hex coordinates to an index position. */
+glm::i32vec2 CHexArray::cubeToIndex(CHex& hex) {
+	glm::i32vec2 offset = cubeToOffset(hex);
+	offset.x += width / 2;
+	offset.y += height / 2;
+	return offset;
 }
 
 ///////////////PRIVATE//////////////

@@ -24,13 +24,16 @@ public:
 	THexList aStarPath(CHex& start, CHex& end);
 	bool outsideArray(CHex& hex);
 	CHex findLineEnd(CHex& start, CHex& target);
+	CHex indexToCube(int x, int y);
+	CHex indexToCube(glm::i32vec2& index);
+	glm::i32vec2 cubeToIndex(CHex& hex);
 		 
 	int width;
 	int height;
 
 private:
 	THexList walkBack(CHex& start, CHex& end, TCameFrom& cameFrom);
-	virtual bool entityCheck(CHex& hex) {
+	virtual bool entityBlockCheck(CHex& hex) {
 		return false;
 	};
 

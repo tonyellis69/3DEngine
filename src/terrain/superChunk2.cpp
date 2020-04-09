@@ -9,66 +9,62 @@
 
 using namespace glm;
 
-//ITerrainAppCallback* CSuperChunk2::pCallbackApp = NULL;
-CTerrain2* CSuperChunk2::pTerrain;
-
+/** Initialise the fundamental settings of this superchunk, */
 void CSuperChunk2::setBasics(int shellNo, glm::i32vec3& index, int numSCchunks) {
 	isEmpty = true;
 	colour = vec4(col::randHue(), 1);
 	origIndex = index;
 	this->numSCchunks = numSCchunks;
-	pTerrain = (CTerrain2*) pTerrainObj; //scrap!!!!!!!
 	this->shellNo = shellNo;
 }
 
+/** Set the region of samplespace this superchunk currently occupies. */
 void CSuperChunk2::setSampleInfo(float sampSize, glm::vec3& samplePos) {
 	setSampleSize(sampSize);
 	setSampleSpacePosition(samplePos);
 }
 
+/** Clear the isEmpty flag if terrain intersects this SC's sample space. */
 void CSuperChunk2::checkForTerrainIntersection() {
-	isEmpty = pCallbackApp->scIntersectionCheckCallback(sampleSpacePos, sampleSize);
+	isEmpty = pTerrainApp->scIntersectionCheckCallback(sampleSpacePos, sampleSize);
 }
 
+/** Change this SC's location in samplespace. */
 void CSuperChunk2::setSampleSpacePosition(glm::vec3 & pos) {
 	sampleSpacePos = pos;
 }
 
+/** Change the cubic area of samplespace this SC covers. */
 void CSuperChunk2::setSampleSize(float sampleSize) {
 	this->sampleSize = sampleSize;
 	chunkSampleSize = sampleSize / numSCchunks;
 }
 
-
-
-void CSuperChunk2::setTerrainCallback(ITerrain* pTerrain) {
+/** Set the terrain object whose shell this SC belongs to. */
+void CSuperChunk2::setTerrainObj(ITerrain* pTerrain) {
 	pTerrainObj = pTerrain;
 }
 
 
 
-/** Acquire a new chunk at the given index position. */
-void CSuperChunk2::createChunk(glm::i32vec3 & index) {
+/** Create a new chunk for this SC at the given chunk index position. */
+void CSuperChunk2::createChunk(glm::i32vec3 & chunkIndex) {
 
-	if (shellNo > 1)
+	if (shellNo > 1) ///////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		return;
-	vec3 sampleCorner = sampleSpacePos + vec3(index) * chunkSampleSize;
 
+
+	vec3 sampleCorner = sampleSpacePos + vec3(chunkIndex) * chunkSampleSize;
+
+	//calculate chunk position in terrain
 	vec3 terrainPos = pTerrainObj->getSCworldPos(shellNo, origIndex); 
+	terrainPos -= pTerrainObj->getChunkOrigin();
+	terrainPos += vec3(chunkIndex) * pTerrainObj->getChunkSize(shellNo);
+	 	
+	int id = pTerrainObj->createChunk(chunkIndex, sampleCorner, shellNo, terrainPos);
+	scChunks.push_back(id);
 
-	terrainPos -= vec3(pTerrain->chunkOrigin[3]);
-
-	terrainPos += vec3(index) * pTerrain->shells[shellNo].chunkSize;
-	 
-	//scChunks.push_back( pTerrain->createChunk(index, sampleCorner, shellNo, terrainPos) );
-	scChunks.push_back(pTerrainObj->createChunk(index, sampleCorner, shellNo, terrainPos));
-
-
-	//pTerrain->chunks[scChunks.back()].colour = colour;
-	//pTerrain->chunks[scChunks.back()].colour = pTerrain->shells[shellNo].shellColour;
-	pTerrain->chunks[scChunks.back()].colour = colour;
-
-
+	pTerrainObj->setChunkColour(id,  colour);
 }	
 
 
@@ -81,13 +77,13 @@ void CSuperChunk2::clearChunks() {
 	isEmpty = true;
 }
 
-/** Remove any chunks within the proportion of the SC volume defined by this unit volutme. */
+/** Remove any chunks within the proportion of the SC volume defined by this unit volume. */
 void CSuperChunk2::clearChunks(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(numSCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(numSCchunks);
 
 	for (auto id = scChunks.begin(); id != scChunks.end();) {
-		i32vec3* chunkIndex = &pTerrain->chunks[*id].index;
+		i32vec3* chunkIndex = &pTerrainObj->getChunkIndex(*id);
 		if (all(greaterThanEqual(*chunkIndex, indexBL)) && all(lessThanEqual(*chunkIndex, indexTR))) {
 			pTerrainObj->removeChunk(*id);
 			id = scChunks.erase(id);
@@ -111,7 +107,7 @@ void CSuperChunk2::addChunks(CBoxVolume& unitVolume) {
 						continue;
 
 					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-					if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+					if (pTerrainApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
 						createChunk(chunk);
 					}
 				}
@@ -121,7 +117,7 @@ void CSuperChunk2::addChunks(CBoxVolume& unitVolume) {
 /** Returns true if this SC has a chunk at this index position. */
 bool CSuperChunk2::chunkExists(glm::i32vec3& index) {
 	for (auto localChunk : scChunks) {
-		if (pTerrain->chunks[localChunk].index == index) {
+		if (pTerrainObj->getChunkIndex(localChunk) == index) {
 			return true;
 		}
 	}
@@ -142,7 +138,7 @@ void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 						continue;
 
 					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-					if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+					if (pTerrainApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
 						createChunk(chunk);
 						isEmpty = false;
 					}
@@ -171,7 +167,7 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 						continue;
 
 					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
-					if (pCallbackApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+					if (pTerrainApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
 						createChunk(chunk);
 					}
 				}
@@ -223,39 +219,7 @@ std::tuple<bool, CBoxVolume> CBoxVolume::findOverlap(CBoxVolume clipVol)
 
 
 /** If clippee is partially or entirely outside this volume, return true
-	and with the proportion of overlap in clipVol, expressed as a unit volume. */
-bool CBoxVolume::doesNotEntirelyEnvelop(CBoxVolume& clipVol) {
-	vec3 SCboundaryFix(1.0f);
-	if (all(lessThan(clipVol.tr, tr + SCboundaryFix)) && all(greaterThan(clipVol.bl, bl - SCboundaryFix)))
-		return false;
-
-	vec3 volSize(clipVol.tr - clipVol.bl);
-
-	//find overlap
-	vec3 boundaryFix(1);
-	vec3 unitBl = max(clipVol.bl, bl);
-	vec3 unitTr = min(clipVol.tr, tr);
-
-	unitBl = unitBl - clipVol.bl;
-	unitTr = unitTr - clipVol.bl;
-
-	for (int axis = 0; axis < 3; axis++)
-		if (unitBl[axis] == unitTr[axis]) {
-			unitBl[axis] = volSize[axis];
-			unitTr[axis] = 0;
-		}
-
-
-	unitBl = unitBl + boundaryFix;
-	unitTr = unitTr - boundaryFix;
-
-	unitBl = unitBl / volSize;
-	unitTr = unitTr / volSize;
-	clipVol.set(unitBl, unitTr);
-	return true;
-}
-//TO DO: make above redundant
-
+	and with the proportion of overlap expressed as a unit volume. */
 std::tuple<bool, CBoxVolume> CBoxVolume::findNotOrPartiallyOverlapped(CBoxVolume clipVol) {
 	vec3 SCboundaryFix(1.0f);
 	if (all(lessThan(clipVol.tr, tr + SCboundaryFix)) && all(greaterThan(clipVol.bl, bl - SCboundaryFix)))

@@ -22,6 +22,7 @@ public:
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
 	void setBuffer(CBuf* buffer);
+	void setBuffer(const std::string& bufName);
 	void setDirection(THexDir direction);
 	virtual bool beginMove();
 	void setZheight(float height);

@@ -73,7 +73,7 @@ void CShell::createTerrain() {
 
 /** Perform the SC setup required when a shell is created. */
 void CShell::initSuperChunks() {
-	CSuperChunk2::pCallbackApp = pTerrainObj->getTerrainApp();
+	CSuperChunk2::pTerrainApp = pTerrainObj->getTerrainApp();
 	scSampleStep = SCsize / pTerrain->worldToSampleScale;
 	CShellIterator scIter = getIterator();
 	while (!scIter.finished()) {

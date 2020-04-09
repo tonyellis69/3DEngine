@@ -97,7 +97,7 @@ void CTerrain2::setWorldScale(float scale) {
 }
 
 void CTerrain2::setCallbackApp(ITerrainAppCallback * pApp) {
-	pCallbackApp = pApp;
+	pTerrainApp = pApp;
 }
 
 
@@ -111,7 +111,7 @@ void CTerrain2::update(float dT) {
 			int id = chunksToMesh.front();
 			chunksToMesh.pop();
 			if (chunks[id].status == chToSkin )
-				pCallbackApp->createChunkMesh(chunks[id]);	
+				pTerrainApp->createChunkMesh(chunks[id]);	
 	}
 }
 
@@ -169,7 +169,7 @@ void CTerrain2::getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& bu
 	}
 	
 	//no? Let's go retrieve it then
-	unsigned int size = pCallbackApp->getChunkTrisCallback(chunkId, cachedChunkTris[freeChunkTriCache].buf);
+	unsigned int size = pTerrainApp->getChunkTrisCallback(chunkId, cachedChunkTris[freeChunkTriCache].buf);
 	
 	noTris = cachedChunkTris[freeChunkTriCache].noTris = size / (sizeof(TChunkVert2) * 3);
 	cachedChunkTris[freeChunkTriCache].id = chunkId;
@@ -203,7 +203,7 @@ void CTerrain2::setViewpoint(glm::vec3& pos) {
 }
 
 ITerrainAppCallback* CTerrain2::getTerrainApp(){
-	return pCallbackApp;
+	return pTerrainApp;
 }
 
 /** Return the worldspace size of the given shell. */
@@ -304,7 +304,7 @@ int CTerrain2::getFreeChunk() {
 /** Take this chunk out of service, returning it to the free pile. */
 void CTerrain2::removeChunk(int id) {
 	if (chunks[id].status == chSkinned)
-		pCallbackApp->deleteChunkMesh(chunks[id]);
+		pTerrainApp->deleteChunkMesh(chunks[id]);
 
 	chunks[id].status = chFree;
 	freeChunks.push_back(id);
@@ -320,7 +320,7 @@ glm::vec3 CTerrain2::getSCworldPos(int shellNo, const glm::i32vec3& origIndex) {
 /** Update the viewpioint position in response to a scroll, so that the view remains the same. */
 void CTerrain2::scrollViewpoint(Tdirection scrollDir) {
 	glm::vec3& move = dirToVec(scrollDir) * shells[0].SCsize;
-	pCallbackApp->onTerrainScroll(move);
+	pTerrainApp->onTerrainScroll(move);
 	viewpoint += move;
 	oldViewpoint += move;
 }
