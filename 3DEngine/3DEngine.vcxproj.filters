@@ -42,6 +42,9 @@
     <Filter Include="Source Files\win">
       <UniqueIdentifier>{d578a43f-a4c2-46a5-bd6b-905fb2c1a1cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\physics2">
+      <UniqueIdentifier>{7ade583e-2bb2-4b90-801f-ed4fb03aaa0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -415,6 +418,12 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\lineBuffer.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\physics2\physEng.cpp">
+      <Filter>Source Files\physics2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\physics2\physObj2.cpp">
+      <Filter>Source Files\physics2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -843,6 +852,15 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\lineBuffer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics2\physEng.h">
+      <Filter>Source Files\physics2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics2\physObj2.h">
+      <Filter>Source Files\physics2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics2\physModel.h">
+      <Filter>Source Files\physics2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

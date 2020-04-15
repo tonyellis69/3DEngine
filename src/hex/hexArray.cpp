@@ -20,6 +20,8 @@ void CHexArray::init(int w, int h) {
 	float yStep = 1.5f;
 
 	glm::vec3 origin (w * 0.5f * xStep, h * 0.5f * yStep, 0.0f);
+	worldPosCornerDist = { origin.x, origin.y,0 };
+
 	glm::i32vec2 intOrigin(w * 0.5f, h * 0.5f);
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {

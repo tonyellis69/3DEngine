@@ -117,9 +117,10 @@ void CCamera::dolly(float dist) {
 	setPos(pos);
 }
 
+/** Return a normalised vector in the direction the camera is looking. */
 glm::vec3 CCamera::getTargetDir() {
 	glm::vec3 dir = glm::vec3(0, 0, -1);
-	return orientation * dir;
+	return glm::normalize(orientation * dir);
 }
 
 

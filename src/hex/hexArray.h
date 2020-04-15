@@ -31,6 +31,8 @@ public:
 	int width;
 	int height;
 
+	glm::vec3 worldPosCornerDist; ///<Dist from origin to corner.
+
 private:
 	THexList walkBack(CHex& start, CHex& end, TCameFrom& cameFrom);
 	virtual bool entityBlockCheck(CHex& hex) {

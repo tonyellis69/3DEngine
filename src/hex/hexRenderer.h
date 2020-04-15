@@ -40,6 +40,9 @@ public:
 	}
 
 	void followTarget(glm::vec3& target);
+	void attemptScreenScroll(glm::i32vec2& mousePos, float dT);
+
+	glm::vec3 castRay(glm::vec3& ray);
 
 private:
 	void tmpCreateHexagonModel();
@@ -72,6 +75,7 @@ private:
 	float cameraPitch;
 	bool followCam;
 	glm::vec3 followCamVec; ///<Vector from target point on plane to camera
+	float screenScrollSpeed;
 
 	CHexArray* hexArray;
 

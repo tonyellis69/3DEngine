@@ -163,7 +163,8 @@ void CBaseApp::OnCharEntry(unsigned int Key, long Mod) {
 }
 
 
-
+/** Called when the mouse moves within the area of the app - *not* 
+	simply anywhere on screen. */
 void CBaseApp::onWinMouseMove(int x, int y) {
 	unsigned int msg = WM_MOUSEMOVE;
 	int key = 0;
@@ -378,6 +379,7 @@ void CBaseApp::setMousePos(int x, int y) {
 	win.setMousePos(x, y);
 }
 
+/** Return mouse position relative to the app window, */
 glm::i32vec2 CBaseApp::getMousePos() {
 	int x, y;
 	win.getMousePos(x, y);

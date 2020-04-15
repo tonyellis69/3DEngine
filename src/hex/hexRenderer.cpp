@@ -20,6 +20,7 @@ CHexRenderer::CHexRenderer() : hexModel(6) {
 	cameraPitch = 45;
 	camera.pitch(cameraPitch);
 	followCam = false;
+	screenScrollSpeed = 25;// 15.0f;
 
 	floorplanLineColour = glm::vec4(0.3, 1, 0.3, 1);
 	floorplanSpaceColour = glm::vec4(0.6431, 0.7412, 0.9882, 0.03);
@@ -240,13 +241,16 @@ CHex CHexRenderer::pickHex(int screenX, int screenY) {
 
 	//this should be a ray, projecting from 0,0,0 in the given direction.
 
-	glm::vec3 planeN(0, 0, 1); //normal of plane on which hexes lie.
-	float d = 0; //distance of plane from origin
-	float t = -(glm::dot(camera.getPos(), planeN) + d)
-			/ glm::dot(ray, planeN); 
-	//t = distance from camera to plane for this ray
+	//glm::vec3 planeN(0, 0, 1); //normal of plane on which hexes lie.
+	//float d = 0; //distance of plane from origin
+	//float t = -(glm::dot(camera.getPos(), planeN) + d)
+	//		/ glm::dot(ray, planeN); 
+	////t = distance from camera to plane for this ray
 
-	glm::vec3 p = camera.getPos() + ray * t; //extend ray to find where it hits plane.
+	//glm::vec3 p = camera.getPos() + ray * t; //extend ray to find where it hits plane.
+
+
+	glm::vec3 p = castRay(ray);
 
 	CHex hexPos = worldSpaceToHex(p);
 
@@ -283,17 +287,17 @@ void CHexRenderer::toggleFollowCam() {
 	if (followCam) {
 		//find camera vector to xy plane
 		glm::vec3 camVector = camera.getTargetDir();
-		camVector = glm::normalize(camVector);
 
-		glm::vec3 planeN(0, 0, 1); //normal of plane on which hexes lie.
-		float d = 0; //distance of plane from origin
-		float t = -(glm::dot(camera.getPos(), planeN) + d)
-			/ glm::dot(camVector, planeN);
-		//t = distance from camera to plane for target vector
 
-		glm::vec3 p = camera.getPos() + camVector * t; //extend vector to find where it hits plane.
+		//glm::vec3 planeN(0, 0, 1); //normal of plane on which hexes lie.
+		//float d = 0; //distance of plane from origin
+		//float t = -(glm::dot(camera.getPos(), planeN) + d)
+		//	/ glm::dot(camVector, planeN);
+		////t = distance from camera to plane for target vector
 
-		followCamVec = camera.getPos() - p;
+		//glm::vec3 p = camera.getPos() + camVector * t; //extend vector to find where it hits plane.
+
+		followCamVec = camera.getPos() - castRay(camVector);
 	}
 
 }
@@ -303,4 +307,51 @@ void CHexRenderer::toggleFollowCam() {
 void CHexRenderer::followTarget(glm::vec3& target) {
 	glm::vec3 newPos = target + followCamVec;
 	camera.setPos(newPos);
+}
+
+/** Scroll the screen if the mouse is at the edge. */
+void CHexRenderer::attemptScreenScroll(glm::i32vec2& mousePos, float dT) {
+	//if (followCam)
+	//	return;
+	float xMove = dT * screenScrollSpeed;
+	float yMove = xMove;
+	glm::vec2 screenSize = camera.getView();
+
+	glm::vec3 cameraMove(0);
+	if (mousePos.x >= screenSize.x - 5 )
+		cameraMove ={ xMove,0,0 };
+	else if (mousePos.x < 5 )
+		cameraMove = { -xMove,0,0 };
+
+	if (mousePos.y >= screenSize.y - 5 )
+		cameraMove = { 0,-yMove,0 };
+	else if (mousePos.y < 5)
+		cameraMove = { 0,yMove,0 };
+	
+	if (cameraMove.length() == 0)
+		return;
+	
+
+	glm::vec3 camTarget = castRay(camera.getTargetDir());
+	camTarget += cameraMove;
+
+	glm::vec3 mapSize = hexArray->worldPosCornerDist;
+	
+
+	if (camTarget.x < -mapSize.x || camTarget.x > mapSize.x
+		|| camTarget.y < -mapSize.y || camTarget.y > mapSize.y)
+		return;
+
+	moveCamera(cameraMove);
+}
+
+glm::vec3 CHexRenderer::castRay(glm::vec3& ray) {
+	glm::vec3 planeN(0, 0, 1); //normal of plane on which hexes lie.
+	float d = 0; //distance of plane from origin
+	float t = -(glm::dot(camera.getPos(), planeN) + d)
+		/ glm::dot(ray, planeN);
+	//t = distance from camera to plane for this ray
+
+	return camera.getPos() + ray * t; //extend ray to find where it hits plane.
+
 }

@@ -113,6 +113,8 @@
     <ClCompile Include="..\src\hex\hexObject.cpp" />
     <ClCompile Include="..\src\hex\hexRenderer.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
+    <ClCompile Include="..\src\physics2\physEng.cpp" />
+    <ClCompile Include="..\src\physics2\physObj2.cpp" />
     <ClCompile Include="..\src\physics\aabb.cpp" />
     <ClCompile Include="..\src\physics\basePhysObj.cpp" />
     <ClCompile Include="..\src\physics\bsphere.cpp" />
@@ -249,6 +251,9 @@
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\Src\Macros.h" />
+    <ClInclude Include="..\src\physics2\physEng.h" />
+    <ClInclude Include="..\src\physics2\physModel.h" />
+    <ClInclude Include="..\src\physics2\physObj2.h" />
     <ClInclude Include="..\src\physics\aabb.h" />
     <ClInclude Include="..\src\physics\basePhysObj.h" />
     <ClInclude Include="..\src\physics\bsphere.h" />
