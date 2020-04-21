@@ -58,8 +58,10 @@ public:
 	unsigned int nInstancedVerts; ///<How many verts belong to the instanced model, if any.
 
 	GLuint indexType; ///<unsigned short or unsigned int
+	int indexStride; 
 
-
+	int frameCount; ///<Number of animation frames
+	int frameIndices;	///<Number of indices per frame
 private:
 	CRenderer* pRenderer;
 };

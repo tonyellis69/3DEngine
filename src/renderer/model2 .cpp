@@ -28,6 +28,7 @@ void CModel2::setDrawCallout(callbackFunctionPtr cb, void * callee) {
 void CModel2::loadMesh(CMesh& newMesh) {
 	mesh = newMesh;
 	bufferMesh();
+	calcBBextent();
 }
 
 /** Upload the mesh data to a graphics hardware buffer. */
@@ -75,5 +76,16 @@ void CModel2::orientateWorldMatrix() {
 
 void CModel2::setTexture(CRenderTexture * texture) {
 	material.texture1 = texture;
+}
+
+/** Find the half-width extent for the axis-aligned bounding box
+	of this model's mesh.
+	TO DO: consider moving to CPhysModel if never used here.*/
+void CModel2::calcBBextent() {
+	//find most distant x,y,z
+	BBextent = glm::vec3(FLT_MIN);
+	for (auto vert : mesh.vertices) {
+		BBextent = glm::max(BBextent, glm::abs(vert));
+	}
 }
 

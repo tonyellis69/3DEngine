@@ -14,6 +14,8 @@
 #include "../hex/hex.h"
 #include "../hex/IHexRenderer.h"
 
+#include "hex/lineModel.h"
+
 
 /**	A class for drawing 3D hex-based graphics. */
 class IhexRendererCallback;
@@ -29,8 +31,10 @@ public:
 	void moveCamera(glm::vec3& move);
 	void setCameraAspectRatio(glm::vec2 ratio);
 	CHex pickHex(int screenX, int screenY);
+	void loadMesh(const std::string& name, const std::string& fileName);
 	CBuf* createMeshBuffer(const std::string& name);
 	CBuf* getBuffer(const std::string& name);
+	CLineModel getLineModel(const std::string& name);
 	void setCursorPath(CHex& playerPos, CHex& cursorPos);
 	void setCursorPath(THexList& path);
 	THexList& getCursorPath() { return cursorPath; }
@@ -54,6 +58,9 @@ private:
 	void drawFloorPlan();
 	void drawHighlights();
 	void drawLines(THexDraw& drawData);
+	void drawLineModel(THexDraw& drawData);
+
+	void drawNode(TModelNode& node, THexDraw& drawData);
 
 	CRenderer* pRenderer;
 	CBuf floorplanLineBuf;
@@ -82,7 +89,12 @@ private:
 	IhexRendererCallback* pCallbackObj; ///<Pointer to obj used for callbacks.
 
 	std::map<std::string, CBuf> modelBuffers;
+	std::map<std::string, CLineModel> lineModels;
+
+
 	THexList cursorPath;
+
+	CImporter importer;
 };
 
 

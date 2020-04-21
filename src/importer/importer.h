@@ -14,17 +14,21 @@
 class CImporter {
 public:
 	void loadFile(const std::string& filename);
-	std::vector<CMesh>& CImporter::getMeshes();
+	void addFrame(const std::string& filename);
 	CMesh& getSingleMesh();
+	TModelNode getMeshNodes();
 
 private:
-	void processNode(aiNode* node, const aiScene* scene);
-	CMesh processMesh(aiMesh* mesh, const aiScene* scene);
-	
+	TModelNode processNode(aiNode* node, const aiScene* scene);
+	TMeshRec processMesh(aiMesh* mesh, const aiNode* node);
+	void copyMatrix(aiMatrix4x4& src, glm::mat4& dest);
 
-	std::vector<CMesh> meshes;
+
+	//std::vector<CMesh> meshes;
 
 	CMesh singleMesh; ///<All the imported 3D model objects stored as one mesh object.
+
+	TModelNode rootNode; 
 };
 
 

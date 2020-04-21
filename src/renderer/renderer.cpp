@@ -770,7 +770,7 @@ void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
 	if (buf.hIndex == 0)
 		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
 	else
-		glDrawElements(getGLdrawMode(drawMode), buf.noIndices, buf.indexType, 0);
+		glDrawElements(getGLdrawMode(drawMode), buf.frameIndices, buf.indexType, 0);
 	setVAO(0);
 }
 
@@ -779,7 +779,7 @@ void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
 /** Draw a buffer of line loop vertices using the current shader. */
 void CRenderer::drawLineLoopBuf(CBuf& buf) {
 	setVAO(buf.hVAO);
-	glDrawElements(GL_LINE_LOOP, buf.noIndices, buf.indexType, 0);
+	glDrawElements(GL_LINE_LOOP, buf.frameIndices, buf.indexType, 0);
 	setVAO(0);
 }
 
@@ -791,13 +791,21 @@ void CRenderer::drawLineStripBuf(CBuf& buf) {
 
 void CRenderer::drawLinesBuf(CBuf& buf) {
 	setVAO(buf.hVAO);
-	glDrawElements(GL_LINES, buf.noIndices, buf.indexType, 0);
+	glDrawElements(GL_LINES, buf.frameIndices, buf.indexType, 0);
 	setVAO(0);
 }
 
+void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
+	setVAO(buf.hVAO); //TO DO: set VAO outside
+	glDrawElements(GL_LINES, count, buf.indexType, (void*)(start * buf.indexStride));
+	setVAO(0);
+}
+
+
+
 void CRenderer::drawTriStripBuf(CBuf& buf) {
 	setVAO(buf.hVAO);
-	glDrawElements(GL_TRIANGLE_STRIP, buf.noIndices, buf.indexType, 0);
+	glDrawElements(GL_TRIANGLE_STRIP, buf.frameIndices, buf.indexType, 0);
 	setVAO(0);
 }
 

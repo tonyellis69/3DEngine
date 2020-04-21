@@ -113,6 +113,7 @@ public:
 	void drawLineLoopBuf(CBuf& buf);
 	void drawLineStripBuf(CBuf& buf);
 	void drawLinesBuf(CBuf& buf);
+	void drawLinesRange(int start, int count, CBuf& buf);
 	void drawTriStripBuf(CBuf& buf);
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();

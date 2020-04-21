@@ -425,6 +425,12 @@
     <ClCompile Include="..\src\physics2\physObj2.cpp">
       <Filter>Source Files\physics2</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\physics2\physModel.cpp">
+      <Filter>Source Files\physics2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\lineModel.cpp">
+      <Filter>Source Files\hex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -861,6 +867,9 @@
     </ClInclude>
     <ClInclude Include="..\src\physics2\physModel.h">
       <Filter>Source Files\physics2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\lineModel.h">
+      <Filter>Source Files\hex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

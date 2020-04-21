@@ -7,7 +7,7 @@
 #include "hex.h"
 
 #include "../hex/IHexRenderer.h"
-
+#include "hex/lineModel.h"
 
 
 
@@ -23,6 +23,8 @@ public:
 	void setPosition(CHex& hex);
 	void setBuffer(CBuf* buffer);
 	void setBuffer(const std::string& bufName);
+	void setLineModel(const std::string& name);
+	void setLineModel(CLineModel& model);
 	void setDirection(THexDir direction);
 	virtual bool beginMove();
 	void setZheight(float height);
@@ -41,6 +43,8 @@ public:
 	glm::vec3 worldPos; ///<Position in world space.
 
 	CHex destination; ///<The hex we're travelling to.
+
+	CLineModel lineModel;
 
 protected:
 	void buildWorldMatrix();	

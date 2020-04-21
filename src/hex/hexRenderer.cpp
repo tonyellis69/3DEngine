@@ -20,7 +20,7 @@ CHexRenderer::CHexRenderer() : hexModel(6) {
 	cameraPitch = 45;
 	camera.pitch(cameraPitch);
 	followCam = false;
-	screenScrollSpeed = 25;// 15.0f;
+	screenScrollSpeed = 20;// 15.0f;
 
 	floorplanLineColour = glm::vec4(0.3, 1, 0.3, 1);
 	floorplanSpaceColour = glm::vec4(0.6431, 0.7412, 0.9882, 0.03);
@@ -70,10 +70,11 @@ void CHexRenderer::drawFloorPlan() {
 /** Draw any hey highlighting, such as the cursor. */
 void CHexRenderer::drawHighlights() {
 	CHexObject* cursorObj = pCallbackObj->getCursorObj();
-	glm::mat4 mvp = camera.clipMatrix * cursorObj->worldMatrix;
-	lineShader->setShaderValue(hColour, floorplanLineColour);
-	lineShader->setShaderValue(hMVP, mvp);
-	pRenderer->drawLinesBuf(*cursorObj->buf);
+	glm::mat4 mvp;// = camera.clipMatrix * cursorObj->worldMatrix;
+	//lineShader->setShaderValue(hColour, floorplanLineColour);
+	//lineShader->setShaderValue(hMVP, mvp);
+	//pRenderer->drawLinesBuf(*cursorObj->buf);
+	cursorObj->draw();
 
 
 	glm::vec4 pathStartColour(0.6, 0.4, 1, 0.1f);
@@ -97,6 +98,27 @@ void CHexRenderer::drawLines(THexDraw& drawData) {
 	lineShader->setShaderValue(hMVP, mvp);
 	lineShader->setShaderValue(hColour, floorplanLineColour);
 	pRenderer->drawLinesBuf(*drawData.buf);
+}
+
+
+
+void CHexRenderer::drawLineModel(THexDraw& drawData) {
+	TModelNode& node = drawData.lineModel->meshNodes;
+	drawNode(node,drawData);
+}
+
+void CHexRenderer::drawNode(TModelNode& node, THexDraw& drawData) {
+	glm::mat4 mvp = camera.clipMatrix *     node.matrix *     *drawData.worldMatrix;
+	lineShader->setShaderValue(hMVP, mvp);
+	lineShader->setShaderValue(hColour, floorplanLineColour);
+
+	for (auto mesh : node.meshes) {
+		pRenderer->drawLinesRange(mesh.indexStart, mesh.indexSize, *drawData.lineModel->buffer);
+	}
+
+	for (auto subNode : node.subNodes)
+		drawNode(subNode, drawData);
+
 }
 
 
@@ -260,6 +282,20 @@ CHex CHexRenderer::pickHex(int screenX, int screenY) {
 	return hexPos;
 }
 
+void CHexRenderer::loadMesh(const std::string& name, const std::string& fileName) {
+	importer.loadFile(fileName);
+	
+	//store vert buffer
+	CBuf* meshBuf = &modelBuffers[name];
+	importer.getSingleMesh().exportToBuffer(*meshBuf);
+
+	//store model
+	TModelNode& nodes = importer.getMeshNodes();
+	nodes.name = name;
+	lineModels[name] = { nodes,meshBuf };
+
+}
+
 
 /** Create a buffer identified by the given name, and return a pointer to it. */
 CBuf* CHexRenderer::createMeshBuffer(const std::string& name) {
@@ -268,6 +304,10 @@ CBuf* CHexRenderer::createMeshBuffer(const std::string& name) {
 
 CBuf* CHexRenderer::getBuffer(const std::string& name) {
 	return &modelBuffers[name];
+}
+
+CLineModel CHexRenderer::getLineModel(const std::string& name) {
+	return lineModels[name];
 }
 
 /** Fill the structure used for drawing the path between player and cursor. */

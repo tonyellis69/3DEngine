@@ -20,9 +20,9 @@ CHexObject::CHexObject() {
 	proximityCutoff = 0.15f;
 	moveSpeed = 7.0f;
 
-;
+	buf = NULL;
 
-	drawData = { &worldMatrix,&colour,buf };
+	drawData = { &worldMatrix,&colour,buf,&lineModel };
 
 	buildWorldMatrix();
 }
@@ -71,6 +71,14 @@ void CHexObject::setBuffer(const std::string& bufName) {
 	drawData.buf = hexRendr->getBuffer(bufName);
 }
 
+void CHexObject::setLineModel(CLineModel& model) {
+	lineModel = model;
+}
+
+void CHexObject::setLineModel(const std::string& name) {
+	lineModel = hexRendr->getLineModel(name);
+}
+
 /** Set the rotation and facing direction of this object. */
 void CHexObject::setDirection(THexDir direction) {
 	facing = direction;
@@ -92,6 +100,7 @@ bool CHexObject::beginMove() {
 void CHexObject::setZheight(float height) {
 	zHeight = height;
 	worldPos.z = height;
+	buildWorldMatrix();
 }
 
 /** Load a sequence of hexes to travel down. */
@@ -129,7 +138,10 @@ bool CHexObject::updateRotationOnly(float dT) {
 
 
 void CHexObject::draw(){
-	hexRendr->drawLines(drawData);
+	if (buf) //TO DO: !!!!!!!!!!!!!!!temp, get rid of buf method
+		hexRendr->drawLines(drawData);
+	else
+		hexRendr->drawLineModel(drawData);
 }
 
 

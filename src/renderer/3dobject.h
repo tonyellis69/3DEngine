@@ -19,4 +19,5 @@ public:
 
 	glm::fquat orientation;
 
+	glm::vec3 pos;
 };

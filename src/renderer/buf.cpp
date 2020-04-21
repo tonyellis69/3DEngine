@@ -16,6 +16,9 @@ CBuf::CBuf() {
 	nInstancedAttribs = 0;
 	instancedBuf = NULL;
 	indexType = GL_UNSIGNED_SHORT;
+	indexStride = sizeof(unsigned short);
+	frameCount = 1;
+
 }
 
 void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
@@ -30,10 +33,14 @@ void CBuf::storeVertexes(void * verts, unsigned int size, unsigned int nVerts) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	noVerts = nVerts;
 	bufSize = size;
-	if (noVerts > 65535)
+	if (noVerts > 65535) {
 		indexType = GL_UNSIGNED_INT;
-	else
+		indexStride = sizeof(unsigned int);
+	}
+	else {
 		indexType = GL_UNSIGNED_SHORT;
+		indexStride = sizeof(unsigned short);
+	}
 }
 
 /**	Merge separate arrays of vertex data into this buf. */
@@ -79,6 +86,7 @@ void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indicesPtr, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	noIndices = nIndices;
+	frameIndices = noIndices; //default. Overrule for multi frame buffers
 	if (shortBuf)
 		delete[] shortBuf;
 }

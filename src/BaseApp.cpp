@@ -255,6 +255,8 @@ void CBaseApp::AppTasks() {
 
 	Engine.physObjManager.update(float(dT * 10.0f));
 
+	physEng.update(dT * 10.0f);
+
 
 	//Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed
 
@@ -473,12 +475,6 @@ void CBaseApp::initialiseSystemStylesheet() {
 
 	style::defaultFont = &renderer.fontManager.getFont("smallSysFont");
 
-	//sysStyleSheet.defaultFontColour = style::uiBlack;
-
-	//kludigly create default text styles for rich text controls
-	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextStyle);
-	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextHotStyle);
-	//GUIroot.themeServer.addToTheme("default", (TtextStyle&)sysStyleSheet.richtextSelectedStyle);
 
 }
 

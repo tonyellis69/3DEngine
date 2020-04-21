@@ -6,23 +6,27 @@ using namespace glm;
 
 /** Create an object with a world matrix positioning it at the given location.*/
 C3dObject::C3dObject(glm::vec3& pos) {
+	this->pos = pos;
 	worldMatrix = glm::translate(glm::mat4(1),pos);	
-	//orientation = glm::fquat(0,0,0,0);
 }
 
 /** Position the object in world space. */
 void C3dObject::setPos(glm::vec3& pos) {
+	this->pos = pos;
 	worldMatrix[3] = glm::vec4(pos,1);
 }
 
 /** Move relative to current position. */
 void C3dObject::translate(vec3& dir) {
 	worldMatrix[3] += vec4(dir,0); 
+	pos += dir;
+	//worldMatrix = glm::translate(mat4(1), dir) * worldMatrix;
 }
 
 /** Return the object's positionHint in world space. */
 glm::vec3 C3dObject::getPos() {
-	return glm::vec3(glm::column(worldMatrix,3));
+	//return glm::vec3(glm::column(worldMatrix,3));
+	return pos;
 }
 
 ///////////////////
@@ -52,7 +56,8 @@ void C3dObject::orientateWorldMatrix() {
 
 	mat4 rotationMatrix = glm::mat4_cast(orientation);
 
-	mat4 transM = glm::translate(mat4(1), getPos());
+	//mat4 transM = glm::translate(mat4(1), getPos());
+	mat4 transM = glm::translate(mat4(1), pos);
 
 	worldMatrix = transM * rotationMatrix ;
 

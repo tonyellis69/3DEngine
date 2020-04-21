@@ -40,6 +40,8 @@
 
 #include "UI\iGuiMsg.h"
 
+#include "physics2/physEng.h"
+
 //class CVMapp;
 class CBaseApp : public Icallback, ILogCallback, IGUImsg {
 public:
@@ -152,5 +154,7 @@ public:
 	std::string dataPath; //<Path to app data folder
 
 	CImporter importer; ///<Object for importing 3D scenes.
+
+	CPhysEng physEng;
 	};
 

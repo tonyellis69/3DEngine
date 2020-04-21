@@ -21,11 +21,15 @@ public:
 	void orientateWorldMatrix();
 	void setTexture(CRenderTexture* texture);
 
+	void calcBBextent();
+
 	CMesh mesh; ///<Stores the verts locally.
 	CBuf buffer; ///<Stores the verts in graphics memory.
 
 	CMaterial2 material; ///TO DO: should this be a pointer to a material instead?
 	glm::vec3 scaleVec;
+
+	glm::vec3 BBextent;
 
 private:
 	void* drawCallee; //<The object whose draw callback we will use.
