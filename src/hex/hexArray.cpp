@@ -191,7 +191,7 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end) {
 			if (getHexCube(next).content == 2)
 				continue; //solid hex
 
-			if (entityBlockCheck(next) == true /* && next != end*/)
+			if (entityBlockCheck(current, next) == true /* && next != end*/)
 				continue;
 
 
@@ -246,12 +246,14 @@ CHex CHexArray::findLineEnd(CHex& start, CHex& target) {
 	glm::vec3 travelVector = (B - A) / float(N);
 
 	CHex travelHex;
+	CHex prevHex;
 	float dist = 1.0f;
 	do {
 		glm::vec3 travelPoint = A + (travelVector * dist);
+		prevHex = travelHex;
 		travelHex = hexRound(travelPoint);
 		dist += 1.0f;
-	} while (getHexCube(travelHex).content != 2 && entityBlockCheck(travelHex) == false);
+	} while (getHexCube(travelHex).content != 2 && entityBlockCheck(prevHex,travelHex) == false);
 
 	return travelHex;
 }

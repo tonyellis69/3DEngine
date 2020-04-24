@@ -9,7 +9,12 @@ void CImporter::loadFile(const std::string& filename) {
 
 
 	const aiScene* scene = importer.ReadFile(filename, /*aiProcess_JoinIdenticalVertices |*/ aiProcess_Triangulate) ;
-	rootNode = processNode(scene->mRootNode, scene);
+	
+	aiNode* startNode = scene->mRootNode;
+	if (startNode->mNumMeshes == 0 && startNode->mNumChildren == 1)
+		startNode = startNode->mChildren[0];
+	
+	rootNode = processNode(startNode, scene);
 }
 
 /** Add an additional model to the existing mesh data. Use this

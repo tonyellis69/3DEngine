@@ -21,10 +21,8 @@ public:
 	void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
-	void setBuffer(CBuf* buffer);
-	void setBuffer(const std::string& bufName);
-	void setLineModel(const std::string& name);
-	void setLineModel(CLineModel& model);
+	virtual void setLineModel(const std::string& name);
+	void setLineModel(CLineModel& model); //scrap
 	void setDirection(THexDir direction);
 	virtual bool beginMove();
 	void setZheight(float height);
@@ -36,9 +34,11 @@ public:
 	bool updateMove(float dT);
 	bool updateRotationOnly(float dT);
 	virtual void draw();
+	THexDir getDirection() {
+		return facing;
+	}
 
-	CBuf* buf; ///<Identifies the graphics buffer to use for drawing this object 
-	glm::mat4 worldMatrix; ///<Position and orientation in the 3D universe.
+	glm::mat4* worldMatrix; ///<Position and orientation in the 3D universe.
 	CHex hexPosition; ///<Position on a hex grid in cube coordinates.
 	glm::vec3 worldPos; ///<Position in world space.
 
@@ -51,6 +51,7 @@ protected:
 	void initMoveToAdjacent(CHex& adjacent);
 	bool initTurnToAdjacent(CHex& adjacent);
 	bool updateRotation(float dT);
+	bool updateMovement(float dT);
 
 	float zHeight; ///<Height above XY plane where drawn.
 	
@@ -75,10 +76,8 @@ protected:
 	float moveSpeed;
 	
 	glm::vec4 colour;
-	THexDraw drawData;
-
 	
-	bool updateMovement(float dT);
+
 };
 
 

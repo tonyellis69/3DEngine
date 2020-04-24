@@ -93,31 +93,25 @@ void CHexRenderer::drawHighlights() {
 
 }
 
-void CHexRenderer::drawLines(THexDraw& drawData) {
-	glm::mat4 mvp = camera.clipMatrix * *drawData.worldMatrix;
-	lineShader->setShaderValue(hMVP, mvp);
-	lineShader->setShaderValue(hColour, floorplanLineColour);
-	pRenderer->drawLinesBuf(*drawData.buf);
+
+
+void CHexRenderer::drawLineModel(CLineModel& lineModel) {
+	TModelNode& node = lineModel.model;
+	drawNode(node, glm::mat4(1),lineModel.buffer);
 }
 
-
-
-void CHexRenderer::drawLineModel(THexDraw& drawData) {
-	TModelNode& node = drawData.lineModel->meshNodes;
-	drawNode(node,drawData);
-}
-
-void CHexRenderer::drawNode(TModelNode& node, THexDraw& drawData) {
-	glm::mat4 mvp = camera.clipMatrix *     node.matrix *     *drawData.worldMatrix;
+void CHexRenderer::drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf) {
+	glm::mat4 mvp = camera.clipMatrix * node.matrix *parentMatrix;// **drawData.worldMatrix;
 	lineShader->setShaderValue(hMVP, mvp);
-	lineShader->setShaderValue(hColour, floorplanLineColour);
+	//lineShader->setShaderValue(hColour, floorplanLineColour);
 
 	for (auto mesh : node.meshes) {
-		pRenderer->drawLinesRange(mesh.indexStart, mesh.indexSize, *drawData.lineModel->buffer);
+		lineShader->setShaderValue(hColour, mesh.colour);
+		pRenderer->drawLinesRange(mesh.indexStart, mesh.indexSize, *buf);
 	}
 
 	for (auto subNode : node.subNodes)
-		drawNode(subNode, drawData);
+		drawNode(subNode, node.matrix * parentMatrix, buf);
 
 }
 
@@ -286,25 +280,20 @@ void CHexRenderer::loadMesh(const std::string& name, const std::string& fileName
 	importer.loadFile(fileName);
 	
 	//store vert buffer
-	CBuf* meshBuf = &modelBuffers[name];
-	importer.getSingleMesh().exportToBuffer(*meshBuf);
+	//CBuf* meshBuf = &modelBuffers[name];
+	CBuf meshBuf;
+	modelBuffers2.push_back(meshBuf);
+
+	importer.getSingleMesh().exportToBuffer(modelBuffers2.back());
+
 
 	//store model
-	TModelNode& nodes = importer.getMeshNodes();
-	nodes.name = name;
-	lineModels[name] = { nodes,meshBuf };
-
+	TModelNode& model = importer.getMeshNodes();
+	model.name = name;
+	lineModels[name] = { model,&modelBuffers2.back() };
+	lineModels[name].setColourR(floorplanLineColour); //////temp!!!!!!!!!!!
 }
 
-
-/** Create a buffer identified by the given name, and return a pointer to it. */
-CBuf* CHexRenderer::createMeshBuffer(const std::string& name) {
-	return &modelBuffers[name];
-}
-
-CBuf* CHexRenderer::getBuffer(const std::string& name) {
-	return &modelBuffers[name];
-}
 
 CLineModel CHexRenderer::getLineModel(const std::string& name) {
 	return lineModels[name];

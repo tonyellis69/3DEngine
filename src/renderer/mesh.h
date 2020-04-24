@@ -12,6 +12,7 @@ enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 struct TMeshRec {
 	int indexStart;
 	int indexSize;
+	glm::vec4 colour;
 };
 
 struct TModelNode {

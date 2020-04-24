@@ -11,6 +11,9 @@
 
 CHexObject::CHexObject() {
 	worldPos = glm::vec3(0);
+	worldMatrix = &lineModel.model.matrix;
+
+
 	setZheight(0.05f);
 
 	facing = hexEast;
@@ -19,10 +22,6 @@ CHexObject::CHexObject() {
 	turning = false;
 	proximityCutoff = 0.15f;
 	moveSpeed = 7.0f;
-
-	buf = NULL;
-
-	drawData = { &worldMatrix,&colour,buf,&lineModel };
 
 	buildWorldMatrix();
 }
@@ -60,15 +59,6 @@ void CHexObject::setPosition(int x, int y) {
 /** Set position using hex cube coordinates. */
 void CHexObject::setPosition(CHex& hex) {
 	setPosition(hex.x, hex.y, hex.z);
-}
-
-void CHexObject::setBuffer(CBuf* buffer) {
-	buf = buffer;
-	drawData.buf = buf;
-}
-
-void CHexObject::setBuffer(const std::string& bufName) {
-	drawData.buf = hexRendr->getBuffer(bufName);
 }
 
 void CHexObject::setLineModel(CLineModel& model) {
@@ -138,18 +128,15 @@ bool CHexObject::updateRotationOnly(float dT) {
 
 
 void CHexObject::draw(){
-	if (buf) //TO DO: !!!!!!!!!!!!!!!temp, get rid of buf method
-		hexRendr->drawLines(drawData);
-	else
-		hexRendr->drawLineModel(drawData);
+	hexRendr->drawLineModel(lineModel);
 }
 
 
 
 /** Construct this object's world matrix from its known position and rotation.*/
 void CHexObject::buildWorldMatrix() {
-	worldMatrix = glm::translate(glm::mat4(1), worldPos);
-	worldMatrix = glm::rotate(worldMatrix, rotation, glm::vec3(0, 0, -1));
+	*worldMatrix = glm::translate(glm::mat4(1), worldPos);
+	*worldMatrix = glm::rotate(*worldMatrix, rotation, glm::vec3(0, 0, -1));
 	//NB: we use a CW system for angles
 }
 

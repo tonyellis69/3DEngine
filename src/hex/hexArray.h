@@ -35,7 +35,7 @@ public:
 
 private:
 	THexList walkBack(CHex& start, CHex& end, TCameFrom& cameFrom);
-	virtual bool entityBlockCheck(CHex& hex) {
+	virtual bool entityBlockCheck(CHex& current, CHex& neighbour) {
 		return false;
 	};
 

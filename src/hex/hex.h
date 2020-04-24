@@ -60,3 +60,4 @@ bool badHex(CHex& hex);
 float shortestRotation(THexDir start, THexDir end);
 float hexAngle(CHex& start, CHex& end);
 THexDir angleToDir(float angle);
+THexDir opposite(THexDir direction);

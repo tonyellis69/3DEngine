@@ -231,3 +231,11 @@ THexDir angleToDir(float angle) {
 	THexDir dir = THexDir(angle / (M_PI / 3.0f));
 	return dir;
 }
+
+/** Return opposite directon. */
+THexDir opposite(THexDir direction) {
+	direction = THexDir(direction + 3);
+	direction = THexDir(direction % 6);
+
+	return direction;
+}
