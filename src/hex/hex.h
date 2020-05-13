@@ -26,7 +26,7 @@ public:
 	CHex operator + (CHex& hex2);
 	CHex operator + (glm::i32vec3& hex2);
 	CHex operator - (CHex& hex2);
-	bool operator == (CHex& hex2);
+	bool operator == (const CHex& hex2) const;
 	bool operator != (CHex& hex2);
 	CHex(glm::vec3& worldSpace);
 	glm::i32vec2 getAxial();

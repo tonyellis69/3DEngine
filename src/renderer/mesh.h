@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 
 #include "buf.h"
+#include "buf2.h"
 
 enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 
@@ -30,6 +31,7 @@ public:
 	CMesh();
 	void calculateVertexNormals();
 	void exportToBuffer(CBuf& buf);
+	void exportToBuffer(CBuf2& buf);
 	void clear();
 
 	std::vector<glm::vec3> vertices;

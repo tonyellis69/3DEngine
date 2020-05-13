@@ -101,6 +101,7 @@
     <ClCompile Include="..\..\VMtest\src\vmConsole.cpp" />
     <ClCompile Include="..\..\VMtest\src\vmApp.cpp" />
     <ClCompile Include="..\Src\BaseApp.cpp" />
+    <ClCompile Include="..\src\buf2.cpp" />
     <ClCompile Include="..\src\chunk.cpp" />
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\colourGradient.cpp" />
@@ -114,6 +115,7 @@
     <ClCompile Include="..\src\hex\hexRenderer.cpp" />
     <ClCompile Include="..\src\hex\lineModel.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
+    <ClCompile Include="..\src\physics2\contact.cpp" />
     <ClCompile Include="..\src\physics2\physEng.cpp" />
     <ClCompile Include="..\src\physics2\physModel.cpp" />
     <ClCompile Include="..\src\physics2\physObj2.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="..\src\renderer\shader.cpp" />
     <ClCompile Include="..\src\renderer\texManager.cpp" />
     <ClCompile Include="..\src\shapes.cpp" />
+    <ClCompile Include="..\src\sharedBuf.cpp" />
     <ClCompile Include="..\src\simplexnoise.cpp" />
     <ClCompile Include="..\src\skyDome.cpp" />
     <ClCompile Include="..\src\smallsysf.cpp" />
@@ -234,6 +237,7 @@
     <ClInclude Include="..\..\VMtest\src\vmConsole.h" />
     <ClInclude Include="..\..\VMtest\src\vmApp.h" />
     <ClInclude Include="..\Src\BaseApp.h" />
+    <ClInclude Include="..\src\buf2.h" />
     <ClInclude Include="..\src\chunk.h" />
     <ClInclude Include="..\src\cnode.h" />
     <ClInclude Include="..\src\colour.h" />
@@ -254,6 +258,7 @@
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\Src\Macros.h" />
+    <ClInclude Include="..\src\physics2\contact.h" />
     <ClInclude Include="..\src\physics2\physEng.h" />
     <ClInclude Include="..\src\physics2\physModel.h" />
     <ClInclude Include="..\src\physics2\physObj2.h" />
@@ -296,6 +301,7 @@
     <ClInclude Include="..\src\renderer\shader.h" />
     <ClInclude Include="..\src\renderer\texManager.h" />
     <ClInclude Include="..\src\shapes.h" />
+    <ClInclude Include="..\src\sharedBuf.h" />
     <ClInclude Include="..\src\simplexnoise.h" />
     <ClInclude Include="..\src\skyDome.h" />
     <ClInclude Include="..\src\smallsysf.h" />

@@ -27,6 +27,10 @@ void CMesh::exportToBuffer(CBuf& buf) {
 	buf.frameCount = frameCount;
 	buf.frameIndices = frameIndices;
 }
+
+void CMesh::exportToBuffer(CBuf2& buf) {
+	buf.storeVerts(vertices, indices, 3);
+}
 //TO DO: look into making a general purpose template-based writeToBuffer
 
 

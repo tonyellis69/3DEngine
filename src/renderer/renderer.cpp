@@ -801,6 +801,11 @@ void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
 	setVAO(0);
 }
 
+void CRenderer::drawLinesBuf(CBuf2& buf, void* start, int count ) {
+	buf.setVAO();
+	glDrawElements(GL_LINES, count, GL_UNSIGNED_SHORT, start);
+}
+
 
 
 void CRenderer::drawTriStripBuf(CBuf& buf) {

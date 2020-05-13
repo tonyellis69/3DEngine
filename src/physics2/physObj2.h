@@ -5,6 +5,8 @@
 struct TAaBB {
 public:
 	bool clips(TAaBB& boxB);
+	bool clips(glm::vec3& baseVertB);
+
 	glm::vec3 AABBmin;
 	glm::vec3 AABBmax;
 };
@@ -17,17 +19,17 @@ public:
 	void updatePosition(float dT);
 	void setMass(float mass);
 	void setVelocity(glm::vec3& velocity);
-	void setBB(glm::vec3& size);
+
 
 	virtual void updateModelPosition(glm::vec3& dPos) = 0;
 	virtual glm::vec3 getPos() = 0;
 	virtual TAaBB calcAABB() = 0;
+	virtual glm::vec3 calcBaseVertPos() = 0;
 
 	glm::vec3 velocity;
 	static inline glm::vec3 gravity;
 	float invMass;
 	glm::vec3 force;
-
-	glm::vec3 BBbl; ///<Bounding box bottom left far corner
-	glm::vec3 BBtr; ///<Bounding box top right near corner
-};
+	float restitution; ///<Bounciness.
+	
+	};

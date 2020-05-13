@@ -12,4 +12,5 @@ public:
 	void scale(glm::vec3& scaleVec);
 	glm::vec3 getPos();
 	TAaBB calcAABB();
+	glm::vec3 calcBaseVertPos();
 };

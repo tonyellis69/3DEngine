@@ -241,7 +241,7 @@ glm::i32vec4 CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	}
 
 	availableParentWidth -= style::controlSpacing * (ctrlsInRow - 1);
-	int defaultCellSize = availableParentWidth / ctrlsInRow;
+	int defaultCellSize = int(availableParentWidth / ctrlsInRow);
 
 	float cellToCtrlRatio; 
 	if (expansiveCtrls) {

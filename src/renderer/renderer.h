@@ -14,7 +14,9 @@
 #include "modelMulti.h"
 #include "renderModel.h"
 #include "buf.h"
-//#include "baseTexture.h"
+
+#include "buf2.h"
+
 #include "texManager.h"
 #include "..\terrain.h"
 #include "shaderDraw.h"
@@ -114,6 +116,7 @@ public:
 	void drawLineStripBuf(CBuf& buf);
 	void drawLinesBuf(CBuf& buf);
 	void drawLinesRange(int start, int count, CBuf& buf);
+	void drawLinesBuf(CBuf2& buf, void* start, int count);
 	void drawTriStripBuf(CBuf& buf);
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();

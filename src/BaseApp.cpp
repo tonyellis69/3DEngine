@@ -255,7 +255,7 @@ void CBaseApp::AppTasks() {
 
 	Engine.physObjManager.update(float(dT * 10.0f));
 
-	physEng.update(dT * 10.0f);
+	physEng.update((float)dT * 10.0f);
 
 
 	//Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed

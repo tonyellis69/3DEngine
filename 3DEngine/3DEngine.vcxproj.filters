@@ -431,6 +431,15 @@
     <ClCompile Include="..\src\hex\lineModel.cpp">
       <Filter>Source Files\hex</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\physics2\contact.cpp">
+      <Filter>Source Files\physics2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\buf2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sharedBuf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -870,6 +879,15 @@
     </ClInclude>
     <ClInclude Include="..\src\hex\lineModel.h">
       <Filter>Source Files\hex</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics2\contact.h">
+      <Filter>Source Files\physics2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\buf2.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sharedBuf.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

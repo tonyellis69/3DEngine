@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <map>
 
 #include "physModel.h"
+#include "contact.h"
 
 /** The definitive physics engine. */
 class CPhysEng {
@@ -14,8 +16,9 @@ public:
 
 private:
 	void broadphase();
-	void checkCollision(CPhysObj2* objA, CPhysObj2* objB);
+	Contact checkCollision(CPhysObj2* objA, CPhysObj2* objB);
 
 	std::vector<CPhysObj2*> objs;
 
+	std::map<ContactKey, Contact> contacts;
 };

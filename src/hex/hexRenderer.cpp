@@ -46,7 +46,10 @@ void CHexRenderer::setMap(CHexArray* hexArray){
 void CHexRenderer::draw() {
 	drawFloorPlan();
 	drawHighlights();
+}
 
+void CHexRenderer::draw2() {
+	drawFloorPlan();
 }
 
 void CHexRenderer::drawFloorPlan() {
@@ -79,7 +82,7 @@ void CHexRenderer::drawHighlights() {
 
 	glm::vec4 pathStartColour(0.6, 0.4, 1, 0.1f);
 	glm::vec4 pathEndColour(0.6, 0.4, 1, 0.75f);
-	THexList* path = pCallbackObj->getPlayerPath();
+	THexList* path = pCallbackObj->getCursorPath();
 	float inc = 1.0 / path->size();  float t = 0;
 	for (auto hex : *path) {
 		glm::mat4 worldPos = glm::translate(glm::mat4(1), hexArray->getWorldPos(hex));
@@ -97,13 +100,13 @@ void CHexRenderer::drawHighlights() {
 
 void CHexRenderer::drawLineModel(CLineModel& lineModel) {
 	TModelNode& node = lineModel.model;
-	drawNode(node, glm::mat4(1),lineModel.buffer);
+	//drawNode(node, glm::mat4(1),lineModel.buffer);
+	drawNode2(node, glm::mat4(1), lineModel.buffer2);
 }
 
 void CHexRenderer::drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf) {
 	glm::mat4 mvp = camera.clipMatrix * node.matrix *parentMatrix;// **drawData.worldMatrix;
 	lineShader->setShaderValue(hMVP, mvp);
-	//lineShader->setShaderValue(hColour, floorplanLineColour);
 
 	for (auto mesh : node.meshes) {
 		lineShader->setShaderValue(hColour, mesh.colour);
@@ -112,6 +115,20 @@ void CHexRenderer::drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf
 
 	for (auto subNode : node.subNodes)
 		drawNode(subNode, node.matrix * parentMatrix, buf);
+
+}
+
+void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf) {
+	glm::mat4 mvp = camera.clipMatrix * node.matrix * parentMatrix;// **drawData.worldMatrix;
+	lineShader->setShaderValue(hMVP, mvp);
+
+	for (auto mesh : node.meshes) {
+		lineShader->setShaderValue(hColour, mesh.colour);
+		pRenderer->drawLinesBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+	}
+
+	for (auto subNode : node.subNodes)
+		drawNode2(subNode, node.matrix * parentMatrix, buf);
 
 }
 
@@ -280,17 +297,20 @@ void CHexRenderer::loadMesh(const std::string& name, const std::string& fileName
 	importer.loadFile(fileName);
 	
 	//store vert buffer
-	//CBuf* meshBuf = &modelBuffers[name];
+
 	CBuf meshBuf;
 	modelBuffers2.push_back(meshBuf);
 
-	importer.getSingleMesh().exportToBuffer(modelBuffers2.back());
+	CBuf2 meshBuf2;
+	modelBuffers.push_back(meshBuf2);
 
+	importer.getSingleMesh().exportToBuffer(modelBuffers2.back());
+	importer.getSingleMesh().exportToBuffer(modelBuffers.back());
 
 	//store model
 	TModelNode& model = importer.getMeshNodes();
 	model.name = name;
-	lineModels[name] = { model,&modelBuffers2.back() };
+	lineModels[name] = { model,&modelBuffers2.back(),&modelBuffers.back() };
 	lineModels[name].setColourR(floorplanLineColour); //////temp!!!!!!!!!!!
 }
 

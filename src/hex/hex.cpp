@@ -33,7 +33,7 @@ CHex CHex::operator-(CHex& hex2) {
 	return CHex(x - hex2.x, y - hex2.y, z - hex2.z);
 }
 
-bool CHex::operator==(CHex& hex2) {
+bool CHex::operator==(const CHex& hex2) const {
 	return (x == hex2.x && y == hex2.y && z == hex2.z);
 }
 

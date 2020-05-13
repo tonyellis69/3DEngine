@@ -1,5 +1,7 @@
 #include  "physEng.h"
 
+#include "utils/log.h"
+
 CPhysEng::CPhysEng() {
 	CPhysObj2::gravity = glm::vec3(0, -9.8f, 0);
 }
@@ -20,6 +22,20 @@ void CPhysEng::update(float dT) {
 	}
 
 
+	//resolution
+	for (int i = 0; i < 10; i++) {
+		for (auto& contact : contacts) {
+			contact.second.applyImpulse();
+
+
+
+
+
+		}
+
+
+	}
+
 
 	//integrate velocity of each object
 	for (auto obj : objs) {
@@ -38,7 +54,18 @@ void CPhysEng::broadphase() {
 			if (objA->invMass == 0 && objB->invMass == 0)
 				continue;
 
-			checkCollision(objA, objB);
+			Contact contact = checkCollision(objA, objB);
+			ContactKey key(objA, objB);
+
+			if (contact.numPoints > 0) {
+				contacts[key] = contact;
+				//liveLog << "\nContact added!";
+
+			}
+			else {
+				if (contacts.erase(key) )
+					liveLog << "\nContact removed!";
+			}
 
 		}
 
@@ -46,16 +73,42 @@ void CPhysEng::broadphase() {
 }
 
 /** If these two objects are colliding, record the collision/ */
-void CPhysEng::checkCollision(CPhysObj2* objA, CPhysObj2* objB) {
-	
-	
-	//AABB check - costs two matrix calcs
-	TAaBB objAbb = objA->calcAABB();
-	TAaBB objBbb = objB->calcAABB();
+Contact CPhysEng::checkCollision(CPhysObj2* objA, CPhysObj2* objB) {
+	Contact contact;
+	if (objA < objB) {
+		contact.objA = objA;
+		contact.objB = objB;
+	}
+	else {
+		contact.objB = objA;
+		contact.objA = objB;
+	}
 
-	if (objAbb.clips(objBbb)) {
-		objA->invMass = 0;
+	glm::vec3 baseVertB = objB->calcBaseVertPos();
+	TAaBB objAbb = objA->calcAABB();
+
+	if (objAbb.clips(baseVertB)) {
+		contact.normal = glm::vec3(0, 1, 0);
+		contact.numPoints = 1;
+		float penetration = objAbb.AABBmax.y - baseVertB.y;
+		contact.points[0] = { baseVertB, penetration };
+
+		//temp
+		objB->velocity = glm::vec3(0);
 		objB->invMass = 0;
 	}
 
+	return contact;
+
+
+	
+	//AABB check - costs two matrix calcs
+	/*TAaBB objAbb = objA->calcAABB();
+	TAaBB objBbb = objB->calcAABB();
+
+	if (objAbb.clips(objBbb)) {
+		contact.numContacts = 1;
+	}
+
+	return contact;*/
 }

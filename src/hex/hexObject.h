@@ -12,17 +12,17 @@
 
 
 
-
+class IGameHexArray;
 /** A class for defining moveable objects in the hex world.*/
 class CHexObject  {
 public:
 	CHexObject();
 	static void setHexRenderer(IHexRenderer* rendrObj);
-	void setPosition(int x, int y, int z);
+	virtual void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
 	virtual void setLineModel(const std::string& name);
-	void setLineModel(CLineModel& model); //scrap
+	//void setLineModel(CLineModel& model); //scrap
 	void setDirection(THexDir direction);
 	virtual bool beginMove();
 	void setZheight(float height);
@@ -45,6 +45,10 @@ public:
 	CHex destination; ///<The hex we're travelling to.
 
 	CLineModel lineModel;
+
+	IGameHexArray* map; ///<The map this object exists in.
+
+
 
 protected:
 	void buildWorldMatrix();	
@@ -82,5 +86,13 @@ protected:
 
 
 
-
+const int blocksNone = 0;
+const int blocksEast = 1;
+const int blocksSE = 2;
+const int blocksSW = 4;
+const int blocksWest = 8;
+const int blocksNW = 16;
+const int blocksNE = 32;
+const int blocksAll = 63;
+const int blocksAsDoor = 54;
 

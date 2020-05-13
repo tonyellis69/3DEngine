@@ -7,6 +7,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>	
 
+#include "../3DTest/src/IGameHexArray.h"
+
 #include "..\TC\Debug\tigConst.h" //temp!!!!
 
 CHexObject::CHexObject() {
@@ -61,10 +63,6 @@ void CHexObject::setPosition(CHex& hex) {
 	setPosition(hex.x, hex.y, hex.z);
 }
 
-void CHexObject::setLineModel(CLineModel& model) {
-	lineModel = model;
-}
-
 void CHexObject::setLineModel(const std::string& name) {
 	lineModel = hexRendr->getLineModel(name);
 }
@@ -82,6 +80,10 @@ void CHexObject::setDirection(THexDir direction) {
 bool CHexObject::beginMove() {
 	if (travelPath.empty() )
 		return false;
+	if (map->getBlockingEntityAt(travelPath[0])) {
+		return true; ////////////////////////////////////////
+	}
+
 	initMoveToAdjacent(travelPath[0]);
 	return true;
 }
@@ -145,8 +147,9 @@ void CHexObject::buildWorldMatrix() {
 
 /* Initialise a move action to the given hex. */
 void CHexObject::initMoveToAdjacent(CHex& adjacent) {
-	//moving = true;
 	destination = travelPath[0];
+	//map->moveEntity((CGameHexObj*)this, destination);
+
 	worldSpaceDestination = cubeToWorldSpace(destination);
 	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
 }
@@ -204,7 +207,8 @@ bool CHexObject::updateMovement(float dT) {
 		setPosition(destination.x, destination.y, destination.z);
 		if (!travelPath.empty() && destination == travelPath[0])
 			travelPath.erase(travelPath.begin());
-		return false;
+		return beginMove();
+		//return false;
 	}
 	else {
 		worldPos += velocity;

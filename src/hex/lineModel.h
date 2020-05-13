@@ -13,6 +13,7 @@ public:
 
 	TModelNode model;
 	CBuf* buffer;
+	CBuf2* buffer2;
 
 private:
 	void recurseColour(TModelNode& node, glm::vec4& colour);

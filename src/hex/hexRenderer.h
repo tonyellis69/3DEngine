@@ -25,6 +25,7 @@ public:
 	void start();
 	void setMap(CHexArray* hexArray);
 	void draw();
+	void draw2();
 	void setCallbackApp(IhexRendererCallback* pObj);
 	void dollyCamera(float delta);
 	void pitchCamera(float delta);
@@ -59,6 +60,8 @@ private:
 
 	void drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf);
 
+	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
+
 	CRenderer* pRenderer;
 	CBuf floorplanLineBuf;
 	CBuf floorplanSpaceBuf;
@@ -85,7 +88,7 @@ private:
 
 	IhexRendererCallback* pCallbackObj; ///<Pointer to obj used for callbacks.
 
-	//std::map<std::string, CBuf> modelBuffers;
+	std::list<CBuf2> modelBuffers;
 	std::list<CBuf> modelBuffers2;
 
 	std::map<std::string, CLineModel> lineModels;
@@ -100,7 +103,7 @@ private:
 class IhexRendererCallback {
 	public:
 	virtual CHexObject* getCursorObj() { return NULL; }
-	virtual THexList* getPlayerPath() { return NULL; }
+	virtual THexList* getCursorPath() { return NULL; }
 	virtual CHexObject* getPlayerObj() { return NULL; }
 };
 

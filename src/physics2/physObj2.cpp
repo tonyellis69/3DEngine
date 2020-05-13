@@ -4,6 +4,7 @@
 CPhysObj2::CPhysObj2() {
 	force = glm::vec3(0.0f) ;
 	invMass = 0;
+	restitution = 0.5f;
 }
 
 void CPhysObj2::updateVelocity(float dT) {
@@ -27,10 +28,7 @@ void CPhysObj2::setVelocity(glm::vec3& velocity) {
 	this->velocity = velocity;
 }
 
-void CPhysObj2::setBB(glm::vec3& size) {
-	BBbl = size * -0.5f;
-	BBtr = size * 0.5f;
-}
+
 
 bool TAaBB::clips(TAaBB& boxB) {
 	// Exit with no intersection if separated along an axis
@@ -39,4 +37,12 @@ bool TAaBB::clips(TAaBB& boxB) {
 	if (AABBmax.z < boxB.AABBmin.z || AABBmin.z > boxB.AABBmax.z) return false;
 	// Overlapping on all axes means AABBs are intersecting
 	return true;
+}
+
+bool TAaBB::clips(glm::vec3& baseVertB) {
+	if (baseVertB.x < AABBmin.x || baseVertB.x > AABBmax.x) return false;
+	if (baseVertB.y < AABBmin.y || baseVertB.y > AABBmax.y) return false;
+	if (baseVertB.z < AABBmin.z || baseVertB.z > AABBmax.z) return false;
+
+	return true;;
 }
