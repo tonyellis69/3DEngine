@@ -148,7 +148,7 @@ void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
 	textObjs[currentTextObj].style = newStyle;
 }
 
-bool CGUIrichText::setTextStyle(std::string styleName) {
+bool CGUIrichText::setTextStyle(const std::string& styleName) {
 //	if (busy)
 //		return false;
 	if (styles == NULL)
@@ -416,6 +416,7 @@ void CGUIrichText::update(float dT) {
 bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelta, int key) {
 	int direction = wheelDelta > 0 ? 1 : -1;
 	smoothScroll(direction * smoothScrollStep);
+
 	return true;
 }
 

@@ -52,6 +52,7 @@ public:
 	void start();
 	void SetWindow( int width, int height, const std::string Title);
 	virtual void onKeyDown( int key, long mod) {};
+	virtual void onKeyUp(int key, long mod) {};
 	virtual void draw() {};
 	virtual void Update() {};
 	virtual void onResize(int width, int height) {};
@@ -64,7 +65,7 @@ public:
 	void OnCharEntry(unsigned int Key, long Mod);
 	void onWinMouseMove(int x, int y);
 	void onWinMouseButton(int button, int action, int mods);
-	virtual void OnMouseWheelMsg(float xoffset, float yoffset);
+	virtual bool OnMouseWheelMsg(float xoffset, float yoffset);
 	virtual void OnEvent() {};
 	void AppTasks();
 	void DrawUI();

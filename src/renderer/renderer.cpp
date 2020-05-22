@@ -366,7 +366,7 @@ unsigned int CRenderer::getShaderDataHandle(int program, std::string varName) {
 /** Use the given matrix as directed with the current shader. */
 void  CRenderer::setShaderValue(unsigned int matrixHandle, int elements, glm::mat4& matrix) {
 	glUniformMatrix4fv(matrixHandle, elements, GL_FALSE, glm::value_ptr(matrix));
-	unsigned int err = glGetError();
+//	unsigned int err = glGetError();
 }
 
 void CRenderer::setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix) {
@@ -804,6 +804,11 @@ void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
 void CRenderer::drawLinesBuf(CBuf2& buf, void* start, int count ) {
 	buf.setVAO();
 	glDrawElements(GL_LINES, count, GL_UNSIGNED_SHORT, start);
+}
+
+void CRenderer::drawTrisBuf(CBuf2& buf, void* start, int count) {
+	buf.setVAO();
+	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, start);
 }
 
 

@@ -87,8 +87,13 @@ namespace style {
 	const std::map<std::string, TtextStyle> gameDefaultStyles = {
 		{ {"default"}, { "default","defaultFont",uiWhite } },
 		{ {"hot"}, { "hot","defaultFont",glm::vec4(0,0,0.5,1) } },
-		{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } }
+		{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } },
+		{ {"mainBody"}, { "mainBody", "smallFnt", uiWhite } },
+		{ {"mainHeader"}, { "mainHeader","smallHeaderFnt",uiWhite } }
+
+
 	};
+
 	const TtextTheme gameTheme = { "gameTheme", { gameDefaultStyles} };
 
 	const glm::vec4 gameBackColour = { 0,0,0,1 };

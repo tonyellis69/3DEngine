@@ -153,8 +153,9 @@ void CBaseApp::onKeyPress(int key, long mod) {
 }
 
 /** Event handler for when a key is released. */
-void CBaseApp::OnKeyRelease(unsigned int Key, long Mod) {
+void CBaseApp::OnKeyRelease(unsigned int key, long mod) {
 	//KeyDown[Key] = false;
+	onKeyUp(key, mod);
 }
 
 /** Event handler for when a key is pressed and we want to handle it as a character. Eg, textbox entry. */
@@ -211,12 +212,13 @@ void CBaseApp::onWinMouseButton(int button, int action, int mods) {
 }
 
 /** Event handler for mouse wheel messages. */
-void CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
+bool CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
 //	getMousePos(x, y); //gives negative y for some reason!
 	int delta = int(yoffset);
 	int keyState = 0; //can get key state if ever needed
 	if (GUIroot.IsOnControl(GUIroot,mouseX, mouseY)) //checks that the mouse isn't outside our app altogether
-		GUIroot.MouseWheelMsg(mouseX, mouseY,delta,keyState);
+		return GUIroot.MouseWheelMsg(mouseX, mouseY,delta,keyState);
+	return false;
 }
 
 

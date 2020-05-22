@@ -22,7 +22,6 @@ public:
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
 	virtual void setLineModel(const std::string& name);
-	//void setLineModel(CLineModel& model); //scrap
 	void setDirection(THexDir direction);
 	virtual bool beginMove();
 	void setZheight(float height);

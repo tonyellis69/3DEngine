@@ -42,6 +42,11 @@ void CPhysEng::update(float dT) {
 		obj->updatePosition(dT);
 	}
 
+	//correct penetration
+	for (auto& contact : contacts) {
+			contact.second.correctPenetration();
+	}
+
 }
 
 void CPhysEng::broadphase() {
@@ -63,8 +68,8 @@ void CPhysEng::broadphase() {
 
 			}
 			else {
-				if (contacts.erase(key) )
-					liveLog << "\nContact removed!";
+				if (contacts.erase(key))
+					;//	liveLog << "\nContact removed!";
 			}
 
 		}
@@ -94,8 +99,8 @@ Contact CPhysEng::checkCollision(CPhysObj2* objA, CPhysObj2* objB) {
 		contact.points[0] = { baseVertB, penetration };
 
 		//temp
-		objB->velocity = glm::vec3(0);
-		objB->invMass = 0;
+	//	objB->velocity = glm::vec3(0);
+	//	objB->invMass = 0;
 	}
 
 	return contact;

@@ -1,5 +1,6 @@
 #include "importer.h"
 
+#include <string.h>
 
 /** Load a line-based model and write it to the given buffer. */
 void CImporter::loadFile(const std::string& filename) {
@@ -78,14 +79,22 @@ TMeshRec CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
 	meshRec.indexSize = 0;
 	for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
 		aiFace face = mesh->mFaces[f];
+		//glm::i32vec3 tri;
 		for (unsigned int i = 0; i < face.mNumIndices; i++) {
 			localMesh.indices.push_back(face.mIndices[i]);
 			singleMesh.indices.push_back(face.mIndices[i] + prevVerts);
+			//tri[i] = face.mIndices[i] + prevVerts;
 			if (singleMesh.frameCount == 1)
 				singleMesh.frameIndices++;
 			meshRec.indexSize++;
 		}
+		//singleMesh.triangles.push_back(tri);
 	}
+
+	if (strcmp("solid\0", mesh->mName.C_Str()) == 0)
+		meshRec.isLine = false;
+	else
+		meshRec.isLine = true;
 
 	return meshRec;
 }

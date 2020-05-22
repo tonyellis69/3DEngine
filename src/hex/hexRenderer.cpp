@@ -31,6 +31,8 @@ CHexRenderer::CHexRenderer() : hexModel(6) {
 
 /** Set up stuff based on the map we're on, etc. */
 void CHexRenderer::start() {
+	solidHex = &lineModels["solidHex"];
+
 	fillFloorplanLineBuffer();
 	fillFloorplanSolidBuffer(floorplanSolidBuf,2,1);
 	fillFloorplanSolidBuffer(floorplanSpaceBuf, 1,0.9f);
@@ -53,18 +55,21 @@ void CHexRenderer::draw2() {
 }
 
 void CHexRenderer::drawFloorPlan() {
+	
 	glm::mat4 mvp = camera.clipMatrix;
 	pRenderer->setShader(lineShader);
 	lineShader->setShaderValue(hMVP, mvp);
 	
 	glDisable(GL_DEPTH_TEST);
+	//draw inner hex for empty hexes
 	lineShader->setShaderValue(hColour, floorplanSpaceColour);
 	pRenderer->drawTriStripBuf(floorplanSpaceBuf);
 
+	//draw filled hexes for solid hexes
 	lineShader->setShaderValue(hColour, floorplanSolidColour);
 	pRenderer->drawTriStripBuf(floorplanSolidBuf);
 
-
+	//draw hex wireframe grid
 	lineShader->setShaderValue(hColour, floorplanLineColour);
 	pRenderer->drawLineStripBuf(floorplanLineBuf);
 	glEnable(GL_DEPTH_TEST);
@@ -100,7 +105,6 @@ void CHexRenderer::drawHighlights() {
 
 void CHexRenderer::drawLineModel(CLineModel& lineModel) {
 	TModelNode& node = lineModel.model;
-	//drawNode(node, glm::mat4(1),lineModel.buffer);
 	drawNode2(node, glm::mat4(1), lineModel.buffer2);
 }
 
@@ -124,7 +128,12 @@ void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* b
 
 	for (auto mesh : node.meshes) {
 		lineShader->setShaderValue(hColour, mesh.colour);
-		pRenderer->drawLinesBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+
+		if (mesh.isLine) //TO DO: ugh, try to avoid
+			pRenderer->drawLinesBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+		else
+			pRenderer->drawTrisBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+
 	}
 
 	for (auto subNode : node.subNodes)
@@ -403,4 +412,37 @@ glm::vec3 CHexRenderer::castRay(glm::vec3& ray) {
 
 	return camera.getPos() + ray * t; //extend ray to find where it hits plane.
 
+}
+
+/** Return the on screen position of a point in world space. */
+glm::i32vec2 CHexRenderer::worldPosToScreen(glm::vec3& worldPos) {
+	glm::vec4 translatedPos = camera.clipMatrix * glm::vec4(worldPos,1.0f);
+
+	translatedPos /= translatedPos.w;
+
+	translatedPos = (translatedPos + glm::vec4(1.0f)) * 0.5f;
+	translatedPos.x *= camera.getView().x;
+	translatedPos.y = (1.0f - translatedPos.y) * camera.getView().y;
+
+
+	return translatedPos;
+}
+
+/** Highlight this hex. */
+void CHexRenderer::highlightHex(CHex& hex) {
+	glDisable(GL_DEPTH_TEST);
+	//draw coloured filled hex
+	TModelNode& node = solidHex->model;
+	glm::mat4 worldM = glm::translate(glm::mat4(1), hexArray->getWorldPos(hex));
+	node.meshes[0].colour = glm::vec4(0, 0, 0.8f, 1); 
+	drawNode2(node, worldM, solidHex->buffer2);
+
+
+	//draw smaller background colour hex
+	glm::mat4 scaleM = glm::scale(glm::mat4(1), glm::vec3(0.9f));
+	worldM = worldM * scaleM;
+	node.meshes[0].colour =  floorplanSpaceColour;
+	drawNode2(node, worldM, solidHex->buffer2);
+
+	glEnable(GL_DEPTH_TEST);
 }

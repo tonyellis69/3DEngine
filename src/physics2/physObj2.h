@@ -17,6 +17,7 @@ public:
 	CPhysObj2();
 	void updateVelocity(float dT);
 	void updatePosition(float dT);
+	void correctPenetration();
 	void setMass(float mass);
 	void setVelocity(glm::vec3& velocity);
 

@@ -14,6 +14,7 @@ struct TMeshRec {
 	int indexStart;
 	int indexSize;
 	glm::vec4 colour;
+	bool isLine = true;
 };
 
 struct TModelNode {
@@ -25,7 +26,6 @@ struct TModelNode {
 
 
 /** A class for storing vertices organised for drawing. */
-
 class CMesh {
 public:
 	CMesh();
@@ -38,6 +38,7 @@ public:
 	std::vector<glm::vec3> normals;
 	std::vector<unsigned int> indices;
 	std::vector<glm::vec2> texCoords;
+	//std::vector<glm::i32vec3> triangles;
 	TMesh type;
 
 	int frameCount;

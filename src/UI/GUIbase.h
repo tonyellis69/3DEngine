@@ -265,6 +265,8 @@ public:
 		positionHint.vAlignment = mode;
 	}
 
+	bool isMouseOver();
+
 
 	static	CMessage Message; ///<Any UI messages are returned here.
 

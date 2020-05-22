@@ -167,7 +167,7 @@ void CWin::windowSizeCallback(GLFWwindow* window, int width, int height) {
 void CWin::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS)
 		pApp->onKeyPress(key, mods);
-	else
+	if (action == GLFW_RELEASE)
 		pApp->OnKeyRelease(key, mods);
 }
 

@@ -1,17 +1,18 @@
 #include "physObj2.h"
 
+#include "utils/log.h"
 
 CPhysObj2::CPhysObj2() {
 	force = glm::vec3(0.0f) ;
 	invMass = 0;
-	restitution = 0.5f;
+	restitution = 0.01f;
 }
 
 void CPhysObj2::updateVelocity(float dT) {
 	if (invMass == 0)
 		return;
 	velocity += dT * (gravity + invMass * force);
-
+	sysLog << "\nvelocity updated to " << velocity;
 }
 
 void CPhysObj2::updatePosition(float dT) {
@@ -19,6 +20,9 @@ void CPhysObj2::updatePosition(float dT) {
 		return;
 	updateModelPosition(dT * velocity);
 }
+
+
+
 
 void CPhysObj2::setMass(float mass) {
 	invMass = 1.0f / mass;

@@ -47,6 +47,10 @@ public:
 
 	glm::vec3 castRay(glm::vec3& ray);
 
+	glm::i32vec2 worldPosToScreen(glm::vec3& worldPos);
+
+	void highlightHex(CHex& hex);
+
 private:
 	void tmpCreateHexagonModel();
 
@@ -69,6 +73,8 @@ private:
 
 	CBuf solidHexBuf;
 	std::vector<glm::vec3> hexModel;
+
+	CLineModel* solidHex;
 
 	CShader* lineShader;
 	unsigned int hMVP;

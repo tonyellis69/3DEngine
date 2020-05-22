@@ -51,7 +51,7 @@ public:
 	void setTextColour(UIcolour colour);
 	void setTextColour(glm::vec4& colour);
 	void setTextStyle(TtextStyle& style);
-	bool setTextStyle(std::string styleName);
+	bool setTextStyle(const std::string& styleName);
 	void refreshCurrentTextStyles();
 	void setTextTheme(const std::string& themeName);
 	void setDefaultTextStyle(std::string styleName);

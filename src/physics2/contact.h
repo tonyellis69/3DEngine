@@ -15,6 +15,8 @@ class Contact {
 public:
 	Contact();
 	void applyImpulse();
+	void correctPenetration();
+
 
 	glm::vec3 normal;
 	int numPoints;

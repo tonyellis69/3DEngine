@@ -13,7 +13,7 @@
 
 #include "..//3DEngine/src/utils/log.h"
 
-// TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
+/// TO DO: get rid of 'Name' and 'Count'. It's messy and I don't use it. 
 
 unsigned int UIuniqueIDgen = 0;
 
@@ -813,8 +813,13 @@ CGUIlabel* CGUIbase::addLabel(const std::string& text, int style) {
 	return (CGUIlabel*) addCtrl(lbl);
 }*/
 
-
-
+/** Return true if the mouse is inside our boundary. */
+bool CGUIbase::isMouseOver(){
+	if (mousePos.x < drawBox.pos.x || mousePos.x > drawBox.pos.x + drawBox.size.x
+		|| mousePos.y < drawBox.pos.y || mousePos.y > drawBox.pos.y + drawBox.size.y)
+		return false;
+	return true;
+}
 
 
 /** Return a pointer to the child control of this control with the given id number. */
