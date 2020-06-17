@@ -110,6 +110,8 @@ void CRenderer::init() {
 //	initRenderToTextureBufs();
 	glEnable(GL_PROGRAM_POINT_SIZE);
 
+	//glEnable(GL_LINE_SMOOTH); //fps penalty of 1100+ !
+
 	//From now on, this is something we temporarily switch off, not temporarily switch on
 	//index numbers are unlikely to rise high enough for this to be a problem, but be vigilant
 	glEnable(GL_PRIMITIVE_RESTART); 
@@ -803,7 +805,9 @@ void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
 
 void CRenderer::drawLinesBuf(CBuf2& buf, void* start, int count ) {
 	buf.setVAO();
+	//glDepthMask(false);
 	glDrawElements(GL_LINES, count, GL_UNSIGNED_SHORT, start);
+	//glDepthMask(true);
 }
 
 void CRenderer::drawTrisBuf(CBuf2& buf, void* start, int count) {

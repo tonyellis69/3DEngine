@@ -7,18 +7,16 @@
 #include "..\direction.h"
 #include "chunk2.h"
 
-#include "..\vertBufs.h"
+
 #include "..\renderer\multiBuf2.h"
 
-typedef vBuf::T3DnormVert TChunkVert2;
+#include "physics2/physObj2.h"
 
-class TChunkTriBuf2 {
-public:
-	TChunkTriBuf2() { id = noTris = 0; /*buf = NULL;*/ }
-	unsigned int id;
-	unsigned int noTris;
-	TChunkVert2 buf[4200];
-};
+#include "chunkDataCache.h"
+
+
+
+
 
 struct TSCident {
 	int shellNo;
@@ -27,7 +25,7 @@ struct TSCident {
 
 const int chunkTriCacheSize2 = 6;
 
-class CTerrain2 : public ITerrain {
+class CTerrain2 : public ITerrain, public CPhysObj2 {
 public:
 	CTerrain2();
 	void setInitialChunkStorageSize(int bytes);
@@ -107,7 +105,25 @@ private:
 
 	CMultiBuf2 multiBuf;
 
+
+	//physics stuff
+	void updateModelPosition(glm::vec3& dPos) {};
+	glm::vec3 getPos() {
+		return glm::vec3(0);
+	}
+	TAaBB calcAABB();
+
+	Contact checkCollision(CPhysObj2* objB);
 	
+	virtual glm::vec3 calcBaseVertPos() {
+		return glm::vec3(0);
+	}
+
+	TChunkTriBuf2* getShell0ChunkDataAt(glm::vec3& pos);
+
+	float checkChunkCollision( glm::vec3 baseVector, TChunkTriBuf2* chunkData);
+
+	ChunkDataCache chunkDataCache;
 };
 
 

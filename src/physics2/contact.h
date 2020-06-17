@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 
-#include "physics2/physObj2.h"
+//#include "physics2/physObj2.h"
 
 
 struct TContactPoint {
@@ -10,7 +10,7 @@ struct TContactPoint {
 	float penetration;
 };
 
-
+class CPhysObj2;
 class Contact {
 public:
 	Contact();

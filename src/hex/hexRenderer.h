@@ -18,15 +18,13 @@
 
 
 /**	A class for drawing 3D hex-based graphics. */
-class IhexRendererCallback;
 class CHexRenderer: public IHexRenderer {
 public:
 	CHexRenderer();
 	void start();
 	void setMap(CHexArray* hexArray);
 	void draw();
-	void draw2();
-	void setCallbackApp(IhexRendererCallback* pObj);
+	void drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour);
 	void dollyCamera(float delta);
 	void pitchCamera(float delta);
 	void moveCamera(glm::vec3& move);
@@ -59,7 +57,6 @@ private:
 	void createSolidHexModel();
 	void createLineShader();
 	void drawFloorPlan();
-	void drawHighlights();
 	void drawLineModel(CLineModel& lineModel);
 
 	void drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf);
@@ -92,8 +89,6 @@ private:
 
 	CHexArray* hexArray;
 
-	IhexRendererCallback* pCallbackObj; ///<Pointer to obj used for callbacks.
-
 	std::list<CBuf2> modelBuffers;
 	std::list<CBuf> modelBuffers2;
 
@@ -106,11 +101,5 @@ private:
 };
 
 
-class IhexRendererCallback {
-	public:
-	virtual CHexObject* getCursorObj() { return NULL; }
-	virtual THexList* getCursorPath() { return NULL; }
-	virtual CHexObject* getPlayerObj() { return NULL; }
-};
 
 

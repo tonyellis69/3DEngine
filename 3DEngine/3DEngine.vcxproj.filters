@@ -45,6 +45,9 @@
     <Filter Include="Source Files\physics2">
       <UniqueIdentifier>{7ade583e-2bb2-4b90-801f-ed4fb03aaa0d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\messaging">
+      <UniqueIdentifier>{a2f37271-955c-4fd6-a636-30fa839a2eed}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -439,6 +442,15 @@
     </ClCompile>
     <ClCompile Include="..\src\sharedBuf.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\terrain\chunkDataCache.cpp">
+      <Filter>terrain2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\messaging\events.cpp">
+      <Filter>Source Files\messaging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\messaging\messenger.cpp">
+      <Filter>Source Files\messaging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -888,6 +900,21 @@
     </ClInclude>
     <ClInclude Include="..\src\sharedBuf.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\terrain\chunkDataCache.h">
+      <Filter>terrain2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\messaging\events.h">
+      <Filter>Source Files\messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\messaging\msg.h">
+      <Filter>Source Files\messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\messaging\messenger.h">
+      <Filter>Source Files\messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\physics2\collisions.h">
+      <Filter>Source Files\physics2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

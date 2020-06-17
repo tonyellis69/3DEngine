@@ -19,6 +19,7 @@ public:
 	void setSize(int numBytes);
 	int copyBuf(CBuf& src, int size);
 	void freeBlock(int addr);
+	int exportBlock(int id, char* buf);
 	void storeLayout(std::initializer_list<int> attribs);
 	unsigned int getVAO();
 

@@ -44,15 +44,10 @@ void CHexRenderer::setMap(CHexArray* hexArray){
 }
 
 
-
 void CHexRenderer::draw() {
 	drawFloorPlan();
-	drawHighlights();
 }
 
-void CHexRenderer::draw2() {
-	drawFloorPlan();
-}
 
 void CHexRenderer::drawFloorPlan() {
 	
@@ -75,32 +70,20 @@ void CHexRenderer::drawFloorPlan() {
 	glEnable(GL_DEPTH_TEST);
 }
 
-/** Draw any hey highlighting, such as the cursor. */
-void CHexRenderer::drawHighlights() {
-	CHexObject* cursorObj = pCallbackObj->getCursorObj();
-	glm::mat4 mvp;// = camera.clipMatrix * cursorObj->worldMatrix;
-	//lineShader->setShaderValue(hColour, floorplanLineColour);
-	//lineShader->setShaderValue(hMVP, mvp);
-	//pRenderer->drawLinesBuf(*cursorObj->buf);
-	cursorObj->draw();
 
-
-	glm::vec4 pathStartColour(0.6, 0.4, 1, 0.1f);
-	glm::vec4 pathEndColour(0.6, 0.4, 1, 0.75f);
-	THexList* path = pCallbackObj->getCursorPath();
+void CHexRenderer::drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour) {
+	glm::mat4 mvp;
 	float inc = 1.0 / path->size();  float t = 0;
 	for (auto hex : *path) {
 		glm::mat4 worldPos = glm::translate(glm::mat4(1), hexArray->getWorldPos(hex));
 		mvp = camera.clipMatrix * worldPos;
 		lineShader->setShaderValue(hMVP, mvp);
-		glm::vec4 pathColour = glm::mix(pathStartColour, pathEndColour, 1-t);
+		glm::vec4 pathColour = glm::mix(pathStartColour, pathEndColour, 1 - t);
 		lineShader->setShaderValue(hColour, pathColour);
 		pRenderer->drawTriStripBuf(solidHexBuf);
 		t += inc;
 	}
-
 }
-
 
 
 void CHexRenderer::drawLineModel(CLineModel& lineModel) {
@@ -139,12 +122,6 @@ void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* b
 	for (auto subNode : node.subNodes)
 		drawNode2(subNode, node.matrix * parentMatrix, buf);
 
-}
-
-
-
-void CHexRenderer::setCallbackApp(IhexRendererCallback* pObj) {
-	pCallbackObj = pObj;
 }
 
 

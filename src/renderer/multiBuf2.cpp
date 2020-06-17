@@ -70,6 +70,15 @@ void CMultiBuf2::freeBlock(int addr) {
 }
 
 
+int CMultiBuf2::exportBlock(int addr, char* buf) {
+	int blockSize = reservedBlocks[addr].size;
+	glBindBuffer(GL_COPY_READ_BUFFER, buffer.getBufHandle());
+	glGetBufferSubData(GL_COPY_READ_BUFFER, addr, blockSize, buf);
+	return blockSize;
+}
+
+
+
 /** Return the address of a free block of memory >= size. */
 int CMultiBuf2::getFreeBlock(int size) {
 	if (freeBlocksBySize.empty())

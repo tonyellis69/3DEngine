@@ -7,6 +7,8 @@
 
 #include "..\\3DEngine\src\utils\log.h"
 
+#include  "physics2/collisions.h"
+
 using glm::vec3;
 using glm::mat4;
 using glm::i32vec3;
@@ -16,7 +18,9 @@ CTerrain2::CTerrain2()   {
 	chunkOrigin = mat4(1);
 	chunksToSkinPerFrame = 10;
 	oldViewpoint = vec3(0);
-	CSuperChunk2::pTerrainObj = this;;
+	CSuperChunk2::pTerrainObj = this;
+
+	chunkDataCache.setMultiBuf(&multiBuf);
 };
 
 /** Specify the size of the storage space for chunk vertices. This will silenty resize if more
@@ -335,4 +339,159 @@ void CTerrain2::rebuildOuterShellInnerFace(int shellNo, Tdirection scrollOutFace
 
 glm::i32vec3 CTerrain2::getChunkIndex(int chunkId) {
 	return chunks[chunkId].index;
+}
+
+
+TAaBB CTerrain2::calcAABB() {
+	glm:vec3 BBextent = glm::vec3(getShellSize(0) * 0.5f);
+	TAaBB AaBb = { -BBextent, BBextent };
+	glm::mat4 worldMatrix = glm::translate(glm::mat4(), shells[0].worldSpacePos);
+	//TO DO: don't need matrix if we just use shell 0  - see how we go
+	glm::vec4 AABBmin = worldMatrix * glm::vec4(-BBextent, 1);
+	glm::vec4 AABBmax = worldMatrix * glm::vec4(BBextent, 1);
+	return { glm::vec3(AABBmin), glm::vec3(AABBmax) };
+}
+
+Contact CTerrain2::checkCollision(CPhysObj2* objB) {
+	Contact contact;
+	if (this < objB) {
+		contact.objA = this;
+		contact.objB = objB;
+	}
+	else {
+		contact.objB = this;
+		contact.objA = objB;
+	}
+
+	glm::vec3 baseVertB = objB->calcBaseVertPos();
+	TAaBB objAbb = calcAABB();
+
+	if (objAbb.clips(baseVertB)) {
+
+		TChunkTriBuf2* chunkData = getShell0ChunkDataAt(baseVertB);
+		if (chunkData == NULL)
+			return contact;
+
+		float penetration = checkChunkCollision(baseVertB, chunkData);
+		if (penetration > 0) {
+			contact.normal = glm::vec3(0, 1, 0);
+			contact.numPoints = 1;
+			contact.points[0] = { baseVertB, penetration };
+		}
+
+		return contact;
+
+
+		glm::i32vec3 scIndex = shells[0].getSCat(baseVertB);
+		//rotate index?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		CSuperChunk2* sc = shells[0].scArray.element(scIndex.x, scIndex.y, scIndex.z);
+		if (sc->isEmpty)
+			return contact;
+
+		float SCsize = shells[0].SCsize;
+
+		glm::vec3 scCornerOrigin = vec3(scIndex) * SCsize;
+		scCornerOrigin -= shells[0].worldSpaceSize * 0.5; // make relative to centre of shell
+		scCornerOrigin += shells[0].worldSpacePos; //and then relative to shell's worldspace position
+
+		glm::vec3 SCorigin = scCornerOrigin + (SCsize * 0.5f); //move orgin to centre of SC
+		float topHeight = SCorigin.y + (SCsize * 0.5);
+
+		//find chunk at baseVertB - if any
+		glm::vec3 pointInSC = baseVertB - scCornerOrigin;
+		glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[0].chunkSize);
+
+		if (sc->chunkExists(chunkIndex) == false)
+			return contact;
+
+		topHeight = (chunkIndex.y + 1) * shells[0].chunkSize;
+		topHeight += scCornerOrigin.y;
+
+		float penetration2 = topHeight - baseVertB.y;
+
+		contact.normal = glm::vec3(0, 1, 0);
+		contact.numPoints = 1;
+		contact.points[0] = { baseVertB, penetration2 };
+
+	}
+
+	return contact;
+}
+
+TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
+	glm::i32vec3 scIndex = shells[0].getSCat(pos);
+	CSuperChunk2* sc = shells[0].scArray.element(scIndex.x, scIndex.y, scIndex.z);
+	if (sc->isEmpty)
+		return NULL;
+
+	float SCsize = shells[0].SCsize;
+
+	glm::vec3 scCornerOrigin = vec3(scIndex) * SCsize;
+	scCornerOrigin -= shells[0].worldSpaceSize * 0.5; // make relative to centre of shell
+	scCornerOrigin += shells[0].worldSpacePos; //and then relative to shell's worldspace position
+
+	glm::vec3 SCorigin = scCornerOrigin + (SCsize * 0.5f); //move orgin to centre of SC
+	float topHeight = SCorigin.y + (SCsize * 0.5);
+
+	//find chunk at baseVertB - if any
+	glm::vec3 pointInSC = pos - scCornerOrigin;
+	glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[0].chunkSize);
+
+	//get the id for the chunk at this index position
+	int chunkAddr = -1;
+	for (auto localChunk : sc->scChunks) {
+		if (chunks[localChunk].index == chunkIndex) {
+			chunkAddr = chunks[localChunk].bufId;
+			break;
+		}
+	}
+
+	if (chunkAddr == -1)
+		return NULL;
+
+	//auto chunkData = chunkCache.find(chunkAddr);
+	//if (chunkData == chunkCache.end()) {
+	//	TChunkTriBuf2* buf = new TChunkTriBuf2();
+	//	//TO DO: memory leak! Optimise to an array of bufs we recycle
+	//	int size = multiBuf.exportBlock(chunkAddr, (char*)buf->buf);
+	//	buf->noTris = size / sizeof(TChunkVert2);
+	//	chunkCache[chunkAddr] = buf;
+	//	return buf;
+	//}
+
+	//return chunkData->second;
+
+	return chunkDataCache.getData(chunkAddr);
+}
+
+/** Return the contact, if any, between an upright line segment ending at the base vector,
+and the triangles in the chunk data. */
+float CTerrain2::checkChunkCollision(glm::vec3 baseVector, TChunkTriBuf2* chunkData) {
+
+	//baseVector = chunkOrigin * -glm::vec4(baseVector,0);
+
+	float penetration = 0;
+	//check for intersection
+	glm::vec3 segTop = baseVector + glm::vec3(0, 100, 0);
+	float u, v, w, t;
+	int vertNo = 0;
+	for (int tri = 0; tri < chunkData->noTris; tri++) {
+		bool intersect = triSegmentIntersection(segTop, baseVector, chunkData->buf[vertNo].v, chunkData->buf[vertNo + 1].v, chunkData->buf[vertNo + 2].v, u, v, w, t);
+
+		if (intersect) {
+			glm::vec3 intersectionPoint = (chunkData->buf[vertNo].v * u) + (chunkData->buf[vertNo + 1].v * v) + (chunkData->buf[vertNo + 2].v * w);
+			float contactDistance = glm::length(segTop - intersectionPoint);
+
+			/*vec3 a = chunkData->buf[vertNo + 1].v - chunkData->buf[vertNo].v;
+			vec3 b = chunkData->buf[vertNo + 2].v - chunkData->buf[vertNo].v;
+			vec3 triNorm = normalize(cross(a, b));
+			vec3 contactDir = triNorm;*/
+		
+			penetration = glm::length(intersectionPoint - baseVector);
+			break;
+		}
+		vertNo += 3;
+
+	}
+	return penetration;
 }

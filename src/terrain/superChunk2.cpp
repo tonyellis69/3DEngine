@@ -195,6 +195,18 @@ void CSuperChunk2::clearOuterLayerChunks(Tdirection face, int layersToKeep) {
 	}
 }
 
+/** Return chunk at the given worldpos or false. */
+//TO DO: unfinished!!! Requires finding worldpos of sc
+std::tuple<bool, glm::i32vec3 > CSuperChunk2::getChunkAt(glm::vec3& pos) {
+	glm::i32vec3 index;
+	bool found;
+
+	
+
+
+	return { found, index };
+}
+
 
 /** If clippee is partially or entirely inside this volume, return true
 	and with the proportion of overlap in clipVol, expressed as a unit volume. */

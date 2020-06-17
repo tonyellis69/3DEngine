@@ -4,6 +4,8 @@
 
 #include "utils/log.h"
 
+#include "physObj2.h"
+
 Contact::Contact() {
 	numPoints = 0;
 

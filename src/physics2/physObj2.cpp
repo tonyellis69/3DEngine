@@ -25,11 +25,40 @@ void CPhysObj2::updatePosition(float dT) {
 
 
 void CPhysObj2::setMass(float mass) {
-	invMass = 1.0f / mass;
+	if (mass < 0)
+		invMass = 0;
+	else
+		invMass = 1.0f / mass;
 }
 
 void CPhysObj2::setVelocity(glm::vec3& velocity) {
 	this->velocity = velocity;
+}
+
+/** Default collision checker. AABB vs base vertex. */
+Contact CPhysObj2::checkCollision(CPhysObj2* objB) {
+	Contact contact;
+	if (this < objB) {
+		contact.objA = this;
+		contact.objB = objB;
+	}
+	else {
+		contact.objB = this;
+		contact.objA = objB;
+	}
+
+	glm::vec3 baseVertB = objB->calcBaseVertPos();
+	TAaBB objAbb = calcAABB();
+
+	if (objAbb.clips(baseVertB)) {
+		contact.normal = glm::vec3(0, 1, 0);
+		contact.numPoints = 1;
+		float penetration = objAbb.AABBmax.y - baseVertB.y;
+		contact.points[0] = { baseVertB, penetration };
+
+	}
+
+	return contact;
 }
 
 

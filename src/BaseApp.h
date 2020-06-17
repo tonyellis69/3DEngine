@@ -42,8 +42,10 @@
 
 #include "physics2/physEng.h"
 
+#include "messaging/messenger.h"
+
 //class CVMapp;
-class CBaseApp : public Icallback, ILogCallback, IGUImsg {
+class CBaseApp : public Icallback, ILogCallback, IGUImsg, public CMessenger {
 public:
 	CBaseApp(void);
 	~CBaseApp(void);

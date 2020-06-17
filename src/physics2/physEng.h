@@ -18,6 +18,13 @@ private:
 	void broadphase();
 	Contact checkCollision(CPhysObj2* objA, CPhysObj2* objB);
 
+	template <typename A, typename B>
+	Contact checkCollision2(A Atype, B Btype, CPhysObj2* objA, CPhysObj2* objB) {
+
+
+
+	}
+
 	std::vector<CPhysObj2*> objs;
 
 	std::map<ContactKey, Contact> contacts;

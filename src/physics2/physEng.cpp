@@ -59,7 +59,10 @@ void CPhysEng::broadphase() {
 			if (objA->invMass == 0 && objB->invMass == 0)
 				continue;
 
-			Contact contact = checkCollision(objA, objB);
+			Contact contact;
+			//contact = checkCollision(objA, objB);
+			contact = objA->checkCollision(objB);
+
 			ContactKey key(objA, objB);
 
 			if (contact.numPoints > 0) {
@@ -98,22 +101,8 @@ Contact CPhysEng::checkCollision(CPhysObj2* objA, CPhysObj2* objB) {
 		float penetration = objAbb.AABBmax.y - baseVertB.y;
 		contact.points[0] = { baseVertB, penetration };
 
-		//temp
-	//	objB->velocity = glm::vec3(0);
-	//	objB->invMass = 0;
 	}
 
 	return contact;
 
-
-	
-	//AABB check - costs two matrix calcs
-	/*TAaBB objAbb = objA->calcAABB();
-	TAaBB objBbb = objB->calcAABB();
-
-	if (objAbb.clips(objBbb)) {
-		contact.numContacts = 1;
-	}
-
-	return contact;*/
 }

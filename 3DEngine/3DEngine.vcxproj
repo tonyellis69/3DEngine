@@ -115,6 +115,8 @@
     <ClCompile Include="..\src\hex\hexRenderer.cpp" />
     <ClCompile Include="..\src\hex\lineModel.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
+    <ClCompile Include="..\src\messaging\events.cpp" />
+    <ClCompile Include="..\src\messaging\messenger.cpp" />
     <ClCompile Include="..\src\physics2\contact.cpp" />
     <ClCompile Include="..\src\physics2\physEng.cpp" />
     <ClCompile Include="..\src\physics2\physModel.cpp" />
@@ -169,6 +171,7 @@
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
     <ClCompile Include="..\src\terrain\chunk2.cpp" />
+    <ClCompile Include="..\src\terrain\chunkDataCache.cpp" />
     <ClCompile Include="..\src\terrain\scArray.cpp" />
     <ClCompile Include="..\src\terrain\shell.cpp" />
     <ClCompile Include="..\src\terrain\superChunk2.cpp" />
@@ -258,6 +261,10 @@
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\Src\Macros.h" />
+    <ClInclude Include="..\src\messaging\events.h" />
+    <ClInclude Include="..\src\messaging\messenger.h" />
+    <ClInclude Include="..\src\messaging\msg.h" />
+    <ClInclude Include="..\src\physics2\collisions.h" />
     <ClInclude Include="..\src\physics2\contact.h" />
     <ClInclude Include="..\src\physics2\physEng.h" />
     <ClInclude Include="..\src\physics2\physModel.h" />
@@ -311,6 +318,7 @@
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />
     <ClInclude Include="..\src\terrain\chunk2.h" />
+    <ClInclude Include="..\src\terrain\chunkDataCache.h" />
     <ClInclude Include="..\src\terrain\iterrain.h" />
     <ClInclude Include="..\src\terrain\scArray.h" />
     <ClInclude Include="..\src\terrain\shell.h" />

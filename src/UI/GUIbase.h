@@ -355,7 +355,9 @@ public:
 	CGUIposition positionHint; ///<How the control is to be positioned on its parent.
 	CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
 
-	typedef struct {
+	//typedef struct {
+	class TControlCursor  {
+	public:
 		void advance() {
 			rowCol.x++;
 			if (rowCol.x >= currentLayoutStyle.cols) {
@@ -376,7 +378,7 @@ public:
 		CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
 		glm::i32vec2 rowCol;
 		bool centreRowOn = false; 
-	} TControlCursor;
+	} ;
 	TControlCursor controlCursor; ///<Keeps track of where the next child control should go.
 
 	glm::bvec2 resizesForChildren; ///<If true control shrinks/grows to fit children.

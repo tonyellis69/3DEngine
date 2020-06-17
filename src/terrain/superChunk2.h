@@ -69,6 +69,8 @@ public:
 
 	void clearOuterLayerChunks(Tdirection face, int maxChunks);
 
+	std::tuple<bool, glm::i32vec3> getChunkAt(glm::vec3& pos);
+
 	glm::vec4 colour; //TO DO probably temp
 	glm::i32vec3 origIndex; //TO DO probably temp
 
