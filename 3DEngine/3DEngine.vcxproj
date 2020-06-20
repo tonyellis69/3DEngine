@@ -115,7 +115,6 @@
     <ClCompile Include="..\src\hex\hexRenderer.cpp" />
     <ClCompile Include="..\src\hex\lineModel.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
-    <ClCompile Include="..\src\messaging\events.cpp" />
     <ClCompile Include="..\src\messaging\messenger.cpp" />
     <ClCompile Include="..\src\physics2\contact.cpp" />
     <ClCompile Include="..\src\physics2\physEng.cpp" />

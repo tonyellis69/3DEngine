@@ -1,6 +1,7 @@
 #include "GUIrichText.h"
 
 #include <string_view>
+#include <functional> //for hash - temp~?
 
 #include "glm\glm.hpp"
 # define PI           3.14159265358979323846  /* pi */
@@ -30,7 +31,8 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
 
 	prepForFirstText();
 	prepForScrolling();
-	setResizeMode(resizeByWidthMode);
+	setResizeMode(resizeNone); //was setResizeMode(resizeByWidthMode);
+	
 }
 
 /** Append new text to the current body of text and show the updated page. */
@@ -148,59 +150,56 @@ void CGUIrichText::setTextStyle(TtextStyle & newStyle) {
 	textObjs[currentTextObj].style = newStyle;
 }
 
+/** Set the style for any text appended after this. */
 bool CGUIrichText::setTextStyle(const std::string& styleName) {
-//	if (busy)
-//		return false;
-	if (styles == NULL)
-		return false;
-	for (auto style : *styles) {
-		/*if (style.name == styleName) {
-			setTextStyle(style);
-			return true;
-		}*/
+	/*if (styles == NULL)
+		return false;*/
 
+	//is this a named style in the current theme?
+	for (auto style : *styles) {
 		if (style.first == styleName) {
 			setTextStyle(style.second);
 			return true;
 		}
-
 	}
+
+	//no? then it may be one of these kludgy psuedo-styles I should totally get rid of
+	
 	if (styleName == "tempOn") {
-		setTempText(true);
+		setTempText(true); return true;
 	}
 	if (styleName == "tempOff") {
-		setTempText(false);
+		setTempText(false); return true;
 	}
 
 	if (styleName == "markOn") {
-		setMarkedText(true);
+		setMarkedText(true); return true;
 	}
 	if (styleName == "markOff") {
-		setMarkedText(false);
+		setMarkedText(false); return true;
 	}
 
 
 	if (styleName == "fadeOn") {
-		setFadeText(true);
+		setFadeText(true); return true;
 	}
 	if (styleName == "fadeOff") {
-		setFadeText(false);
+		setFadeText(false); return true;
 	}
 
-	if (styleName == "bookmark")
-		insertBookmark();
+	if (styleName == "bookmark") {
+		insertBookmark(); return true;
+	}
 
-	return true;
+	fatalLog << "\nText style " << styleName << " not found.";
+
+	return false;
 }
 
 
 /** Update the set of text styles to use */
 void CGUIrichText::refreshCurrentTextStyles() {
-	//styles = &style::getTheme(currentTheme).styles;
-
 	styles = (std::map<std::string, TtextStyle> *) &style::themes2.at(currentTheme).styles;
-
-	
 
 	for (auto style : *styles) {
 		if (style.first == "default")
@@ -217,19 +216,11 @@ void CGUIrichText::refreshCurrentTextStyles() {
 
 /** Set the current theme, and load the styles of that theme, for use when requested. */
 void CGUIrichText::setTextTheme(const std::string& themeName) {
+	if (style::themes2.find(themeName) == style::themes2.end())
+		fatalLog << "\nUnable to load text theme " << themeName;
+
 	currentTheme = themeName;
 	refreshCurrentTextStyles();
-}
-
-//!!!!!!!!!!!!!!!!TO DO: get rid of
-void CGUIrichText::setDefaultTextStyle(std::string styleName) {
-	for (auto style : *styles) {
-		//if (style.name == styleName)
-		//	defaultTextStyle = style;
-		if (style.first == styleName)
-			;// defaultTextStyle = style.second;
-
-	}
 }
 
 

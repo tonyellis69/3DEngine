@@ -446,9 +446,6 @@
     <ClCompile Include="..\src\terrain\chunkDataCache.cpp">
       <Filter>terrain2</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\messaging\events.cpp">
-      <Filter>Source Files\messaging</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\messaging\messenger.cpp">
       <Filter>Source Files\messaging</Filter>
     </ClCompile>

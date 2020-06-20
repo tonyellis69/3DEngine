@@ -366,11 +366,17 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 	glm::vec3 baseVertB = objB->calcBaseVertPos();
 	TAaBB objAbb = calcAABB();
 
-	if (objAbb.clips(baseVertB)) {
-
+	if (objAbb.clips(baseVertB)) { //we're inside shell 0
+		
 		TChunkTriBuf2* chunkData = getShell0ChunkDataAt(baseVertB);
-		if (chunkData == NULL)
-			return contact;
+		if (chunkData == NULL) {
+			//check the chunk above in case we dropped straight through
+			glm::vec3 chunkAbove = baseVertB + glm::vec3(0, LoD1chunkSize, 0);
+			TChunkTriBuf2* chunkAboveData = getShell0ChunkDataAt(chunkAbove);
+			if (chunkAboveData == NULL)
+				return contact;
+			chunkData = chunkAboveData;
+		}
 
 		float penetration = checkChunkCollision(baseVertB, chunkData);
 		if (penetration > 0) {
@@ -466,15 +472,14 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 
 /** Return the contact, if any, between an upright line segment ending at the base vector,
 and the triangles in the chunk data. */
-float CTerrain2::checkChunkCollision(glm::vec3 baseVector, TChunkTriBuf2* chunkData) {
-
-	//baseVector = chunkOrigin * -glm::vec4(baseVector,0);
+float CTerrain2::checkChunkCollision(glm::vec3& baseVector, TChunkTriBuf2* chunkData) {
 
 	float penetration = 0;
 	//check for intersection
-	glm::vec3 segTop = baseVector + glm::vec3(0, 100, 0);
+	glm::vec3 segTop = baseVector + glm::vec3(0, LoD1chunkSize, 0);
 	float u, v, w, t;
 	int vertNo = 0;
+
 	for (int tri = 0; tri < chunkData->noTris; tri++) {
 		bool intersect = triSegmentIntersection(segTop, baseVector, chunkData->buf[vertNo].v, chunkData->buf[vertNo + 1].v, chunkData->buf[vertNo + 2].v, u, v, w, t);
 
@@ -490,8 +495,9 @@ float CTerrain2::checkChunkCollision(glm::vec3 baseVector, TChunkTriBuf2* chunkD
 			penetration = glm::length(intersectionPoint - baseVector);
 			break;
 		}
-		vertNo += 3;
 
+		vertNo += 3;
 	}
+
 	return penetration;
 }

@@ -54,7 +54,6 @@ public:
 	bool setTextStyle(const std::string& styleName);
 	void refreshCurrentTextStyles();
 	void setTextTheme(const std::string& themeName);
-	void setDefaultTextStyle(std::string styleName);
 	void setText(std::string newText);
 
 	void createPage();

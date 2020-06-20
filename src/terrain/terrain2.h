@@ -121,7 +121,7 @@ private:
 
 	TChunkTriBuf2* getShell0ChunkDataAt(glm::vec3& pos);
 
-	float checkChunkCollision( glm::vec3 baseVector, TChunkTriBuf2* chunkData);
+	float checkChunkCollision( glm::vec3& baseVector, TChunkTriBuf2* chunkData);
 
 	ChunkDataCache chunkDataCache;
 };

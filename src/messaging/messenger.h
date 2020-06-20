@@ -12,21 +12,21 @@
 /** Wrapper for message handler member function calls. Abstract base enables easy storage in a container. */
 struct CFunctorBase {
 public:
-	virtual void call(CMsg* msg) = 0;
+	virtual void call(CMsg& msg) = 0;
 };
 
 template <class handlerT, typename messageT>
 struct CFunctor :  public CFunctorBase {
 public:
-	CFunctor(handlerT* obj, void (handlerT::* m) (messageT*) ) : objPointer(obj), fnPointer(m) {}
+	CFunctor(handlerT* obj, void (handlerT::* m) (messageT&) ) : objPointer(obj), fnPointer(m) {}
 
-	void call(CMsg* param)	{
-		 (objPointer->*fnPointer)((messageT*)param);
+	void call(CMsg& param)	{
+		 (objPointer->*fnPointer)((messageT&)param);
 	}
 
 protected:
 	handlerT* objPointer;
-	void (handlerT::* fnPointer) (messageT*);
+	void (handlerT::* fnPointer) (messageT&);
 };
 
 
@@ -35,8 +35,8 @@ class CMessenger {
 public:
 
 	template <typename messageT>
-	void send(messageT msg) {
-		messageBus.dispatch(*msg);
+	void send(messageT& msg) {
+		messageBus.dispatch(msg);
 	}
 
 
@@ -52,7 +52,7 @@ class CMessageBus {
 public:
 
 	template <typename messageT, typename handlerObjT, typename memberFuncT >
-	void setHandler(handlerObjT* handlerObj, void (memberFuncT::* handlerFn) (messageT*) ) {
+	void setHandler(handlerObjT* handlerObj, void (memberFuncT::* handlerFn) (messageT&) ) {
 
 		 auto sp = std::make_shared< CFunctor<memberFuncT, messageT> >(handlerObj, handlerFn);	
 		 handlers[std::type_index(typeid(messageT))] = sp;
@@ -60,10 +60,10 @@ public:
 
 
 	template <typename messageT>
-	void dispatch(messageT msg) {
+	void dispatch(messageT& msg) {
 		auto msgType = std::type_index(typeid(msg));
 		if (handlers.find(msgType) != handlers.end())
-			handlers[typeid(msg)]->call(&msg);	
+			handlers[typeid(msg)]->call(msg);	
 	}
 
 private:

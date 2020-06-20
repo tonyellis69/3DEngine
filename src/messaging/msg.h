@@ -3,5 +3,5 @@
 class CMsg {
 public:
 
-
+	virtual ~CMsg() {};
 };

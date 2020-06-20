@@ -66,6 +66,7 @@ namespace style {
 	const glm::vec4 hottextSelectedColour = { 1, 0.547, 0.0, 1 };
 
 	const std::map<std::string, TtextStyle> gameNormalStyles = {
+		{ {"default"}, { "default", "main", darkGray } },
 		{ {"mainBody"}, { "mainBody", "main", darkGray } },
 		{ {"mainHeader"}, { "mainHeader","mainHeader",darkGray } },
 		{ {"hot"}, { "hot", "main", hottextColour } },
@@ -74,6 +75,7 @@ namespace style {
 	};
 
 	const std::map<std::string, TtextStyle> smallNormalStyles = {
+		{ {"default"}, { "default","smallFnt",uiWhite } },
 		{ {"small"}, { "small","small",darkGray } },
 		{ {"smallHeader"}, { "smallHeader","smallHeader",darkGray } },
 		{ {"hot"}, { "hot", "small", hottextColour } },
@@ -90,15 +92,17 @@ namespace style {
 		{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } },
 		{ {"mainBody"}, { "mainBody", "smallFnt", uiWhite } },
 		{ {"mainHeader"}, { "mainHeader","smallHeaderFnt",uiWhite } }
-
-
 	};
+
+
+
+
 
 	const TtextTheme gameTheme = { "gameTheme", { gameDefaultStyles} };
 
 	const glm::vec4 gameBackColour = { 0,0,0,1 };
 	const glm::vec4 gameBorderColour = { 1,1,1,1 };
-	const glm::i32vec2 richTextInset = { 10,10 };
+
 
 
 
@@ -109,10 +113,34 @@ namespace style {
 		{ {"gameTheme"}, {gameTheme} }
 	};
 
+	const int mainWinCtrlBorder = 20; ///<Indent around main window for placing controls
 
+	const int defPopupW = 300; ///<Defence details popup width;
+	const int defPopupH = 100; ///<Defence details popup width;
+
+	const glm::i32vec2 gameWinCtrBorder = { 10,10 };
 
 }
 
+/* A text style specifies what pre-rendered font to use (ie, typeset and size), 
+	what colour to draw it in, and what this style is called. 
+
+	A theme bundles together a collection of text styles. 
+	
+	A richText control is set to a theme. When it is asked to render 
+	text in a named style, it looks up that style in the current theme.
+	If it can find the style it will use it, if not it continues with
+	the current style.
+		In this way, if a user specifies 'bold' or 'hot text' and that
+	style is supported by the theme, their text will rendered in the 
+	appropriate typeface.
+		For this reason, it is important that themes include a style
+	called 'default', because after a theme change this is the style
+	the richText control will attempt to render in. If it does not find
+	it, it will keep rendering in the default style of the previous theme.
+	
+	
+	*/
 
 
 
