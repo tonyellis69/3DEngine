@@ -12,7 +12,6 @@ void CPhysObj2::updateVelocity(float dT) {
 	if (invMass == 0)
 		return;
 	velocity += dT * (gravity + invMass * force);
-	sysLog << "\nvelocity updated to " << velocity;
 }
 
 void CPhysObj2::updatePosition(float dT) {

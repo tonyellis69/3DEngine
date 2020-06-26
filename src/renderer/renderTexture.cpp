@@ -223,7 +223,10 @@ CRenderTexture & CRenderTexture::operator=(const CRenderTexture & other) {
 void CRenderTexture::savePNG(std::string filepath) {
 	std::vector<unsigned char> data(width * height * channels);
 	glBindTexture(GL_TEXTURE_2D, handle);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
+	if (channels == 1) //kludge for saving font bitmaps
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, &data[0]);
+	else
+		glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, &data[0]);
 	//SOIL_save_image (filepath.c_str(), SOIL_SAVE_TYPE_BMP,width,height,channels,data.data() );
 
 	stbi_write_png(filepath.c_str(), width, height, channels, data.data(), width * channels);

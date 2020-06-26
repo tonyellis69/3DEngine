@@ -378,6 +378,9 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 			chunkData = chunkAboveData;
 		}
 
+		
+		baseVertB = baseVertB - glm::vec3(chunkOrigin[3]);
+
 		float penetration = checkChunkCollision(baseVertB, chunkData);
 		if (penetration > 0) {
 			contact.normal = glm::vec3(0, 1, 0);

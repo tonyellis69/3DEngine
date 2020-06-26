@@ -11,16 +11,13 @@ void CPhysEng::addObj(CPhysObj2* physObj) {
 }
 
 void CPhysEng::update(float dT) {
-	//chech for collisions
+	//check for collisions
 	broadphase();
 
-
-
-	//integrate forces acting on each object
+	//integrate forces acting on each object, eg gravity
 	for (auto obj : objs) {
 		obj->updateVelocity(dT);
 	}
-
 
 	//resolution
 	for (int i = 0; i < 10; i++) {

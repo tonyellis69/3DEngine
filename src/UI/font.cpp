@@ -101,4 +101,5 @@ void CFont::loadFromFile(std::string filename) {
 
 	loadFromStream(fontFile);
 	fontFile.close();
+	//texture.savePNG(filename + ".png");
 }

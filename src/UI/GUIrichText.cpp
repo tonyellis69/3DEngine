@@ -65,6 +65,10 @@ void CGUIrichText::applyStyleSheet() {
 
 void CGUIrichText::DrawSelf() {
 	lineBuffer2.renderSprites(dT);
+	//if (uniqueID == 402) {
+	//	int b = 9;// lineBuffer2.getTextBuf()->savePNG("d:\\statBuf.png");
+
+	//}
 	pDrawFuncs->drawTexture(drawBox, *lineBuffer2.getTextBuf());
 
 	if (drawBorder) { //should be an overridable basic drawborder routine in the superclass

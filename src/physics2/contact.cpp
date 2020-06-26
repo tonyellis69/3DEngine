@@ -12,8 +12,7 @@ Contact::Contact() {
 }
 
 void Contact::applyImpulse() {
-	sysLog << "\nvelocity at impulse start " << objB->velocity;
-
+	
 
 	//calculate relative velocity of A & B
 	glm::vec3 relativeVelocity = objB->velocity - objA->velocity;
@@ -23,26 +22,28 @@ void Contact::applyImpulse() {
 
 	//Separating? Then don't resolve
 	if (velocityAlongNormal > 0) {
-		sysLog << "\nSeparating!";
 		return;
 	}
 
-	if (objB->velocity.x == 0 && objB->velocity.z == 0)
-		int d = 0;
-
-	//find the resitution
+	//find the restitution
 	float e = std::min(objA->restitution, objB->restitution);
 
 	//calcualate the impulse scalar
 	float j = -(1 + e) * velocityAlongNormal;
 	j /= objA->invMass + objB->invMass;
 
+
+
 	//apply it to the bodies relative to their mass
 	glm::vec3 impulse = j * normal;
 	objA->velocity -= objA->invMass * impulse;
 	objB->velocity += objB->invMass * impulse;
 
+	//sysLog << "\nObjA velocity " << objA->velocity << " objB velocity " << objB->velocity;
+	if (objB->velocity.y < 0.017f) //kludge for resting quivers
+		objB->velocity.y = 0;
 	
+	//now we work out friction:
 
 	//find the new relative velocity
 	relativeVelocity = objB->velocity - objA->velocity;
@@ -84,6 +85,7 @@ void Contact::applyImpulse() {
 void Contact::correctPenetration() {
 	const float k_slop = 0.05f; // Penetration allowance
 	const float percent = 0.4f; // Penetration percentage to correct
+	
 
 	//TO DO: kludge, should really find largest penetration probably.
 	float penetration = points[0].penetration;

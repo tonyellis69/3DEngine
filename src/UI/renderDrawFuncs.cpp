@@ -132,7 +132,7 @@ unsigned int CRenderDrawFuncs::getTextureHandle(const std::string & textureName)
 }
 
 void CRenderDrawFuncs::drawTexture(guiRect& drawBox, CBaseTexture& texture) {
-	mat4 trans = glm::translate(mat4(1), vec3(drawBox.pos, 0));
+	mat4 trans = glm::translate(mat4(1), vec3(drawBox.pos, 0) + vec3(-0.0,-0.0,0) );
 	mat4 shape = glm::scale(trans, glm::vec3(drawBox.size.x,drawBox.size.y, 1));
 	mat4 ctrlMatrix = orthoView * shape;
 
