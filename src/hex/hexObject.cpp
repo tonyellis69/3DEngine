@@ -1,34 +1,22 @@
 #include "hexObject.h"
 
-#include <cmath>
-#include <algorithm>
-
 #include "..\utils\log.h"
 
 #include <glm/gtc/matrix_transform.hpp>	
 
-#include "../3DTest/src/IGameHexArray.h"
-
-#include "..\TC\Debug\tigConst.h" //temp!!!!
 
 CHexObject::CHexObject() {
 	worldPos = glm::vec3(0);
 	worldMatrix = &lineModel.model.matrix;
 
-
 	setZheight(0.05f);
 
 	facing = hexEast;
 	rotation = 0.0f;
-	rotationalVelocity = 0.0f;
-	turning = false;
-	proximityCutoff = 0.15f;
 	moveSpeed = 7.0f;
 
 	buildWorldMatrix();
 }
-
-
 
 void CHexObject::setHexRenderer(IHexRenderer* rendrObj) {
 	hexRendr = rendrObj;
@@ -75,19 +63,6 @@ void CHexObject::setDirection(THexDir direction) {
 }
 
 
-/**	Initialise this object to start moving to the next hex on its current travel path when it gets
-	updated. This may include rotating to face that hex. */
-bool CHexObject::beginMove() {
-	if (travelPath.empty() )
-		return false;
-	if (map->getBlockingEntityAt(travelPath[0])) {
-		return true; ////////////////////////////////////////
-	}
-
-	initMoveToAdjacent(travelPath[0]);
-	return true;
-}
-
 /** Set the height at which this object is drawn. */
 void CHexObject::setZheight(float height) {
 	zHeight = height;
@@ -95,44 +70,10 @@ void CHexObject::setZheight(float height) {
 	buildWorldMatrix();
 }
 
-/** Load a sequence of hexes to travel down. */
-void CHexObject::setTravelPath(THexList& path) {
-	travelPath = path;
-}
-
-THexList& CHexObject::getTravelPath() {
-	return travelPath;
-}
-
-
-bool CHexObject::isNeighbour(CHex& position) {
-	return ::isNeighbour(hexPosition, position);
-}
-
-bool CHexObject::updateMove(float dT) {
-		if (turning) {
-			updateRotation(dT);
-			return true;
-		}
-		return updateMovement(dT);
-	return false;
-}
-
-bool CHexObject::updateRotationOnly(float dT) {
-	if ( turning) {
-		if (!updateRotation(dT)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-
 
 void CHexObject::draw(){
 	hexRendr->drawLineModel(lineModel);
 }
-
 
 
 /** Construct this object's world matrix from its known position and rotation.*/
@@ -143,82 +84,7 @@ void CHexObject::buildWorldMatrix() {
 }
 
 
-
-
-/* Initialise a move action to the given hex. */
-void CHexObject::initMoveToAdjacent(CHex& adjacent) {
-	destination = travelPath[0];
-	//map->moveEntity((CGameHexObj*)this, destination);
-
-	worldSpaceDestination = cubeToWorldSpace(destination);
-	moveVector = glm::normalize(worldSpaceDestination - cubeToWorldSpace(hexPosition));
-}
-
-//TO DO: need a function that returns the approximate direction for *any* hex
-	//not just an adjacent one
-/** Initialise a rotation action to face the given adjacent hex. */
-bool CHexObject::initTurnToAdjacent(CHex& adjacent) {
-	destinationAngle = 0;
-	destinationDirection = neighbourDirection(hexPosition, adjacent);
-	if (destinationDirection == hexNone)
-		return false;
-
-	float dist = 2 * M_PI + dirToAngle(destinationDirection) - rotation;
-	dist = fmod(dist, 2 * M_PI);
-	if (dist > M_PI)
-		dist = -(2 * M_PI - dist);
-		
-	if (dist == 0.0f)
-		return false;
-	//moving = true;
-	turning = true;
-	rotationalVelocity = (dist > 0) - (dist < 0);
-	destinationAngle = dirToAngle(destinationDirection);
-	return true;
-}
-
 ///////////////private functions
-
-/** Apply dT seconds of the rotation this object is undergoing. */
-bool CHexObject::updateRotation(float dT){	
-	float gap = std::fmod(rotation - destinationAngle + M_PI, 2 * M_PI) - M_PI;
-	if (abs(gap) < 0.1f) {
-		turning = false;
-		//setDirection(destinationDirection);
-		facing = angleToDir(rotation);
-		return false; 
-	}
-	else {
-		rotation += rotationalVelocity * 10.0f * dT;
-		rotation = glm::mod<float>(rotation, 2 * M_PI);
-		
-	}
-	buildWorldMatrix();
-	return true;
-}
-
-
-/**	Apply dT seconds of the movement this object is undergoing. */
-bool CHexObject::updateMovement(float dT) {
-	glm::vec3 velocity = moveVector * moveSpeed * dT;
-
-	if (glm::distance(worldPos, worldSpaceDestination) < proximityCutoff) {
-		velocity = glm::vec3(0);
-		setPosition(destination.x, destination.y, destination.z);
-		if (!travelPath.empty() && destination == travelPath[0])
-			travelPath.erase(travelPath.begin());
-		return beginMove();
-		//return false;
-	}
-	else {
-		worldPos += velocity;
-	}
-
-	buildWorldMatrix();
-	return true;
-}
-
-
 
 
 

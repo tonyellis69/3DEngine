@@ -10,6 +10,14 @@ void CPhysEng::addObj(CPhysObj2* physObj) {
 	objs.push_back(physObj);
 }
 
+void CPhysEng::removeObj(CPhysObj2* physObj) {
+	for (auto obj = objs.begin(); obj != objs.end(); obj++)
+		if (*obj == physObj) {
+			objs.erase(obj);
+			return;
+		}
+}
+
 void CPhysEng::update(float dT) {
 	//check for collisions
 	broadphase();
@@ -23,14 +31,7 @@ void CPhysEng::update(float dT) {
 	for (int i = 0; i < 10; i++) {
 		for (auto& contact : contacts) {
 			contact.second.applyImpulse();
-
-
-
-
-
 		}
-
-
 	}
 
 
@@ -41,7 +42,7 @@ void CPhysEng::update(float dT) {
 
 	//correct penetration
 	for (auto& contact : contacts) {
-			contact.second.correctPenetration();
+		contact.second.correctPenetration();
 	}
 
 }

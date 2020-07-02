@@ -43,5 +43,6 @@ public:
 	float restitution; ///<Bounciness.
 
 	TCollider collideType = collideAAbaseVert;
+
 	
 	};

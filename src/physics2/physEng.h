@@ -11,6 +11,7 @@ class CPhysEng {
 public:
 	CPhysEng();
 	void addObj(CPhysObj2* physObj);
+	void removeObj(CPhysObj2* physObj);
 	void update(float dT);
 
 
