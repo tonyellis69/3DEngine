@@ -248,6 +248,7 @@ public:
 	virtual void setHeight(int h);
 	const glm::i32vec2 getScreenPos();
 	virtual void resize(int w, int h);
+	void setSize(const glm::i32vec2& size);
 	void setGUIcallback(Icallback* callbackInstance);
 	virtual void GUIcallback(CGUIbase* sender, CMessage& msg);
 	

@@ -76,8 +76,8 @@ void CGUIroot::setLocalDimensions(int x, int y, int w, int h) {
 	setHeight(h);
 	//drawBox.pos = glm::i32vec2(x, y);
 	Clipbox.x =x;Clipbox.y =y; Clipbox.width = w; Clipbox.height = h;
-	//for (size_t i=0;i < controls.size();i++)
-	//	controls[i]->updateAppearance();
+	for (size_t i=0;i < controls.size();i++)
+		controls[i]->updateAppearance();
 }
 
 

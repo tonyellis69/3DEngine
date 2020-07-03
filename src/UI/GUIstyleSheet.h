@@ -120,6 +120,8 @@ namespace style {
 
 	const glm::i32vec2 gameWinCtrBorder = { 10,10 };
 
+	const glm::i32vec2 powerQueueWinSize = { 120,500 };
+
 }
 
 /* A text style specifies what pre-rendered font to use (ie, typeset and size), 

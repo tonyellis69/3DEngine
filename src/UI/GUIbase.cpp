@@ -722,6 +722,10 @@ void CGUIbase::resize(int w, int h) {
 	setHeight(h);
 }
 
+void CGUIbase::setSize(const glm::i32vec2& size) {
+	resize(size.x, size.y);
+}
+
 void CGUIbase::setGUIcallback(Icallback * callbackInstance) {
 	callbackObj = callbackInstance;
 }
