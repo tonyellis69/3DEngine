@@ -91,7 +91,7 @@ private:
 		chunks[chunkId].colour = colour;
 	}
 
-	const int approxChunksRequired = 2000; 
+	const int approxChunksRequired = 2000;
 	int chunksToSkinPerFrame;
 	
 	float LoD1cubeSize; //<In worldspace.

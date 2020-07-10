@@ -42,6 +42,7 @@ public:
 	CGUIrichText(int x, int y, int w, int h);
 	void applyStyleSheet();
 	void appendMarkedUpText(const std::string& text);
+	void Draw(float dT);
 	void DrawSelf();
 	TRichTextRec* getTexObjCallback(int objNo);
 	void setFont(CFont* newFont);
@@ -55,6 +56,7 @@ public:
 	void refreshCurrentTextStyles();
 	void setTextTheme(const std::string& themeName);
 	void setText(std::string newText);
+	void setAutoscrollDown(bool onOff);
 
 	void createPage();
 	void compileFragmentsToEnd(TPagePos fragmentStart);
@@ -74,7 +76,7 @@ public:
 	TCharacterPos getPreviousLine(TPagePos& startText);
 
 	TCharacterPos getPrevNewline(int textObj, int pos);
-	void update(float dT);
+	
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 	void smoothScroll(int pixels);
@@ -202,6 +204,7 @@ private:
 
 	bool endOfText(TCharacterPos textPos);
 
+	void update(float dT);
 
 	bool busy; ///<Indicates text should not be appended. True when engaged in smoothly collapsing text etc
 	std::string currentTheme; ///<Name of the stylesheet theme to ask for styles.

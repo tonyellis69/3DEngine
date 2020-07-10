@@ -52,6 +52,11 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	autoscrollingDown = true;
 }
 
+void CGUIrichText::Draw(float dT) {
+	update(dT);
+	CGUIbase::Draw(dT);
+}
+
 /**	Compose all the currently in-view text into a single image, ready for drawing to the screen. */
 void CGUIrichText::createPage() {
 	initialisePage();
@@ -232,6 +237,10 @@ void CGUIrichText::setTextTheme(const std::string& themeName) {
 void CGUIrichText::setText(std::string newText) {
 	firstVisibleText = 0;
 	textObjs[currentTextObj].text = newText;
+}
+
+void CGUIrichText::setAutoscrollDown(bool onOff) {
+	autoscrollingDown = onOff;
 }
 
 

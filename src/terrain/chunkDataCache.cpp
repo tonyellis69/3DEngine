@@ -2,12 +2,15 @@
 
 #include "utils/log.h"
 
+/** Return the chunk data at this multibuf address. If it's not already in the 
+	cache, export it to the cache from the multibuf. */
 TChunkTriBuf2* ChunkDataCache::getData(int chunkAddr) {
-	//incrementTimeStamp();
 	timeStamp++;
 	auto chunkData = chunkCache.find(chunkAddr);
 	if (chunkData == chunkCache.end()) {
 		//we need to copy this data to our cache
+
+		sysLog << "\nChunk data not found in cache.";
 
 		TChunkTriBuf2* buf = getFreeDataBuf();
 
@@ -22,10 +25,13 @@ TChunkTriBuf2* ChunkDataCache::getData(int chunkAddr) {
 	return chunkData->second;
 }
 
-
+/** Return the address of a free buffer in the cache. If all buffers are
+	full, return the least recently used one. */
 TChunkTriBuf2* ChunkDataCache::getFreeDataBuf() {
 	if (nextFreeBuf < NUM_DATABUFS)
 		return &dataBufs[nextFreeBuf++];
+
+	sysLog << "\nRecycling buffers.";
 
 	//find the least recently used buf
 	timeStamp_t lowestTimeStamp = timeStamp;

@@ -40,7 +40,6 @@ void CHexRenderer::start() {
 
 void CHexRenderer::setMap(CHexArray* hexArray){
 	this->hexArray = hexArray;
-
 }
 
 

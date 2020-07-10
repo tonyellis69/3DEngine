@@ -275,7 +275,7 @@ void CBaseApp::AppTasks() {
 
 	//Engine.removeUserScale();
 
-	logWindow->update((float)dT);
+	//logWindow->update((float)dT);
 
 	DrawUI(); 
 
@@ -291,7 +291,7 @@ void CBaseApp::AppTasks() {
 void CBaseApp::DrawUI() {
 	Engine.setCurrentShader(0);
 	Engine.setDrawColour(engineWhite);
-	GUIroot.Draw();
+	GUIroot.Draw(dT);
 	Engine.setClip(0,0,GUIroot.drawBox.size.x, GUIroot.drawBox.size.y);
 }
 

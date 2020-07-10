@@ -64,6 +64,7 @@ namespace style {
 	const glm::vec4 white = { 1,1,1,1 };
 	const glm::vec4 hottextColour = { 0.28, 0.28, 0.47, 1 };
 	const glm::vec4 hottextSelectedColour = { 1, 0.547, 0.0, 1 };
+	const glm::vec4 gameReservedColour = { 0,1,0,0.75f };
 
 	const std::map<std::string, TtextStyle> gameNormalStyles = {
 		{ {"default"}, { "default", "main", darkGray } },
@@ -76,6 +77,7 @@ namespace style {
 
 	const std::map<std::string, TtextStyle> smallNormalStyles = {
 		{ {"default"}, { "default","smallFnt",uiWhite } },
+		{ {"reserved"}, { "reserved","smallFnt",gameReservedColour } },
 		{ {"small"}, { "small","small",darkGray } },
 		{ {"smallHeader"}, { "smallHeader","smallHeader",darkGray } },
 		{ {"hot"}, { "hot", "small", hottextColour } },
@@ -121,6 +123,8 @@ namespace style {
 	const glm::i32vec2 gameWinCtrBorder = { 10,10 };
 
 	const glm::i32vec2 powerQueueWinSize = { 120,500 };
+	const glm::i32vec2 combatLogWinSize = { 180,500 };
+
 
 }
 

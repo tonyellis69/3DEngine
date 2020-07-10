@@ -606,7 +606,8 @@ void CGUIbase::recalculateDiminsions() {
 
 
 /** Draw this UI element. In practice this means recursively drawing all its child items too.*/
-void CGUIbase::Draw() {
+void CGUIbase::Draw(float dT) {
+
 	if (!visible)
 		return;
 	if (needsUpdate)
@@ -620,7 +621,7 @@ void CGUIbase::Draw() {
 	//then draw each subcontrol
 	for (auto control : controls) {
 		if (!control->isModal) //modal controls go on top of everything else
-			control->Draw();
+			control->Draw(dT);
 	}
 }
 

@@ -38,6 +38,7 @@ void CPhysEng::update(float dT) {
 	//integrate velocity of each object
 	for (auto obj : objs) {
 		obj->updatePosition(dT);
+
 	}
 
 	//correct penetration

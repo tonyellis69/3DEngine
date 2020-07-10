@@ -70,6 +70,10 @@ void CTerrain2::onPlayerMove(glm::vec3 & move) {
 	i32vec3 terrainAdvanceInChunks = newPosInChunks - oldPosInChunks;
 	Tdirection advanceDirection = vecToDir(terrainAdvanceInChunks);
 
+	if (advanceDirection == down) {
+			return;
+	}
+
 	if (advanceDirection != none) {	
 		for (auto & shell : shells) {
 			if (shell.advanceShellTerrain(advanceDirection) == false)
@@ -259,7 +263,7 @@ void CTerrain2::prepShellForScroll(int shellNo, Tdirection direction) {
 
 		vec3 move = dirToVec(scrollDir) * shells[0].SCsize;
 		chunkOrigin = glm::translate(chunkOrigin, move);
-		liveLog << "\nchunkOrigin moved to " << vec3(chunkOrigin[3]);
+
 		
 		scrollViewpoint(scrollDir);
 	}
@@ -367,26 +371,35 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 	TAaBB objAbb = calcAABB();
 
 	if (objAbb.clips(baseVertB)) { //we're inside shell 0
-		
+		sysLog << "\nLooking for chunk data... ";
 		TChunkTriBuf2* chunkData = getShell0ChunkDataAt(baseVertB);
 		if (chunkData == NULL) {
 			//check the chunk above in case we dropped straight through
 			glm::vec3 chunkAbove = baseVertB + glm::vec3(0, LoD1chunkSize, 0);
 			TChunkTriBuf2* chunkAboveData = getShell0ChunkDataAt(chunkAbove);
-			if (chunkAboveData == NULL)
+			if (chunkAboveData == NULL) {
+				sysLog << " data not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 				return contact;
+			}
 			chunkData = chunkAboveData;
 		}
-
 		
 		baseVertB = baseVertB - glm::vec3(chunkOrigin[3]);
 
+		if (baseVertB.z < 0 && baseVertB.y > 1) {
+			sysLog << "\nRogue y!";
+		}
+
 		float penetration = checkChunkCollision(baseVertB, chunkData);
 		if (penetration > 0) {
+			sysLog << "\nPenetration found at " << baseVertB;
 			contact.normal = glm::vec3(0, 1, 0);
 			contact.numPoints = 1;
 			contact.points[0] = { baseVertB, penetration };
 		}
+		else
+			sysLog << "\nPenetration not found at " << baseVertB;
+
 
 		return contact;
 
@@ -433,6 +446,8 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 	if (sc->isEmpty)
 		return NULL;
 
+	sysLog << "in sc " << scIndex;
+
 	float SCsize = shells[0].SCsize;
 
 	glm::vec3 scCornerOrigin = vec3(scIndex) * SCsize;
@@ -446,6 +461,8 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 	glm::vec3 pointInSC = pos - scCornerOrigin;
 	glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[0].chunkSize);
 
+	sysLog << ", chunkIndex " << chunkIndex << ". ";
+
 	//get the id for the chunk at this index position
 	int chunkAddr = -1;
 	for (auto localChunk : sc->scChunks) {
@@ -455,20 +472,11 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 		}
 	}
 
+	sysLog << " chunk address " << chunkAddr;
 	if (chunkAddr == -1)
 		return NULL;
 
-	//auto chunkData = chunkCache.find(chunkAddr);
-	//if (chunkData == chunkCache.end()) {
-	//	TChunkTriBuf2* buf = new TChunkTriBuf2();
-	//	//TO DO: memory leak! Optimise to an array of bufs we recycle
-	//	int size = multiBuf.exportBlock(chunkAddr, (char*)buf->buf);
-	//	buf->noTris = size / sizeof(TChunkVert2);
-	//	chunkCache[chunkAddr] = buf;
-	//	return buf;
-	//}
 
-	//return chunkData->second;
 
 	return chunkDataCache.getData(chunkAddr);
 }

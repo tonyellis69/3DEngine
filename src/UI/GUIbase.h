@@ -202,7 +202,7 @@ public:
 	virtual void Add(CGUIbase* child);
 	virtual void updateAppearance();
 	void recalculateDiminsions();
-	virtual void Draw();
+	virtual void Draw(float dT);
 	virtual void DrawSelf();
 	virtual void recalculateClipbox();
 	virtual void scrollMsg(int deviceID, int newValue) {};
@@ -339,7 +339,7 @@ protected:
 
 	inline static glm::i32vec2 mousePos; ///<Current mouse screen position.
 
-
+	float dT;
 private:
 	void defaultMouseMoveResponse(int mouseX, int mouseY, int key);
 

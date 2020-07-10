@@ -16,7 +16,7 @@ public:
 	void KeyboardMsg(unsigned int Key, long Mod);
 	void CharEntryMsg(unsigned int Key, long Mod);
 	void setDrawFuncs(CDrawFuncs* drawFunc);
-	void Draw();
+	void Draw(float dT);
 	bool OnMouseMove(const int mouseX, const int mouseY, int key);
 	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	void OnRMouseDown(const  int mouseX, const  int mouseY);

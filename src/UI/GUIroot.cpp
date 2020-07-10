@@ -105,7 +105,7 @@ void CGUIroot::setDrawFuncs(CDrawFuncs* drawFunc) {
 }
 
 /** Overload function to draw the mouse after drawing everything else, so it's on top. */
-void CGUIroot::Draw() {
+void CGUIroot::Draw(float dT) {
 	//CGUIbase::Draw(); //draw every other child control of root first
 
 	UIrect* parentClipbox = &parent->Clipbox;
@@ -114,12 +114,12 @@ void CGUIroot::Draw() {
 	//then draw each subcontrol
 	for (size_t i = 0; i < controls.size(); i++) {
 		if (!controls[i]->isModal)
-			controls[i]->Draw();
+			controls[i]->Draw(dT);
 	}
 
 	//draw modal controls last
 	for (auto modalCtrl : modalControls) {
-		modalCtrl->Draw();
+		modalCtrl->Draw(dT);
 	}
 
 	//draw mouse control if any
