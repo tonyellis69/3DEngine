@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 
 #include "superChunk2.h"

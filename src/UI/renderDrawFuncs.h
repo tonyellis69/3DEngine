@@ -14,9 +14,9 @@ UIengine removed altogether, as there's too much overlap of
 functionality. */
 
 struct TControlRects {
-	glm::mat4 ctrlMatrix;
-	glm::mat4 ctrlBorderMatrix;
-	glm::mat4 orthoTransMatrix;
+	glm::mat4 ctrlMatrix = glm::mat4(1);
+	glm::mat4 ctrlBorderMatrix = glm::mat4(1);
+	glm::mat4 orthoTransMatrix = glm::mat4(1);
 };
 
 class CRenderDrawFuncs : public CDrawFuncs {

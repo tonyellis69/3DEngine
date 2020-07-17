@@ -9,7 +9,11 @@
 #include "../hex/IHexRenderer.h"
 #include "hex/lineModel.h"
 
-
+struct TFov { //describes a fov shape
+	CHex A;
+	CHex B;
+	THexList arc;
+};
 /** A class for defining moveable objects in the hex world.*/
 class CHexObject  {
 public:

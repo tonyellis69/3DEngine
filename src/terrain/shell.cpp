@@ -265,6 +265,7 @@ CFaceIterator  CShell::getFaceIterator(Tdirection face) {
 void CShell::reinitialiseFaceSCs(Tdirection face) {
 	CFaceIterator faceIter = getFaceIterator(face);
 	while (!faceIter.finished()) {
+	
 		faceIter->isEmpty = true;
 		faceIter->clearChunks();
 

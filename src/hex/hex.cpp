@@ -1,6 +1,7 @@
 #include "hex.h"
 
 #include <cmath>
+#include <glm/gtx/rotate_vector.hpp>
 
 #include "..\utils\log.h"
 
@@ -129,6 +130,7 @@ CHex hexRound(float q, float r) {
 	return cubeToAxial(hexRound(axialToCube(q, r)));
 }
 
+/** Treat points as being on an XY plane, with z=0. */
 CHex worldSpaceToHex(glm::vec3& worldSpace) {
 	//find fractional position
 	float q = sqrt(3.0f) / 3.0f * worldSpace.x - 1.0f / 3.0f * -worldSpace.y;
@@ -238,4 +240,73 @@ THexDir opposite(THexDir direction) {
 	direction = THexDir(direction % 6);
 
 	return direction;
+}
+
+/**	Convert n to a direction, with wraparound. */
+THexDir intToDir(int n) {
+	return THexDir(n % 6);
+}
+
+/** Return the corner hexes of this triangle. */
+std::tuple<CHex,CHex> findTriangle(CHex& apex, int hexLength, float angle, float rotation) {
+	//find the far midpoint in world space
+	//rotate it to A
+	//rotate it to B
+	//convert these to hexes
+
+	glm::vec3 farMid = glm::vec3(hexLength * hexWidth, 0, 0);
+	glm::vec3 A = glm::rotate(farMid, rotation - (angle * 0.5f), glm::vec3(0, 0, -1));
+	glm::vec3 B = glm::rotate(farMid, rotation + (angle * 0.5f), glm::vec3(0, 0, -1));
+	A += cubeToWorldSpace(apex);
+	B += cubeToWorldSpace(apex);
+
+	CHex hexA = worldSpaceToHex(A);
+	CHex hexB = worldSpaceToHex(B);
+	return { hexA, hexB };
+}
+
+THexList* findArc(CHex& apex, int hexLength, float angle, float rotation) {
+	glm::vec3 farMid = glm::vec3(hexLength * hexWidth , 0, 0);
+	float angleA = rotation - (angle * 0.5f);
+	float angleB = rotation + (angle * 0.5f);
+	glm::vec3 A = glm::rotate(farMid, angleA, glm::vec3(0, 0, -1));
+	glm::vec3 B = glm::rotate(farMid, angleB, glm::vec3(0, 0, -1));
+//	A += cubeToWorldSpace(apex);
+	//B += cubeToWorldSpace(apex);
+
+	float step = (glm::distance(A, B) / hexWidth) * 2.0f;
+	step = angle / step;
+
+	static THexList hexes;
+	hexes.clear();
+	CHex lastHex(-1, -1, -1);
+	glm::vec3 apexOffset = cubeToWorldSpace(apex);
+	for (float a = angleA; a < angleB; a += step) {
+		glm::vec3 Arotated = glm::rotate(farMid, a, glm::vec3(0, 0, -1));
+		CHex currentHex = worldSpaceToHex(Arotated + apexOffset);
+		if (currentHex != lastHex) {
+			hexes.push_back(currentHex);
+			lastHex = currentHex;
+		}
+	}
+
+
+	return &hexes;
+}
+
+/**  Create a hexagonal 'ring' of hexes of the given radius, centred at 0,0,0. */
+THexList* findRing(int radius) {
+	CHex hex(radius, -radius, 0);
+	static THexList hexes;
+	hexes.clear();
+
+	for (int corner = 0; corner < 6; corner++) {
+		for (int h = 0; h < radius; h++) {
+			hexes.push_back(hex);
+			hex = getNeighbour(hex, intToDir(corner +2));
+		}
+	}
+
+
+	return &hexes;
 }

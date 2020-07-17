@@ -1,4 +1,8 @@
+#define GLM_ENABLE_EXPERIMENTAL
+
+
 #include "colour.h"
+
 
 
 namespace col {

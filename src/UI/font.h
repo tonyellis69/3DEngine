@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+
+
 #include "..\renderer\renderTexture.h"
 
 struct glyph {

@@ -4,7 +4,7 @@
 
 #include <vector>
 
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
 
@@ -61,3 +61,7 @@ float shortestRotation(THexDir start, THexDir end);
 float hexAngle(CHex& start, CHex& end);
 THexDir angleToDir(float angle);
 THexDir opposite(THexDir direction);
+THexDir intToDir(int n);
+std::tuple<CHex, CHex> findTriangle(CHex& apex, int hexLength, float angle, float rotation);
+THexList* findArc(CHex& apex, int hexLength, float angle, float rotation);
+THexList* findRing(int radius);

@@ -118,7 +118,7 @@ namespace style {
 	const int mainWinCtrlBorder = 20; ///<Indent around main window for placing controls
 
 	const int defPopupW = 300; ///<Defence details popup width;
-	const int defPopupH = 100; ///<Defence details popup width;
+	const int defPopupH = 125; ///<Defence details popup width;
 
 	const glm::i32vec2 gameWinCtrBorder = { 10,10 };
 

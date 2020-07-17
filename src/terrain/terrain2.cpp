@@ -311,6 +311,9 @@ int CTerrain2::getFreeChunk() {
 
 /** Take this chunk out of service, returning it to the free pile. */
 void CTerrain2::removeChunk(int id) {
+	if (chunks[id].bufId == 8955792)
+		int b = 9;
+
 	if (chunks[id].status == chSkinned)
 		pTerrainApp->deleteChunkMesh(chunks[id]);
 
@@ -446,7 +449,7 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 	if (sc->isEmpty)
 		return NULL;
 
-	sysLog << "in sc " << scIndex;
+	sysLog << "in sc " << scIndex << " (orig " << sc->origIndex << ") ";
 
 	float SCsize = shells[0].SCsize;
 
@@ -467,6 +470,7 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 	int chunkAddr = -1;
 	for (auto localChunk : sc->scChunks) {
 		if (chunks[localChunk].index == chunkIndex) {
+			sysLog << "chunk id " << localChunk;
 			chunkAddr = chunks[localChunk].bufId;
 			break;
 		}

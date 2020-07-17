@@ -19,6 +19,8 @@ void CMultiBuf2::setSize(int numBytes) {
 int CMultiBuf2::copyBuf(CBuf& src, int size) {
 	int addr = getFreeBlock(size);
 	copyToBlock(src, addr, size);
+	if (addr == 8955792)
+		sysLog << "\nUsing address";
 	return addr;
 }
 
@@ -37,6 +39,8 @@ unsigned int CMultiBuf2::getVAO() {
 
 /**	Free the reserved block at the given address, so that it can be resused. */
 void CMultiBuf2::freeBlock(int addr) {
+	if (addr == 8955792)
+		sysLog << "\nFreeing address";
 	
 	TBlock freedBlock = reservedBlocks[addr];
 	reservedBlocks.erase(addr);

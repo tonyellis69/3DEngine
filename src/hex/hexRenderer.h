@@ -3,7 +3,7 @@
 #define _USE_MATH_DEFINES //for cmath
 #include <vector>
 
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm/glm.hpp"
 
 #include "../renderer/renderer.h"
@@ -15,6 +15,8 @@
 #include "../hex/IHexRenderer.h"
 
 #include "hex/lineModel.h"
+
+
 
 
 /**	A class for drawing 3D hex-based graphics. */
@@ -62,6 +64,8 @@ private:
 	void drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf);
 
 	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
+
+	void drawFov(TFov& fov, CHex& origin);
 
 	CRenderer* pRenderer;
 	CBuf floorplanLineBuf;

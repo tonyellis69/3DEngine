@@ -1,4 +1,7 @@
 #pragma once
+
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "renderer\3dobject.h"
 #include "renderer\model.h"
 #include "renderer\model2.h"

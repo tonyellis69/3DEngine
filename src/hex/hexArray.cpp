@@ -1,6 +1,6 @@
 #include "hexArray.h"
 
-#include <algorithm>"
+#include <algorithm>
 #include <queue>
 #include <unordered_map>
 #include <functional>

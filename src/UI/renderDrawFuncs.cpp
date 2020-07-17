@@ -8,6 +8,9 @@ using namespace glm;
 using namespace std;
 
 CRenderDrawFuncs::CRenderDrawFuncs() {
+	orthoView = glm::mat4(1);
+	lineOrthoView = glm::mat4(1);
+
 	cursorOn = false;
 	lastCursorFlash = chrono::system_clock::now();
 
@@ -71,6 +74,7 @@ void CRenderDrawFuncs::loadShaders() {
 void CRenderDrawFuncs::registerControl(CGUIbase & control) {	
 	controlRects[control.uniqueID].ctrlMatrix = glm::mat4(1);
 	controlRects[control.uniqueID].ctrlBorderMatrix = glm::mat4(1);
+	controlRects[control.uniqueID].orthoTransMatrix = glm::mat4(1);
 
 	setScreenDimensions(control);
 }

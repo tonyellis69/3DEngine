@@ -1,4 +1,7 @@
 #pragma once
+
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include "superChunk.h"
 #include "renderer/model.h"
 #include "direction.h"

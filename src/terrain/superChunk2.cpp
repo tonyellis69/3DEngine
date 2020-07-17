@@ -70,8 +70,9 @@ void CSuperChunk2::createChunk(glm::i32vec3 & chunkIndex) {
 
 /** Remove all th chunks of this superchunk.*/
 void CSuperChunk2::clearChunks() {
-	for (auto id : scChunks)
+	for (auto id : scChunks) {
 		pTerrainObj->removeChunk(id);
+	}
 		
 	scChunks.clear();
 	isEmpty = true;

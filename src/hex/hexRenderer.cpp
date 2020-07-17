@@ -71,7 +71,7 @@ void CHexRenderer::drawFloorPlan() {
 
 
 void CHexRenderer::drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour) {
-	glm::mat4 mvp;
+	glm::mat4 mvp(1);
 	float inc = 1.0 / path->size();  float t = 0;
 	for (auto hex : *path) {
 		glm::mat4 worldPos = glm::translate(glm::mat4(1), hexArray->getWorldPos(hex));
@@ -121,6 +121,16 @@ void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* b
 	for (auto subNode : node.subNodes)
 		drawNode2(subNode, node.matrix * parentMatrix, buf);
 
+}
+
+/** Draw field-of-view shape. */
+void CHexRenderer::drawFov(TFov& fov, CHex& origin) {
+	for (auto h : fov.arc) {
+		highlightHex(h + origin);
+	}
+
+	//highlightHex(fov.A);
+	//highlightHex(fov.B);
 }
 
 

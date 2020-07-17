@@ -1,5 +1,6 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include "3dobject.h"
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/norm.hpp>

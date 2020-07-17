@@ -1,5 +1,7 @@
 #pragma once
 
+#define GLM_ENABLE_EXPERIMENTAL
+
 //#include "Renderer.h"
 #include "renderer\renderer.h"
 //#include "ImageLib.h"
