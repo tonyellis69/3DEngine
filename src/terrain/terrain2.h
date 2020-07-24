@@ -15,14 +15,6 @@
 #include "chunkDataCache.h"
 
 
-
-
-
-struct TSCident {
-	int shellNo;
-	glm::i32vec3 index;
-};
-
 const int chunkTriCacheSize2 = 6;
 
 class CTerrain2 : public ITerrain, public CPhysObj2 {
@@ -38,8 +30,7 @@ public:
 	void setWorldScale(float scale);
 	void setCallbackApp(ITerrainAppCallback* pApp);
 	void update(float dT);
-	TSCident getSC(const glm::vec3& pos);
-	void getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& buf, unsigned int& noTris);
+	//TSCident getSC(const glm::vec3& pos);
 	int storeChunkMesh(CBuf& src, int size);
 	void freeChunkMesh(int addr);
 	unsigned int getChunkMeshVAO();

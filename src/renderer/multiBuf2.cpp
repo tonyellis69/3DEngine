@@ -19,8 +19,6 @@ void CMultiBuf2::setSize(int numBytes) {
 int CMultiBuf2::copyBuf(CBuf& src, int size) {
 	int addr = getFreeBlock(size);
 	copyToBlock(src, addr, size);
-	if (addr == 8955792)
-		sysLog << "\nUsing address";
 	return addr;
 }
 
@@ -39,35 +37,11 @@ unsigned int CMultiBuf2::getVAO() {
 
 /**	Free the reserved block at the given address, so that it can be resused. */
 void CMultiBuf2::freeBlock(int addr) {
-	if (addr == 8955792)
-		sysLog << "\nFreeing address";
-	
 	TBlock freedBlock = reservedBlocks[addr];
 	reservedBlocks.erase(addr);
 
 	freeBlocks[addr] = freedBlock;
-/*
-	//Get the free blocks either side of this one, if they exist
-	auto next = freeBlocks.find(freedBlock.start + freedBlock.size);
-	auto prev = next;
-	if (prev != freeBlocks.end())
-		prev = std::prev(next);
 
-	//merge any preceding free block
-	if (prev != freeBlocks.end() && (prev->second.start + prev->second.size == addr)) {
-		freedBlock.start = prev->second.start;
-		freedBlock.size += prev->second.size;
-		next = freeBlocks.erase(prev);
-	}
- 
-	//merge any following free block
-	if (next != freeBlocks.end()) {
-		freedBlock.size += next->second.size;
-		freeBlocks.erase(next);
-	}
-	
-	freeBlocks[freedBlock.start] = freedBlock;
-	*/
 	//Removing just these blocks from freeBlocksBySize is hard, so wipe the whole thing.
 	if (!freeBlocksBySize.empty())
 		freeBlocksBySize.clear();
@@ -90,8 +64,7 @@ int CMultiBuf2::getFreeBlock(int size) {
 		
 	auto largerBlock = freeBlocksBySize.lower_bound(size);
 
-	//if we can't find a free block, panic
-	//if (largerBlock == freeBlocksBySize.end()) { 
+	//if we can't find a free block, panic 
 	while  (largerBlock == freeBlocksBySize.end()) {
 		memoryPanic();
 		largerBlock = freeBlocksBySize.lower_bound(size);

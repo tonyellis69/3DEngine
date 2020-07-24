@@ -6,6 +6,9 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtx/hash.hpp>
+
+
 
 
 enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE, hexNone};
@@ -38,6 +41,12 @@ public:
 	int z;
 };
 
+struct hex_hash {
+	size_t operator()(const CHex& hex) const {
+		return std::hash<glm::i32vec3>()(glm::i32vec3(hex.x, hex.y, hex.z));
+	}
+};
+
 using THexList = std::vector<CHex> ;
 
 CHex cubeToAxial(CHex& cube);
@@ -65,3 +74,6 @@ THexDir intToDir(int n);
 std::tuple<CHex, CHex> findTriangle(CHex& apex, int hexLength, float angle, float rotation);
 THexList* findArc(CHex& apex, int hexLength, float angle, float rotation);
 THexList* findRing(int radius);
+std::tuple<int, int> findRingHex(int radius, float angle);
+THexList* findArc2(CHex& apex, int radius, float angle, float rotation);
+CHex findRingCornerHex(int radius, int corner);

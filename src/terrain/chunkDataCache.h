@@ -6,7 +6,7 @@
 
 #include "..\renderer\multiBuf2.h"
 
-#define NUM_DATABUFS  4 //40
+#define NUM_DATABUFS  40
 #define ARBITRARY_MAX_VERTS 4200
 
 typedef vBuf::T3DnormVert TChunkVert2;
@@ -31,6 +31,7 @@ public:
 	void setMultiBuf(CMultiBuf2* multiBuf) {
 		this->multiBuf = multiBuf;
 	}
+	void freeBuf(int addr);
 
 private:
 	TChunkTriBuf2* getFreeDataBuf();

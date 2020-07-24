@@ -5,7 +5,10 @@
 #include "..\terrain\terrain2.h"
 #include "PhysObj.h"
 
-
+struct TSCident {
+	int shellNo;
+	glm::i32vec3 index;
+};
 
 /** The terrain physics object. */
 class CTerrainPhysObj2 : public CPhysObj {

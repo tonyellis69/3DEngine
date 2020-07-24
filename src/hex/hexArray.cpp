@@ -260,6 +260,47 @@ CHex CHexArray::findLineEnd(CHex& start, CHex& target) {
 	return travelHex;
 }
 
+/** Return the hexes from the start to end of this line that are not blocked. */
+THexList CHexArray::findLineHexes(CHex& start, CHex& end) {
+	int N = cubeDistance(start, end);
+
+	glm::vec3 A(start.x, start.y, start.z);
+	A += glm::vec3(1e-6, 2e-6, -3e-6);
+	glm::vec3 B(end.x, end.y, end.z);
+
+	CHex prevHex;
+
+	THexList hexes;
+
+	prevHex = start;
+	for (int h = 0; h <= N; h++) {
+		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));
+		if (getHexCube(hex).content == 2 || fromToBlocked(prevHex, hex))
+			break;
+		hexes.push_back(hex);
+		prevHex = hex;
+	}
+
+	return hexes;
+}
+
+bool CHexArray::lineOfSight2(CHex& start, CHex& end) {
+	int N = cubeDistance(start, end);
+
+	glm::vec3 A(start.x, start.y, start.z);
+	A += glm::vec3(1e-6, 2e-6, -3e-6);
+	glm::vec3 B(end.x, end.y, end.z);
+
+	CHex prevHex = start;
+	for (int h = 0; h <= N; h++) {
+		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));
+		if (getHexCube(hex).content == 2 || fromToBlocked(prevHex, hex))
+			return false;
+		prevHex = hex;
+	}
+	return true;
+}
+
 /** Return index coordinates as a cubic position. */
 CHex CHexArray::indexToCube(int x, int y) {
 	x -= width / 2;

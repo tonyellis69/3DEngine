@@ -125,79 +125,13 @@ void CTerrain2::update(float dT) {
 
 
 
-/** Return the superchunk at this position in worldspace containing terrain, or NULL. */
-TSCident CTerrain2::getSC(const glm::vec3& pos) {
-	for (auto shell : shells) {
-		i32vec3 scIndex = shell.getSCat(pos);
-		if (any(lessThan(scIndex, i32vec3 (0))))
-			continue;
-		 CSuperChunk2* sc =  shell.scArray.element(scIndex.x, scIndex.y, scIndex.z);
-		if (!sc->isEmpty)
-			return {sc->shellNo,scIndex};
-	}
-	return { -1,glm::i32vec3(-1) };
-}
-//TO DO: weird pointer corruption if I return sc directly to terrainPhysObj2, as if shell sc vector gone out of scope
-//FIX or replace when I sort out physics
-
-
-
-/** Return a pointer to a buffer of chunk triangles for the given position, if any. */
-void CTerrain2::getTris(CSuperChunk2* sc, const glm::vec3& pos, TChunkVert2*& buf, unsigned int& noTris) {
-	return;
-	noTris = 0;
-	float chunkSize = shells[sc->shellNo].chunkSize;
-	//get chunk at this position
-	int chunkId = -1;
-	for (auto chunk : sc->scChunks) {
-		if (all(greaterThanEqual(chunks[chunk].terrainPos, pos)) && 
-				all(lessThanEqual(chunks[chunk].terrainPos, pos + vec3(chunkSize)))) {
-			chunkId = chunks[chunk].bufId;
-			break;
-		}
-	}
-
-	if (chunkId == -1)
-		return;
-
-
-	//Use callback to getChunkTris? Or give terrain2 a pointer to the multibuf?
-	//prob better to do the former, separating terrain model from mesh data 
-	//it's a virtual call but can always optimise later
-
-	
-
-	//check if we already have this chunk in the cache
-	for (int cacheNo = 0; cacheNo < chunkTriCacheSize2; cacheNo++) {
-		if (cachedChunkTris[cacheNo].id == chunkId) {
-			noTris = cachedChunkTris[cacheNo].noTris;
-			buf = cachedChunkTris[cacheNo].buf;
-			return;
-		}
-	}
-	
-	//no? Let's go retrieve it then
-	unsigned int size = pTerrainApp->getChunkTrisCallback(chunkId, cachedChunkTris[freeChunkTriCache].buf);
-	
-	noTris = cachedChunkTris[freeChunkTriCache].noTris = size / (sizeof(TChunkVert2) * 3);
-	cachedChunkTris[freeChunkTriCache].id = chunkId;
-	buf = cachedChunkTris[freeChunkTriCache].buf;
-
-
-	freeChunkTriCache++;
-	if (freeChunkTriCache >= chunkTriCacheSize2)
-		freeChunkTriCache = 0;
-	
-}
-//TO DO: another one to FIX or replace when I sort out physics and what's actually required
-
-
 int CTerrain2::storeChunkMesh(CBuf& src, int size) {
 	return multiBuf.copyBuf(src, size);
 }
 
 void CTerrain2::freeChunkMesh(int addr) {
 	multiBuf.freeBlock(addr);
+	chunkDataCache.freeBuf(addr);
 }
 
 unsigned int CTerrain2::getChunkMeshVAO() {
@@ -311,9 +245,6 @@ int CTerrain2::getFreeChunk() {
 
 /** Take this chunk out of service, returning it to the free pile. */
 void CTerrain2::removeChunk(int id) {
-	if (chunks[id].bufId == 8955792)
-		int b = 9;
-
 	if (chunks[id].status == chSkinned)
 		pTerrainApp->deleteChunkMesh(chunks[id]);
 
@@ -373,71 +304,40 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 	glm::vec3 baseVertB = objB->calcBaseVertPos();
 	TAaBB objAbb = calcAABB();
 
+	glm::vec3 corners[] = { { -20,0,20}, {20,0,20}, {20,0,-20}, {-20,0,-20} };
+
+	float penetration = 0;
+	TChunkTriBuf2* chunkData;
 	if (objAbb.clips(baseVertB)) { //we're inside shell 0
-		sysLog << "\nLooking for chunk data... ";
-		TChunkTriBuf2* chunkData = getShell0ChunkDataAt(baseVertB);
-		if (chunkData == NULL) {
-			//check the chunk above in case we dropped straight through
-			glm::vec3 chunkAbove = baseVertB + glm::vec3(0, LoD1chunkSize, 0);
-			TChunkTriBuf2* chunkAboveData = getShell0ChunkDataAt(chunkAbove);
-			if (chunkAboveData == NULL) {
-				sysLog << " data not found!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-				return contact;
+
+		for (int corner = 0; corner < 4; corner++) {
+			chunkData = getShell0ChunkDataAt(baseVertB + corners[corner]);
+			if (chunkData == NULL) {
+				//check the chunk above in case we dropped straight through
+				glm::vec3 chunkAbove = baseVertB + corners[corner] + glm::vec3(0, LoD1chunkSize, 0);
+				TChunkTriBuf2* chunkAboveData = getShell0ChunkDataAt(chunkAbove);
+				if (chunkAboveData == NULL) {
+					//return contact;
+					continue;
+				}
+				chunkData = chunkAboveData;
 			}
-			chunkData = chunkAboveData;
+
+			baseVertB = baseVertB - glm::vec3(chunkOrigin[3]); //move to chunk worldspace position
+
+			penetration = checkChunkCollision(baseVertB + corners[corner], chunkData);
+			if (penetration > 0) {
+				contact.normal = glm::vec3(0, 1, 0);
+				contact.numPoints = 1;
+				contact.points[0] = { baseVertB + corners[corner], penetration };
+				return contact; //for now, exit on first contact
+			}
+
 		}
+
+		//got here? Then we've made no contact
+		//liveLog << "\nNo contact!";
 		
-		baseVertB = baseVertB - glm::vec3(chunkOrigin[3]);
-
-		if (baseVertB.z < 0 && baseVertB.y > 1) {
-			sysLog << "\nRogue y!";
-		}
-
-		float penetration = checkChunkCollision(baseVertB, chunkData);
-		if (penetration > 0) {
-			sysLog << "\nPenetration found at " << baseVertB;
-			contact.normal = glm::vec3(0, 1, 0);
-			contact.numPoints = 1;
-			contact.points[0] = { baseVertB, penetration };
-		}
-		else
-			sysLog << "\nPenetration not found at " << baseVertB;
-
-
-		return contact;
-
-
-		glm::i32vec3 scIndex = shells[0].getSCat(baseVertB);
-		//rotate index?!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		CSuperChunk2* sc = shells[0].scArray.element(scIndex.x, scIndex.y, scIndex.z);
-		if (sc->isEmpty)
-			return contact;
-
-		float SCsize = shells[0].SCsize;
-
-		glm::vec3 scCornerOrigin = vec3(scIndex) * SCsize;
-		scCornerOrigin -= shells[0].worldSpaceSize * 0.5; // make relative to centre of shell
-		scCornerOrigin += shells[0].worldSpacePos; //and then relative to shell's worldspace position
-
-		glm::vec3 SCorigin = scCornerOrigin + (SCsize * 0.5f); //move orgin to centre of SC
-		float topHeight = SCorigin.y + (SCsize * 0.5);
-
-		//find chunk at baseVertB - if any
-		glm::vec3 pointInSC = baseVertB - scCornerOrigin;
-		glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[0].chunkSize);
-
-		if (sc->chunkExists(chunkIndex) == false)
-			return contact;
-
-		topHeight = (chunkIndex.y + 1) * shells[0].chunkSize;
-		topHeight += scCornerOrigin.y;
-
-		float penetration2 = topHeight - baseVertB.y;
-
-		contact.normal = glm::vec3(0, 1, 0);
-		contact.numPoints = 1;
-		contact.points[0] = { baseVertB, penetration2 };
-
 	}
 
 	return contact;
@@ -448,8 +348,6 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 	CSuperChunk2* sc = shells[0].scArray.element(scIndex.x, scIndex.y, scIndex.z);
 	if (sc->isEmpty)
 		return NULL;
-
-	sysLog << "in sc " << scIndex << " (orig " << sc->origIndex << ") ";
 
 	float SCsize = shells[0].SCsize;
 
@@ -464,19 +362,16 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 	glm::vec3 pointInSC = pos - scCornerOrigin;
 	glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[0].chunkSize);
 
-	sysLog << ", chunkIndex " << chunkIndex << ". ";
 
 	//get the id for the chunk at this index position
 	int chunkAddr = -1;
 	for (auto localChunk : sc->scChunks) {
 		if (chunks[localChunk].index == chunkIndex) {
-			sysLog << "chunk id " << localChunk;
 			chunkAddr = chunks[localChunk].bufId;
 			break;
 		}
 	}
-
-	sysLog << " chunk address " << chunkAddr;
+		 
 	if (chunkAddr == -1)
 		return NULL;
 

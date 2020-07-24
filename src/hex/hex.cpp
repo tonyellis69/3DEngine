@@ -310,3 +310,65 @@ THexList* findRing(int radius) {
 
 	return &hexes;
 }
+
+/** Return the corner and offset of the hex that lies at the given angle
+	of a hex 'ring' of the given radius. */
+std::tuple<int, int> findRingHex(int radius, float angle) {
+	float radsPerHex = M_PI / (3 * radius); //60
+
+	int corner = std::floor(angle / (M_PI / 3.0f)) ; //60
+
+	float remain = fmod(angle, M_PI / 3.0f); //60
+	float hexOff = remain / radsPerHex;
+	int hexOffset = std::ceil(remain / radsPerHex);
+
+	return { corner, hexOffset };
+}
+
+/** Return the hexes in the arc lying at the given rotation around apex. */
+THexList* findArc2(CHex& apex, int radius, float angle, float rotation) {
+	
+	float rotationToA = rotation - (angle / 2.0f);
+	if (rotationToA < 0)
+		rotationToA += M_PI * 2.0f;
+	auto [startCorner, hexOffset] = findRingHex(radius, rotationToA);
+
+
+	float radsPerHex = M_PI / (3 * radius);
+	int hexesInArc = floor(angle / radsPerHex);
+
+	//find the hex at A, the start of the arc
+	CHex hex = findRingCornerHex(radius, startCorner);
+	for (int h = 0; h < hexOffset; h++) {
+		hex = getNeighbour(hex, intToDir(startCorner+2));
+	}
+
+	static THexList hexes;
+	hexes.clear();
+	for (int h = 0; h < hexesInArc; h++) {
+		hexes.push_back(hex + apex);
+		hexOffset++;
+		if (hexOffset > radius) {
+			hexOffset = 0;
+			startCorner++;
+		}
+		hex = getNeighbour(hex,intToDir(startCorner + 2));
+	}
+
+	return &hexes;
+}
+
+/** Calculate the hex at the given corner of the hex 'ring' of this
+	radius. Corner 0 = the NE corner, counting clockwise. */
+CHex findRingCornerHex(int radius, int corner) {
+	switch (corner) {
+	case 0: return { radius, -radius, 0 };
+	case 1: return { 0, -radius, radius };
+	case 2: return { -radius, 0, radius };
+	case 3: return { -radius, radius, 0 };
+	case 4: return { 0, radius, -radius };
+	case 5: return { radius, 0, -radius };
+	}
+}
+
+

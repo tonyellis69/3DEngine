@@ -115,13 +115,13 @@ float CTerrainPhysObj2::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contact
 
 	//for each chunk space
 	///////////////////////////////////////////////////////////////
-	TSCident  sc2 = pTerrain->getSC(searchPos);
+	TSCident  sc2; /// = pTerrain->getSC(searchPos);
 	//while (sc = pTerrain->getSC(searchPos)) {
 	while (sc2.shellNo != -1) {
 		sc = pTerrain->shells[sc2.shellNo].scArray.element(sc2.index.x, sc2.index.y, sc2.index.z);
 		//check for chunks
 		//pTerrain->getTris(searchPos, pBuf, noTris);
-		pTerrain->getTris(sc, searchPos, pBuf, noTris);
+	//	pTerrain->getTris(sc, searchPos, pBuf, noTris);
 		if (pBuf) {
 			for (size_t vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
 				int intersect = triSegmentIntersection(scrolledSegTop, scrolledSegBase, pBuf[vNo].v, pBuf[vNo + 1].v, pBuf[vNo + 2].v, u, v, w, t);
@@ -143,7 +143,7 @@ float CTerrainPhysObj2::checkAllWayDown(glm::vec3& searchTop, glm::vec3& contact
 		float chunkHeight = pTerrain->shells[sc->shellNo].chunkSize;
 		//vec3 currentChunkCorner = pTerrain->getChunkPos(searchPos);
 		searchPos.y -= chunkHeight;
-		sc2 = pTerrain->getSC(searchPos);
+		//sc2 = pTerrain->getSC(searchPos);
 	}
 	
 	std::cerr << "\n!!!!No terrain found below search point!";
@@ -165,14 +165,14 @@ float CTerrainPhysObj2::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactD
 	//TO DO looks like this can be optimised to an IF not a WHILE
 	//shouldn't have to pass sc to getTris if we find sc at getTris
 
-	TSCident  sc2 = pTerrain->getSC(searchPos);
+	TSCident  sc2; // = pTerrain->getSC(searchPos);
 	//while (sc = pTerrain->getSC(searchPos)) {
 	while (sc2.shellNo != -1) {
 		sc = pTerrain->shells[sc2.shellNo].scArray.element(sc2.index.x, sc2.index.y, sc2.index.z);
 
 
 
-		pTerrain->getTris(sc,searchPos, pBuf, noTris);
+		//pTerrain->getTris(sc,searchPos, pBuf, noTris);
 		//pTerrain->getTris(searchPos, pBuf, noTris);
 		if (pBuf) {
 			for (size_t vNo = 0; vNo < noTris * 3; vNo += 3) { //check for collision with chunk triangles
@@ -197,7 +197,7 @@ float CTerrainPhysObj2::checkAllWayUp(glm::vec3& searchBase, glm::vec3& contactD
 		float chunkHeight = pTerrain->shells[sc->shellNo].chunkSize;
 		//vec3 currentChunkCorner = pTerrain->getChunkPos(searchPos);
 		searchPos.y += chunkHeight;
-		sc2 = pTerrain->getSC(searchPos);
+		//sc2 = pTerrain->getSC(searchPos);
 	}
 	
 	std::cerr << "\n????No terrain found above search point!";

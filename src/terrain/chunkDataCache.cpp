@@ -10,19 +10,27 @@ TChunkTriBuf2* ChunkDataCache::getData(int chunkAddr) {
 	if (chunkData == chunkCache.end()) {
 		//we need to copy this data to our cache
 
-		sysLog << "\nChunk data not found in cache.";
-
 		TChunkTriBuf2* buf = getFreeDataBuf();
 
 		int size = multiBuf->exportBlock(chunkAddr, (char*)buf->buf);
 		buf->noTris = (size / sizeof(TChunkVert2)) / 3.0f;
 		buf->timeStamp = timeStamp;
 		chunkCache[chunkAddr] = buf;
+		buf->id = chunkAddr;
 		return buf;
 	}
 
 	chunkData->second->timeStamp = timeStamp;
 	return chunkData->second;
+}
+
+/** Remove this chunk data, if we have it, freeing the buffer for re-use. */
+void ChunkDataCache::freeBuf(int addr) {
+	auto chunkData = chunkCache.find(addr);
+	if (chunkData != chunkCache.end()) {
+		chunkData->second->timeStamp = 0;
+		chunkCache.erase(chunkData);
+	}
 }
 
 /** Return the address of a free buffer in the cache. If all buffers are
@@ -31,7 +39,6 @@ TChunkTriBuf2* ChunkDataCache::getFreeDataBuf() {
 	if (nextFreeBuf < NUM_DATABUFS)
 		return &dataBufs[nextFreeBuf++];
 
-	sysLog << "\nRecycling buffers.";
 
 	//find the least recently used buf
 	timeStamp_t lowestTimeStamp = timeStamp;
