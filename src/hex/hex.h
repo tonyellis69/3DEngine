@@ -24,6 +24,7 @@ static glm::vec3 moveVector3D[]{ {hexWidth,0,0}, {hexWidth * 0.5f,-1.5f,0},
 class CHex {
 public:
 	CHex();
+	CHex(int n);
 	CHex(int x, int y, int z);
 	CHex(int q, int r);
 	CHex operator + (CHex& hex2);
@@ -40,6 +41,8 @@ public:
 	int y;
 	int z;
 };
+
+static CHex nullHex(-1);
 
 struct hex_hash {
 	size_t operator()(const CHex& hex) const {

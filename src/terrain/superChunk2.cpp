@@ -143,6 +143,9 @@ void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 						createChunk(chunk);
 						isEmpty = false;
 					}
+					//try replacing with provisionallyCreateChunk, which doesn't put it on scChunks
+					//or chunksToSkin but a chunkCheck list. Terrain2.update tries 1 or 2 each frame
+					//and if they have terrain, then does the above
 				}
 			}
 }
@@ -169,7 +172,7 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 
 					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
 					if (pTerrainApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
-						createChunk(chunk);
+						 createChunk(chunk);
 					}
 				}
 			}
@@ -188,7 +191,8 @@ void CSuperChunk2::clearOuterLayerChunks(Tdirection face, int layersToKeep) {
 	for (auto id = scChunks.begin(); id != scChunks.end();) {
 		i32vec3 chunkIndexPos = pTerrainObj->getChunkIndex(*id);
 		if (chunkIndexPos[axis] >= limitA && chunkIndexPos[axis] < limitB) {
-			pTerrainObj->removeChunk(*id);
+			//pTerrainObj->removeChunk(*id);
+			pTerrainObj->scrolledOutChunksToDelete.push_back({ origIndex, *id });
 			id = scChunks.erase(id);
 		}
 		else

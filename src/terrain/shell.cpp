@@ -100,7 +100,9 @@ void CShell::removeOverlappedInnerFaceChunks(Tdirection face) {
 /** Add chunks to this inner face, to fill the gap left by the chunks of the
 	inner shell that were removed when it scrolled. */
 void CShell::addInnerFaceChunks2(Tdirection face) {
-	TBoxVolume innerFaceVolume = findOverlappedInnerFaceSCsmultiLayer(face);	
+	TBoxVolume innerFaceVolume = findOverlappedInnerFaceSCsmultiLayer(face);
+
+	tmpCount2 = 0;
 	addChunksAtOrOutsideInnerShell(innerFaceVolume);
 }
 
@@ -174,11 +176,21 @@ void CShell::scroll(Tdirection direction) {
 
 	//now that we've scrolled, return to the default layout of one final double-layer of chunks all around.
 	addChunksToFaceLayer(direction);
+
+	pTerrain->scrolledOutChunksToDelete.clear();
+	//TO DO: reserve will be much faster
+	
 	removeOutfaceChunks(scrollDir);
+
+
 
 	//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
 	//needs to add some to cover that area of terrain
-	pTerrainObj->rebuildOuterShellInnerFace(shellNo, scrollDir); 
+	//pTerrainObj->rebuildOuterShellInnerFace(shellNo, scrollDir); //!!!!!!!!!!!!!!!!!!!!!!!
+
+	pTerrainObj->overwriteInnerShellChunks(shellNo);
+
+	
 }
 
 
@@ -389,6 +401,7 @@ void CShell::addChunksAtOrOutsideInnerShell(TBoxVolume volume) {
 	CBoxVolume innerChunkVol = pTerrain->shells[shellNo - 1].calcWorldSpaceChunkExtent();
 	vec3 shellOrigin = (vec3(worldSpaceSize) * 0.5f);
 	CBoxVolume thisShellSCvol;
+
 	for (int x = volume.bl.x; x <= volume.tr.x; x++) {
 		for (int y = volume.bl.y; y <= volume.tr.y; y++) {
 			for (int z = volume.bl.z; z <= volume.tr.z; z++) {
@@ -397,11 +410,12 @@ void CShell::addChunksAtOrOutsideInnerShell(TBoxVolume volume) {
 				bool notEntirelyEnveloped; CBoxVolume SCnonOverlappedVol;
 				std::tie(notEntirelyEnveloped, SCnonOverlappedVol) = innerChunkVol.findNotOrPartiallyOverlapped(thisShellSCvol);
 				if (notEntirelyEnveloped) {
-					scArray.element(x, y, z)->addChunksOutside(SCnonOverlappedVol);;
+					 scArray.element(x, y, z)->addChunksOutside(SCnonOverlappedVol);;
 				}
 			}
 		}
 	}
+
 }
 
 

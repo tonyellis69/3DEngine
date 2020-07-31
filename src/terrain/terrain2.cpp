@@ -9,6 +9,8 @@
 
 #include  "physics2/collisions.h"
 
+int tmpCount2;
+
 using glm::vec3;
 using glm::mat4;
 using glm::i32vec3;
@@ -153,6 +155,61 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 	return shells[shellNo].worldSpaceSize;
 }
 
+/** We're removing this shell's chunk because it has scrolled out,
+	so tell the enclosing shell to create a new, lower-LOD chunk 
+	in the same area. */
+//TO DO: may be able to find pos from position in samplespace
+//removing dependence on sc index. Get working as is, then try
+void CTerrain2::overwriteInnerShellChunks(int shellNo) {
+	for (auto chunk : scrolledOutChunksToDelete) {
+		if (shellNo < shells.size() - 1) {
+			//find location of chunk in worldspace 
+			//fnd the enclosing shell SC at that point
+			//find the SC chunk index for that point
+			//ask shell to create a chunk there
+			CShell& innerShell = shells[shellNo];
+			Chunk2& chunkData = chunks[chunk.second];
+			glm::vec3 chunkPos = glm::vec3(chunkData.index) * innerShell.chunkSize;
+			chunkPos += glm::vec3(chunk.first) * innerShell.SCsize;
+			glm::vec3 shellOrigin = (vec3(innerShell.worldSpaceSize) * 0.5f) - innerShell.worldSpacePos;
+			chunkPos += shellOrigin;
+
+			//find SC of enclosing shell at this point
+			glm::i32vec3 outerSCindex = shells[shellNo + 1].getSCat(chunkPos);
+
+			//find outer SC chunk index at this point 
+
+
+			float outerSCsize = shells[shellNo + 1].SCsize;
+			glm::vec3 scCornerOrigin = vec3(outerSCindex) * outerSCsize;
+			scCornerOrigin -= shells[shellNo + 1].worldSpaceSize * 0.5; // make relative to centre of shell
+			scCornerOrigin += shells[shellNo + 1].worldSpacePos; //and then relative to shell's worldspace position
+			glm::vec3 SCorigin = scCornerOrigin + (outerSCsize * 0.5f); //move orgin to centre of SC
+
+			glm::vec3 pointInSC = chunkPos - scCornerOrigin;
+			glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[shellNo+1].chunkSize);
+
+			//is there already a chunk there?
+			CSuperChunk2* outerSC = shells[shellNo + 1].scArray.element(outerSCindex.x, outerSCindex.y, outerSCindex.z);
+			bool chunkFound = false;
+			for (auto localChunk : outerSC->scChunks) {
+				if (chunks[localChunk].index == chunkIndex) {
+					chunkFound = true;
+					break;
+				}
+			}
+
+			if (!chunkFound) {
+				outerSC->createChunk(chunkIndex);
+			}
+
+
+		}
+
+		removeChunk(chunk.second);
+	}
+}
+
 //////////Private functions
 
 /** Prepare all chunks for use. */
@@ -270,7 +327,7 @@ void CTerrain2::scrollViewpoint(Tdirection scrollDir) {
 /**	If we've removed scrolled-out chunks from this shell following a scroll, the rear
 	inner face of the enclosing shell now needs to add chunks to cover that area of terrain. */
 void CTerrain2::rebuildOuterShellInnerFace(int shellNo, Tdirection scrollOutFace) {
-	if (shellNo < shells.size() - 1) {
+	if (shellNo <  shells.size() - 1) {
 		shells[shellNo + 1].addInnerFaceChunks2(scrollOutFace);
 	}
 }

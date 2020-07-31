@@ -10,6 +10,15 @@ CHex::CHex() {
 	x = 0; y = 0; z = 0;
 }
 
+CHex::CHex(int n) {
+	if (n == -1) { //special negated hex
+		x = -1; y = -1; z = -1;
+	}
+	else {
+		CHex(n, n);
+	}
+}
+
 /** Construct from cube coordinates. */
 CHex::CHex(int x, int y, int z) {
 	this->x = x; this->y = y; this->z = z;

@@ -12,6 +12,8 @@ class COuterSCIterator;
 class CFaceIterator;
 class CTerrain2;  ///TO DO get rid of dependency!
 
+
+
 class ITerrain;
 class CShell {
 public:

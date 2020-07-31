@@ -14,6 +14,7 @@
 
 #include "chunkDataCache.h"
 
+extern int tmpCount2;
 
 const int chunkTriCacheSize2 = 6;
 
@@ -37,6 +38,7 @@ public:
 	void setViewpoint(glm::vec3& pos);
 	ITerrainAppCallback* getTerrainApp();
 	float getShellSize(unsigned int shellNo);
+	void overwriteInnerShellChunks(int shellNo);
 
 	std::vector<CShell> shells;
 
