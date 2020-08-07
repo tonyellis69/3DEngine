@@ -164,7 +164,7 @@ void CBaseApp::OnCharEntry(unsigned int Key, long Mod) {
 }
 
 
-/** Called when the mouse moves within the area of the app - *not* 
+/** Called (by GLFW) when the mouse moves within the area of the app - *not* 
 	simply anywhere on screen. */
 void CBaseApp::onWinMouseMove(int x, int y) {
 	unsigned int msg = WM_MOUSEMOVE;
@@ -177,8 +177,6 @@ void CBaseApp::onWinMouseMove(int x, int y) {
 		key += MK_MBUTTON;
 	mouseKey = key;
 	GUIroot.MouseMsg(msg, x, y, key);
-	mouseMove(x, y, key);
-
 }
 
 void CBaseApp::onWinMouseButton(int button, int action, int mods) {
@@ -235,11 +233,18 @@ void CBaseApp::AppTasks() {
 	dT = Time - LastTime;
 	Engine.dT = dT;
 	LastTime = Time;
-	//getMousePos(mouseX, mouseY);
+
 	win.getMousePos(mouseX, mouseY);
+	if (mouseX != lastMousePos.x || mouseY != lastMousePos.y) {
+		lastMousePos = { mouseX, mouseY };
+		mouseMove(mouseX, mouseY,NULL);
+		//TO DO: see onWinMouseMove for how to provide mouse buttons if ever needed
+	}
+
+
 	keyCheck(); //happens every frame, therefore responsive
 
-	//TO DO: mouseCheck, which calls user with last reported mouse positionHint.
+	//TO DO: mouseCheck, which calls user with last reported mouse position.
 
 	if (!Paused) {
 		//Engine.updateRegisteredSprites(dT);

@@ -427,7 +427,7 @@ void CShell::removeOutfaceChunks(Tdirection outface) {
 	CFaceIterator faceIter = getFaceIterator(outface);
 	while (!faceIter.finished()) {
 		if (faceIter->isEmpty == false) {
-			faceIter->clearOuterLayerChunks(outface, layersToKeep);
+			faceIter->clearOuterLayerChunks(outface, layersToKeep,faceIter.getIndex());
 		}
 		faceIter++;
 	}

@@ -181,7 +181,7 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 
 
 /** Remove any chunks in the outermost layers of this face. */
-void CSuperChunk2::clearOuterLayerChunks(Tdirection face, int layersToKeep) {
+void CSuperChunk2::clearOuterLayerChunks(Tdirection face, int layersToKeep, glm::i32vec3& scIndex) {
 	int axis = getAxis(face);
 	int limitA = layersToKeep; int limitB = numSCchunks;
 	if (face == north || face == west || face == down) {
@@ -192,7 +192,7 @@ void CSuperChunk2::clearOuterLayerChunks(Tdirection face, int layersToKeep) {
 		i32vec3 chunkIndexPos = pTerrainObj->getChunkIndex(*id);
 		if (chunkIndexPos[axis] >= limitA && chunkIndexPos[axis] < limitB) {
 			//pTerrainObj->removeChunk(*id);
-			pTerrainObj->scrolledOutChunksToDelete.push_back({ origIndex, *id });
+			pTerrainObj->scrolledOutChunksToDelete.push_back({ scIndex, *id });
 			id = scChunks.erase(id);
 		}
 		else

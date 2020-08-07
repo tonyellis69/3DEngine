@@ -27,26 +27,21 @@ CHexRenderer::CHexRenderer() : hexModel(6) {
 	floorplanSpaceColour = glm::vec4(0, 0, 0, 1);
 	floorplanSolidColour = glm::vec4(0, 0.65f, 0, 1);
 	floorplanSolidColour = glm::vec4(0, 0.47f, 0.16f, 1);
-}
-
-/** Set up stuff based on the map we're on, etc. */
-void CHexRenderer::start() {
 	solidHex = &lineModels["solidHex"];
-
-	fillFloorplanLineBuffer();
-	fillFloorplanSolidBuffer(floorplanSolidBuf,2,1);
-	fillFloorplanSolidBuffer(floorplanSpaceBuf, 1,0.9f);
 }
+
 
 void CHexRenderer::setMap(CHexArray* hexArray){
 	this->hexArray = hexArray;
+	
+	fillFloorplanLineBuffer();
+	fillFloorplanSolidBuffer(floorplanSolidBuf, 2, 1);
+	fillFloorplanSolidBuffer(floorplanSpaceBuf, 1, 0.9f);
 }
-
 
 void CHexRenderer::draw() {
 	drawFloorPlan();
 }
-
 
 void CHexRenderer::drawFloorPlan() {
 	

@@ -29,6 +29,8 @@ public:
 	CHex indexToCube(int x, int y);
 	CHex indexToCube(glm::i32vec2& index);
 	glm::i32vec2 cubeToIndex(CHex& hex);
+	bool isValidPath(CHex& start, CHex& end);
+	void clear();
 		 
 	int width;
 	int height;

@@ -23,7 +23,6 @@
 class CHexRenderer: public IHexRenderer {
 public:
 	CHexRenderer();
-	void start();
 	void setMap(CHexArray* hexArray);
 	void draw();
 	void drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour);

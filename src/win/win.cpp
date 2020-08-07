@@ -151,7 +151,7 @@ bool CWin::mouseButtonPressed(int button) {
 	return glfwGetMouseButton(window, button);
 }
 
-
+/** NB: only seems to trigger if mouse moves inside window. */
 void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
 	pApp->onWinMouseMove(xpos, ypos);
 }

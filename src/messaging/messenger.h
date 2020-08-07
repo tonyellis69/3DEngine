@@ -10,9 +10,11 @@
 #include "msg.h"
 
 /** Wrapper for message handler member function calls. Abstract base enables easy storage in a container. */
+class CMessenger;;
 struct CFunctorBase {
 public:
 	virtual void call(CMsg& msg) = 0;
+	virtual class CMessenger* getHandlerObj() = 0;
 };
 
 template <class handlerT, typename messageT>
@@ -23,7 +25,9 @@ public:
 	void call(CMsg& param)	{
 		 (objPointer->*fnPointer)((messageT&)param);
 	}
-
+	handlerT* getHandlerObj() {
+		return objPointer;
+	}
 protected:
 	handlerT* objPointer;
 	void (handlerT::* fnPointer) (messageT&);
@@ -31,23 +35,14 @@ protected:
 
 
 /** Class to enable message sending/receiving. */
-class CMessenger {
-public:
-
-	template <typename messageT>
-	void send(messageT& msg) {
-		messageBus.dispatch(msg);
-	}
-
-
-
-
-};
 
 
 
 
 
+
+
+class CMessenger;
 class CMessageBus {
 public:
 
@@ -66,11 +61,43 @@ public:
 			handlers[typeid(msg)]->call(msg);	
 	}
 
+	void clearHandlers(CMessenger* handlerObj) {
+		if (handlers.empty()) //in case we come here after this global object has been destroyed
+			return;
+
+		for (auto& handler = handlers.begin(); handler != handlers.end();) {
+			CMessenger* regHandlerObj = handler->second->getHandlerObj();
+			if (regHandlerObj == handlerObj) {
+				handler = handlers.erase(handler);
+			}
+			else
+				handler++;
+		}
+	}
+
+	~CMessageBus() {
+		handlers.clear();
+	}
+
 private:
 	std::unordered_map <std::type_index, std::shared_ptr<CFunctorBase> > handlers;
 
 };
 
-
-
 extern CMessageBus messageBus;
+
+class CMessenger {
+public:
+
+	template <typename messageT>
+	void send(messageT& msg) {
+		messageBus.dispatch(msg);
+	}
+
+	~CMessenger() {
+		messageBus.clearHandlers(this);
+	};
+
+
+
+};

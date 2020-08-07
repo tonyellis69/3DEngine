@@ -155,8 +155,8 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 	return shells[shellNo].worldSpaceSize;
 }
 
-/** We're removing this shell's chunk because it has scrolled out,
-	so tell the enclosing shell to create a new, lower-LOD chunk 
+/** We're removing this shell's chunks because they have scrolled out,
+	so for each one tell the enclosing shell to create a new, lower-LOD chunk
 	in the same area. */
 //TO DO: may be able to find pos from position in samplespace
 //removing dependence on sc index. Get working as is, then try
@@ -172,7 +172,7 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo) {
 			glm::vec3 chunkPos = glm::vec3(chunkData.index) * innerShell.chunkSize;
 			chunkPos += glm::vec3(chunk.first) * innerShell.SCsize;
 			glm::vec3 shellOrigin = (vec3(innerShell.worldSpaceSize) * 0.5f) - innerShell.worldSpacePos;
-			chunkPos += shellOrigin;
+			chunkPos -= shellOrigin;
 
 			//find SC of enclosing shell at this point
 			glm::i32vec3 outerSCindex = shells[shellNo + 1].getSCat(chunkPos);
@@ -184,10 +184,11 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo) {
 			glm::vec3 scCornerOrigin = vec3(outerSCindex) * outerSCsize;
 			scCornerOrigin -= shells[shellNo + 1].worldSpaceSize * 0.5; // make relative to centre of shell
 			scCornerOrigin += shells[shellNo + 1].worldSpacePos; //and then relative to shell's worldspace position
-			glm::vec3 SCorigin = scCornerOrigin + (outerSCsize * 0.5f); //move orgin to centre of SC
+			
 
 			glm::vec3 pointInSC = chunkPos - scCornerOrigin;
 			glm::i32vec3 chunkIndex = glm::i32vec3(pointInSC) / glm::i32vec3(shells[shellNo+1].chunkSize);
+			chunkIndex = glm::abs(chunkIndex);
 
 			//is there already a chunk there?
 			CSuperChunk2* outerSC = shells[shellNo + 1].scArray.element(outerSCindex.x, outerSCindex.y, outerSCindex.z);
@@ -200,7 +201,7 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo) {
 			}
 
 			if (!chunkFound) {
-				outerSC->createChunk(chunkIndex);
+				 outerSC->createChunk(chunkIndex);
 			}
 
 

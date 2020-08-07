@@ -320,6 +320,20 @@ glm::i32vec2 CHexArray::cubeToIndex(CHex& hex) {
 	return offset;
 }
 
+
+bool CHexArray::isValidPath(CHex& start, CHex& end) {
+	THexList path = aStarPath(start, end);
+	if (getHexCube(start).content == 2 || path.empty() ||  path.back() != end)
+		return false;
+	return true;
+}
+
+void CHexArray::clear() {
+	for (auto& element : flatArray) {
+		element.content = 1;
+	}
+}
+
 ///////////////PRIVATE//////////////
 
 /** Utility func to return a journey from a pathfinding results list.*/

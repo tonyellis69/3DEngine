@@ -67,7 +67,7 @@ public:
 
 	//void getTris(const glm::vec3& pos, TChunkVert*& buf, unsigned int& noTris);
 
-	void clearOuterLayerChunks(Tdirection face, int maxChunks);
+	void clearOuterLayerChunks(Tdirection face, int maxChunks, glm::i32vec3& scIndex);
 
 	std::tuple<bool, glm::i32vec3> getChunkAt(glm::vec3& pos);
 

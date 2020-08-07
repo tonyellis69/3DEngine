@@ -136,6 +136,7 @@ public:
 	bool keyNow(int vKey);
 	bool mouseButtonNow(int button);
 
+	glm::i32vec2 lastMousePos = { 0,0 };
 	int mouseX,mouseY;
 	int dMouseX,dMouseY;
 	int mouseKey;
