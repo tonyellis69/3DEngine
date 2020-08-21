@@ -158,9 +158,8 @@ float CTerrain2::getShellSize(unsigned int shellNo) {
 /** We're removing this shell's chunks because they have scrolled out,
 	so for each one tell the enclosing shell to create a new, lower-LOD chunk
 	in the same area. */
-//TO DO: may be able to find pos from position in samplespace
-//removing dependence on sc index. Get working as is, then try
-void CTerrain2::overwriteInnerShellChunks(int shellNo) {
+
+void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) {
 	for (auto chunk : scrolledOutChunksToDelete) {
 		if (shellNo < shells.size() - 1) {
 			//find location of chunk in worldspace 
@@ -170,16 +169,39 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo) {
 			CShell& innerShell = shells[shellNo];
 			Chunk2& chunkData = chunks[chunk.second];
 			glm::vec3 chunkPos = glm::vec3(chunkData.index) * innerShell.chunkSize;
-			chunkPos += glm::vec3(chunk.first) * innerShell.SCsize;
+
+			glm::vec3 scOffset = glm::vec3(chunk.first) * innerShell.SCsize;
+
+			//proof of concept bodge
+			if (chunk.first.z == 0)
+				scOffset.z = 5 * innerShell.SCsize;
+			//to do this for real, pass scroll direction, use to find plane
+	/*		int scrollAxis = getAxis(scrollOutdir);
+			if (scrollOutdir == south || scrollOutdir == east || scrollOutdir == up) {
+				if (chunk.first[scrollAxis] == 0)
+					scOffset[scrollAxis] = innerShell.shellSCs  * innerShell.SCsize;
+			}
+			else {
+				if (chunk.first[scrollAxis] == innerShell.shellSCs - 1 )
+					scOffset[scrollAxis] -= innerShell.SCsize;
+			}*/
+
+
+			chunkPos += scOffset;
 			glm::vec3 shellOrigin = (vec3(innerShell.worldSpaceSize) * 0.5f) - innerShell.worldSpacePos;
 			chunkPos -= shellOrigin;
 
 			//find SC of enclosing shell at this point
 			glm::i32vec3 outerSCindex = shells[shellNo + 1].getSCat(chunkPos);
 
+			glm::i32vec3 testOuterSCindex = shells[shellNo + 1].getSCAtSamplePos(chunkData.sampleCorner);
+			if (outerSCindex != testOuterSCindex)
+				int b = 0;
+			//eventually fails - see if a shell or something is extra displaced at this point in getSCAtSamplePos
+
+
+
 			//find outer SC chunk index at this point 
-
-
 			float outerSCsize = shells[shellNo + 1].SCsize;
 			glm::vec3 scCornerOrigin = vec3(outerSCindex) * outerSCsize;
 			scCornerOrigin -= shells[shellNo + 1].worldSpaceSize * 0.5; // make relative to centre of shell

@@ -25,6 +25,7 @@ public:
 	CHexRenderer();
 	void setMap(CHexArray* hexArray);
 	void draw();
+	void drawFog();
 	void drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour);
 	void dollyCamera(float delta);
 	void pitchCamera(float delta);
@@ -44,11 +45,13 @@ public:
 	void followTarget(glm::vec3& target);
 	void attemptScreenScroll(glm::i32vec2& mousePos, float dT);
 
-	glm::vec3 castRay(glm::vec3& ray);
+	glm::vec3 castFromCamToHexPlane(glm::vec3& ray);
 
 	glm::i32vec2 worldPosToScreen(glm::vec3& worldPos);
 
 	void highlightHex(CHex& hex);
+
+	CShader* hexShader;
 
 private:
 	void tmpCreateHexagonModel();
@@ -57,6 +60,7 @@ private:
 	void fillFloorplanSolidBuffer(CBuf& buf, int drawValue, float scale);
 	void createSolidHexModel();
 	void createLineShader();
+	void createHexShader();
 	void drawFloorPlan();
 	void drawLineModel(CLineModel& lineModel);
 
@@ -64,7 +68,6 @@ private:
 
 	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
 
-	void drawFov(TFov& fov, CHex& origin);
 
 	CRenderer* pRenderer;
 	CBuf floorplanLineBuf;
@@ -77,8 +80,14 @@ private:
 	CLineModel* solidHex;
 
 	CShader* lineShader;
+
+
 	unsigned int hMVP;
 	unsigned int hColour;
+
+	unsigned int hHexMVP;
+	unsigned int hGridSize;
+	unsigned int hViewPort;
 
 	glm::vec4 floorplanLineColour;
 	glm::vec4 floorplanSpaceColour;
@@ -101,6 +110,8 @@ private:
 	THexList cursorPath;
 
 	CImporter importer;
+
+	CBuf2 hexShaderBuf;
 };
 
 

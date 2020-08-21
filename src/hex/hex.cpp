@@ -15,7 +15,7 @@ CHex::CHex(int n) {
 		x = -1; y = -1; z = -1;
 	}
 	else {
-		CHex(n, n);
+		x = n; z = n; y = -x - z;
 	}
 }
 
@@ -303,15 +303,15 @@ THexList* findArc(CHex& apex, int hexLength, float angle, float rotation) {
 	return &hexes;
 }
 
-/**  Create a hexagonal 'ring' of hexes of the given radius, centred at 0,0,0. */
-THexList* findRing(int radius) {
+/**  Create a hexagonal 'ring' of hexes of the given radius, centred at centre.. */
+THexList* findRing(int radius, CHex& centre = CHex( 0,0,0)) {
 	CHex hex(radius, -radius, 0);
 	static THexList hexes;
 	hexes.clear();
 
 	for (int corner = 0; corner < 6; corner++) {
 		for (int h = 0; h < radius; h++) {
-			hexes.push_back(hex);
+			hexes.push_back(hex + centre);
 			hex = getNeighbour(hex, intToDir(corner +2));
 		}
 	}

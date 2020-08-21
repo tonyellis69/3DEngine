@@ -38,7 +38,7 @@ public:
 	void setViewpoint(glm::vec3& pos);
 	ITerrainAppCallback* getTerrainApp();
 	float getShellSize(unsigned int shellNo);
-	void overwriteInnerShellChunks(int shellNo);
+	void overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir);
 
 	std::vector<CShell> shells;
 

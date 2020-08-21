@@ -76,7 +76,7 @@ THexDir opposite(THexDir direction);
 THexDir intToDir(int n);
 std::tuple<CHex, CHex> findTriangle(CHex& apex, int hexLength, float angle, float rotation);
 THexList* findArc(CHex& apex, int hexLength, float angle, float rotation);
-THexList* findRing(int radius);
+THexList* findRing( int radius, CHex& centre);
 std::tuple<int, int> findRingHex(int radius, float angle);
 THexList* findArc2(CHex& apex, int radius, float angle, float rotation);
 CHex findRingCornerHex(int radius, int corner);

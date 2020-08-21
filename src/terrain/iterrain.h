@@ -41,7 +41,7 @@ public:
 	virtual glm::vec3 getChunkOrigin() = 0;
 	virtual float getChunkSize(int shell) = 0;
 	virtual void setChunkColour(int chunkId, glm::vec4& colour) = 0;
-	virtual void overwriteInnerShellChunks(int shellNo) = 0;
+	virtual void overwriteInnerShellChunks(int shellNo, Tdirection scrollDir) = 0;
 
 	std::vector<std::pair<glm::i32vec3, int>> scrolledOutChunksToDelete;
 	

@@ -21,7 +21,7 @@ public:
 	glm::vec3 getWorldPos(CHex& hex);
 	THexList breadthFirstPath(CHex& start, CHex& end);
 	THexList dijkstraPath(CHex& start, CHex& end);
-	THexList aStarPath(CHex& start, CHex& end);
+	THexList aStarPath(CHex& start, CHex& end, bool fogCheck = false);
 	bool outsideArray(CHex& hex);
 	CHex findLineEnd(CHex& start, CHex& target);
 	THexList findLineHexes(CHex& start, CHex& end);

@@ -30,6 +30,7 @@ public:
 	glm::i32vec3 getSCat(const glm::vec3& pos);
 	glm::i32vec3 getInvRotatedIndex(const glm::i32vec3& origIndex);
 	COuterSCIterator getOuterSCiterator();
+	glm::i32vec3 getSCAtSamplePos(glm::vec3& pos);
 
 	int LoD; //<1=highest, then 2,4,8, etc
 	int numSCchunks; //<SC size in chunks.

@@ -136,6 +136,20 @@ COuterSCIterator  CShell::getOuterSCiterator() {
 	return COuterSCIterator(this);
 }
 
+glm::i32vec3 CShell::getSCAtSamplePos(glm::vec3& pos) {
+	//find worldspace pos of shell corner
+	//find distance from terrain origin
+	//divide distance by samplestep find samplespace displacement
+	//glm::vec3 shellCornerWorldSpaceDisp(worldSpaceSize * -0.5f);
+	//glm::vec3 sampleSpaceDisplacement = shellCornerWorldSpaceDisp / pTerrain->worldToSampleScale;
+	//glm::vec3 sampleSpaceAtShellCorner = pTerrain->sampleSpacePos + shellCornerWorldSpaceDisp;
+
+	glm::vec3 sampleSpaceAtShellCorner = calcSCsampleSpacePosition(glm::i32vec3(0));
+	glm::vec3 sampleSpaceDisplacement = pos - sampleSpaceAtShellCorner;
+	glm::i32vec3 scIndex = sampleSpaceDisplacement / scSampleStep;
+	return scIndex;
+}
+
 
 
 /////public-private divide 
@@ -166,7 +180,14 @@ void CShell::addChunksToFaceLayer(Tdirection direction) {
 	ready for the cycle to begin again. Because this creates a gap between the outgoing
 	face and the inner face of the outer shell, we notify the outer shell to rebuild itself. */
 void CShell::scroll(Tdirection direction) {
+	if (shellNo == 1)
+		int b = 0;
+
 	pTerrainObj->prepShellForScroll(shellNo, direction);
+
+	pTerrain->scrolledOutChunksToDelete.clear();
+	//TO DO: reserve will be much faster
+
 
 	Tdirection scrollDir = flipDir(direction);
 	rotateSCs(scrollDir); 
@@ -177,8 +198,7 @@ void CShell::scroll(Tdirection direction) {
 	//now that we've scrolled, return to the default layout of one final double-layer of chunks all around.
 	addChunksToFaceLayer(direction);
 
-	pTerrain->scrolledOutChunksToDelete.clear();
-	//TO DO: reserve will be much faster
+
 	
 	removeOutfaceChunks(scrollDir);
 
@@ -188,7 +208,14 @@ void CShell::scroll(Tdirection direction) {
 	//needs to add some to cover that area of terrain
 	//pTerrainObj->rebuildOuterShellInnerFace(shellNo, scrollDir); //!!!!!!!!!!!!!!!!!!!!!!!
 
-	pTerrainObj->overwriteInnerShellChunks(shellNo);
+
+	//!!!!!!!!!!
+	//problem happens on the 2nd scroll of shell 1 (chunks in outermost layer of outface SCs not
+	//getting erased) (but only those within width of inner shell - suggests somehow caused by
+	//scrolledOutChunksToDelete process
+	//step through 2nd scroll, try to see why chunks not getting removed
+
+	pTerrainObj->overwriteInnerShellChunks(shellNo, scrollDir);
 
 	
 }
@@ -279,7 +306,20 @@ void CShell::reinitialiseFaceSCs(Tdirection face) {
 	while (!faceIter.finished()) {
 	
 		faceIter->isEmpty = true;
-		faceIter->clearChunks();
+
+
+		//faceIter->clearChunks(); //old way of doing it
+
+
+		for (auto id = faceIter->scChunks.begin(); id != faceIter->scChunks.end();) {
+			pTerrainObj->scrolledOutChunksToDelete.push_back({ faceIter.getIndex()/* glm::i32vec3(0)*/, *id });
+			id = faceIter->scChunks.erase(id);
+		}
+		faceIter->scChunks.clear();
+
+
+
+
 
 		vec3 sampleSpacePosition = calcSCsampleSpacePosition(faceIter.getIndex());
 		faceIter->setSampleSpacePosition(sampleSpacePosition);

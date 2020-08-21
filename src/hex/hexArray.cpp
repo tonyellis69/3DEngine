@@ -153,7 +153,7 @@ THexList CHexArray::dijkstraPath(CHex& start, CHex& end) {
 }
 
 /**Return a path from start to end using the A* algorithm. */
-THexList CHexArray::aStarPath(CHex& start, CHex& end) {
+THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck) {
 	std::priority_queue<PQElement, std::vector<PQElement>, order> frontier;
 	frontier.push({ 0,start });
 
@@ -188,7 +188,9 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end) {
 			if (outsideArray(next))
 				continue;
 
-			//if (getHexCube(next).content == 2) 
+			if (fogCheck && getHexCube(next).fogged)
+				continue; 
+
 			if (getHexCube(next).blocks == blocksAll)
 				continue; 
 			
@@ -294,7 +296,7 @@ bool CHexArray::lineOfSight2(CHex& start, CHex& end) {
 	CHex prevHex = start;
 	for (int h = 0; h <= N; h++) {
 		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));
-		if (getHexCube(hex).content == 2 || fromToBlocked(prevHex, hex))
+		if (getHexCube(hex).content == 2 /*|| fromToBlocked(prevHex, hex)*/)
 			return false;
 		prevHex = hex;
 	}

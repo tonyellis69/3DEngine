@@ -37,6 +37,8 @@ public:
 		storeIndexInt(index);
 	}
 
+	int numElements; ///<For indexed buffers, the total indices
+
 
 private:
 	void storeVerts(void* data, unsigned int numVerts, int vertSize);
