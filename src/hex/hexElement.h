@@ -13,6 +13,6 @@ public:
 	int content;
 	glm::vec3 position; //TO DO: scrap!!!
 	unsigned int blocks;
-	bool fogged;
+	float fogged;
 };
 

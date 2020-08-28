@@ -51,7 +51,10 @@ public:
 
 	void highlightHex(CHex& hex);
 
-	CShader* hexShader;
+	void updateHexShaderBuffer();
+
+	CShader* hexLineShader;
+	CShader* hexSolidShader;
 
 private:
 	void tmpCreateHexagonModel();
@@ -67,6 +70,7 @@ private:
 	void drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf);
 
 	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
+
 
 
 	CRenderer* pRenderer;
@@ -88,6 +92,10 @@ private:
 	unsigned int hHexMVP;
 	unsigned int hGridSize;
 	unsigned int hViewPort;
+
+	unsigned int hHexMVPs;
+	unsigned int hGridSizes;
+	unsigned int hViewPorts;
 
 	glm::vec4 floorplanLineColour;
 	glm::vec4 floorplanSpaceColour;

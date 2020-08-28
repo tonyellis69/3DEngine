@@ -173,10 +173,10 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 			glm::vec3 scOffset = glm::vec3(chunk.first) * innerShell.SCsize;
 
 			//proof of concept bodge
-			if (chunk.first.z == 0)
-				scOffset.z = 5 * innerShell.SCsize;
+			//if (chunk.first.z == 0)
+			//	scOffset.z = 5 * innerShell.SCsize;
 			//to do this for real, pass scroll direction, use to find plane
-	/*		int scrollAxis = getAxis(scrollOutdir);
+			int scrollAxis = getAxis(scrollOutdir);
 			if (scrollOutdir == south || scrollOutdir == east || scrollOutdir == up) {
 				if (chunk.first[scrollAxis] == 0)
 					scOffset[scrollAxis] = innerShell.shellSCs  * innerShell.SCsize;
@@ -184,7 +184,7 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 			else {
 				if (chunk.first[scrollAxis] == innerShell.shellSCs - 1 )
 					scOffset[scrollAxis] -= innerShell.SCsize;
-			}*/
+			}
 
 
 			chunkPos += scOffset;
@@ -225,6 +225,8 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 			if (!chunkFound) {
 				 outerSC->createChunk(chunkIndex);
 			}
+
+			outerSC->isEmpty = false;;
 
 
 		}

@@ -180,7 +180,7 @@ void CShell::addChunksToFaceLayer(Tdirection direction) {
 	ready for the cycle to begin again. Because this creates a gap between the outgoing
 	face and the inner face of the outer shell, we notify the outer shell to rebuild itself. */
 void CShell::scroll(Tdirection direction) {
-	if (shellNo == 1)
+	if (shellNo == 0)
 		int b = 0;
 
 	pTerrainObj->prepShellForScroll(shellNo, direction);
@@ -200,7 +200,9 @@ void CShell::scroll(Tdirection direction) {
 
 
 	
-	removeOutfaceChunks(scrollDir);
+	removeOutfaceChunks(scrollDir); //!!!happens here, chunks not added
+	//solved!!! central SCs with chunks were ignored because flagged as empty
+
 
 
 

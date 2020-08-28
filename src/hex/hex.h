@@ -20,6 +20,11 @@ const float hexHeight = 2;
 static glm::vec3 moveVector3D[]{ {hexWidth,0,0}, {hexWidth * 0.5f,-1.5f,0}, 
 	{-hexWidth * 0.5f,-1.5f,0}, {-hexWidth,0,0}, {-hexWidth * 0.5f,1.5f,0}, {hexWidth * 0.5f,1.5f,0} };
 
+static glm::vec3 corners[]{ {hexWidth * 0.5f, 0.5f, 0}, {hexWidth * 0.5f, -0.5f, 0}, {0, -1, 0},
+	{-hexWidth * 0.5f, -0.5f,0}, {-hexWidth * 0.5f, 0.5f,0}, {0, 1, 0}
+
+};
+
 /** A class describing a hex position. */
 class CHex {
 public:
@@ -63,6 +68,8 @@ CHex hexRound(float q, float r);
 CHex worldSpaceToHex(glm::vec3& worldSpace);
 int cubeDistance(CHex& cubeA, CHex& cubeB);
 THexList* hexLine(CHex& cubeA, CHex& cubeB);
+THexList* hexLine2(CHex& cubeA, CHex& cubeB);
+THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner);
 THexDir neighbourDirection(CHex& hex, CHex& neighbour);
 bool isNeighbour(CHex& hex, CHex& neighbour);
 float dirToAngle(THexDir direction);
@@ -80,3 +87,7 @@ THexList* findRing( int radius, CHex& centre);
 std::tuple<int, int> findRingHex(int radius, float angle);
 THexList* findArc2(CHex& apex, int radius, float angle, float rotation);
 CHex findRingCornerHex(int radius, int corner);
+
+bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B);
+
+float signed2DTriArea(glm::vec3& a, glm::vec3& b, glm::vec3& c);

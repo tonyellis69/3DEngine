@@ -41,6 +41,8 @@ void CHexRenderer::setMap(CHexArray* hexArray){
 	fillFloorplanLineBuffer();
 	fillFloorplanSolidBuffer(floorplanSolidBuf, 2, 1);
 	fillFloorplanSolidBuffer(floorplanSpaceBuf, 1, 0.9f);
+
+	updateHexShaderBuffer();
 }
 
 void CHexRenderer::draw() {
@@ -48,42 +50,13 @@ void CHexRenderer::draw() {
 }
 
 
-void CHexRenderer::drawFog() {
-	return;
-	glm::mat4 mvp = camera.clipMatrix;
-	pRenderer->setShader(lineShader);
-	lineShader->setShaderValue(hMVP, mvp);
 
-	glDisable(GL_DEPTH_TEST);
-	TModelNode& node = solidHex->model;
-	glm::mat4 scaleM = glm::scale(glm::mat4(1), glm::vec3(1.05f));
-	for (int x = 0; x < hexArray->width; x++) {
-		for (int y = 0; y < hexArray->height; y++) {
-			if (hexArray->getHexOffset(x, y).fogged) {
-				CHex hex = hexArray->indexToCube(x, y);
-				glm::mat4 worldM = glm::translate(glm::mat4(1), hexArray->getWorldPos(hex));		
-				worldM = worldM * scaleM;
-				node.meshes[0].colour = glm::vec4(0, 0, 0, 1); //style::uialmostBlack; // glm::vec4(0, 0, 1, 1);
-				drawNode2(node, worldM, solidHex->buffer2);
-
-
-
-			}
-		}
-	}
-
-
-
-
-
-	glEnable(GL_DEPTH_TEST);
-}
 
 
 void CHexRenderer::drawFloorPlan() {
 	
 	glm::mat4 mvp = camera.clipMatrix;
-	pRenderer->setShader(lineShader);
+//	pRenderer->setShader(lineShader);
 	lineShader->setShaderValue(hMVP, mvp);
 	
 	glDisable(GL_DEPTH_TEST);
@@ -96,17 +69,25 @@ void CHexRenderer::drawFloorPlan() {
 	//pRenderer->drawTriStripBuf(floorplanSolidBuf);
 
 	//draw hex wireframe grid
-//	lineShader->setShaderValue(hColour, floorplanLineColour);
-//	pRenderer->drawLineStripBuf(floorplanLineBuf);
+	lineShader->setShaderValue(hColour, floorplanLineColour);
+	//pRenderer->drawLineStripBuf(floorplanLineBuf);
 
 
 
 	//!!!!!!!!!!!!!!!!!!temp hardcoding
-	pRenderer->setShader(hexShader);
-	hexShader->setShaderValue(hHexMVP, mvp);
-	hexShader->setShaderValue(hGridSize, glm::i32vec2(hexArray->width, hexArray->height));
-	hexShader->setShaderValue(hViewPort, camera.getView());
+	pRenderer->setShader(hexSolidShader);
+	hexLineShader->setShaderValue(hHexMVPs, mvp);
+	hexLineShader->setShaderValue(hGridSizes, glm::i32vec2(hexArray->width, hexArray->height));
+	hexLineShader->setShaderValue(hViewPorts, camera.getView());
 	pRenderer->drawPointsBuf(hexShaderBuf, 0, hexShaderBuf.numElements);
+
+	pRenderer->setShader(hexLineShader);
+	hexLineShader->setShaderValue(hHexMVP, mvp);
+	hexLineShader->setShaderValue(hGridSize, glm::i32vec2(hexArray->width, hexArray->height));
+	hexLineShader->setShaderValue(hViewPort, camera.getView());
+	pRenderer->drawPointsBuf(hexShaderBuf, 0, hexShaderBuf.numElements);
+
+
 
 
 	glEnable(GL_DEPTH_TEST);
@@ -168,13 +149,35 @@ void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* b
 
 }
 
+/** Update the data in the hexShader buffer. */
+void CHexRenderer::updateHexShaderBuffer() {
+	std::vector<unsigned int> hexIndices;
+	struct THexElem {
+		glm::i32vec2 v;
+		unsigned int content = 0;
+		float fog = 0;
+	};
+	std::vector<THexElem> shaderVerts;
+	int index = 0; int vNum = 0; int hexIndex = 0;
+	for (int y = 0; y < hexArray->height; y++) {
+		for (int x = 0; x < hexArray->width; x++) {
+			unsigned int content = hexArray->getHexOffset(x, y).content;
+			float fog = hexArray->getHexOffset(x, y).fogged;
+			shaderVerts.push_back({ {x,y},content,fog });
+			hexIndices.push_back(hexIndex++);
+		}
+	}
+
+
+	hexShaderBuf.storeVerts(shaderVerts, hexIndices, 2,1,1);
+}
+
 
 
 /** Fill the floorplan line buffer with outline hexagons translated to worldspace. */
 void CHexRenderer::fillFloorplanLineBuffer() {
 	std::vector<glm::vec3> verts;
-	std::vector<unsigned int> indices; 	std::vector<unsigned int> hexIndices;
-	std::vector<glm::i32vec2> shaderVerts; ////!!!!!!!!!!Temp!!
+	std::vector<unsigned int> indices; 	
 	int index = 0; int vNum = 0; int hexIndex = 0;
 	for (int y = 0; y < hexArray->height; y++) {
 		for (int x= 0; x < hexArray->width; x++) {
@@ -188,10 +191,8 @@ void CHexRenderer::fillFloorplanLineBuffer() {
 			
 
 				}
-				shaderVerts.push_back({ x,y });
 				indices.push_back(indices.back() - 5);
 				indices.push_back(65535);
-				hexIndices.push_back(hexIndex++);
 			}
 		}
 	}
@@ -200,7 +201,6 @@ void CHexRenderer::fillFloorplanLineBuffer() {
 	floorplanLineBuf.storeIndex(indices.data(), indices.size());
 	floorplanLineBuf.storeLayout(3, 0, 0, 0);
 
-	hexShaderBuf.storeVerts(shaderVerts,hexIndices,2);
 }
 
 
@@ -292,10 +292,15 @@ void CHexRenderer::createLineShader() {
 }
 
 void CHexRenderer::createHexShader() {
-	hexShader = pRenderer->createShader("hexShader");
-	hHexMVP = hexShader->getUniformHandle("mvpMatrix");
-	hGridSize = hexShader->getUniformHandle("gridSize");
-	hViewPort = hexShader->getUniformHandle("viewPort");
+	hexLineShader = pRenderer->createShader("hexLine");
+	hHexMVP = hexLineShader->getUniformHandle("mvpMatrix");
+	hGridSize = hexLineShader->getUniformHandle("gridSize");
+	hViewPort = hexLineShader->getUniformHandle("viewPort");
+
+	hexSolidShader = pRenderer->createShader("hexSolid");
+	hHexMVPs = hexLineShader->getUniformHandle("mvpMatrix");
+	hGridSizes = hexLineShader->getUniformHandle("gridSize");
+	hViewPorts = hexLineShader->getUniformHandle("viewPort");
 }
 
 void CHexRenderer::setCameraAspectRatio(glm::vec2 ratio) {

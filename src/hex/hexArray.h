@@ -25,7 +25,8 @@ public:
 	bool outsideArray(CHex& hex);
 	CHex findLineEnd(CHex& start, CHex& target);
 	THexList findLineHexes(CHex& start, CHex& end);
-	bool lineOfSight2(CHex& start, CHex& end);
+	bool inLineOfSight(CHex& start, CHex& end);
+	bool inLineOfSight2(CHex& start, CHex& end);
 	CHex indexToCube(int x, int y);
 	CHex indexToCube(glm::i32vec2& index);
 	glm::i32vec2 cubeToIndex(CHex& hex);

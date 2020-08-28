@@ -259,6 +259,7 @@ unsigned int CRenderer::linkShaders(unsigned int program) {
 		GLchar *strInfoLog = new GLchar[infoLogLength + 1];
 		glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
 		liveLog << alertMsg << "\nLinker failure:\n" <<  strInfoLog;
+		sysLog  << alertMsg << "\nLinker failure:\n" << strInfoLog;
 		delete[] strInfoLog;
 		return NULL;
 	}

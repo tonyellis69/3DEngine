@@ -188,7 +188,7 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck) {
 			if (outsideArray(next))
 				continue;
 
-			if (fogCheck && getHexCube(next).fogged)
+			if (fogCheck && getHexCube(next).fogged == 1.0f)
 				continue; 
 
 			if (getHexCube(next).blocks == blocksAll)
@@ -286,19 +286,42 @@ THexList CHexArray::findLineHexes(CHex& start, CHex& end) {
 	return hexes;
 }
 
-bool CHexArray::lineOfSight2(CHex& start, CHex& end) {
+bool CHexArray::inLineOfSight(CHex& start, CHex& end) {
 	int N = cubeDistance(start, end);
 
 	glm::vec3 A(start.x, start.y, start.z);
 	A += glm::vec3(1e-6, 2e-6, -3e-6);
 	glm::vec3 B(end.x, end.y, end.z);
 
-	CHex prevHex = start;
 	for (int h = 0; h <= N; h++) {
 		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));
-		if (getHexCube(hex).content == 2 /*|| fromToBlocked(prevHex, hex)*/)
+		if (getHexCube(hex).content == 2 )
 			return false;
-		prevHex = hex;
+	}
+	return true;
+}
+
+bool CHexArray::inLineOfSight2(CHex& start, CHex& end) {
+	int N = cubeDistance(start, end);
+
+	glm::vec3 A(start.x, start.y, start.z);
+	A += glm::vec3(1e-6, 2e-6, -3e-6);
+	glm::vec3 B(end.x, end.y, end.z);
+
+	for (int h = 0; h <= N; h++) {
+		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));
+		bool jitterSearch = false;
+		if (getHexCube(hex).content == 2) {
+			for (int a = 0; a < 6; a++) {
+				glm::vec3 C = B + (moveVector3D[a] * 0.5f);
+				hex = hexRound(glm::mix(A, C, 1.0 / N * h));
+				if (getHexCube(hex).content != 2) {
+					jitterSearch = true; break;
+				}
+			}
+			if (jitterSearch == false)
+				return false;
+		}
 	}
 	return true;
 }

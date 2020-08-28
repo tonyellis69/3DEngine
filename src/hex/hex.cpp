@@ -175,6 +175,111 @@ THexList* hexLine(CHex& cubeA, CHex& cubeB) {
 	return &results;
 }
 
+THexList* hexLine2(CHex& cubeA, CHex& cubeB) {
+	glm::vec3 worldA = cubeToWorldSpace(cubeA) +glm::vec3(1e-4, 2e-4, -3e-4);
+	glm::vec3 worldB = cubeToWorldSpace(cubeB);// +corners[4] * 0.75f;
+	
+	CHex cubeHex = cubeA;
+
+	glm::vec3 faceA; glm::vec3 faceB;
+
+	static THexList results;
+	results.clear();
+
+	while (cubeHex != cubeB) {	
+		results.push_back(cubeHex);
+
+		glm::vec3 currentHex = cubeToWorldSpace(cubeHex);
+
+
+		for (int face = 0; face < 6; face++) {
+			faceA = currentHex + corners[face];
+			if (face < 5)
+				faceB = currentHex + corners[face + 1];
+			else
+				faceB = currentHex + corners[0];
+
+			glm::vec3 faceAB = faceB - faceA;
+			glm::vec3 pointB = worldB - faceA;
+
+			if (glm::cross(faceAB, pointB).z < 0)
+				continue;
+
+			if (segIntersect(worldA, worldB, faceA, faceB)) {
+				cubeHex = getNeighbour(cubeHex, THexDir(face));
+				break;
+			}
+		}
+	}
+
+	results.push_back(cubeB);
+
+	if (results.size() >=2 )
+	for (auto hex = results.begin() + 2; hex != results.end();) {
+		if (isNeighbour(*hex, *(hex - 2)) && isNeighbour(*hex, *(hex -1)))
+			hex = results.erase(hex-1);
+		else
+			hex++;
+	}
+
+	return &results;
+}
+
+
+
+THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner) {
+	glm::vec3 worldA = cubeToWorldSpace(cubeA) + glm::vec3(1e-4, 2e-4, -3e-4);
+	glm::vec3 worldB = cubeToWorldSpace(cubeB) + corners[corner] * 0.75f;
+
+	CHex cubeHex = cubeA;
+
+	glm::vec3 faceA; glm::vec3 faceB;
+
+	static THexList results;
+	results.clear();
+
+	while (cubeHex != cubeB) {
+		results.push_back(cubeHex);
+
+		glm::vec3 currentHex = cubeToWorldSpace(cubeHex);
+
+
+		for (int face = 0; face < 6; face++) {
+			faceA = currentHex + corners[face];
+			if (face < 5)
+				faceB = currentHex + corners[face + 1];
+			else
+				faceB = currentHex + corners[0];
+
+			glm::vec3 faceAB = faceB - faceA;
+			glm::vec3 pointB = worldB - faceA;
+
+			if (glm::cross(faceAB, pointB).z < 0)
+				continue;
+
+			if (segIntersect(worldA, worldB, faceA, faceB)) {
+				cubeHex = getNeighbour(cubeHex, THexDir(face));
+				break;
+			}
+		}
+	}
+
+	results.push_back(cubeB);
+
+
+	if (results.size() >= 2)
+	for (auto hex = results.begin() + 2; hex != results.end();) {
+		if (isNeighbour(*hex, *(hex - 2)) && isNeighbour(*hex, *(hex - 1)))
+			hex = results.erase(hex - 1);
+		else
+			hex++;
+	}
+
+	return &results;
+}
+
+
+
 /** Return the direction of the neighbouring hex. */
 THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
 	CHex dirVector = neighbour - hex;
@@ -379,5 +484,24 @@ CHex findRingCornerHex(int radius, int corner) {
 	case 5: return { radius, 0, -radius };
 	}
 }
+
+
+
+bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B) {
+	float a1 = signed2DTriArea(seg1A, seg1B, seg2B); 
+	float a2 = signed2DTriArea(seg1A, seg1B, seg2A); 
+
+	if (a1 * a2 < 0.0f)
+		return true;
+
+	return false;
+}
+
+
+
+float signed2DTriArea(glm::vec3& a, glm::vec3& b, glm::vec3& c) {
+	return (a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x);
+}
+
 
 
