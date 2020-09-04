@@ -18,6 +18,7 @@ struct TFov { //describes a fov shape
 class CHexObject  {
 public:
 	CHexObject();
+	virtual ~CHexObject() {}
 	static void setHexRenderer(IHexRenderer* rendrObj);
 	virtual void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);

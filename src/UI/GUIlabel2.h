@@ -13,6 +13,7 @@ public:
 	bool OnLMouseUp(const  int mouseX, const  int mouseY) { return false; };
 
 	void setFont(CFont* font);
+	void setFont(const std::string& fontName);
 	void setText(std::string newText);
 	//void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);

@@ -35,3 +35,5 @@ public:
 	//CThemeServer themeServer; ///<Stores the available text style collecctions
 };
 
+extern CGUIroot* pGUIroot; 
+//TO DO: replace with a global GUIroot object.

@@ -9,7 +9,7 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	textBuf.setSize(getWidth(), getHeight());
 
 	type = uiLabel;
-	setTextColour(vec4(0, 0, 0, 1));
+	setTextColour(style::uiDarkGrey);
 	multiLine = false;
 	drawBorder = false;
 	renderOffset = i32vec2(0, 0);
@@ -19,6 +19,10 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 
 void CGUIlabel2::setFont(CFont* newFont) {
 	textData.font = newFont;
+}
+
+void CGUIlabel2::setFont(const std::string& fontName) {
+	setFont(pDrawFuncs->getFont(fontName));
 }
 
 void CGUIlabel2::setText(std::string newText) {

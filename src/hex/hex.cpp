@@ -280,6 +280,81 @@ THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner) {
 
 
 
+THexList* hexLine4(CHex& cubeA, CHex& cubeB, int offset) {
+	glm::vec3 worldA = cubeToWorldSpace(cubeA) + glm::vec3(1e-4, 2e-4, 0);
+	glm::vec3 worldB = cubeToWorldSpace(cubeB);
+	glm::vec3 AB = worldB - worldA;
+
+	if (offset == 1) {
+		glm::vec3 offsetVec;
+		offsetVec.x = AB.y;
+		offsetVec.y = -AB.x;
+		offsetVec = glm::normalize(offsetVec) * 0.75f;
+		worldA += offsetVec;
+		worldB += offsetVec;
+	}
+	else if (offset == 2) {
+		glm::vec3 offsetVec;
+		offsetVec.x = -AB.y;
+		offsetVec.y = AB.x;
+		offsetVec = glm::normalize(offsetVec) * 0.75f;
+		worldA += offsetVec;
+		worldB += offsetVec;
+
+	}
+ 
+
+
+
+
+	CHex cubeHex = cubeA;
+
+	glm::vec3 faceA; glm::vec3 faceB;
+
+	static THexList results;
+	results.clear();
+
+	while (cubeHex != cubeB) {
+		results.push_back(cubeHex);
+
+		glm::vec3 currentHex = cubeToWorldSpace(cubeHex);
+
+
+		for (int face = 0; face < 6; face++) {
+			faceA = currentHex + corners[face];
+			if (face < 5)
+				faceB = currentHex + corners[face + 1];
+			else
+				faceB = currentHex + corners[0];
+
+			glm::vec3 faceAB = faceB - faceA;
+			glm::vec3 pointB = worldB - faceA;
+
+			if (glm::cross(faceAB, pointB).z < 0)
+				continue;
+
+			if (segIntersect(worldA, worldB, faceA, faceB)) {
+				cubeHex = getNeighbour(cubeHex, THexDir(face));
+				break;
+			}
+		}
+	}
+
+	results.push_back(cubeB);
+
+
+	if (results.size() >= 2)
+		for (auto hex = results.begin() + 2; hex != results.end();) {
+			if (isNeighbour(*hex, *(hex - 2)) && isNeighbour(*hex, *(hex - 1)))
+				hex = results.erase(hex - 1)+1;
+			else
+				hex++;
+		}
+
+	return &results;
+}
+
+
 /** Return the direction of the neighbouring hex. */
 THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
 	CHex dirVector = neighbour - hex;

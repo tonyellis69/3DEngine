@@ -200,10 +200,7 @@ void CShell::scroll(Tdirection direction) {
 
 
 	
-	removeOutfaceChunks(scrollDir); //!!!happens here, chunks not added
-	//solved!!! central SCs with chunks were ignored because flagged as empty
-
-
+	removeOutfaceChunks(scrollDir); 
 
 
 	//because we've removed scrolled out chunks, the rear inner face of the enclosing shell 
@@ -211,11 +208,7 @@ void CShell::scroll(Tdirection direction) {
 	//pTerrainObj->rebuildOuterShellInnerFace(shellNo, scrollDir); //!!!!!!!!!!!!!!!!!!!!!!!
 
 
-	//!!!!!!!!!!
-	//problem happens on the 2nd scroll of shell 1 (chunks in outermost layer of outface SCs not
-	//getting erased) (but only those within width of inner shell - suggests somehow caused by
-	//scrolledOutChunksToDelete process
-	//step through 2nd scroll, try to see why chunks not getting removed
+
 
 	pTerrainObj->overwriteInnerShellChunks(shellNo, scrollDir);
 

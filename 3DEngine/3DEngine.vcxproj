@@ -185,6 +185,7 @@
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\UIengine.cpp" />
     <ClCompile Include="..\src\UI\font.cpp" />
+    <ClCompile Include="..\src\UI\gui.cpp" />
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
@@ -335,6 +336,7 @@
     <ClInclude Include="..\Src\Types.h" />
     <ClInclude Include="..\src\UIengine.h" />
     <ClInclude Include="..\src\UI\font.h" />
+    <ClInclude Include="..\src\UI\gui.h" />
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbutton.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />

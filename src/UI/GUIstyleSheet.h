@@ -39,6 +39,7 @@ namespace style {
 	const glm::i32vec2 resizeMax = { 200, 30 }; ///<Maximum size resizeToFit is allowed to go to.
 
 	const std::vector<glm::i32vec2> buttonPresets = { {60,24}, {80,28}, {100,32} }; ///<Preset sizes for buttons.
+	const std::vector<glm::i32vec2> labelPresets = { {60,24}, {80,28}, {100,32} }; ///<Preset sizes for labels.
 
 	const int controlBorder = 10; ///<Size of border surrounding child control area
 	const int controlSpacing = 10; ///<Space between one control and the next.

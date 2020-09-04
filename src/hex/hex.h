@@ -70,6 +70,7 @@ int cubeDistance(CHex& cubeA, CHex& cubeB);
 THexList* hexLine(CHex& cubeA, CHex& cubeB);
 THexList* hexLine2(CHex& cubeA, CHex& cubeB);
 THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner);
+THexList* hexLine4(CHex& cubeA, CHex& cubeB, int offset);
 THexDir neighbourDirection(CHex& hex, CHex& neighbour);
 bool isNeighbour(CHex& hex, CHex& neighbour);
 float dirToAngle(THexDir direction);

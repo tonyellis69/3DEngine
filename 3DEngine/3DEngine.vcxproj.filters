@@ -449,6 +449,9 @@
     <ClCompile Include="..\src\messaging\messenger.cpp">
       <Filter>Source Files\messaging</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -912,6 +915,9 @@
     </ClInclude>
     <ClInclude Include="..\src\physics2\collisions.h">
       <Filter>Source Files\physics2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\gui.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

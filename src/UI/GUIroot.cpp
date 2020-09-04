@@ -3,6 +3,8 @@
 
 CGUIroot* CGUIbase::rootUI = NULL;
 CDrawFuncs* CGUIdragDrop::pDrawFuncs = NULL;
+
+CGUIroot* pGUIroot;
  
 CGUIroot::CGUIroot()  {
 	SetName("Root");
@@ -11,6 +13,7 @@ CGUIroot::CGUIroot()  {
 	id = uiRootID;
 	focusControl = NULL;
 	borderWidth = 0;
+	pGUIroot = this;
 }
 
 /** Root overloads this method so it can send messages direct to any control that has trapped the

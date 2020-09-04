@@ -179,11 +179,17 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 			int scrollAxis = getAxis(scrollOutdir);
 			if (scrollOutdir == south || scrollOutdir == east || scrollOutdir == up) {
 				if (chunk.first[scrollAxis] == 0)
-					scOffset[scrollAxis] = innerShell.shellSCs  * innerShell.SCsize;
+					 scOffset[scrollAxis] = innerShell.shellSCs * innerShell.SCsize;
+
 			}
 			else {
-				if (chunk.first[scrollAxis] == innerShell.shellSCs - 1 )
-					scOffset[scrollAxis] -= innerShell.SCsize;
+				if (chunk.first[scrollAxis] == innerShell.shellSCs - 1) {
+					scOffset[scrollAxis] = 0 - innerShell.SCsize; //this is the fail!
+					//removeChunk(chunk.second);
+					//continue; //functionally the same
+				}
+	
+
 			}
 
 
@@ -194,11 +200,12 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 			//find SC of enclosing shell at this point
 			glm::i32vec3 outerSCindex = shells[shellNo + 1].getSCat(chunkPos);
 
+
 			glm::i32vec3 testOuterSCindex = shells[shellNo + 1].getSCAtSamplePos(chunkData.sampleCorner);
 			if (outerSCindex != testOuterSCindex)
-				int b = 0;
+				int b = 0;	
 			//eventually fails - see if a shell or something is extra displaced at this point in getSCAtSamplePos
-
+		
 
 
 			//find outer SC chunk index at this point 
