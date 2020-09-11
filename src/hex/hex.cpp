@@ -281,8 +281,8 @@ THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner) {
 
 
 THexList* hexLine4(CHex& cubeA, CHex& cubeB, int offset) {
-	glm::vec3 worldA = cubeToWorldSpace(cubeA) + glm::vec3(1e-4, 2e-4, 0);
-	glm::vec3 worldB = cubeToWorldSpace(cubeB);
+	glm::vec3 worldA = cubeToWorldSpace(cubeA) +glm::vec3(1e-4, 2e-4, 0);
+	glm::vec3 worldB = cubeToWorldSpace(cubeB);// -glm::vec3(1e-4, 2e-4, 0);
 	glm::vec3 AB = worldB - worldA;
 
 	if (offset == 1) {

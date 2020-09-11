@@ -23,6 +23,8 @@ CTerrain2::CTerrain2()   {
 	CSuperChunk2::pTerrainObj = this;
 
 	chunkDataCache.setMultiBuf(&multiBuf);
+
+	pRenderer = &CRenderer::getInstance();
 };
 
 /** Specify the size of the storage space for chunk vertices. This will silenty resize if more
@@ -201,11 +203,6 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 			glm::i32vec3 outerSCindex = shells[shellNo + 1].getSCat(chunkPos);
 
 
-			glm::i32vec3 testOuterSCindex = shells[shellNo + 1].getSCAtSamplePos(chunkData.sampleCorner);
-			if (outerSCindex != testOuterSCindex)
-				int b = 0;	
-			//eventually fails - see if a shell or something is extra displaced at this point in getSCAtSamplePos
-		
 
 
 			//find outer SC chunk index at this point 
@@ -241,6 +238,217 @@ void CTerrain2::overwriteInnerShellChunks(int shellNo, Tdirection scrollOutdir) 
 		removeChunk(chunk.second);
 	}
 }
+
+
+void CTerrain2::loadShaders() {
+	//load chunk shader
+	char* chunkFeedbackStrs[2];
+	chunkFeedbackStrs[0] = "gl_Position";
+	chunkFeedbackStrs[1] = "normal";
+	chunkShader = pRenderer->createShader(pRenderer->dataPath + "chunk", chunkFeedbackStrs, 2);
+	chunkShader->setType(userShader);
+
+	//Upload data texture for chunk shader
+	triTableTex = pRenderer->createDataTexture(intTex, 16, 256, &triTable);
+	pRenderer->setShader(chunkShader);
+	hChunkCubeSize = chunkShader->getUniformHandle("cubeSize");
+	hChunkLoDscale = chunkShader->getUniformHandle("LoDscale");
+	hChunkSamplePos = chunkShader->getUniformHandle("samplePos");
+	hChunkTriTable = chunkShader->getUniformHandle("triTableTex");
+	hChunkTerrainPos = chunkShader->getUniformHandle("terrainPos");
+	hSamplesPerCube = chunkShader->getUniformHandle("samplesPerCube");
+	hChunkTerrainTexture = chunkShader->getUniformHandle("terrainTexture");
+	chunkShader->setShaderValue(hChunkTriTable, *triTableTex);
+
+	//load chunkCheck shader
+	chunkCheckShader = pRenderer->createShader(pRenderer->dataPath + "chunkCheck");
+	pRenderer->setShader(chunkCheckShader);
+	hNWsamplePos = chunkCheckShader->getUniformHandle("nwSamplePos");
+	hLoDscale = chunkCheckShader->getUniformHandle("LoDscale");
+	hTerrainTexture = chunkCheckShader->getUniformHandle("terrainTexture");
+
+	//load te point finding shader
+	char* fPointFeedbackStrs[1];
+	fPointFeedbackStrs[0] = "newPoint";
+	findPointHeightShader = pRenderer->createShader(pRenderer->dataPath + "findPointHeight", fPointFeedbackStrs, 1);
+	hCurrentY = findPointHeightShader->getUniformHandle("currentY");
+	hChunkSamplePosition = findPointHeightShader->getUniformHandle("chunkSamplePosition");
+	hFPHSampleScale = findPointHeightShader->getUniformHandle("sampleScale");
+	hChunkLocaliser = findPointHeightShader->getUniformHandle("chunkLocaliser");
+	hFPHterrainTexture = findPointHeightShader->getUniformHandle("terrainTexture");
+
+	//TO DO: temporarily commented out while I try to remove dependency on soil.h
+	//grassTex = pRenderer->textureManager.getTexture(pRenderer->dataPath + "grassPack.dds");
+
+	
+	//load terrain surface point shader
+
+
+	char* pointFeedbackStrs[1];
+	pointFeedbackStrs[0] = "result";
+	terrainPointShader = pRenderer->createShader(pRenderer->dataPath + "terrainPoint", pointFeedbackStrs, 1);
+	terrainPointShader->setType(userShader);
+	pRenderer->setShader(terrainPointShader);
+	hPointSampleBase = terrainPointShader->getUniformHandle("sampleBase");
+	hPointOffsetScale = terrainPointShader->getUniformHandle("offsetScale");
+	hPSTerrainTexture = terrainPointShader->getUniformHandle("terrainTexture");
+
+	//load heightpoint culling shader
+	char* feedbackStrs[1];
+	feedbackStrs[0] = "gl_Position";
+	cullPointsShader = pRenderer->createShader(pRenderer->dataPath + "cullPoints", feedbackStrs, 1);
+	cullPointsShader->setType(userShader);
+	pRenderer->setShader(cullPointsShader);
+	hSampleOffset = cullPointsShader->getUniformHandle("sampleOffset");
+	hSampleScale = cullPointsShader->getUniformHandle("sampleScale");
+	hMode = cullPointsShader->getUniformHandle("mode");
+
+	wireBoxShader = pRenderer->createShader(pRenderer->dataPath + "wireBox");
+	wireBoxShader->setType(userShader);
+	hBoxColour = wireBoxShader->getUniformHandle("colour");
+	hBoxMVP = wireBoxShader->getUniformHandle("mvpMatrix");
+}
+
+float CTerrain2::findTerrainHeight(glm::vec3& basePos) {
+	pRenderer->setShader(terrainPointShader);
+	float offsetScale = 1 / worldUnitsPerSampleUnit;
+	terrainPointShader->setShaderValue(hPointOffsetScale, offsetScale);
+
+	pRenderer->attachTexture(0, tmpTerrainMap.handle);
+	terrainPointShader->setShaderValue(hPSTerrainTexture, 0);
+
+	vec3 startPos = basePos;
+	CBaseBuf* heightResultsBuf = pRenderer->createBuffer();
+	heightResultsBuf->setSize(sizeof(float) * findHeightVerts);
+
+	float* heightResults = new float[findHeightVerts];
+	float terrainHeight = 0;; const float MCvertexTest = 0.5f;
+
+	for (int step = 0; step < 100; step++) {
+		terrainPointShader->setShaderValue(hPointSampleBase, startPos);
+		pRenderer->getGeometryFeedback(heightFinderBuf, drawPoints, (CBuf&)*heightResultsBuf, drawPoints);
+
+		heightResultsBuf->getData((unsigned char*)heightResults, sizeof(float) * findHeightVerts);
+		for (int r = 0; r < findHeightVerts; r++) {
+			if (heightResults[r] < MCvertexTest)
+				terrainHeight = startPos.y + (r * offsetScale);
+		}
+		startPos.y += findHeightVerts * offsetScale;
+	}
+	delete heightResults;
+	return terrainHeight;
+}
+
+void CTerrain2::initChunkShell() {
+	float vertsPerEdge = numChunkCubes + 1;
+	shellTotalVerts = std::pow(vertsPerEdge, 3) - std::pow(vertsPerEdge - 2, 3);
+	vec3* shell = new vec3[shellTotalVerts];
+	int v = 0;
+	for (int y = 0; y < vertsPerEdge; y++) {
+		for (int x = 0; x < vertsPerEdge; x++) {
+			shell[v++] = vec3(x, y, 0);
+			shell[v++] = vec3(x, y, numChunkCubes);
+		}
+		for (int z = 1; z < numChunkCubes; z++) {
+			shell[v++] = vec3(0, y, z);
+			shell[v++] = vec3(numChunkCubes, y, z);
+		}
+	}
+
+	for (int x = 1; x < numChunkCubes; x++) {
+		for (int z = 1; z < numChunkCubes; z++) {
+			shell[v++] = vec3(x, 0, z);
+			shell[v++] = vec3(x, numChunkCubes, z);
+		}
+	}
+
+	chunkShell = new CRenderModel();
+
+	CRenderMaterial* material = new CRenderMaterial();
+	chunkShell->setMaterial(*material);
+	chunkShell->setDrawMode(drawPoints);
+	chunkShell->storeVertexes(shell, sizeof(vec3), v);
+	chunkShell->storeLayout(3, 0, 0, 0);
+	delete[] shell;
+	chunkShell->getMaterial()->setShader(chunkCheckShader);
+}
+
+/** Initialise a 3D grid of points to represent the cubes of a chunk in drawing. */
+void CTerrain2::initChunkGrid(int cubesPerChunkEdge) {
+	int vertsPerEdge = cubesPerChunkEdge + 1;
+	int noVerts = vertsPerEdge * vertsPerEdge * vertsPerEdge;
+	vec3* shaderChunkVerts = new vec3[noVerts];
+	int i = 0;
+	for (float y = 0; y < vertsPerEdge; y++) {
+		for (float z = 0; z < vertsPerEdge; z++) {
+			for (float x = 0; x < vertsPerEdge; x++) {
+				shaderChunkVerts[i++] = vec3(x, y, z);
+			}
+		}
+	}
+
+
+	//create an index that creates a bottom square for each cube in the grid
+	int noIndices = cubesPerChunkEdge * cubesPerChunkEdge * cubesPerChunkEdge * 5;
+
+	unsigned short layer = vertsPerEdge * vertsPerEdge;
+	unsigned int* index = new unsigned int[noIndices];
+	i = 0;
+	unsigned short vertNo = 0;
+	do {
+		index[i++] = vertNo;
+		index[i++] = vertNo + 1;
+		index[i++] = vertNo + 1 + layer;
+		index[i++] = vertNo + layer;
+
+
+		index[i++] = 65535; //signals the end of this line sequence
+
+		vertNo++;
+		if (((vertNo + 1) % vertsPerEdge) == 0)
+			vertNo++;
+		if ((vertNo % layer) == (vertsPerEdge * (vertsPerEdge - 1)))
+			vertNo += vertsPerEdge;
+
+	} while (i < noIndices);
+
+	//shaderChunkGrid = Engine.createModel();
+	{shaderChunkGrid = new CRenderModel();
+	//CMaterial* material = pRenderer. createMaterial();
+
+	CRenderMaterial* material = new CRenderMaterial();
+	material->setShader(pRenderer->phongShader);
+	//materialList.push_back(material);
+	shaderChunkGrid->setMaterial(*material);
+	//modelList.push_back(model); 
+	}
+
+	shaderChunkGrid->setDrawMode(drawLinesAdjacency);
+
+
+
+	shaderChunkGrid->storeVertexes(shaderChunkVerts, sizeof(vec3), noVerts);
+	shaderChunkGrid->storeIndex(index, noIndices);
+	shaderChunkGrid->storeLayout(3, 0, 0, 0);
+
+	delete[] shaderChunkVerts;
+	delete[] index;
+}
+
+/** Initialise shader and buffer required to run a terrain height-finding query. */
+void CTerrain2::initHeightFinder() {
+
+
+	//create verts
+	vec3* v = new vec3[findHeightVerts];
+	for (int x = 0; x < findHeightVerts; x++)
+		v[x] = vec3(0, x, 0);
+
+	heightFinderBuf.storeVertexes(v, sizeof(vec3) * findHeightVerts, findHeightVerts);
+	heightFinderBuf.storeLayout(3, 0, 0, 0);
+	delete v;
+}
+
 
 //////////Private functions
 
@@ -393,7 +601,9 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 	glm::vec3 baseVertB = objB->calcBaseVertPos();
 	TAaBB objAbb = calcAABB();
 
-	glm::vec3 corners[] = { { -20,0,20}, {20,0,20}, {20,0,-20}, {-20,0,-20} };
+	float playerHalfWidth = 2.5f;//TEMP should import this!
+
+	glm::vec3 corners[] = { { -playerHalfWidth,0,playerHalfWidth}, {playerHalfWidth,0,playerHalfWidth}, {playerHalfWidth,0,-playerHalfWidth}, {-playerHalfWidth,0,-playerHalfWidth} };
 
 	float penetration = 0;
 	TChunkTriBuf2* chunkData;

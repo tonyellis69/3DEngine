@@ -180,8 +180,6 @@ void CShell::addChunksToFaceLayer(Tdirection direction) {
 	ready for the cycle to begin again. Because this creates a gap between the outgoing
 	face and the inner face of the outer shell, we notify the outer shell to rebuild itself. */
 void CShell::scroll(Tdirection direction) {
-	if (shellNo == 0)
-		int b = 0;
 
 	pTerrainObj->prepShellForScroll(shellNo, direction);
 

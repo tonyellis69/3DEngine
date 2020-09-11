@@ -50,8 +50,8 @@ void CSuperChunk2::setTerrainObj(ITerrain* pTerrain) {
 /** Create a new chunk for this SC at the given chunk index position. */
 void CSuperChunk2::createChunk(glm::i32vec3 & chunkIndex) {
 
-	if (shellNo > 1) ///////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		return;
+	//if (shellNo > 1) ///////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//	return;
 
 
 	vec3 sampleCorner = sampleSpacePos + vec3(chunkIndex) * chunkSampleSize;
@@ -150,7 +150,7 @@ void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 			}
 }
 
-/** Add chunks that fall within the proportion of the SC defined by outerUnitVoluCGlobalFuncDeclNodeme that do not also 
+/** Add chunks that fall within the proportion of the SC defined by outerUnitVolume that do not also 
 	fall within innerUnitVolume. */
 void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& innerUnitVolume) {
 	i32vec3 outerBL = outerUnitVolume.bl *= vec3(numSCchunks);
@@ -162,9 +162,15 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 		for (int y = 0; y < numSCchunks; y++)
 			for (int z = 0; z < numSCchunks; z++) {	
 				i32vec3 chunk(x, y, z);
+
+				if (shellNo == 0 && chunk == glm::i32vec3(0, 0, 0))
+					int b = 0;
+
 				//does this chunk fall within the inner volume? Then we can bail
-				if (all(greaterThanEqual(chunk, innerBL)) && all(lessThanEqual(chunk, innerTR)))
-					continue;
+				if (shellNo > 0 && all(greaterThanEqual(chunk, innerBL)) && all(lessThanEqual(chunk, innerTR)))
+					 continue;
+
+
 
 				if (all(greaterThanEqual(chunk, outerBL)) && all(lessThanEqual(chunk, outerTR))) {
 					if (chunkExists(chunk))
@@ -172,6 +178,7 @@ void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& inn
 
 					chunkSampleSpacePos = sampleSpacePos + glm::vec3(x, y, z) * chunkSampleSize;
 					if (pTerrainApp->chunkCheckCallback(chunkSampleSpacePos, chunkSampleSize)) {
+
 						 createChunk(chunk);
 					}
 				}
