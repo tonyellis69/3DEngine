@@ -50,8 +50,8 @@ void CSuperChunk2::setTerrainObj(ITerrain* pTerrain) {
 /** Create a new chunk for this SC at the given chunk index position. */
 void CSuperChunk2::createChunk(glm::i32vec3 & chunkIndex) {
 
-	//if (shellNo > 1) ///////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//	return;
+	if (shellNo > 1) ///////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		return;
 
 
 	vec3 sampleCorner = sampleSpacePos + vec3(chunkIndex) * chunkSampleSize;

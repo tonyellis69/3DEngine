@@ -9,7 +9,8 @@ CHexObject::CHexObject() {
 	worldPos = glm::vec3(0);
 	worldMatrix = &lineModel.model.matrix;
 
-	setZheight(0.05f);
+	//setZheight(0.05f);
+	setZheight(0.0f);
 
 	facing = hexEast;
 	rotation = 0.0f;

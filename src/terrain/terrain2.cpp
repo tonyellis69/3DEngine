@@ -587,6 +587,10 @@ TAaBB CTerrain2::calcAABB() {
 	return { glm::vec3(AABBmin), glm::vec3(AABBmax) };
 }
 
+bool lastResult = false;
+bool groundLevelFail;
+bool chunkAboveFail;
+
 Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 	Contact contact;
 	if (this < objB) {
@@ -604,14 +608,18 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 	float playerHalfWidth = 2.5f;//TEMP should import this!
 
 	glm::vec3 corners[] = { { -playerHalfWidth,0,playerHalfWidth}, {playerHalfWidth,0,playerHalfWidth}, {playerHalfWidth,0,-playerHalfWidth}, {-playerHalfWidth,0,-playerHalfWidth} };
-
+	groundLevelFail = true;
+	chunkAboveFail = true;
 	float penetration = 0;
+	contact.points[0].penetration = 0;
+
 	TChunkTriBuf2* chunkData;
 	if (objAbb.clips(baseVertB)) { //we're inside shell 0
 
 		for (int corner = 0; corner < 4; corner++) {
 			chunkData = getShell0ChunkDataAt(baseVertB + corners[corner]);
 			if (chunkData == NULL) {
+				
 				//check the chunk above in case we dropped straight through
 				glm::vec3 chunkAbove = baseVertB + corners[corner] + glm::vec3(0, LoD1chunkSize, 0);
 				TChunkTriBuf2* chunkAboveData = getShell0ChunkDataAt(chunkAbove);
@@ -619,17 +627,21 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 					//return contact;
 					continue;
 				}
+				else
+					chunkAboveFail = false;
 				chunkData = chunkAboveData;
 			}
+			else
+				groundLevelFail = false;
 
 			baseVertB = baseVertB - glm::vec3(chunkOrigin[3]); //move to chunk worldspace position
 
 			penetration = checkChunkCollision(baseVertB + corners[corner], chunkData);
-			if (penetration > 0) {
+			if (penetration > contact.points[0].penetration) {
 				contact.normal = glm::vec3(0, 1, 0);
 				contact.numPoints = 1;
 				contact.points[0] = { baseVertB + corners[corner], penetration };
-				return contact; //for now, exit on first contact
+				//return contact; //for now, exit on first contact
 			}
 
 		}
@@ -637,6 +649,31 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 		//got here? Then we've made no contact
 		//liveLog << "\nNo contact!";
 		
+	}
+
+	if (groundLevelFail)
+		sysLog << "\nGround level check fail";
+	else
+		sysLog << "\nGround level check worked";
+
+	if (chunkAboveFail)
+		sysLog << " ...chunk above check fail";
+	else
+		sysLog << " ...chunk above check worked";
+
+	if (contact.points[0].penetration == 0) {
+		if (lastResult == true) {
+			sysLog << "\nbreak in contact!";
+			liveLog << "\nbreak in contact!";
+		}
+		lastResult = false;
+	}
+	else {
+		if (lastResult == false) {
+			sysLog << "\ncontact restored!";
+			liveLog << "\ncontact restored!";
+		}
+		lastResult = true;
 	}
 
 	return contact;
