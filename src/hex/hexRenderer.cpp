@@ -95,15 +95,15 @@ void CHexRenderer::drawFloorPlan() {
 
 
 void CHexRenderer::drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour) {
-	pRenderer->setShader(lineShader);
+	pRenderer->setShader(lineShaderBasic);
 	glm::mat4 mvp(1);
 	float inc = 1.0 / path->size();  float t = 0;
 	for (auto hex : *path) {
 		glm::mat4 worldPos = glm::translate(glm::mat4(1), hexArray->getWorldPos(hex));
 		mvp = camera.clipMatrix * worldPos;
-		lineShader->setShaderValue(hMVP, mvp);
+		lineShaderBasic->setShaderValue(hMVPb, mvp);
 		glm::vec4 pathColour = glm::mix(pathStartColour, pathEndColour, 1 - t);
-		lineShader->setShaderValue(hColour, pathColour);
+		lineShaderBasic->setShaderValue(hColourb, pathColour);
 		pRenderer->drawTriStripBuf(solidHexBuf);
 		t += inc;
 	}
@@ -111,34 +111,38 @@ void CHexRenderer::drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec
 
 
 void CHexRenderer::drawLineModel(CLineModel& lineModel) {
+	if (lineModel.model.name == "test")
+		int b = 0;
 	TModelNode& node = lineModel.model;
 	drawNode2(node, glm::mat4(1), lineModel.buffer2);
 }
 
-void CHexRenderer::drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf) {
-	glm::mat4 mvp = camera.clipMatrix * node.matrix *parentMatrix;// **drawData.worldMatrix;
-	lineShader->setShaderValue(hMVP, mvp);
-
-	for (auto mesh : node.meshes) {
-		lineShader->setShaderValue(hColour, mesh.colour);
-		pRenderer->drawLinesRange(mesh.indexStart, mesh.indexSize, *buf);
-	}
-
-	for (auto subNode : node.subNodes)
-		drawNode(subNode, node.matrix * parentMatrix, buf);
-
-}
+//void CHexRenderer::drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf) {
+//	glm::mat4 mvp = camera.clipMatrix * node.matrix *parentMatrix;// **drawData.worldMatrix;
+//	lineShader->setShaderValue(hMVP, mvp);
+//
+//	for (auto mesh : node.meshes) {
+//		lineShader->setShaderValue(hColour, mesh.colour);
+//		pRenderer->drawLinesRange(mesh.indexStart, mesh.indexSize, *buf);
+//	}
+//
+//	for (auto subNode : node.subNodes)
+//		drawNode(subNode, node.matrix * parentMatrix, buf);
+//
+//}
 
 void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf) {
 	pRenderer->setShader(lineShader);
 	glm::mat4 mvp = camera.clipMatrix * node.matrix * parentMatrix;// **drawData.worldMatrix;
 	lineShader->setShaderValue(hMVP, mvp);
+	lineShader->setShaderValue(hWinSize, camera.getView());
 
 	for (auto mesh : node.meshes) {
 		lineShader->setShaderValue(hColour, mesh.colour);
 
 		if (mesh.isLine) //TO DO: ugh, try to avoid
-			pRenderer->drawLinesBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+			pRenderer->drawLineStripAdjBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+			//pRenderer->drawLinesBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
 		else
 			pRenderer->drawTrisBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
 
@@ -289,6 +293,12 @@ void CHexRenderer::createLineShader() {
 	lineShader = pRenderer->createShader("lineModel");
 	hMVP = lineShader->getUniformHandle("mvpMatrix");
 	hColour = lineShader->getUniformHandle("colour");
+	hWinSize = lineShader->getUniformHandle("winSize");
+
+	lineShaderBasic = pRenderer->createShader("lineModelBasic");
+	hMVPb = lineShaderBasic->getUniformHandle("mvpMatrix");
+	hColourb = lineShaderBasic->getUniformHandle("colour");
+
 }
 
 void CHexRenderer::createHexShader() {

@@ -1,9 +1,14 @@
 #include "mesh.h"
+#include <map>
+#include <unordered_map>
+#include <algorithm>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtx/hash.hpp>
 
 CMesh::CMesh() {
-	frameCount = 1;
-	frameIndices = 0;
+
 }
 
 void CMesh::calculateVertexNormals() {
@@ -24,8 +29,7 @@ void CMesh::exportToBuffer(CBuf& buf) {
 	buf.storeVertexes(vertices.data(), sizeof(glm::vec3) * vertices.size(), vertices.size());
 	buf.storeIndex(indices.data(), indices.size());
 	buf.storeLayout(3, 0, 0, 0);
-	buf.frameCount = frameCount;
-	buf.frameIndices = frameIndices;
+
 }
 
 void CMesh::exportToBuffer(CBuf2& buf) {
@@ -40,6 +44,137 @@ void CMesh::clear() {
 	normals.clear();
 	indices.clear();
 	texCoords.clear();
-	frameCount = 1;
-	frameIndices = 0;
 }
+
+/** Remove duplicate vertices and update the indices accordingly. */
+void CMesh::mergeUniqueVerts() {
+	//create a new list of unique verts
+	std::unordered_map<glm::vec3, int> uniqueVertsIndexed;
+	int index = 0; int oldIndex = 0;
+
+	for (auto v : vertices) {
+		int newIndex;
+
+		auto merged = uniqueVertsIndexed.find(v);
+		if (merged == uniqueVertsIndexed.end()) {
+			newIndex = index;
+			uniqueVertsIndexed[v] = index++;
+		}
+		else
+			newIndex = merged->second;
+
+		std::replace(indices.begin(), indices.end(), oldIndex, newIndex);
+		oldIndex++;
+	}
+	std::vector<glm::vec3> uniqueVerts(uniqueVertsIndexed.size());
+	for (auto v : uniqueVertsIndexed) {
+		uniqueVerts[v.second] = v.first;
+	}
+
+	vertices = uniqueVerts;
+}
+
+/** Convert a bunch of individual lines to line strips. Merge them
+	together if they share vertexes, and separate them with the
+	primitive restart value if not. */
+void CMesh::linesToLineStrip() {
+	orderLines();
+
+	unsigned int primitiveRestart = 0xFFFF;
+	if (vertices.size() > 0xFFFE)
+		primitiveRestart = 0xFFFFFFFF;
+
+	//run through index line pairs
+	std::vector<unsigned int> stripIndices;
+	for (int i = 0; i < indices.size(); i++) {
+		stripIndices.push_back(indices[i]);
+		if (i % 2 && i < indices.size() - 1) { //second vertex of a line pair
+			if (indices[i] == indices[i + 1])
+				i++; //skip next vertex
+			else {
+				stripIndices.push_back(primitiveRestart);
+			}
+		}
+	}
+
+	indices = stripIndices;
+}
+
+
+/** Add an extra point at the start and end of each line.*/
+void CMesh::addAdjacencyVerts() {
+	unsigned int primitiveRestart = 0xFFFF;
+	if (vertices.size() > 0xFFFE)
+		primitiveRestart = 0xFFFFFFFF;
+
+	std::vector<unsigned int> adjacencyIndices;
+
+	adjacencyIndices.push_back(indices.front());
+	for (auto i = indices.begin(); i != indices.end(); i++) {	
+		if (*i == primitiveRestart ) {
+			adjacencyIndices.push_back(*(i-1));
+			adjacencyIndices.push_back(*i);
+			adjacencyIndices.push_back(*(i+1));
+		}
+		else
+			adjacencyIndices.push_back(*i);
+	}
+	adjacencyIndices.push_back(indices.back());
+
+	indices = adjacencyIndices;
+}
+
+
+
+
+/** Append the given mesh, updating its index data in the process. */
+TMeshRec CMesh::add(CMesh& mesh) {
+	TMeshRec meshRec;
+	meshRec.indexStart = indices.size();
+	meshRec.indexSize = mesh.indices.size();
+	meshRec.vertStart = vertices.size();
+
+	vertices.insert(vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
+	for (auto index : mesh.indices) {
+		indices.push_back(index + meshRec.vertStart);
+	}
+
+	return meshRec;
+}
+
+
+/** Sort line-pair vertexes to form as long a sequence as possible. This is
+	to prep them for converting into line strips. */
+void CMesh::orderLines() {
+	std::vector<unsigned int> orderedIndices; std::vector<unsigned int> rejects;
+	for (auto linePairA = indices.begin(); linePairA != indices.end(); linePairA += 2) {
+		bool inserted = false;
+		for (auto orderedPairA = orderedIndices.begin(); orderedPairA != orderedIndices.end(); orderedPairA += 2) {
+			if (*(linePairA + 1) == (*orderedPairA)) { //pair fits before this pair
+				orderedIndices.insert(orderedPairA, linePairA, linePairA+ 2);
+				inserted = true;
+				break;
+			}
+
+			if (*(linePairA) == (*orderedPairA)) { //try to fit pair by reversing it
+				auto it = orderedIndices.insert(orderedPairA, *linePairA);
+				orderedIndices.insert(it, *(linePairA + 1));
+				inserted = true;
+				break;
+			}
+
+			if (*(linePairA+ 1) == *(orderedPairA + 1)) { //try to fit pair by reversing and adding at end
+				auto it = orderedIndices.insert(orderedPairA + 2, *(linePairA + 1));
+				orderedIndices.insert(it + 1, *linePairA);
+				inserted = true;
+				break;
+			}
+
+		}
+		if (!inserted)
+			orderedIndices.insert(orderedIndices.end(), linePairA, linePairA+ 2);
+	}
+
+	indices = orderedIndices;
+}
+

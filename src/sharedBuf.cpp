@@ -31,7 +31,10 @@ void CSharedBuf::attachIndex(unsigned int* indices, unsigned int numIndices) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, (void*)shortBuf, GL_STATIC_DRAW);
 		delete shortBuf;
 	}
-	else {
+	else 
+	////TO DO: doesn't work! Need the number of verts to make this decision, which we don't yet have.
+
+	{
 		indexStride = sizeof(unsigned int);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, indices, GL_STATIC_DRAW);
 	}

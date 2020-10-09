@@ -14,7 +14,7 @@
 class CImporter {
 public:
 	void loadFile(const std::string& filename);
-	void addFrame(const std::string& filename);
+	//void addFrame(const std::string& filename);
 	CMesh& getSingleMesh();
 	TModelNode getMeshNodes();
 

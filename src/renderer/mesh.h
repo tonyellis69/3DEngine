@@ -5,6 +5,8 @@
 
 #include "glm/glm.hpp"
 
+
+
 #include "buf.h"
 #include "buf2.h"
 
@@ -13,6 +15,7 @@ enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 struct TMeshRec {
 	int indexStart;
 	int indexSize;
+	int vertStart;
 	glm::vec4 colour;
 	bool isLine = true;
 };
@@ -33,6 +36,11 @@ public:
 	void exportToBuffer(CBuf& buf);
 	void exportToBuffer(CBuf2& buf);
 	void clear();
+	void mergeUniqueVerts();
+	void linesToLineStrip();
+	void addAdjacencyVerts();
+
+	TMeshRec add(CMesh& mesh);
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
@@ -41,10 +49,9 @@ public:
 	//std::vector<glm::i32vec3> triangles;
 	TMesh type;
 
-	int frameCount;
-	int frameIndices; ///<Number of vertices per frame.
+private:
+	void orderLines();
 
 };
-
 
 

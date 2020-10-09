@@ -9,23 +9,18 @@ void CImporter::loadFile(const std::string& filename) {
 	singleMesh.clear();
 
 
-	const aiScene* scene = importer.ReadFile(filename, /*aiProcess_JoinIdenticalVertices |*/ aiProcess_Triangulate) ;
+	const aiScene* scene = importer.ReadFile(filename , /*aiProcess_JoinIdenticalVertices |*/ 0 /*aiProcess_Triangulate*/) ;
 	
 	aiNode* startNode = scene->mRootNode;
 	if (startNode->mNumMeshes == 0 && startNode->mNumChildren == 1)
 		startNode = startNode->mChildren[0];
 	
 	rootNode = processNode(startNode, scene);
-}
 
-/** Add an additional model to the existing mesh data. Use this
-	to add animation frames.*/
-void CImporter::addFrame(const std::string& filename) {
-	singleMesh.frameCount++;
+	//Post-processing should happen here, now we have a finished model of one
+	//or more nodes
+	//singleMesh holds all the verts
 
-	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filename, /*aiProcess_JoinIdenticalVertices |*/ aiProcess_Triangulate);
-	processNode(scene->mRootNode, scene);
 }
 
 
@@ -63,39 +58,36 @@ TModelNode CImporter::processNode(aiNode* node, const aiScene* scene) {
 TMeshRec CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
 	CMesh localMesh;
 
-	TMeshRec meshRec;
-
-	unsigned int prevVerts = singleMesh.vertices.size();
 	//get verts
 	for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
 		glm::vec3 vert = { mesh->mVertices[v].x, mesh->mVertices[v].y, mesh->mVertices[v].z };
 		localMesh.vertices.push_back(vert);
-		singleMesh.vertices.push_back(vert);
 		//normals and texture coords go here
 	}
 
 	//get indices to verts
-	meshRec.indexStart = (int)singleMesh.indices.size();
-	meshRec.indexSize = 0;
 	for (unsigned int f = 0; f < mesh->mNumFaces; f++) {
 		aiFace face = mesh->mFaces[f];
-		//glm::i32vec3 tri;
 		for (unsigned int i = 0; i < face.mNumIndices; i++) {
 			localMesh.indices.push_back(face.mIndices[i]);
-			singleMesh.indices.push_back(face.mIndices[i] + prevVerts);
-			//tri[i] = face.mIndices[i] + prevVerts;
-			if (singleMesh.frameCount == 1)
-				singleMesh.frameIndices++;
-			meshRec.indexSize++;
 		}
-		//singleMesh.triangles.push_back(tri);
 	}
 
-	if (strcmp("solid\0", mesh->mName.C_Str()) == 0)
-		meshRec.isLine = false;
-	else
-		meshRec.isLine = true;
+	bool isLine;
+	if(strcmp("solid\0", mesh->mName.C_Str()) == 0)
+		isLine = false;
+	else {
+		isLine = true;
+		localMesh.mergeUniqueVerts();
+		localMesh.linesToLineStrip();
+		localMesh.addAdjacencyVerts();
+	}
 
+
+
+	//add to singleMesh
+	TMeshRec meshRec = singleMesh.add(localMesh);
+	meshRec.isLine = isLine;
 	return meshRec;
 }
 

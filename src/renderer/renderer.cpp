@@ -810,9 +810,18 @@ void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
 
 void CRenderer::drawLinesBuf(CBuf2& buf, void* start, int count ) {
 	buf.setVAO();
-	//glDepthMask(false);
 	glDrawElements(GL_LINES, count, GL_UNSIGNED_SHORT, start);
-	//glDepthMask(true);
+}
+
+
+void CRenderer::drawLineStripBuf(CBuf2& buf, void* start, int count) {
+	buf.setVAO();
+	glDrawElements(GL_LINE_STRIP, count, GL_UNSIGNED_SHORT, start);
+}
+
+void CRenderer::drawLineStripAdjBuf(CBuf2& buf, void* start, int count) {
+	buf.setVAO();
+	glDrawElements(GL_LINE_STRIP_ADJACENCY, count, GL_UNSIGNED_SHORT, start);
 }
 
 void CRenderer::drawPointsBuf(CBuf2& buf, void* start, int count) {

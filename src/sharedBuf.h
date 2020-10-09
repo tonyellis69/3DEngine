@@ -13,6 +13,9 @@ public:
 	void setAttribs();
 	void setVAO();
 	void setSize(unsigned int size);
+	void setNumVerts(unsigned int n) {
+		numVerts = n;
+	}
 
 
 	~CSharedBuf();
@@ -20,7 +23,7 @@ public:
 private:
 	unsigned int hBuffer;
 	int stride;
-	int numVerts;
+	unsigned int numVerts;
 
 	unsigned int hIndex;
 	int indexStride;

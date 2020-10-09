@@ -30,6 +30,7 @@ void CBuf2::storeIndexInt(std::vector<unsigned int>& index) {
 	if (!sharedBuf)
 		sharedBuf = std::make_shared<CSharedBuf>();
 
+	sharedBuf->setNumVerts(numVerts);
 	sharedBuf->attachIndex(index.data(),index.size());
 	numElements = index.size();
 }
@@ -41,6 +42,7 @@ void CBuf2::storeIndexShort(std::vector<unsigned short>& index) {
 	if (!sharedBuf)
 		sharedBuf = std::make_shared<CSharedBuf>();
 
+	sharedBuf->setNumVerts(numVerts);
 	sharedBuf->attachIndex(index.data(), index.size());
 	numElements = index.size();
 }

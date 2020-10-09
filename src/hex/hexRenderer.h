@@ -55,6 +55,7 @@ public:
 
 	CShader* hexLineShader;
 	CShader* hexSolidShader;
+	CShader* lineShader;
 
 private:
 	void tmpCreateHexagonModel();
@@ -83,11 +84,15 @@ private:
 
 	CLineModel* solidHex;
 
-	CShader* lineShader;
-
-
+	
 	unsigned int hMVP;
 	unsigned int hColour;
+	unsigned int hWinSize;
+
+	CShader* lineShaderBasic;
+	unsigned int hMVPb;
+	unsigned int hColourb;
+
 
 	unsigned int hHexMVP;
 	unsigned int hGridSize;

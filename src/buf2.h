@@ -14,6 +14,7 @@ public:
 
 	template <typename V, typename... T>
 	void storeVerts(std::vector<V>& verts, T... t) {
+		numVerts = verts.size();
 		processParam( t...);
 
 		storeVerts(verts.data(), verts.size(), sizeof(V));
@@ -47,5 +48,7 @@ private:
 	void addAttributeSize(int attr);
 
 	std::shared_ptr<CSharedBuf> sharedBuf;
+
+	unsigned int numVerts;
 
 };
