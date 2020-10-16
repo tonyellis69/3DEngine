@@ -590,8 +590,12 @@ TAaBB CTerrain2::calcAABB() {
 bool lastResult = false;
 bool groundLevelFail;
 bool chunkAboveFail;
+int workCount = 0;
 
 Contact CTerrain2::checkCollision(CPhysObj2* objB) {
+	if (workCount == 28)
+		int b = 0;
+
 	Contact contact;
 	if (this < objB) {
 		contact.objA = this;
@@ -615,24 +619,31 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 
 	TChunkTriBuf2* chunkData;
 	if (objAbb.clips(baseVertB)) { //we're inside shell 0
-
+	
 		for (int corner = 0; corner < 4; corner++) {
 			chunkData = getShell0ChunkDataAt(baseVertB + corners[corner]);
 			if (chunkData == NULL) {
-				
 				//check the chunk above in case we dropped straight through
 				glm::vec3 chunkAbove = baseVertB + corners[corner] + glm::vec3(0, LoD1chunkSize, 0);
 				TChunkTriBuf2* chunkAboveData = getShell0ChunkDataAt(chunkAbove);
 				if (chunkAboveData == NULL) {
 					//return contact;
+					workCount = 0;
 					continue;
 				}
-				else
+				else {
 					chunkAboveFail = false;
+					sysLog << " chunkAbove worked " << workCount << " times in a row";
+					workCount++;
+				}
 				chunkData = chunkAboveData;
+
+			
 			}
-			else
+			else {
 				groundLevelFail = false;
+				workCount = 0;
+			}
 
 			baseVertB = baseVertB - glm::vec3(chunkOrigin[3]); //move to chunk worldspace position
 
@@ -660,6 +671,8 @@ Contact CTerrain2::checkCollision(CPhysObj2* objB) {
 		sysLog << " ...chunk above check fail";
 	else
 		sysLog << " ...chunk above check worked";
+
+	sysLog << " : " << workCount;
 
 	if (contact.points[0].penetration == 0) {
 		if (lastResult == true) {

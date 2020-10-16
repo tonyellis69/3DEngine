@@ -68,8 +68,6 @@ private:
 	void drawFloorPlan();
 	void drawLineModel(CLineModel& lineModel);
 
-	void drawNode(TModelNode& node, glm::mat4& parentMatrix, CBuf* buf);
-
 	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
 
 

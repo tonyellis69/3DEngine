@@ -332,7 +332,6 @@
     <ClInclude Include="..\src\texGen\texGenUI.h" />
     <ClInclude Include="..\Src\TexLoader.h" />
     <ClInclude Include="..\src\Texture.h" />
-    <ClInclude Include="..\Src\Timer.h" />
     <ClInclude Include="..\Src\Types.h" />
     <ClInclude Include="..\src\UIengine.h" />
     <ClInclude Include="..\src\UI\font.h" />

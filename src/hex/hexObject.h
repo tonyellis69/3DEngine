@@ -40,6 +40,7 @@ public:
 	CHex destination; ///<The hex we're travelling to.
 	CLineModel lineModel;
 
+	THexList travelPath; ///<Route for movement.
 	
 protected:
 	void buildWorldMatrix();	
@@ -49,7 +50,7 @@ protected:
 	THexDir facing; ///<Direction entity is facing.
 	float rotation; ///<Angle of object's z-rotation in world space.
 
-	THexList travelPath; ///<Route for movement.
+
 
 	inline static IHexRenderer* hexRendr;
 

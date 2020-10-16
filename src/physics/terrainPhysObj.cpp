@@ -2,7 +2,6 @@
 #include "collision.h"
 
 
-#include "..\watch.h"
 #include <iostream> //for cerr
 
 using namespace glm;

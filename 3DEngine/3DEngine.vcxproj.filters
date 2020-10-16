@@ -538,9 +538,6 @@
     <ClInclude Include="..\src\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>

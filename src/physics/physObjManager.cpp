@@ -1,13 +1,13 @@
 #include "physObjManager.h"
 #include "physObj.h"
-#include "..\watch.h"
+//#include "..\watch.h"
 
 
 #include <iostream> //for cerr
 
 using namespace glm;
 
-using namespace watch;
+//using namespace watch;
 
 CPhysObjManager::~CPhysObjManager() {
 	for (size_t obj = 0; obj < physObjList.size(); obj++) {
