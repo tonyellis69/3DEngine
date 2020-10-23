@@ -74,12 +74,26 @@ TMeshRec CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
 	}
 
 	bool isLine;
-	if(strcmp("solid\0", mesh->mName.C_Str()) == 0)
+	bool isLineLoop = false;
+	//if(strcmp("solid\0", mesh->mName.C_Str()) == 0)
+	if (std::string(mesh->mName.C_Str()).find("solid") != std::string::npos)
 		isLine = false;
 	else {
 		isLine = true;
-		localMesh.mergeUniqueVerts();
-		localMesh.linesToLineStrip();
+		if (std::string(mesh->mName.C_Str()).find("line_loop") != std::string::npos) {
+			isLineLoop = true;
+			if (mesh->mNumFaces > 1) {
+				std::vector<unsigned int> loopSizes;
+				for (unsigned int f = 0; f < mesh->mNumFaces-1; f++)
+					loopSizes.push_back(mesh->mFaces[f].mNumIndices);
+				localMesh.closeLineLoops(loopSizes);
+			}
+
+		}
+		else {
+			localMesh.mergeUniqueVerts();
+			localMesh.linesToLineStrip();
+		}
 		localMesh.addAdjacencyVerts();
 	}
 
@@ -88,6 +102,7 @@ TMeshRec CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
 	//add to singleMesh
 	TMeshRec meshRec = singleMesh.add(localMesh);
 	meshRec.isLine = isLine;
+	meshRec.isLineLoop = isLineLoop;
 	return meshRec;
 }
 

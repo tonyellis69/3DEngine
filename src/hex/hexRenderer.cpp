@@ -139,10 +139,11 @@ void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* b
 
 	for (auto mesh : node.meshes) {
 		lineShader->setShaderValue(hColour, mesh.colour);
-
-		if (mesh.isLine) //TO DO: ugh, try to avoid
+	
+		if (mesh.isLine) {//TO DO: ugh, try to avoid
 			pRenderer->drawLineStripAdjBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
 			//pRenderer->drawLinesBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
+		}
 		else
 			pRenderer->drawTrisBuf(*buf, (void*)(mesh.indexStart * sizeof(unsigned short)), mesh.indexSize);
 

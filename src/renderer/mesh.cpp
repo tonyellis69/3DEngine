@@ -100,6 +100,34 @@ void CMesh::linesToLineStrip() {
 	indices = stripIndices;
 }
 
+/** Ensure loops end at their starting vertex, and insert primitive restarts 
+	for every new loop in a sequence of line loops. */
+void CMesh::closeLineLoops(std::vector<unsigned int>& loopSizes) {
+	unsigned int primitiveRestart = 0xFFFF;
+	if (vertices.size() > 0xFFFE)
+		primitiveRestart = 0xFFFFFFFF;
+
+	unsigned int loopNo = 0;
+	unsigned int vertNo = 1;
+	unsigned int startingVert = indices[0];
+	std::vector<unsigned int> restartIndices;
+	for (unsigned int i = 0; i < indices.size(); i++) {		
+		restartIndices.push_back(indices[i]);
+		if (loopNo < loopSizes.size()  && vertNo == loopSizes[loopNo]) {
+			restartIndices.push_back(startingVert);
+			restartIndices.push_back(primitiveRestart);
+			loopNo++;
+			vertNo = 1;
+			startingVert = indices[i + 1];
+		}
+		else
+			vertNo++;
+	}
+	restartIndices.push_back(startingVert);
+
+	indices = restartIndices;
+}
+
 
 /** Add an extra point at the start and end of each line.*/
 void CMesh::addAdjacencyVerts() {
@@ -109,20 +137,47 @@ void CMesh::addAdjacencyVerts() {
 
 	std::vector<unsigned int> adjacencyIndices;
 
-	adjacencyIndices.push_back(indices.front());
-	for (auto i = indices.begin(); i != indices.end(); i++) {	
-		if (*i == primitiveRestart ) {
-			adjacencyIndices.push_back(*(i-1));
-			adjacencyIndices.push_back(*i);
-			adjacencyIndices.push_back(*(i+1));
+	adjacencyIndices.push_back(makeAdjacencyVert(vertices[indices[0]],vertices[indices[1]]));
+
+	auto lineStart = indices.begin(); //position in the indices vector of the line's starting index
+	unsigned int lineAdjacencyA = 0;
+
+	for (auto linePos = indices.begin(); linePos != indices.end(); linePos++) {
+		if (*linePos == primitiveRestart) {
+			if (*(linePos - 1) == *lineStart) { //this line loops
+				adjacencyIndices[lineAdjacencyA] = *(linePos - 2);
+				adjacencyIndices.push_back(*(lineStart + 1));
+			}
+			else
+				adjacencyIndices.push_back(makeAdjacencyVert(vertices[*(linePos - 1)], vertices[*(linePos - 2)]));
+
+			adjacencyIndices.push_back(*linePos);
+			adjacencyIndices.push_back(makeAdjacencyVert(vertices[*(linePos + 1)], vertices[*(linePos + 2)]));
+
+			lineAdjacencyA = adjacencyIndices.size() - 1;
+			lineStart = linePos + 1;
 		}
 		else
-			adjacencyIndices.push_back(*i);
+			adjacencyIndices.push_back(*linePos);
 	}
-	adjacencyIndices.push_back(indices.back());
+
+	if (indices.back() == *lineStart) { //this line loops
+		adjacencyIndices[lineAdjacencyA] = indices.end()[-2];
+		adjacencyIndices.push_back(*(lineStart+1));
+	}
+	else
+		adjacencyIndices.push_back(makeAdjacencyVert(vertices[indices.back()], vertices[indices.end()[-2]]));
+
 
 	indices = adjacencyIndices;
 }
+
+unsigned int CMesh::makeAdjacencyVert(glm::vec3& A, glm::vec3& B) {
+	glm::vec3 adjacencyVert = 2.0f * A - B;
+	vertices.push_back(adjacencyVert);
+	return vertices.size() - 1;
+}
+
 
 
 

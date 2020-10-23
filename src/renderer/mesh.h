@@ -18,6 +18,7 @@ struct TMeshRec {
 	int vertStart;
 	glm::vec4 colour;
 	bool isLine = true;
+	bool isLineLoop = false;
 };
 
 struct TModelNode {
@@ -38,7 +39,11 @@ public:
 	void clear();
 	void mergeUniqueVerts();
 	void linesToLineStrip();
+	void closeLineLoops(std::vector<unsigned int>& loopSizes);
 	void addAdjacencyVerts();
+
+	unsigned int makeAdjacencyVert(glm::vec3& A, glm::vec3& B);
+
 
 	TMeshRec add(CMesh& mesh);
 
