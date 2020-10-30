@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/vector_angle.hpp> 
 
 
 CHexRenderer::CHexRenderer() : hexModel(6) {
@@ -32,6 +33,11 @@ CHexRenderer::CHexRenderer() : hexModel(6) {
 	floorplanSolidColour = glm::vec4(0, 0.65f, 0, 1);
 	floorplanSolidColour = glm::vec4(0, 0.47f, 0.16f, 1);
 	solidHex = &lineModels["solidHex"];
+
+
+	std::vector<glm::vec3> lineVerts = { {-0.1,0,0}, {0,0,0}, {1,0,0}, {1.1,0,0} };
+	std::vector<unsigned int> index = { 0,1,2,3 };
+	unitLineBuf.storeVerts(lineVerts,index,3);
 }
 
 
@@ -45,32 +51,23 @@ void CHexRenderer::setMap(CHexArray* hexArray){
 	updateHexShaderBuffer();
 }
 
-void CHexRenderer::draw() {
-	drawFloorPlan();
-}
-
-
 
 
 
 void CHexRenderer::drawFloorPlan() {
 	
 	glm::mat4 mvp = camera.clipMatrix;
-//	pRenderer->setShader(lineShader);
 	lineShader->setShaderValue(hMVP, mvp);
 	
 	glDisable(GL_DEPTH_TEST);
 	//draw inner hex for empty hexes
 	lineShader->setShaderValue(hColour, floorplanSpaceColour);
-	//pRenderer->drawTriStripBuf(floorplanSpaceBuf);
 
 	//draw filled hexes for solid hexes
 	lineShader->setShaderValue(hColour, floorplanSolidColour);
-	//pRenderer->drawTriStripBuf(floorplanSolidBuf);
 
 	//draw hex wireframe grid
 	lineShader->setShaderValue(hColour, floorplanLineColour);
-	//pRenderer->drawLineStripBuf(floorplanLineBuf);
 
 
 
@@ -133,7 +130,7 @@ void CHexRenderer::drawLineModel(CLineModel& lineModel) {
 
 void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf) {
 	pRenderer->setShader(lineShader);
-	glm::mat4 mvp = camera.clipMatrix * node.matrix * parentMatrix;// **drawData.worldMatrix;
+	glm::mat4 mvp = camera.clipMatrix * node.matrix * parentMatrix;
 	lineShader->setShaderValue(hMVP, mvp);
 	lineShader->setShaderValue(hWinSize, camera.getView());
 
@@ -175,6 +172,29 @@ void CHexRenderer::updateHexShaderBuffer() {
 
 
 	hexShaderBuf.storeVerts(shaderVerts, hexIndices, 2,1,1);
+}
+
+/** Draw a simple line between the two points. */
+void CHexRenderer::drawSightLine(glm::vec3& posA, glm::vec3& posB) {
+	glm::vec3 lineVec = posB - posA;
+
+	float angle = glm::orientedAngle(glm::normalize(lineVec), glm::vec3(1, 0, 0), glm::vec3(0,0,-1));
+
+	glm::mat4 rot = glm::rotate((angle), glm::vec3(0, 0, 1));
+
+	glm::mat4 trans = glm::translate(glm::mat4(1), posA) * rot;
+
+	glm::mat4 scale =  glm::scale(trans, glm::vec3(glm::length(lineVec),0,0)) ;
+
+	pRenderer->setShader(lineShader);
+	glm::mat4 mvp = camera.clipMatrix * scale;
+	lineShader->setShaderValue(hMVP, mvp);
+	lineShader->setShaderValue(hWinSize, camera.getView());
+
+	lineShader->setShaderValue(hColour,glm::vec4(1,0,0,1));
+
+	pRenderer->drawLineStripAdjBuf(unitLineBuf, 0, 4);
+
 }
 
 
@@ -319,7 +339,7 @@ void CHexRenderer::setCameraAspectRatio(glm::vec2 ratio) {
 }
 
 /** Return the hex coordinates for the given screen positon. */
-CHex CHexRenderer::pickHex(int screenX, int screenY) {
+std::tuple <CHex, glm::vec3> CHexRenderer::pickHex(int screenX, int screenY) {
 	//convert to clip coordinates
 	glm::vec2 screenSize = camera.getView();
 	glm::vec4 clip( (2.0f * screenX) / screenSize.x - 1.0f, 1.0f - (2.0f * screenY) / screenSize.y, -1.0f, 1.0f);
@@ -341,7 +361,7 @@ CHex CHexRenderer::pickHex(int screenX, int screenY) {
 	//liveLog << "\n" << hexPos.x << " " << hexPos.y << " " << hexPos.z;
 
 
-	return hexPos;
+	return { hexPos, p };
 }
 
 void CHexRenderer::loadMesh(const std::string& name, const std::string& fileName) {

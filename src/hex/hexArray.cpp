@@ -152,8 +152,21 @@ THexList CHexArray::dijkstraPath(CHex& start, CHex& end) {
 	return walkBack(start,end,cameFrom);
 }
 
-/**Return a path from start to end using the A* algorithm. */
+THexList CHexArray::aStarPath(CHex& start, CHex& end) {
+	return aStarPath(start, end, false, CHex(-1));
+}
+
 THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck) {
+	return aStarPath(start, end, fogCheck, CHex(-1));
+}
+
+THexList CHexArray::aStarPath(CHex& start, CHex& end, CHex& omit) {
+	return aStarPath(start, end, false,omit);
+}
+
+
+/**Return a path from start to end using the A* algorithm. */
+THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck, CHex& omit) {
 	std::priority_queue<PQElement, std::vector<PQElement>, order> frontier;
 	frontier.push({ 0,start });
 
@@ -196,6 +209,9 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck) {
 			
 
 			if (fromToBlocked(current, next) == true )
+				continue;
+
+			if (next == omit)
 				continue;
 
 

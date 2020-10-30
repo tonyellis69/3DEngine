@@ -24,14 +24,13 @@ class CHexRenderer: public IHexRenderer {
 public:
 	CHexRenderer();
 	void setMap(CHexArray* hexArray);
-	void draw();
-	void drawFog();
+	void drawFloorPlan();
 	void drawPath(THexList* path, glm::vec4& pathStartColour, glm::vec4& pathEndColour);
 	void dollyCamera(float delta);
 	void pitchCamera(float delta);
 	void moveCamera(glm::vec3& move);
 	void setCameraAspectRatio(glm::vec2 ratio);
-	CHex pickHex(int screenX, int screenY);
+	std::tuple <CHex, glm::vec3> pickHex(int screenX, int screenY);
 	void loadMesh(const std::string& name, const std::string& fileName);
 	CLineModel getLineModel(const std::string& name);
 	void setCursorPath(CHex& playerPos, CHex& cursorPos);
@@ -53,10 +52,13 @@ public:
 
 	void updateHexShaderBuffer();
 
+	void drawSightLine(glm::vec3& posA, glm::vec3& posB);
+
 	CShader* hexLineShader;
 	CShader* hexSolidShader;
 	CShader* lineShader;
 
+	
 private:
 	void tmpCreateHexagonModel();
 
@@ -65,7 +67,7 @@ private:
 	void createSolidHexModel();
 	void createLineShader();
 	void createHexShader();
-	void drawFloorPlan();
+
 	void drawLineModel(CLineModel& lineModel);
 
 	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
@@ -123,6 +125,8 @@ private:
 	CImporter importer;
 
 	CBuf2 hexShaderBuf;
+
+	CBuf2 unitLineBuf; //Should be temp, holds verts to draw sightline
 };
 
 
