@@ -11,8 +11,7 @@ public:
 	
 
 	int content;
-	glm::vec3 position; //TO DO: scrap!!!
+	glm::vec3 position; //TO DO: not really used, might save shaders some work
 	unsigned int blocks;
-	float fogged;
 };
 

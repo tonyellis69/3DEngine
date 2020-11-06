@@ -50,7 +50,9 @@ public:
 
 	void highlightHex(CHex& hex);
 
-	void updateHexShaderBuffer();
+	void updateFogBuffer();
+
+	void updateMapVerts();
 
 	void drawSightLine(glm::vec3& posA, glm::vec3& posB);
 
@@ -71,8 +73,11 @@ private:
 	void drawLineModel(CLineModel& lineModel);
 
 	void drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* buf);
+	
+	void createFogBuffer(int w, int h);
 
-
+	unsigned int hFogBuffer;
+	unsigned int hFogTex;
 
 	CRenderer* pRenderer;
 	CBuf floorplanLineBuf;
@@ -97,10 +102,12 @@ private:
 	unsigned int hHexMVP;
 	unsigned int hGridSize;
 	unsigned int hViewPort;
+	unsigned int hFogTexUniform;
 
 	unsigned int hHexMVPs;
 	unsigned int hGridSizes;
 	unsigned int hViewPorts;
+	unsigned int hFogTexUniforms;
 
 	glm::vec4 floorplanLineColour;
 	glm::vec4 floorplanSpaceColour;

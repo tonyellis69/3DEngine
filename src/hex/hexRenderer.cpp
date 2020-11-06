@@ -48,7 +48,10 @@ void CHexRenderer::setMap(CHexArray* hexArray){
 	fillFloorplanSolidBuffer(floorplanSolidBuf, 2, 1);
 	fillFloorplanSolidBuffer(floorplanSpaceBuf, 1, 0.9f);
 
-	updateHexShaderBuffer();
+	createFogBuffer(hexArray->width,hexArray->height);
+
+	//updateHexShaderBuffer();
+	updateMapVerts();
 }
 
 
@@ -82,6 +85,12 @@ void CHexRenderer::drawFloorPlan() {
 	hexLineShader->setShaderValue(hHexMVP, mvp);
 	hexLineShader->setShaderValue(hGridSize, glm::i32vec2(hexArray->width, hexArray->height));
 	hexLineShader->setShaderValue(hViewPort, camera.getView());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_BUFFER, hFogTex);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, hFogBuffer);
+	glUniform1i(hFogTexUniform, 0);
+
 	pRenderer->drawPointsBuf(hexShaderBuf, 0, hexShaderBuf.numElements);
 
 
@@ -151,27 +160,51 @@ void CHexRenderer::drawNode2(TModelNode& node, glm::mat4& parentMatrix, CBuf2* b
 
 }
 
-/** Update the data in the hexShader buffer. */
-void CHexRenderer::updateHexShaderBuffer() {
+/** Create a buffer for holding every hex's fog-of-war status. (And 
+	maybe other things. */
+void CHexRenderer::createFogBuffer(int w, int h) {
+	//delete any existing buffer
+	glDeleteBuffers(1,&hFogBuffer);
+	glDeleteBuffers(1,&hFogTex);
+
+	glGenBuffers(1, &hFogBuffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, hFogBuffer);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * w * h, NULL, GL_DYNAMIC_DRAW);
+
+	glGenTextures(1, &hFogTex);
+
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+
+}
+
+/** Update the data in the fog data buffer supplied to shaders. */
+void CHexRenderer::updateFogBuffer() {
+
+	glBindBuffer(GL_TEXTURE_BUFFER, hFogBuffer);
+	glBufferData(GL_TEXTURE_BUFFER, sizeof(float) * hexArray->fogData.size(), hexArray->fogData.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+
+}
+
+/** Create a vertex buffer with data on each map hex. Eg, index and 
+	scenery type. */
+void CHexRenderer::updateMapVerts() {
 	std::vector<unsigned int> hexIndices;
 	struct THexElem {
 		glm::i32vec2 v;
 		unsigned int content = 0;
-		float fog = 0;
 	};
 	std::vector<THexElem> shaderVerts;
 	int index = 0; int vNum = 0; int hexIndex = 0;
 	for (int y = 0; y < hexArray->height; y++) {
 		for (int x = 0; x < hexArray->width; x++) {
 			unsigned int content = hexArray->getHexOffset(x, y).content;
-			float fog = hexArray->getHexOffset(x, y).fogged;
-			shaderVerts.push_back({ {x,y},content,fog });
+			shaderVerts.push_back({ {x,y},content });
 			hexIndices.push_back(hexIndex++);
 		}
 	}
 
-
-	hexShaderBuf.storeVerts(shaderVerts, hexIndices, 2,1,1);
+	hexShaderBuf.storeVerts(shaderVerts, hexIndices, 2, 1);
 }
 
 /** Draw a simple line between the two points. */
@@ -327,11 +360,13 @@ void CHexRenderer::createHexShader() {
 	hHexMVP = hexLineShader->getUniformHandle("mvpMatrix");
 	hGridSize = hexLineShader->getUniformHandle("gridSize");
 	hViewPort = hexLineShader->getUniformHandle("viewPort");
+	hFogTexUniform = hexLineShader->getUniformHandle("fogTex");
 
 	hexSolidShader = pRenderer->createShader("hexSolid");
-	hHexMVPs = hexLineShader->getUniformHandle("mvpMatrix");
-	hGridSizes = hexLineShader->getUniformHandle("gridSize");
-	hViewPorts = hexLineShader->getUniformHandle("viewPort");
+	hHexMVPs = hexSolidShader->getUniformHandle("mvpMatrix");
+	hGridSizes = hexSolidShader->getUniformHandle("gridSize");
+	hViewPorts = hexSolidShader->getUniformHandle("viewPort");
+	hFogTexUniforms = hexSolidShader->getUniformHandle("fogTex");
 }
 
 void CHexRenderer::setCameraAspectRatio(glm::vec2 ratio) {

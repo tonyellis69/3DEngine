@@ -15,6 +15,8 @@
 void CHexArray::init(int w, int h) {
 	flatArray.clear();
 	flatArray.resize(w * h);
+	fogData.clear();
+	fogData.resize(w * h, 1.0f);
 	width = w; height = h;
 	float xStep = sqrt(3);
 	float yStep = 1.5f;
@@ -201,7 +203,8 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck, CHex& omit)
 			if (outsideArray(next))
 				continue;
 
-			if (fogCheck && getHexCube(next).fogged == 1.0f)
+			//if (fogCheck && getHexCube(next).fogged == 1.0f)
+			if (fogCheck && getFog(next) == 1.0f)
 				continue; 
 
 			if (getHexCube(next).blocks == blocksAll)
@@ -373,6 +376,25 @@ void CHexArray::clear() {
 	for (auto& element : flatArray) {
 		element.content = 1;
 	}
+}
+
+void CHexArray::setFog(int x, int y, float fog) {
+	fogData[y * width + x] = fog;
+}
+
+void CHexArray::setFog(CHex& hex, float fog) {
+	glm::i32vec2 offset = cubeToOffset(hex);
+	offset.x += width / 2;
+	offset.y = offset.y + height / 2;
+	fogData[offset.y * width + offset.x] = fog;
+}
+
+
+float CHexArray::getFog(CHex& hex) {
+	glm::i32vec2 offset = cubeToOffset(hex);
+	offset.x += width / 2;
+	offset.y = offset.y + height / 2;
+	return fogData[offset.y * width + offset.x];
 }
 
 ///////////////PRIVATE//////////////

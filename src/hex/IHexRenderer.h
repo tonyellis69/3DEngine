@@ -20,6 +20,6 @@ public:
 	virtual CLineModel getLineModel(const std::string& name) = 0;
 	virtual glm::i32vec2 worldPosToScreen(glm::vec3& worldPos) = 0;
 	virtual void highlightHex(CHex& hex) = 0;
-
+	virtual void updateFogBuffer() = 0;
 };
 

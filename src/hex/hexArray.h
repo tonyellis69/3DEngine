@@ -35,11 +35,16 @@ public:
 	glm::i32vec2 cubeToIndex(CHex& hex);
 	bool isValidPath(CHex& start, CHex& end);
 	void clear();
+	void setFog(int x, int y, float fog);
+	void setFog(CHex& hex, float fog);
+	float getFog(CHex& hex);
 		 
 	int width;
 	int height;
 
 	glm::vec3 worldPosCornerDist; ///<Dist from origin to corner.
+
+	std::vector<float> fogData; ///<Fog state for each hex of the map.
 
 private:
 	THexList walkBack(CHex& start, CHex& end, TCameFrom& cameFrom);
