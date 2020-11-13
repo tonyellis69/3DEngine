@@ -7,7 +7,7 @@
 //#include "ImageLib.h"
 #include "SoundLib.h"
 #include "Timer.h"
-#include "Sprite.h"
+//#include "Sprite.h"
 //#include "2DPolygon.h"
 //#include "TileLayer.h"
 #include "Config.h"
@@ -26,7 +26,7 @@
 
 //#include "UI\uiRectShader.h"
 
-typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
+//typedef std::vector<CSprite*> CRegisteredSpriteList; ///<Defines a vector type for holding sprites.
 
 
 class CEngine
@@ -170,14 +170,14 @@ public:
 	void scaleToFit();
 
 	void* WinHandle;  ///<Handle of the window we render to.
-	CSprite* CurrentSprite; ///<Points to the last-used billboard.
+	//CSprite* CurrentSprite; ///<Points to the last-used billboard.
 	unsigned int CurrentTexture; ///<Points to the last-used texture.
 
 	int DesiredWidth; ///<Desired width of drawing area, in pixels.
 	int DesiredHeight; ///<Desired height of drawing area, in pixels.
 	bool DrawCentred; ///<True if the desired drawing area is to be centred within the view.
 	
-	CRegisteredSpriteList RegisteredSpriteList;
+	//CRegisteredSpriteList RegisteredSpriteList;
 	//std::vector<CCamera*> cameraList; ///<Tracks engine-created cameras.
 	std::vector<CModel2*> modelDrawList; ///<Models to be draw automatically.
 	//TO DO: scrap above and use name
@@ -185,7 +185,7 @@ public:
 	
 	public:
 	glm::vec2 userScale; ///<Scaling factor applied to user drawing, every frame.
-	TSpriteSheet* CurrentTileSet; ///<Points to the last-used SpriteSheet.
+	//TSpriteSheet* CurrentTileSet; ///<Points to the last-used SpriteSheet.
 	
 	
 	CSkyDome* skyDome;

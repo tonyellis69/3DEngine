@@ -107,9 +107,6 @@
     <ClCompile Include="..\Src\SoundLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\superChunk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -413,9 +410,6 @@
     <ClCompile Include="..\src\UI\text.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\hex\hexRenderer.cpp">
-      <Filter>Source Files\hex</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\VMtest\src\tigObj.cpp">
       <Filter>vm</Filter>
     </ClCompile>
@@ -430,9 +424,6 @@
     </ClCompile>
     <ClCompile Include="..\src\physics2\physModel.cpp">
       <Filter>Source Files\physics2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\hex\lineModel.cpp">
-      <Filter>Source Files\hex</Filter>
     </ClCompile>
     <ClCompile Include="..\src\physics2\contact.cpp">
       <Filter>Source Files\physics2</Filter>
@@ -450,6 +441,9 @@
       <Filter>Source Files\messaging</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\gui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\lineModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -648,9 +642,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Plants\fractalTree.h">
       <Filter>plants</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Sprite.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\shapes.h">
       <Filter>Header Files</Filter>
@@ -853,12 +844,6 @@
     <ClInclude Include="..\src\UI\textSprite.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\hex\hexRenderer.h">
-      <Filter>Source Files\hex</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\hex\IHexRenderer.h">
-      <Filter>Source Files\hex</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\VMtest\src\tigObj.h">
       <Filter>vm</Filter>
     </ClInclude>
@@ -886,9 +871,6 @@
     <ClInclude Include="..\src\physics2\physModel.h">
       <Filter>Source Files\physics2</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\hex\lineModel.h">
-      <Filter>Source Files\hex</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\physics2\contact.h">
       <Filter>Source Files\physics2</Filter>
     </ClInclude>
@@ -915,6 +897,9 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\gui.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\lineModel.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

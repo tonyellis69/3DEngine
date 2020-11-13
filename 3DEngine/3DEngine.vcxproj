@@ -112,9 +112,8 @@
     <ClCompile Include="..\src\hex\hexElement.cpp" />
     <ClCompile Include="..\src\hex\hexArray.cpp" />
     <ClCompile Include="..\src\hex\hexObject.cpp" />
-    <ClCompile Include="..\src\hex\hexRenderer.cpp" />
-    <ClCompile Include="..\src\hex\lineModel.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
+    <ClCompile Include="..\src\lineModel.cpp" />
     <ClCompile Include="..\src\messaging\messenger.cpp" />
     <ClCompile Include="..\src\physics2\contact.cpp" />
     <ClCompile Include="..\src\physics2\physEng.cpp" />
@@ -165,7 +164,6 @@
     <ClCompile Include="..\src\skyDome.cpp" />
     <ClCompile Include="..\src\smallsysf.cpp" />
     <ClCompile Include="..\Src\SoundLib.cpp" />
-    <ClCompile Include="..\src\Sprite.cpp" />
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
@@ -255,11 +253,9 @@
     <ClInclude Include="..\src\hex\hexElement.h" />
     <ClInclude Include="..\src\hex\hexArray.h" />
     <ClInclude Include="..\src\hex\hexObject.h" />
-    <ClInclude Include="..\src\hex\hexRenderer.h" />
-    <ClInclude Include="..\src\hex\IHexRenderer.h" />
-    <ClInclude Include="..\src\hex\lineModel.h" />
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
+    <ClInclude Include="..\src\lineModel.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\messaging\events.h" />
     <ClInclude Include="..\src\messaging\messenger.h" />
@@ -313,7 +309,6 @@
     <ClInclude Include="..\src\skyDome.h" />
     <ClInclude Include="..\src\smallsysf.h" />
     <ClInclude Include="..\Src\SoundLib.h" />
-    <ClInclude Include="..\src\Sprite.h" />
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />

@@ -18,9 +18,9 @@ using namespace vBuf;
 
 CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 
-	CurrentTileSet = 0; //TO DO - should be the built-in default;
+	//CurrentTileSet = 0; //TO DO - should be the built-in default;
 	CurrentTexture = 0; //TO DO - should be the built-in default;
-	CurrentSprite = 0;
+	//CurrentSprite = 0;
 	MakingFit = false;
 	DrawCentred = false;
 	BackdropOn = false;

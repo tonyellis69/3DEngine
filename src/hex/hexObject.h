@@ -6,8 +6,8 @@
 #include "../renderer/buf.h"
 #include "hex.h"
 
-#include "../hex/IHexRenderer.h"
-#include "hex/lineModel.h"
+#include "../3DTest/src/IHexRenderer.h"
+#include "lineModel.h"
 
 struct TFov { //describes a fov shape
 	CHex A;
