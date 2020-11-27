@@ -10,7 +10,7 @@ using glm::greaterThanEqual;
 
 C2DimageBuf::C2DimageBuf() {
 	nextId = 0;
-	highestReservedAddress = 0;
+	highestReservedaddress = 0;
 }
 
 /** Set the size of the main buffer. This will wipe any existing content.*/
@@ -26,7 +26,7 @@ void C2DimageBuf::clear() {
 	reservedBlocksPerRow.clear();
 	freeBlocks.push_back({ {0, 0},{imageBuffer.width, imageBuffer.height} });
 	reservedBlocksPerRow[0] = 0;
-	highestReservedAddress = 0;
+	highestReservedaddress = 0;
 	reservedBlocks2.clear();
 }
 
@@ -45,7 +45,7 @@ glm::i32vec2 C2DimageBuf::reserve( glm::i32vec2 size) {
 	glm::i32vec2 addr = freeBlocks[index].start;
 	reservedBlocks2[addr] = freeBlocks[index];
 	reservedBlocksPerRow[addr.y]++;
-	highestReservedAddress = std::max(highestReservedAddress, addr.y + freeBlocks[index].size.y);
+	highestReservedaddress = std::max(highestReservedaddress, addr.y + freeBlocks[index].size.y);
 	freeBlocks.erase(freeBlocks.begin() + index);
 	return addr;
 }
@@ -111,7 +111,7 @@ int C2DimageBuf::panic() {
 	//is there a free block at the end of the old memory?
 	int index = 0;
 	for (auto& freeBlock : freeBlocks) {
-		if (freeBlock.start.x == 0 && freeBlock.start.y + freeBlock.size.y >= highestReservedAddress) {
+		if (freeBlock.start.x == 0 && freeBlock.start.y + freeBlock.size.y >= highestReservedaddress) {
 			freeBlock.size.y += newSize - oldSize;
 			return index;// freeBlocks.size() - 1;
 		}
@@ -120,7 +120,7 @@ int C2DimageBuf::panic() {
 
 	//still here? then the highest block is a reserved block,
 	//and we can create a new free block right after it
-	TTexBlock newBlock = { {0, highestReservedAddress + 1}, {imageBuffer.width, newSize - oldSize} };
+	TTexBlock newBlock = { {0, highestReservedaddress + 1}, {imageBuffer.width, newSize - oldSize} };
 	freeBlocks.push_back(newBlock);
 	reservedBlocksPerRow[newBlock.start.y] = 0;
 	return freeBlocks.size() - 1;

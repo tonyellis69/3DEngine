@@ -618,7 +618,7 @@ unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode,
 	return primitives;
 }
 
-void CRenderer::uploadDataTexture(int hShader, int hTexture) {
+void CRenderer::uploaddataTexture(int hShader, int hTexture) {
 	//TO DO: use hTexture to find texture unit
 	GLuint texUnit = 0;
 	glUniform1i(hShader,texUnit); 

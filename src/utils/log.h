@@ -11,6 +11,8 @@
 
 #include "glm/glm.hpp"
 
+#include "hex/hex.h"
+
 using namespace std::chrono;
 
 class ILogCallback {
@@ -35,6 +37,8 @@ public:
 	void showTime(bool onOff);
 
 	void insertTime();
+
+	void writeToOutput();
 	
 template <typename T>
 	friend CLog& operator<<(CLog& log, const T& in);
@@ -43,6 +47,7 @@ template <typename T>
 	friend CLog& operator<<(CLog& log, const glm::i32vec3& in);
 	friend CLog& operator<<(CLog& log, const glm::vec4& in);
 	friend CLog& operator<<(CLog& log, const glm::i32vec2& in);
+	friend CLog& operator<<(CLog& log, const CHex& in);
 
  
 	std::ofstream outFile;
@@ -58,16 +63,14 @@ CLog& operator<<(CLog& log, const T& in) {
 		 log.insertTime();
 	log.ss << in;
 
-	if (log.outFile.is_open()) {
-		log.outFile << log.ss.str();
-	}
-	
-	if (log.callbackObj) {
-		log.callbackObj->logCallback(log.ss);
-	}
-	log.ss.str("");
+	log.writeToOutput();
+
 	return log;
 }
+
+CLog& operator<<(CLog& log, const glm::vec2& in);
+
+
 
 
 extern CLog  sysLog;

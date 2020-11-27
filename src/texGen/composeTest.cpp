@@ -103,8 +103,8 @@ CTexGen * ComposeTest::createScalePointTex() {
 	return texGen;
 }
 
-CTexGen * ComposeTest::createAddTex() {
-	CAddTex* texGen = new CAddTex();
+CTexGen * ComposeTest::createaddTex() {
+	CaddTex* texGen = new CaddTex();
 	addToStack(texGen);
 	texGen->setTarget(createTarget());
 	texGen->setSource(&nullTexGen);
@@ -312,7 +312,7 @@ void ComposeTest::setCurrentLayer(int layerNo) {
 
 }
 
-/** Add this tex gen to the stack. */
+/** add this tex gen to the stack. */
 void ComposeTest::addTexGen(CTexGen* texGen) {
 	texGens.push_back(texGen);
 }
@@ -389,7 +389,7 @@ void ComposeTest::restore(std::string filename) {
 		case texTurbulence: createTurbulenceTex(); break;
 		case texScaleBias: createScaleBiasTex(); break;
 		case texSeamless:  createSeamlessTex(); break;
-		case texAdd: createAddTex(); break;
+		case texadd: createaddTex(); break;
 		case texScalePoint: createScalePointTex(); break;
 		case texSelect: createSelectTex(); break;
 		case texLayer: createLayerTex(); break;

@@ -18,7 +18,7 @@ CGUIradio::CGUIradio(int x , int y, int w, int h) {
 	label = new CGUIlabel2(5, 5, w - (10 + iconOffset), h - 10);
 	label->setText("radio");
 	label->setTextAlignment(tright);
-	Add(label);
+	add(label);
 }
 
 

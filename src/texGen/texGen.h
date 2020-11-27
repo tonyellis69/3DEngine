@@ -9,7 +9,7 @@
 #include <random>
 
 enum TexGenType { texNoise, texColour, texRidged, texCylinder, texTurbulence,
-	texScaleBias, texAdd, texSeamless, texScalePoint, texBillow, texVoronoi,
+	texScaleBias, texadd, texSeamless, texScalePoint, texBillow, texVoronoi,
 	texSelect, texLayer, texNull, texGaus, texRects, texBlocks, texCover,
 	texCutup, texTerrain
 };
@@ -262,9 +262,9 @@ public:
 	float bias;
 };
 
-class CAddTex : public CTexGen {
+class CaddTex : public CTexGen {
 public:
-	CAddTex() : CTexGen(texAdd) { name = "Add";  }
+	CaddTex() : CTexGen(texadd) { name = "add";  }
 	void loadShader();
 	void render();
 
@@ -381,7 +381,7 @@ public:
 };
 
 
-class CLayerTex : public CAddTex {
+class CLayerTex : public CaddTex {
 public:
 	CLayerTex() { texGenType = texLayer; name = "Layer"; }
 	void loadShader();

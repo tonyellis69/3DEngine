@@ -15,8 +15,8 @@
 void CHexArray::init(int w, int h) {
 	flatArray.clear();
 	flatArray.resize(w * h);
-	fogData.clear();
-	fogData.resize(w * h, 1.0f);
+	effectsData.clear();
+	effectsData.resize(w * h, { 1.0f,1.0f, 0.0f });
 	width = w; height = h;
 	float xStep = sqrt(3);
 	float yStep = 1.5f;
@@ -61,7 +61,7 @@ CHexElement& CHexArray::getHexAxial(int q, int r) {
 }
 
 /** Return a reference to the hex at the given cube coordinates.*/
-CHexElement& CHexArray::getHexCube(CHex& cube) {
+CHexElement& CHexArray::getHexCube(const CHex& cube) {
 	glm::i32vec2 offset = cubeToOffset(cube);
 	offset.x += width / 2;
 	offset.y = offset.y + height / 2;
@@ -379,14 +379,14 @@ void CHexArray::clear() {
 }
 
 void CHexArray::setFog(int x, int y, float fog) {
-	fogData[y * width + x] = fog;
+	effectsData[y * width + x].fog = fog;
 }
 
 void CHexArray::setFog(CHex& hex, float fog) {
 	glm::i32vec2 offset = cubeToOffset(hex);
 	offset.x += width / 2;
 	offset.y = offset.y + height / 2;
-	fogData[offset.y * width + offset.x] = fog;
+	effectsData[offset.y * width + offset.x].fog = fog;
 }
 
 
@@ -394,8 +394,26 @@ float CHexArray::getFog(CHex& hex) {
 	glm::i32vec2 offset = cubeToOffset(hex);
 	offset.x += width / 2;
 	offset.y = offset.y + height / 2;
-	return fogData[offset.y * width + offset.x];
+	return effectsData[offset.y * width + offset.x].fog;
 }
+
+void CHexArray::setHighlight(CHex& hex, float highlight) {
+	glm::i32vec2 offset = cubeToOffset(hex);
+	offset.x += width / 2;
+	offset.y = offset.y + height / 2;
+	effectsData[offset.y * width + offset.x].highlight = highlight;
+	effectsNeedUpdate = true;
+}
+
+void CHexArray::setVisibility(CHex& hex, float visibility) {
+	glm::i32vec2 offset = cubeToOffset(hex);
+	offset.x += width / 2;
+	offset.y = offset.y + height / 2;
+	effectsData[offset.y * width + offset.x].visibility = visibility;
+	effectsNeedUpdate = true;
+}
+
+
 
 ///////////////PRIVATE//////////////
 

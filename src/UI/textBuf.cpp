@@ -65,7 +65,7 @@ void CTextBuffer::init(int clearBuf) {
 	textQuadsIndex.clear();
 }
 
-/** Add this to the list of text quads to eventually draw. Return the x-coordinate we finish on.  */
+/** add this to the list of text quads to eventually draw. Return the x-coordinate we finish on.  */
 int CTextBuffer::addFragment(int x, int y, TLineFragDrawRec& drawData) {
 	textColour = drawData.textColour;
 	this->mDrawData = &drawData;

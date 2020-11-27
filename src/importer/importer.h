@@ -20,9 +20,9 @@ public:
 
 private:
 	TModelNode processNode(aiNode* node, const aiScene* scene);
-	TMeshRec processMesh(aiMesh* mesh, const aiNode* node);
+	std::tuple<TMeshRec,TMeshExtents> processMesh(aiMesh* mesh, const aiNode* node);
 	void copyMatrix(aiMatrix4x4& src, glm::mat4& dest);
-
+	void updateNodeExtents(TModelNode& node, TModelNode& subNode);
 
 	//std::vector<CMesh> meshes;
 

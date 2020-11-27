@@ -359,13 +359,13 @@ void CScaleBiasTex::read(std::ifstream & in) {
 
 
 
-void CAddTex::loadShader() {
-	shader = pRenderer->createShader("texAdd");
+void CaddTex::loadShader() {
+	shader = pRenderer->createShader("texadd");
 	hSource = shader->getUniformHandle("source");
 	hSource2 = shader->getUniformHandle("source2");
 }
 
-void CAddTex::render() {
+void CaddTex::render() {
 	loadShader();
 	pRenderer->setShader(shader);
 	pRenderer->attachTexture(0, mSource->handle);

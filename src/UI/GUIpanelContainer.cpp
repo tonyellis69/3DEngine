@@ -30,12 +30,12 @@ void CGUIpanelContainer::createSurface() {
 	surface = new CGUIstackSurface();
 	surface->backColour1 = UItransparent;
 	surface->backColour2 = UItransparent;
-	CGUIbase::Add(surface);
+	CGUIbase::add(surface);
 }
 
 
-/** Add an empty panel to the container's surface. */
-void CGUIpanelContainer::AddPanel(int size) {
+/** add an empty panel to the container's surface. */
+void CGUIpanelContainer::addPanel(int size) {
 	CGUIpanel* startPanel = new CGUIpanel(0,0,surface->viewBox.width,size);
 	startPanel->drawBorder = false;
 	startPanel->hFormat = hSpan;
@@ -45,13 +45,13 @@ void CGUIpanelContainer::AddPanel(int size) {
 	needsUpdate = true;
 }
 
-/** Add controls to the given panel.*/
-void CGUIpanelContainer::Add(unsigned int panel, CGUIbase* child) {
+/** add controls to the given panel.*/
+void CGUIpanelContainer::add(unsigned int panel, CGUIbase* child) {
 	//check the panel exists
 	if (panel > (surface->controls.size()-1))
 		return; //Error!
 	//add the child control
-	surface->controls[panel]->Add(child);
+	surface->controls[panel]->add(child);
 }
 
 
@@ -114,7 +114,7 @@ CGUIpanel* CGUIpanelContainer::getPanel(unsigned int panelNo) {
 
 
 void CGUIstackSurface::addPanel(CGUIpanel* panel) {
-	Add(panel);
+	add(panel);
 	assignPanelPositions();
 }
 

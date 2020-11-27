@@ -28,7 +28,7 @@ void CTexGenUI::initGUI() {
 	image = new CGUItrackImage(0, 0, 512, 512);
 	image->setBorderOn(false);
 	image->setGUIcallback(this);
-	pApp->GUIroot.Add(image);
+	pApp->GUIroot.add(image);
 
 
 	//got here
@@ -37,48 +37,48 @@ void CTexGenUI::initGUI() {
 
 	GUInoiseCtrl->setGUIcallback(this);
 
-	pApp->GUIroot.Add(GUInoiseCtrl);
+	pApp->GUIroot.add(GUInoiseCtrl);
 	//pApp->GUIroot.focusControl = GUInoiseCtrl;
 
 	texGenListPanel = new CGUIpanel(700, 80, 380, 290);
-	pApp->GUIroot.Add(texGenListPanel);
+	pApp->GUIroot.add(texGenListPanel);
 
 	CGUIlabel2* listTitle = new CGUIlabel2(10, 10, 100, 20);
 	
 	listTitle->setText("Tex gen stack:");
 
-	texGenListPanel->Add(listTitle);
+	texGenListPanel->add(listTitle);
 	
 
 	container = new CGUIcontainer(10, 30, 130, 175);
-	texGenListPanel->Add(container);
+	texGenListPanel->add(container);
 
 	//didn't get here
 
 	CGUIlabel2* lbl = new CGUIlabel2(150, 30, 70, 20);
 	lbl->setText("Load file");
 	lbl->setTextAlignment(tright);
-	texGenListPanel->Add(lbl);
+	texGenListPanel->add(lbl);
 	restoreMenu = new CGUIdropdownMenu(230, 30, 80, 20);
 	restoreMenu->setText("[select]");
 	restoreMenu->setGUIcallback(this);
-	texGenListPanel->Add(restoreMenu);
+	texGenListPanel->add(restoreMenu);
 
 	saveButton = new CGUIbutton2(150, 55, 70, 20);
 	saveButton->setText("Save as");
 	saveButton->setGUIcallback(this);
-	texGenListPanel->Add(saveButton);
+	texGenListPanel->add(saveButton);
 	fileName = new CGUItextbox2(230, 55, 80, 20);
 	fileName->setText("TexGen1");
-	texGenListPanel->Add(fileName);
+	texGenListPanel->add(fileName);
 
 
 	texGenList = new CGUImenu(0, 0, 130, 300);
 	texGenList->setGUIcallback(this);
-	container->Add(texGenList);
+	container->add(texGenList);
 
 	thumbnailImage = new CGUIimage(150, 80, 200, 200);
-	texGenListPanel->Add(thumbnailImage);
+	texGenListPanel->add(thumbnailImage);
 
 
 	addTexGenMenu = new CGUImenu(700, 210, 200, 300);
@@ -87,14 +87,14 @@ void CTexGenUI::initGUI() {
 	addTexGenMenu->resizeHorizontal = true;
 	addTexGenMenu->drawBorder = true;
 	addTexGenMenu->addItem({ "Noise","Colourise","RidgedMF","Cylinder","Turbulence","ScaleBias",
-		"Add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer","Gaus",
+		"add","Seamless","ScalePoint","Billow","Voronoi","Select","Layer","Gaus",
 		"Rects", "Blocks", "Cover", "Cutup", "Terrain" });
-	pApp->GUIroot.Add(addTexGenMenu);
+	pApp->GUIroot.add(addTexGenMenu);
 
 	savePNGbtn = new CGUIbutton2(10, 230, 100, 30);
 	savePNGbtn->setText("Save PNG file");
 	savePNGbtn->setGUIcallback(this);
-	texGenListPanel->Add(savePNGbtn);
+	texGenListPanel->add(savePNGbtn);
 
 
 
@@ -535,10 +535,10 @@ void CTexGenUI::fillStackMenu() {
 		else
 			itemNo++;
 	}
-	texGenList->addItem({ "[Add texgen]" });
+	texGenList->addItem({ "[add texgen]" });
 }
 
-/** Add the tex gen indicated to the stack. */
+/** add the tex gen indicated to the stack. */
 void CTexGenUI::addTexGen(int itemNo) {
 	switch (itemNo) {
 	case 0: texCompositor.createNoiseTex(); break;
@@ -547,7 +547,7 @@ void CTexGenUI::addTexGen(int itemNo) {
 	case 3: texCompositor.createCylinderTex(); break;
 	case 4: texCompositor.createTurbulenceTex(); break;
 	case 5: texCompositor.createScaleBiasTex(); break;
-	case 6: texCompositor.createAddTex(); break;
+	case 6: texCompositor.createaddTex(); break;
 	case 7: texCompositor.createSeamlessTex(); break;
 	case 8: texCompositor.createScalePointTex(); break;
 	case 9: texCompositor.createBillowTex(); break;
@@ -592,7 +592,7 @@ void CTexGenUI::configureGUI(TexGenType texType) {
 	case texTurbulence: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight",
 		"source1" }); break;
 	case texScaleBias: GUInoiseCtrl->activateRows({ "scaleBias","source1" }); break;
-	case texAdd: GUInoiseCtrl->activateRows({ "source1&2" }); break;
+	case texadd: GUInoiseCtrl->activateRows({ "source1&2" }); break;
 	case texSeamless: GUInoiseCtrl->activateRows({ "source1","seamPercentFalloff" }); break;;
 	case texScalePoint: GUInoiseCtrl->activateRows({ "source1", "scalePoint" }); break;
 	case texBillow: GUInoiseCtrl->activateRows({ "octavePower", "freqPersist","sampWidthHeight" }); break;

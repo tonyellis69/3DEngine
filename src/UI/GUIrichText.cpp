@@ -869,7 +869,7 @@ bool CGUIrichText::scrollDown2(int dist) {
 
 /** Attempt to scroll up by the given distance in pixels. */
 bool CGUIrichText::scrollUp2(int dist) {
-	lineBuffer2.setAddFragmentsAtTop(true);
+	lineBuffer2.setaddFragmentsAtTop(true);
 	while (lineBuffer2.getTopOverlap() < dist) {
 
 		TCharacterPos prevNewline = getPreviousLine(lineBuffer2.getPageStart());
@@ -882,7 +882,7 @@ bool CGUIrichText::scrollUp2(int dist) {
 		//insert line in line buffer
 		compileSingleLine(TLineFragment{ firstVisibleObject,firstVisibleText,0,0,0,0,no});
 	}
-	lineBuffer2.setAddFragmentsAtTop(false);
+	lineBuffer2.setaddFragmentsAtTop(false);
 	int result = lineBuffer2.scrollUp(dist);
 	return result;
 }

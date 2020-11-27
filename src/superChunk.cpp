@@ -125,7 +125,7 @@ void CSuperChunk::removeFace(Tdirection faceDir) {
 
 
 
-/**	Add a layer of new chunks to the face indicated. */
+/**	add a layer of new chunks to the face indicated. */
 void CSuperChunk::addFace(Tdirection faceDir) {
 	chunksToSkin = 0;
 

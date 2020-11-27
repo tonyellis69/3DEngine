@@ -243,7 +243,7 @@ RECENT REVISION HISTORY:
 // (note, do not use _inverse_ constants; stbi_image will invert them
 // appropriately).
 //
-// Additionally, there is a new, parallel interface for loading files as
+// additionally, there is a new, parallel interface for loading files as
 // (linear) floats to preserve the full dynamic range:
 //
 //    float *data = stbi_loadf(filename, &x, &y, &n, 0);
@@ -279,7 +279,7 @@ RECENT REVISION HISTORY:
 //
 // ===========================================================================
 //
-// ADDITIONAL CONFIGURATION
+// addITIONAL CONFIGURATION
 //
 //  - You can suppress implementation of any of the decoders to reduce
 //    your code footprint by #defining one or more of the following

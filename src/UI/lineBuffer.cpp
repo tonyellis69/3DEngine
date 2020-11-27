@@ -42,7 +42,7 @@ void CLineBuffer::clear() {
 	prevMousedHotText = -1;
 }
 
-/**	Add this text fragment as a text sprite. */
+/**	add this text fragment as a text sprite. */
 void CLineBuffer::addTextSprite(TLineFragment& fragment) {
 	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
 	sprite->createTextImage(spriteBuffer.getBuffer());
@@ -152,7 +152,7 @@ TPagePos CLineBuffer::getPageEnd() {
 	return pageEnd;
 }
 
-void CLineBuffer::setAddFragmentsAtTop(bool onOff) {
+void CLineBuffer::setaddFragmentsAtTop(bool onOff) {
 	insertAtTop = onOff;
 }
 

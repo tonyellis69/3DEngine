@@ -38,7 +38,7 @@ CGUIbutton::CGUIbutton(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	label = new CGUIlabel2(5, 5, w - 10, h - 10);
 	label->setText("Button");
 	label->setHorizontalAlignment(tcentred);
-	Add(label);
+	add(label);
 	setBackColour1(oldbackColour1);
 	setBackColour2(oldbackColour2);
 }*/

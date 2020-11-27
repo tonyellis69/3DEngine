@@ -23,8 +23,8 @@ CGUIswatchContainer::CGUIswatchContainer(int x, int y, int w, int h)
 };
 
 	addButton = new CGUIbutton2(addButtonX, nextGroupY, 100, 30);
-	addButton->setText("Add group");
-	Add(addButton);
+	addButton->setText("add group");
+	add(addButton);
 	addButton->setGUIcallback(this);
 
 	setControlMargin(5);
@@ -36,7 +36,7 @@ CGUIswatchContainer::CGUIswatchContainer(int x, int y, int w, int h)
 	colourPicker = new CGUIcolourPicker(0, 0, 500, 400);
 	colourPicker->setGUIcallback(this);
 	colourPicker->setVisible(false);
-	rootUI->Add(colourPicker);
+	rootUI->add(colourPicker);
 }
 
 CGUIswatchContainer::~CGUIswatchContainer() {
@@ -45,7 +45,7 @@ CGUIswatchContainer::~CGUIswatchContainer() {
 }
 
 
-/** Add a swatch group with the given name and colour swatches. */
+/** add a swatch group with the given name and colour swatches. */
 void CGUIswatchContainer::addSwatchGroup(std::string name, std::vector<glm::i32vec4>* colours) {
 	int defaultWidth = surface->getWidth();// -(indent * 2);
 	CGUIswatchGroup* newGroup = new CGUIswatchGroup(swatchGap, nextGroupY, defaultWidth, swatchSize + swatchGap );
@@ -57,7 +57,7 @@ void CGUIswatchContainer::addSwatchGroup(std::string name, std::vector<glm::i32v
 	newGroup->nameTextbox->setText(name);
 	newGroup->setGUIcallback(this);
 	newGroup->addColours(colours);
-	Add(newGroup);
+	add(newGroup);
 	nextGroupY += newGroup->getHeight();// +groupGap;
 	respaceControls();
 
@@ -227,7 +227,7 @@ CGUIswatchGroup::CGUIswatchGroup(int x, int y, int w, int h)
 	nameTextbox->setBorderOn(false);
 	nameTextbox->setBackColour1(style::uiLightGrey);
 	nameTextbox->setBackColour2(style::uiLightGrey);
-	Add(nameTextbox);
+	add(nameTextbox);
 	nameTextbox->setBorderOn(true);
 }
 
@@ -343,7 +343,7 @@ void CGUIswatchGroup::resize(int w, int h) {
 	calcRowColumnSize();
 }
 
-/** Add one or more colours to the group. */
+/** add one or more colours to the group. */
 void CGUIswatchGroup::addColours(std::vector<glm::i32vec4>* swatches) {
 	calcRowColumnSize();
 	if (swatches) {
@@ -364,7 +364,7 @@ void CGUIswatchGroup::setSwatchColour(int & swatchNo, glm::i32vec4 & colour) {
 	swatches[swatchNo] = colour;
 }
 
-/** Add a single new swatch to the group. */
+/** add a single new swatch to the group. */
 void CGUIswatchGroup::addSwatch(i32vec4& newSwatch) {
 	swatches.push_back(newSwatch);
 	if (((swatches.size() - 1) / totalColumns) == totalRows) {

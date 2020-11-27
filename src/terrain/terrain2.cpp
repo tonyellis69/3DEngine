@@ -48,7 +48,7 @@ void CTerrain2::createCentralShell(float LoD1cubeSize, int numChunkCubes, int nu
 	addShell(numShellSCs);
 }
 
-/** Add an outer shell to the existing shells, consisting of extent layers of SCs. */
+/** add an outer shell to the existing shells, consisting of extent layers of SCs. */
 void CTerrain2::addShell(int extent) {	
 	int LoD = 1 << shells.size(); //1 2 4 8 etc
 	float chunkSize = LoD1chunkSize * (LoD);
@@ -713,20 +713,20 @@ TChunkTriBuf2* CTerrain2::getShell0ChunkDataAt(glm::vec3& pos) {
 
 
 	//get the id for the chunk at this index position
-	int chunkAddr = -1;
+	int chunkaddr = -1;
 	for (auto localChunk : sc->scChunks) {
 		if (chunks[localChunk].index == chunkIndex) {
-			chunkAddr = chunks[localChunk].bufId;
+			chunkaddr = chunks[localChunk].bufId;
 			break;
 		}
 	}
 		 
-	if (chunkAddr == -1)
+	if (chunkaddr == -1)
 		return NULL;
 
 
 
-	return chunkDataCache.getData(chunkAddr);
+	return chunkDataCache.getData(chunkaddr);
 }
 
 /** Return the contact, if any, between an upright line segment ending at the base vector,

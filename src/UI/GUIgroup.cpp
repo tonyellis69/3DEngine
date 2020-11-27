@@ -17,7 +17,7 @@ CGUIgroup::CGUIgroup(int x, int y, int w, int h){
 	headerHeight = defaultHeaderHeight;
 	headerIndent = defaultHeaderIndent + 5;
 	header = new CGUIlabel2(headerIndent,0,w-headerIndent,headerHeight);
-	Add(header);
+	add(header);
 	SetText(Name);
 }
 

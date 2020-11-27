@@ -68,7 +68,7 @@ void CFractalTree::createStem(TStem& stem) {
 	}
 }
 
-/** Add a segment to the end of the current one. */
+/** add a segment to the end of the current one. */
 void CFractalTree::addAppendingSegment(TStem & stem, float startRadius, unsigned int endRingIndexPos) {
 	glm::vec3 startPoint = stem.basePos + stem.direction * stem.length;
 

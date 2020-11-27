@@ -425,7 +425,7 @@ void CBaseApp::initLogWindow() {
 	logWindow->resizeMode = resizeNone;
 	//sysLog.setCallback(this);
 
-	GUIroot.Add(logWindow);
+	GUIroot.add(logWindow);
 
 
 }

@@ -12,7 +12,7 @@ void CMultiBuf2::setSize(int numBytes) {
 	freeBlocksBySize.clear();
 	TBlock initialBlock = { 0, numBytes };
 	freeBlocks[0] = initialBlock;
-	highestAddr = 0;
+	highestaddr = 0;
 }
 
 /** Copy the given buffer to a reserved block of multibuf's free memory, returning the address. */
@@ -83,7 +83,7 @@ int CMultiBuf2::getFreeBlock(int size) {
 	}
 
 	reservedBlocks[freeBlock.start] = freeBlock;
-	highestAddr = std::max(highestAddr,freeBlock.start + freeBlock.size);
+	highestaddr = std::max(highestaddr,freeBlock.start + freeBlock.size);
 	return freeBlock.start;
 }
 
@@ -100,10 +100,10 @@ TBlock CMultiBuf2::split(TBlock block, int size) {
 }
 
 /** Copy the given buffer to a reserved block of our buffer. */
-void CMultiBuf2::copyToBlock(CBuf& src, int blockAddr, int size) {	
+void CMultiBuf2::copyToBlock(CBuf& src, int blockaddr, int size) {	
 	glBindBuffer(GL_COPY_READ_BUFFER, src.getBufHandle());
 	glBindBuffer(GL_COPY_WRITE_BUFFER, buffer.getBufHandle());
-	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, blockAddr, size);
+	glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, blockaddr, size);
 }
 
 /** We've run out of memory. Create a larger buffer and copy everything to that.*/
@@ -117,7 +117,7 @@ void CMultiBuf2::memoryPanic() {
 	//is there a free block at the end of the old memory? If so, extend it
 	std::multimap<int, TBlock>::iterator block = freeBlocksBySize.begin();
 	while(block != freeBlocksBySize.end()) {
-		if (block->second.start + block->second.size >= highestAddr) {
+		if (block->second.start + block->second.size >= highestaddr) {
 			auto  endBlock = freeBlocks[block->second.start];
 			freeBlocks[block->second.start].size += newSize - oldSize;
 			endBlock.size += newSize - oldSize;
@@ -129,8 +129,8 @@ void CMultiBuf2::memoryPanic() {
 	}
 
 	//still here? then the highest block is a reserved block, and we can create a new free block right after it
-	TBlock newBlock = { highestAddr,newSize - oldSize };
-	freeBlocks[highestAddr ] = newBlock;
+	TBlock newBlock = { highestaddr,newSize - oldSize };
+	freeBlocks[highestaddr ] = newBlock;
 	freeBlocksBySize.insert({ newBlock.size,newBlock });
 }
 

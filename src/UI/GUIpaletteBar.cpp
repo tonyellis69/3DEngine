@@ -16,17 +16,17 @@ CGUIpaletteBar::CGUIpaletteBar(int x, int y, int w, int h) : CGUIpanel(x, y, w, 
 	paletteImageEndX = w - (2 * upperPadding) + paletteImageStartX;
 	paletteImage = new CGUIimage1D(paletteImageStartX, upperPadding, w - (2 * upperPadding), barHeight);
 	paletteImage->setBorderOn(false);
-	Add(paletteImage);
+	add(paletteImage);
 
 	colourPicker = new CGUIcolourPicker(600, 300, 500, 400);
 	colourPicker->setGUIcallback(this);
 	colourPicker->setVisible(false);
-	rootUI->Add(colourPicker);
+	rootUI->add(colourPicker);
 
 	tabPosLbl = new CGUIlabel2(0, 0, 50, 20);
 	tabPosLbl->setBorderOn(false);
 	tabPosLbl->setVisible(false);
-	Add(tabPosLbl);
+	add(tabPosLbl);
 
 	createTab(0);
 	createTab(255);
@@ -123,7 +123,7 @@ CGUIpaletteTab* CGUIpaletteBar::addTab(int tabIndex) {
 	int paletteImageProportion = paletteImage->getWidth() *  (tabIndex / 255.0f);
 	CGUIpaletteTab* tab = new CGUIpaletteTab(paletteImageProportion + paletteImage->getLocalPos().x - (tabSize.x / 2),
 		paletteImage->getLocalPos().y + barHeight, tabSize.x, tabSize.y);
-	Add(tab);
+	add(tab);
 
 	tab->position = tabIndex;
 	return tab;

@@ -26,7 +26,7 @@ CGUIcheckButton::CGUIcheckButton(int x, int y, int w, int h) {
 	label->setText("check");
 	label->setTextAlignment(tleft);
 	label->setBorderOn(false);
-	Add(label);
+	add(label);
 
 }
 

@@ -476,8 +476,8 @@ CBaseTexture* CEngine::createDataTexture(renderTextureFormat dataType, int w, in
 	return Renderer.createDataTexture(dataType,w,h,data);
 }
 
-void CEngine::uploadDataTexture(int hShader, int hTexture) {
-	Renderer.uploadDataTexture(hShader,hTexture);
+void CEngine::uploaddataTexture(int hShader, int hTexture) {
+	Renderer.uploaddataTexture(hShader,hTexture);
 }
 
 void CEngine::setDataTexture(unsigned int textureHandle) {

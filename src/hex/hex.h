@@ -59,7 +59,7 @@ using THexList = std::vector<CHex> ;
 
 CHex cubeToAxial(CHex& cube);
 glm::vec3 axialToCube(float q, float r);
-glm::i32vec2 cubeToOffset(CHex& hex);
+glm::i32vec2 cubeToOffset(const CHex& hex);
 glm::i32vec2 axialToOffset(int q, int r);
 glm::vec3 cubeToWorldSpace(CHex& hex);
 CHex offsetToCube(int x, int y);
@@ -89,10 +89,6 @@ std::tuple<int, int> findRingHex(int radius, float angle);
 THexList* findArc2(CHex& apex, int radius, float angle, float rotation);
 CHex findRingCornerHex(int radius, int corner);
 
-bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B);
 
-bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B, glm::vec3& intersect);
-
-float signed2DTriArea(glm::vec3& a, glm::vec3& b, glm::vec3& c);
 
 

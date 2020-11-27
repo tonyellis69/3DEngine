@@ -22,10 +22,21 @@ void CLog::showTime(bool onOff) {
 	timeOn = onOff;
 }
 
-/** Add the current elapsed time since boot-up to the stream. */
+/** add the current elapsed time since boot-up to the stream. */
 void CLog::insertTime() {
 	duration<double> elapsed_seconds = system_clock::now() - bootTime;
 	ss << elapsed_seconds.count() << "s ";
+}
+
+void CLog::writeToOutput() {
+	if (outFile.is_open()) {
+		outFile << ss.str();
+	}
+
+	if (callbackObj) {
+		callbackObj->logCallback(ss);
+	}
+	ss.str("");
 }
 
 CLog::~CLog() {
@@ -69,3 +80,14 @@ CLog& operator<<(CLog& log, const glm::i32vec2& in) {
 }
 
 
+CLog& operator<<(CLog& log, const glm::vec2& in) {
+	log.ss << "x " << in.x << " y " << in.y;
+	return log;
+}
+
+
+CLog& operator<<(CLog& log, const CHex& in) {
+	log.ss << "x " << in.x << " y " << in.y << " z " << in.z;
+	log.writeToOutput();
+	return log;
+}

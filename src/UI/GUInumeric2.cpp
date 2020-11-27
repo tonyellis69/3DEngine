@@ -22,15 +22,15 @@ CGUInumeric2::CGUInumeric2(int x, int y, int w, int h) {
 	upButton->hFormat = hRight;
 	upButton->icon = rightIconArrow;
 	upButton->id = upButtonID;
-	Add(downButton);
-	Add(upButton);
+	add(downButton);
+	add(upButton);
 
 	//create numBox
 	numBox = new CGUInumericTextbox2(h, 0,
 		getWidth() - (h * 2), h);
 	////////////////numBox->TextAlign = tcentred;
 	
-	Add(numBox);
+	add(numBox);
 
 	valMin = 0; valMax = 10;
 

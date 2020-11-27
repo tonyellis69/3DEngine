@@ -118,7 +118,7 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 
 	//set position arbitarily for now
 	ctrl->setLocalPos(10, 10);
-	Add(ctrl);
+	add(ctrl);
 	positionLogical(ctrl);
 	glm::i32vec2 maxSize = layoutControlsCoarse();
 	//resize parent if required
@@ -527,8 +527,8 @@ void CGUIbase::setPosY(int y) {
 
 
 
-/** Add a child UI element to this UI element. */
-void CGUIbase::Add(CGUIbase* child) {
+/** add a child UI element to this UI element. */
+void CGUIbase::add(CGUIbase* child) {
 	controls.push_back(child);
 	child->parent = this;
 	child->needsUpdate = true;
@@ -738,7 +738,7 @@ void CGUIbase::GUIcallback(CGUIbase * sender, CMessage & msg) {
 		<< " value " << msg.value;
 }
 
-/** Add given controls to the named row, creating it if necessary. */
+/** add given controls to the named row, creating it if necessary. */
 void CGUIbase::addToRow(const std::string & name, std::initializer_list<CGUIbase*> childControls) {
 	auto row = std::find_if(rowObjects.begin(), rowObjects.end(), [&](CRowObject& obj) { return obj.name == name; });
 	int index = row - rowObjects.begin();
@@ -751,7 +751,7 @@ void CGUIbase::addToRow(const std::string & name, std::initializer_list<CGUIbase
 
 	for (auto control : childControls) {
 		if (!findControl(control)) //may have already been added
-			Add(control); 
+			add(control); 
 		control->setVisible(false);
 		rowObjects[index].addControl(control);
 	}
@@ -808,7 +808,7 @@ void CGUIbase::popupMenu(std::initializer_list<std::string> options,  IPopupMenu
 	popupMenu->maxItemsShown = options.size();
 
 	popupMenu->addItem(options);
-	Add(popupMenu);
+	add(popupMenu);
 	popupMenu->makeModal();
 }
 

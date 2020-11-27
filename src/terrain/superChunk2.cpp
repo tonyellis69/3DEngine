@@ -94,7 +94,7 @@ void CSuperChunk2::clearChunks(CBoxVolume& unitVolume) {
 	}
 }
 
-/** Add any chunks that fall within the proportion of the SC defined by this unit volume. */
+/** add any chunks that fall within the proportion of the SC defined by this unit volume. */
 void CSuperChunk2::addChunks(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(numSCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(numSCchunks);
@@ -125,7 +125,7 @@ bool CSuperChunk2::chunkExists(glm::i32vec3& index) {
 	return false;
 }
 
-/** Add any chunks that fall outside the proportion of the SC defined by this unit volume. */
+/** add any chunks that fall outside the proportion of the SC defined by this unit volume. */
 void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 	i32vec3 indexBL = unitVolume.bl *= vec3(numSCchunks);
 	i32vec3 indexTR = unitVolume.tr *= vec3(numSCchunks);
@@ -150,7 +150,7 @@ void CSuperChunk2::addChunksOutside(CBoxVolume& unitVolume) {
 			}
 }
 
-/** Add chunks that fall within the proportion of the SC defined by outerUnitVolume that do not also 
+/** add chunks that fall within the proportion of the SC defined by outerUnitVolume that do not also 
 	fall within innerUnitVolume. */
 void CSuperChunk2::addChunksBetween(CBoxVolume& outerUnitVolume, CBoxVolume& innerUnitVolume) {
 	i32vec3 outerBL = outerUnitVolume.bl *= vec3(numSCchunks);

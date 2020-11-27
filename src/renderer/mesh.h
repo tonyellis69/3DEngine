@@ -12,6 +12,8 @@
 
 enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 
+/** Stores the data for drawing a mesh, but not 
+	the mesh itself. */
 struct TMeshRec {
 	int indexStart;
 	int indexSize;
@@ -21,11 +23,24 @@ struct TMeshRec {
 	bool isLineLoop = false;
 };
 
+struct TMeshExtents {
+	glm::vec3 furthestVert;
+	glm::vec3 BBmin; 
+	glm::vec3 BBmax;
+};
+
+/** Holds the reference data for a model or part of a multipart
+	model, including all sub-parts. Does not store the actual vertices. */
 struct TModelNode {
 	std::string name;
 	glm::mat4 matrix;
 	std::vector<TMeshRec> meshes;
 	std::vector<TModelNode> subNodes;
+	//glm::vec3 furthestVert;
+	//glm::vec3 BBnw;
+	//glm::vec3 BBse;
+	TMeshExtents extents;
+
 };
 
 
@@ -46,6 +61,7 @@ public:
 
 
 	TMeshRec add(CMesh& mesh);
+
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;

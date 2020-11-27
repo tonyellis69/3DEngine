@@ -13,7 +13,7 @@ CGUIdlg::CGUIdlg(int x, int y, int w, int h){
 	header->setText("Header");
 	header->hFormat = hSpan;
 	header->setTextAlignment(tcentred);
-	Add(header);
+	add(header);
 
 	backColour1 = oldbackColour1;
 	backColour2 = oldbackColour2;
@@ -31,7 +31,7 @@ CGUIsysDlg::CGUIsysDlg() : CGUIdlg(0,0,defaultDlgWidth,defaultDlgHeight)  {
 	body->setText("Body text");
 	body->setMultiLine(true);
 	body->hFormat = hCentre;
-	Add(body);	
+	add(body);	
 }
 
 
@@ -45,12 +45,12 @@ CGUIyesNoDlg::CGUIyesNoDlg() {
 	yes = new CGUIbutton2(20,defaultDlgHeight-40,100,30);
 	yes->setText("Yes");
 	yes->id = dlgYesID;
-	Add(yes);
+	add(yes);
 
 	no = new CGUIbutton2(defaultDlgWidth - 120,defaultDlgHeight-40,100,30);
 	no->setText("No");
 	no->id = dlgNoID;
-	Add(no);
+	add(no);
 }
 
 CGUIdlgButton::CGUIdlgButton(int x, int y, int w, int h) : CGUIbutton2(x,y,w,h) {
@@ -73,7 +73,7 @@ CGUIokDlg::CGUIokDlg(int w, int h)  : CGUIsysDlg()  {
 	ok->hFormat = hCentre;
 	ok->setPosY(parent->getHeight() - 50);
 	ok->id = dlgOKID;
-	Add(ok);
+	add(ok);
 
 
 	body->setWidth( w - 40);

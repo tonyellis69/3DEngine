@@ -197,12 +197,12 @@ bool CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
 	pDrawFuncs->handleUImsg(*this,msg);
 } */
 
-/** Add this control as something that must be dismissed before the user can return to
+/** add this control as something that must be dismissed before the user can return to
 	the rest of the UI. Normally used for modal dialogue boxes.*/
 void CGUIroot::addModal(CGUIbase* control) {
 	modalControls.push_back(control);
 	control->isModal = true;
-	Add(control);
+	add(control);
 }
 
 

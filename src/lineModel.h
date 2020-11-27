@@ -10,6 +10,8 @@ class CLineModel {
 public:
 	void setColourR(glm::vec4& colour);
 	TModelNode* getNode(const std::string&  name);
+	bool circleCollision(glm::vec3& segA, glm::vec3& segB);
+	bool BBcollision(glm::vec3& segA, glm::vec3& segB);
 
 	TModelNode model;
 	CBuf* buffer;

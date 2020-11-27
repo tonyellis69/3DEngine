@@ -27,7 +27,7 @@ public:
 private:
 	int getFreeBlock(int size);
 	TBlock split(TBlock block, int size);
-	void copyToBlock(CBuf& src, int blockAddr, int size);
+	void copyToBlock(CBuf& src, int blockaddr, int size);
 	void memoryPanic();
 	void rebuildFreeBlocksSized();
 
@@ -36,7 +36,7 @@ private:
 	std::map<int, TBlock> freeBlocks; //ordered by start
 	std::unordered_map<int, TBlock> reservedBlocks; //ordered by start
 
-	int highestAddr;
+	int highestaddr;
 
 
 	CBuf buffer; //make private!!!!!

@@ -97,7 +97,7 @@ void CShell::removeOverlappedInnerFaceChunks(Tdirection face) {
 	removeOverlappedChunksInVolume(innerFaceVolume);
 }
 
-/** Add chunks to this inner face, to fill the gap left by the chunks of the
+/** add chunks to this inner face, to fill the gap left by the chunks of the
 	inner shell that were removed when it scrolled. */
 void CShell::addInnerFaceChunks2(Tdirection face) {
 	TBoxVolume innerFaceVolume = findOverlappedInnerFaceSCsmultiLayer(face);
@@ -426,7 +426,7 @@ TBoxVolume CShell::findOverlappedInnerFaceSCsmultiLayer(Tdirection face) {
 	return innerVol;
 }
 
-/** Add chunks to every SC in the given volume that is *outside* or only
+/** add chunks to every SC in the given volume that is *outside* or only
 	partially overlapped by the chunk extent of the inner shell. 
 	This is used to add chunks to an inner face to fill the gap left when the chunks of an
 	scrolling inner were removed.*/

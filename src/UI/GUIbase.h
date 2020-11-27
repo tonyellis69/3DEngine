@@ -199,7 +199,7 @@ public:
 	virtual void setLocalPos(int x, int y);
 	virtual void setPosX(int x);
 	virtual void setPosY(int y);
-	virtual void Add(CGUIbase* child);
+	virtual void add(CGUIbase* child);
 	virtual void updateAppearance();
 	void recalculateDiminsions();
 	virtual void Draw(float dT);
@@ -407,24 +407,24 @@ public:
 	T* add(S const& s, int style) {
 		if constexpr (std::is_convertible_v<S, std::string>) {
 			T* ctrl = new T(s, style);
-			Add(ctrl);
+			add(ctrl);
 			autoPosition(ctrl);
 			return ctrl;
 		}
 
 			T* ctrl = new T(s, style); //pretty damn sure this is just leftover code
-			Add(ctrl);
+			add(ctrl);
 			autoPosition(ctrl);
 			return ctrl;
 
 		return NULL;
 	}
 
-	/** Add a control supplying styling but no text.*/
+	/** add a control supplying styling but no text.*/
 	template <typename T>
 	T* add(int style) {
 		T* ctrl = new T(style);
-		Add(ctrl);
+		add(ctrl);
 		autoPosition(ctrl);
 		return ctrl;
 

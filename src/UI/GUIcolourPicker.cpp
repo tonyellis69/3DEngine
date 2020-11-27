@@ -5,7 +5,7 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 	int padding = 30;
 	int panelSize = 90;
 	colourPanel = new CGUIpanel(padding, padding, panelSize, panelSize);
-	Add(colourPanel);
+	add(colourPanel);
 	int numericRow = padding + panelSize + padding;
 	int numericWidth = 75; int numericHeight = 20; int sliderX = 140;
 	int ySpace = numericRow; 
@@ -13,13 +13,13 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 		numeric[component] = new CGUInumeric2(padding, ySpace, numericWidth, numericHeight);
 		numeric[component]->setMinMax(0, 255);
 		numeric[component]->id = component;
-		Add(numeric[component]);
+		add(numeric[component]);
 		ySpace = numeric[component]->getLocalPos().y + numeric[component]->getHeight() + padding;
 
 		slider[component] = new CGUIsysScrollbar(horizontal, sliderX, numeric[component]->getLocalPos().y, 300);
 		slider[component]->setMax(255); slider[component]->setMin(0);
 		slider[component]->id = component;
-		Add(slider[component]);
+		add(slider[component]);
 	}
 
 	setColour(glm::i32vec4(255));
@@ -28,14 +28,14 @@ CGUIcolourPicker::CGUIcolourPicker(int x, int y, int w, int h) : CGUIpanel(x, y,
 		numericWidth, numericHeight);
 	OKbutton->setText("OK");
 	OKbutton->id = uiOKid;
-	Add(OKbutton);
+	add(OKbutton);
 
 	int cancelXpos = sliderX;
 	CGUIbutton2* CancelButton = new CGUIbutton2(cancelXpos, numeric[3]->getLocalPos().y + numeric[3]->getHeight() + padding,
 		numericWidth, numericHeight);
 	CancelButton->setText("Cancel");
 	CancelButton->id = uiCancelId;
-	Add(CancelButton);
+	add(CancelButton);
 }
 
 /** Set the current selected colour. */

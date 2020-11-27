@@ -40,7 +40,7 @@ public:
 	CRenderTexture* getTextBuf();
 	TPagePos getPageStart();
 	TPagePos getPageEnd();
-	void setAddFragmentsAtTop(bool onOff);
+	void setaddFragmentsAtTop(bool onOff);
 	void onMouseMove(glm::i32vec2& mousePos);
 	bool doesPageEndWithNewline() {
 		return pageEndNewline;

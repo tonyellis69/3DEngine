@@ -20,7 +20,7 @@ public:
 	CTexGen* createScaleBiasTex();
 	CTexGen * createSeamlessTex();
 	CTexGen* createScalePointTex();
-	CTexGen* createAddTex();
+	CTexGen* createaddTex();
 	CTexGen* createLayerTex();
 	CTexGen* createSelectTex();
 	CTexGen* createGausTex();

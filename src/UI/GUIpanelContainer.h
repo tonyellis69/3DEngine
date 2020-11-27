@@ -10,8 +10,8 @@ public:
 	//CGUIpanelContainer(void) {};
 	CGUIpanelContainer(int x, int y, int w, int h);
 	void createSurface();
-	void AddPanel(int size);
-	void Add(unsigned int panel, CGUIbase* child);
+	void addPanel(int size);
+	void add(unsigned int panel, CGUIbase* child);
 	void movePanel(unsigned int panel, unsigned int slot);
 	void assignPanelPositions();
 	void deletePanel(unsigned int panel);

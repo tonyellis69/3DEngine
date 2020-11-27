@@ -87,7 +87,7 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 				itemWidth += leftAlignIndent;
 		}
 
-		Add(item);
+		add(item);
 		items.push_back(item);
 	}
 	resizeToFit();

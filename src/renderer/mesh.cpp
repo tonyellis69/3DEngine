@@ -129,7 +129,7 @@ void CMesh::closeLineLoops(std::vector<unsigned int>& loopSizes) {
 }
 
 
-/** Add an extra point at the start and end of each line.*/
+/** add an extra point at the start and end of each line.*/
 void CMesh::addAdjacencyVerts() {
 	unsigned int primitiveRestart = 0xFFFF;
 	if (vertices.size() > 0xFFFE)
@@ -196,6 +196,8 @@ TMeshRec CMesh::add(CMesh& mesh) {
 
 	return meshRec;
 }
+
+
 
 
 /** Sort line-pair vertexes to form as long a sequence as possible. This is

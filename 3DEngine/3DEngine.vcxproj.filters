@@ -446,6 +446,9 @@
     <ClCompile Include="..\src\lineModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\intersect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -899,6 +902,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\lineModel.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\intersect.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

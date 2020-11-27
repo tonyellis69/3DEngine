@@ -49,7 +49,7 @@ private:
 
 	unsigned int nextId;
 
-	int highestReservedAddress;
+	int highestReservedaddress;
 ;
 };
 

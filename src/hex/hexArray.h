@@ -9,6 +9,12 @@
 
 typedef std::unordered_map<glm::i32vec2, CHex> TCameFrom; 
 
+struct TMapEffects {
+	float fog;
+	float visibility;
+	float highlight;
+};
+
 /** A 2D container for CHexElement objects. */
 class CHexArray {
 public:
@@ -17,7 +23,7 @@ public:
 	//void setEntityList(THexObjs* pEntities);
 	CHexElement& getHexOffset(int x, int y);
 	CHexElement& getHexAxial(int q, int r);
-	CHexElement& getHexCube(CHex& cube);
+	CHexElement& getHexCube(const CHex& cube);
 	glm::vec3 getWorldPos(CHex& hex);
 	THexList breadthFirstPath(CHex& start, CHex& end);
 	THexList dijkstraPath(CHex& start, CHex& end);
@@ -38,13 +44,19 @@ public:
 	void setFog(int x, int y, float fog);
 	void setFog(CHex& hex, float fog);
 	float getFog(CHex& hex);
+
+	void setHighlight(CHex& hex, float highlight);
+
+	void setVisibility(CHex& hex, float visibility);
 		 
 	int width;
 	int height;
 
 	glm::vec3 worldPosCornerDist; ///<Dist from origin to corner.
 
-	std::vector<float> fogData; ///<Fog state for each hex of the map.
+	std::vector<TMapEffects> effectsData; ///<Fog state, etcc, for each hex of the map.
+	bool effectsNeedUpdate = false; ///<Notifies that effects need redrawing.
+
 
 private:
 	THexList walkBack(CHex& start, CHex& end, TCameFrom& cameFrom);

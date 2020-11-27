@@ -21,6 +21,7 @@ void CImporter::loadFile(const std::string& filename) {
 	//or more nodes
 	//singleMesh holds all the verts
 
+
 }
 
 
@@ -42,27 +43,35 @@ TModelNode CImporter::processNode(aiNode* node, const aiScene* scene) {
 
 	for (unsigned int m = 0; m < node->mNumMeshes; m++) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[m]];
-		TMeshRec meshRec = processMesh(mesh, node);
+		auto[meshRec,extents] = processMesh(mesh, node);
 		currentNode.meshes.push_back(meshRec);
+		currentNode.extents = extents;
 	}
 
 	for (unsigned int n = 0; n < node->mNumChildren; n++) {
 		TModelNode newNode = processNode(node->mChildren[n], scene);
 		currentNode.subNodes.push_back(newNode);
+
+		updateNodeExtents(currentNode, newNode);
 	}
+	
 
 	return currentNode;
 }
 
 /**	Return a mesh object holding all the data from this assimp mesh. */
-TMeshRec CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
+std::tuple<TMeshRec, TMeshExtents> CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
 	CMesh localMesh;
+	TMeshExtents localExtents;
 
 	//get verts
 	for (unsigned int v = 0; v < mesh->mNumVertices; v++) {
 		glm::vec3 vert = { mesh->mVertices[v].x, mesh->mVertices[v].y, mesh->mVertices[v].z };
 		localMesh.vertices.push_back(vert);
 		//normals and texture coords go here
+		localExtents.furthestVert = glm::max(localExtents.furthestVert, vert);
+		localExtents.BBmin = glm::min(localExtents.BBmin, vert);
+		localExtents.BBmax = glm::max(localExtents.BBmax, vert);
 	}
 
 	//get indices to verts
@@ -100,10 +109,10 @@ TMeshRec CImporter::processMesh(aiMesh* mesh, const aiNode* node) {
 
 
 	//add to singleMesh
-	TMeshRec meshRec = singleMesh.add(localMesh);
-	meshRec.isLine = isLine;
-	meshRec.isLineLoop = isLineLoop;
-	return meshRec;
+	TMeshRec localMeshRec = singleMesh.add(localMesh);
+	localMeshRec.isLine = isLine;
+	localMeshRec.isLineLoop = isLineLoop;
+	return { localMeshRec, localExtents };
 }
 
 void CImporter::copyMatrix(aiMatrix4x4& src, glm::mat4& dest) {
@@ -127,3 +136,15 @@ void CImporter::copyMatrix(aiMatrix4x4& src, glm::mat4& dest) {
 	dest[3].z = (float)src.d3;
 	dest[3].w = (float)src.d4;
 }
+
+
+/** Modify node's extents if the subnode out-extends them. */
+void CImporter::updateNodeExtents(TModelNode& node, TModelNode& subNode) {
+	node.extents.furthestVert = glm::max(node.extents.furthestVert, subNode.extents.furthestVert);
+	node.extents.BBmin = glm::min(node.extents.BBmin, subNode.extents.BBmin);
+	node.extents.BBmax = glm::max(node.extents.BBmax, subNode.extents.BBmax);
+}
+
+
+
+

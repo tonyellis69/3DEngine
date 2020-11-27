@@ -32,7 +32,7 @@ void CGUIsysContainer::createScrollbars() {
 	verticalBar->id = uiContainerVbarID;
 	verticalBar->setMax(getHeight());
 	verticalBar->setMin(0);
-	CGUIbase::Add(verticalBar);
+	CGUIbase::add(verticalBar);
 
 	horizontalBar = new CGUIsysScrollbar(horizontal,1, getHeight()-barWidth,getWidth()-barWidth);
 	horizontalBar->vFormat = vBottom;
@@ -40,19 +40,19 @@ void CGUIsysContainer::createScrollbars() {
 	horizontalBar->id = uiContainerHbarID;
 	horizontalBar->setMax(getWidth());
 	horizontalBar->setMin(0);
-	CGUIbase::Add(horizontalBar);
+	CGUIbase::add(horizontalBar);
 }
 
 /** Create the 'surface' control to which the container's contents are attached. */
 void CGUIsysContainer::createSurface() {
 	surface = new CGUIsurface();
-	CGUIbase::Add(surface);
+	CGUIbase::add(surface);
 }
 
 
-/** Overloads the base Add method, so that child controls are added to the container's 'surface' control.*/
-void CGUIsysContainer::Add(CGUIbase* child) {
-	surface->Add(child);
+/** Overloads the base add method, so that child controls are added to the container's 'surface' control.*/
+void CGUIsysContainer::add(CGUIbase* child) {
+	surface->add(child);
 	adaptToContents(); //resize surface as required, adding scrollbars
 	needsUpdate = true;
 }

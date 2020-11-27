@@ -17,7 +17,7 @@ CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
 	menuButton->setBorderOn(true);
 	//menuButton->mousePassthru = true;
 	menuButton->setBorderOn(false);
-	Add(menuButton);
+	add(menuButton);
 
 	//get here
 
@@ -31,7 +31,7 @@ CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
 	//didn't get here
 	menu->minItemsShown = 3;
 	menu->resizeHorizontal = true;
-	rootUI->Add(menu);
+	rootUI->add(menu);
 
 }
 

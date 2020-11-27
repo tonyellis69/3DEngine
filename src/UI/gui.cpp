@@ -8,7 +8,7 @@ CGUIlabel2* gui::addLabel(std::string text, int x, int y) {
 	CGUIlabel2* label = new CGUIlabel2(x, y, style::labelPresets[0].x, style::labelPresets[0].y);
 	label->setText(text);
 
-	pGUIroot->Add(label);
+	pGUIroot->add(label);
 	return label;
 }
 

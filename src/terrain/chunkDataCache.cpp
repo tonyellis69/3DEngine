@@ -4,19 +4,19 @@
 
 /** Return the chunk data at this multibuf address. If it's not already in the 
 	cache, export it to the cache from the multibuf. */
-TChunkTriBuf2* ChunkDataCache::getData(int chunkAddr) {
+TChunkTriBuf2* ChunkDataCache::getData(int chunkaddr) {
 	timeStamp++;
-	auto chunkData = chunkCache.find(chunkAddr);
+	auto chunkData = chunkCache.find(chunkaddr);
 	if (chunkData == chunkCache.end()) {
 		//we need to copy this data to our cache
 
 		TChunkTriBuf2* buf = getFreeDataBuf();
 
-		int size = multiBuf->exportBlock(chunkAddr, (char*)buf->buf);
+		int size = multiBuf->exportBlock(chunkaddr, (char*)buf->buf);
 		buf->noTris = (size / sizeof(TChunkVert2)) / 3.0f;
 		buf->timeStamp = timeStamp;
-		chunkCache[chunkAddr] = buf;
-		buf->id = chunkAddr;
+		chunkCache[chunkaddr] = buf;
+		buf->id = chunkaddr;
 		return buf;
 	}
 

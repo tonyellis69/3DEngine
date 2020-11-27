@@ -117,7 +117,7 @@ public:
 	}
 	void freeModel(CModel* model);
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
-	void uploadDataTexture(int hShader, int hTexture);
+	void uploaddataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
 	void setFeedbackData(int shader, int nVars, const char** strings);
 	unsigned int acquireFeedbackVerts(CBaseBuf& srcBuf, TdrawMode srcDrawMode, CBaseBuf& destBuf, TdrawMode destDrawMode);
