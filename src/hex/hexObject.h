@@ -26,7 +26,7 @@ public:
 	virtual void setLineModel(const std::string& name);
 	void setDirection(THexDir direction);
 	void setZheight(float height);
-	virtual bool update(float dT) { return false; };
+	//virtual bool update(float dT) { return false; };
 	
 
 	virtual void draw();
