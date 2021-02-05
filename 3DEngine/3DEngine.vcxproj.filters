@@ -48,6 +48,9 @@
     <Filter Include="Source Files\messaging">
       <UniqueIdentifier>{a2f37271-955c-4fd6-a636-30fa839a2eed}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\sound">
+      <UniqueIdentifier>{f0fb6ba5-ec8a-41db-8fe3-f2b22aa225f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -102,9 +105,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\simplexnoise.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\SoundLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\superChunk.cpp">
@@ -449,6 +449,9 @@
     <ClCompile Include="..\src\intersect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sound\sound.cpp">
+      <Filter>Source Files\sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\chunk.h">
@@ -515,9 +518,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\simplexnoise.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\SoundLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\superChunk.h">
@@ -906,6 +906,9 @@
     </ClInclude>
     <ClInclude Include="..\src\intersect.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sound\sound.h">
+      <Filter>Source Files\sound</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

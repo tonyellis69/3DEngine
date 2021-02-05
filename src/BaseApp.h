@@ -44,6 +44,8 @@
 
 #include "messaging/messenger.h"
 
+
+
 //class CVMapp;
 class CBaseApp : public Icallback, ILogCallback, IGUImsg, public CMessenger {
 public:
@@ -95,7 +97,7 @@ public:
 	CEngine Engine;
 	//CWindow Window;
 	CGUIengine UIeng;
-	CSoundLib snd;
+	//CSoundLib snd;
 	CGUIroot GUIroot;
 	CWin win;
 

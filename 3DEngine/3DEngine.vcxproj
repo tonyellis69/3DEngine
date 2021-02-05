@@ -56,7 +56,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\SFML-1.6\include;$(ProjectDir)..\..\glew\include\GL;$(ProjectDir)..\..\glm;$(ProjectDir)..\..\glfw32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\glew\include\GL;$(ProjectDir)..\..\glm;$(ProjectDir)..\..\glfw32\include;$(ProjectDir)..\..\sdl2\SDL2\include;$(ProjectDir)..\..\sdl2\SDL2_mixer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -69,17 +69,17 @@
       <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>opengl32.lib;sfml-audio-s-d.lib;sfml-system-s-d.lib;glew32s.lib;glfw3.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;assimp-vc142-mt.lib;SDL2.lib;SDL2main.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-d.lib</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;$(ProjectDir)..\..\sdl2\SDL2_mixer\lib\x86;$(ProjectDir)..\..\sdl2\SDL2\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions> /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\SFML-1.6\include;$(ProjectDir)..\..\glew\include\GL;$(ProjectDir)..\..\glm;$(ProjectDir)..\..\glfw32\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>SFML_STATIC;WIN32;NDEBUG;_LIB;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\src;$(ProjectDir)..\..\glew\include\GL;$(ProjectDir)..\..\glm;$(ProjectDir)..\..\glfw32\include;$(ProjectDir)..\..\sdl2\SDL2\include;$(ProjectDir)..\..\sdl2\SDL2_mixer\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
@@ -87,8 +87,8 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Lib>
-      <AdditionalDependencies>OpenGL32.lib;sfml-audio-s.lib;sfml-system-s.lib;glew32s.lib;glfw3.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32s.lib;glfw3.lib;assimp-vc142-mt.lib;SDL2.lib;SDL2main.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\3DEngine\lib;$(ProjectDir)..\..\sdl2\SDL2\lib\x86;$(ProjectDir)..\..\sdl2\SDL2_mixer\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)..\lib\$(ProjectName).lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
@@ -164,7 +164,7 @@
     <ClCompile Include="..\src\simplexnoise.cpp" />
     <ClCompile Include="..\src\skyDome.cpp" />
     <ClCompile Include="..\src\smallsysf.cpp" />
-    <ClCompile Include="..\Src\SoundLib.cpp" />
+    <ClCompile Include="..\src\sound\sound.cpp" />
     <ClCompile Include="..\src\superChunk.cpp" />
     <ClCompile Include="..\src\SysFnt.cpp" />
     <ClCompile Include="..\src\terrain.cpp" />
@@ -310,7 +310,7 @@
     <ClInclude Include="..\src\simplexnoise.h" />
     <ClInclude Include="..\src\skyDome.h" />
     <ClInclude Include="..\src\smallsysf.h" />
-    <ClInclude Include="..\Src\SoundLib.h" />
+    <ClInclude Include="..\src\sound\sound.h" />
     <ClInclude Include="..\src\superChunk.h" />
     <ClInclude Include="..\Src\SysFnt.h" />
     <ClInclude Include="..\src\terrain.h" />

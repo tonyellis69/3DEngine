@@ -5,7 +5,7 @@
 //#include "Renderer.h"
 #include "renderer\renderer.h"
 //#include "ImageLib.h"
-#include "SoundLib.h"
+/////#include "SoundLib.h"
 #include "Timer.h"
 //#include "Sprite.h"
 //#include "2DPolygon.h"
@@ -138,7 +138,7 @@ public:
 	void recompileShaders();
 
 	//CImageLib ImageLib;
-	CSoundLib SoundLib;
+	//CSoundLib SoundLib;
 	CTimer Time;
 //	CSceneObj Scene; 
 

@@ -8,7 +8,7 @@
 
 #include "utils/log.h"
 
-//using namespace watch;
+#include "sound/sound.h"
 
 CFont* style::defaultFont;
 
@@ -73,6 +73,9 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 
 	sysLog <<  "BaseApp constructor finished. Yay!\n";
 
+	if (!snd::init(44100)) {
+		fatalLog << "Sound initialisation failed.";
+	}
 }
 
 
@@ -534,6 +537,7 @@ CBaseApp::~CBaseApp() {
 	fclose(ErrStream);
 	delete drawFuncs;
 	GUIroot.setDrawFuncs(NULL);
+
 }
 
 
