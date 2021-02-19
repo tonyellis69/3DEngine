@@ -424,6 +424,7 @@ void CBaseApp::initLogWindow() {
 	logWindow->setBorderOn(true);
 	logWindow->setFont(smallSysFont);
 
+	logWindow->setTextColour(glm::vec4(1));
 
 	logWindow->resizeMode = resizeNone;
 	//sysLog.setCallback(this);
