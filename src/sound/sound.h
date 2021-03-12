@@ -12,6 +12,7 @@ namespace snd {
 	int loadSample(const std::string& name, const std::string& filename);
 	void play(int id);
 	void play(const std::string name);
+	void setVolume(int volume);
 
 
 

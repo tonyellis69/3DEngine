@@ -57,5 +57,9 @@ namespace snd {
 		Mix_PlayChannel(-1, samplesStr[name], 0);
 	}
 
+	void setVolume(int volume) {
+		Mix_Volume(-1, volume);
+	}
+
 
 }

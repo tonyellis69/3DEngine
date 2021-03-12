@@ -8,6 +8,8 @@
 #include "intersect.h"
 
 
+bool dbgOn = false;
+
 CHex::CHex() {
 	x = 0; y = 0; z = 0;
 }
@@ -85,6 +87,13 @@ glm::vec3 axialToCube(float q, float r) {
 	return glm::vec3(x, y, z);
 }
 
+CHex axialToCube(int q, int r) {
+	int x = q;
+	int z = r;
+	int y = -x - z;
+	return CHex(x, y, z);
+}
+
 /** Convert cube coordinates to odd-row offset coordinates.*/
 glm::i32vec2 cubeToOffset(const CHex& hex) {
 	return glm::i32vec2(hex.x + (hex.z - (hex.z & 1)) / 2, hex.z);
@@ -100,16 +109,16 @@ glm::vec3 cubeToWorldSpace(CHex& hex) {
 	//float x = (hex.x + (-0.5f * (hex.z & 1))) * hexWidth;
 	//float y = -hex.z * 1.5f;
 	glm::i32vec2 offset = cubeToOffset(hex);
-	float x = (offset.x + (0.5f * (hex.z & 1)))* hexWidth;
+	float x = (offset.x + (0.5f * (hex.z & 1))) * hexWidth;
 	float y = -offset.y * 1.5f;
-	return glm::vec3(x,y,0);
+	return glm::vec3(x, y, 0);
 }
 
 /** Convert odd-row offset coordinates to cube coordinates. */
 CHex offsetToCube(int x, int y) {
 	CHex hex;
 	hex.x = x - (y - (y & 1)) / 2;
-	hex.z = y;		
+	hex.z = y;
 	hex.y = -hex.x - hex.z;
 	return hex;
 }
@@ -126,7 +135,7 @@ CHex hexRound(glm::vec3& cubePos) {
 
 	//reset component with largest change. This ensures
 	//x + y + z = 0 as it should.
-	if (x_diff > y_diff&& x_diff > z_diff)
+	if (x_diff > y_diff && x_diff > z_diff)
 		rx = -ry - rz;
 	else if (y_diff > z_diff)
 		ry = -rx - rz;
@@ -138,17 +147,68 @@ CHex hexRound(glm::vec3& cubePos) {
 
 /** Convert fractional axial coordinates to integer axials .*/
 CHex hexRound(float q, float r) {
-	return cubeToAxial(hexRound(axialToCube(q, r)));
+	return /*cubeToAxial*/(hexRound(axialToCube(q, r)));
 }
 
 /** Treat points as being on an XY plane, with z=0. */
-CHex worldSpaceToHex(glm::vec3& worldSpace) {
+CHex OLDworldSpaceToHex(glm::vec3& worldSpace) {
+
+	float x = worldSpace.x;
+	float t = fmod(abs(x), sqrt(3.0f) * 0.5f);
+	if (fmod(x, sqrt(3.0f) * 0.5f) < 0.025f)
+		x += 0.1f;
+
 	//find fractional position
-	float q = sqrt(3.0f) / 3.0f * worldSpace.x - 1.0f / 3.0f * -worldSpace.y;
+	float q = (sqrt(3.0f) / 3.0f * x) - 1.0f / 3.0f * -worldSpace.y;
 	float r = -2.0f / 3.0f * worldSpace.y;
 
 	return hexRound(q, r);
 }
+
+CHex worldSpaceToHex(glm::vec3& worldSpace) {
+	//first find the rectangle for this point
+	float halfHexHeight = hexHeight / 2.0f;
+	float hexQuarterHeight = hexHeight / 4.0f;
+	float rectHeight = hexHeight * 0.75f;
+	
+	int row = -floor(((worldSpace.y + hexQuarterHeight) ) / rectHeight);
+
+	bool rowIsOdd = int(row) & 1 == 1;
+
+	float offset = rowIsOdd ? 0 : halfHexWidth;
+	int col = floor((worldSpace.x + offset) / hexWidth);
+
+
+	//now check if we're in the upper triangles
+	//first, find BL origin of rectangle
+	glm::vec3 BL = { -halfHexWidth +  col * hexWidth, -hexQuarterHeight + row * -rectHeight,0 };
+	if (rowIsOdd)
+		BL.x += halfHexWidth;
+
+	glm::vec2 relative = (worldSpace) - (BL);
+	if (relative.y > halfHexHeight) {
+		relative.y -= halfHexHeight;
+		float slope = hexQuarterHeight / halfHexWidth;
+
+		//find which triangle to check against
+		if (relative.x < halfHexWidth) {
+			if (relative.y > relative.x * slope) {
+				row--;
+				if (!rowIsOdd)
+					col--;
+			}
+		}
+		else if (relative.y > (hexWidth - relative.x) * slope) {
+			row--;
+			if (rowIsOdd)
+				col++;
+		}
+	}
+	
+
+	return offsetToCube(col, row);
+}
+
 
 /** Distance between two hex coordinates. */
 int cubeDistance(CHex& cubeA, CHex& cubeB) {
@@ -418,11 +478,17 @@ float hexAngle(CHex& start, CHex& end) {
 
 /** Return the nearest hex direction to the given angle. */
 THexDir angleToDir(float angle) {
-	angle += M_PI / 6.0f;
-	angle = fmod(angle, 2 * M_PI);
+	glm::vec3 A = glm::rotate(glm::vec3(1, 0, 0), angle, glm::vec3(0, 0, 1));
 
-	THexDir dir = THexDir(angle / (M_PI / 3.0f));
-	return dir;
+	float nearestDot = -FLT_MAX; int nearestFace;
+	for (int face = 0; face < 6; face++) {
+		float dot = glm::dot(A, moveVector3D[face]);
+		if (dot > nearestDot) {
+			nearestFace = face;
+			nearestDot = dot;
+		}
+	}
+	return THexDir(nearestFace);
 }
 
 /** Return opposite directon. */
@@ -564,3 +630,12 @@ CHex findRingCornerHex(int radius, int corner) {
 
 
 
+/** Returns a consistent exit direction for a segment leaving a hex via a corner. */
+THexDir findCornerExit(glm::vec3& start, glm::vec3& corner, CHex& hex) {
+	glm::vec3 extension = glm::normalize(corner - start) * 0.1f;
+	glm::vec3 exitPoint = corner + extension;
+	CHex newHex = worldSpaceToHex(exitPoint);
+	//ensures borderline cases default to the same hex other hex code would provide
+
+	return neighbourDirection(hex,newHex);
+}

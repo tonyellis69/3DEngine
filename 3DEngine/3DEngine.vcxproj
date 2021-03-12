@@ -224,6 +224,7 @@
     <ClCompile Include="..\src\UI\textSprite.cpp" />
     <ClCompile Include="..\src\utils\idContainer.cpp" />
     <ClCompile Include="..\src\utils\log.cpp" />
+    <ClCompile Include="..\src\utils\random.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\win\win.cpp" />
   </ItemGroup>
@@ -378,6 +379,7 @@
     <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\utils\idContainer.h" />
     <ClInclude Include="..\src\utils\log.h" />
+    <ClInclude Include="..\src\utils\random.h" />
     <ClInclude Include="..\src\vertBufs.h" />
     <ClInclude Include="..\src\win\win.h" />
   </ItemGroup>

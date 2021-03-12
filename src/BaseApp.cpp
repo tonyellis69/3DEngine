@@ -225,8 +225,8 @@ bool CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
 
 void CBaseApp::AppTasks() {
 
-	if (Engine.MakingFit) //activate the global scaling matrix, if we're using one.
-		Engine.applyGlobalScale(); //TO DO: messes GUI - look into or scrap - prob due to line-drawing methods
+	//if (Engine.MakingFit) //activate the global scaling matrix, if we're using one.
+	//	Engine.applyGlobalScale(); //TO DO: messes GUI - look into or scrap - prob due to line-drawing methods
 
 	Engine.clearFrame();
 
@@ -245,15 +245,15 @@ void CBaseApp::AppTasks() {
 	}
 
 
-	keyCheck(); //happens every frame, therefore responsive
 
 	//TO DO: mouseCheck, which calls user with last reported mouse position.
 
 	if (!Paused) {
-		//Engine.updateRegisteredSprites(dT);
 		Update();
 	}
 	
+
+	keyCheck(); //happens every frame, therefore responsive
 
 	if (Engine.skyDome) {
 		drawSkyDome();
@@ -267,8 +267,6 @@ void CBaseApp::AppTasks() {
 
 	physEng.update((float)dT * 10.0f);
 
-
-	//Engine.applyUserScale(); //Scale matrix in case scene or other user drawing is zoomed
 
 	Engine.drawModels();
 	
