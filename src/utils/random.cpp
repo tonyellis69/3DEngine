@@ -14,5 +14,17 @@ namespace rnd {
 		return d(randEngine);
 	}
 
+	/** Return a random float between 0 and n. */
+	float rand(float n) {
+		std::uniform_real_distribution<float> f(0.0f,n);
+		return f(randEngine);
+	}
+
+	/** Return a random float between r1 and r2. */
+	float rand(float r1, float r2)	{
+		std::uniform_real_distribution<float> f(r1, r2);
+		return f(randEngine);
+	}
+
 
 }

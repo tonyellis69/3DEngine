@@ -35,9 +35,10 @@ bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec
 	}
 
 	//if seg1 intersects either end of seg2, report this
-	if (a1 == 0 && inColinearSegment(seg1A, seg1B, seg2B))
+	float t = 1E-03f; 
+	if (abs(a1) < t && inColinearSegment(seg1A, seg1B, seg2B))
 		intersect = { 0,1,0 };
-	else if (a2 == 0 && inColinearSegment(seg1A, seg1B, seg2A))
+	else if (abs(a2) < t && inColinearSegment(seg1A, seg1B, seg2A))
 		intersect = { 1,0,0 };
 
 	return false;
