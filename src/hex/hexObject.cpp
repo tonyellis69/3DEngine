@@ -2,6 +2,8 @@
 
 #include "..\utils\log.h"
 
+#include "..\3Dtest\src\hexRenderer.h"
+
 #include <glm/gtc/matrix_transform.hpp>	
 
 
@@ -17,10 +19,6 @@ CHexObject::CHexObject() {
 	moveSpeed = 7.0f;
 
 	buildWorldMatrix();
-}
-
-void CHexObject::setHexRenderer(IHexRenderer* rendrObj) {
-	hexRendr = rendrObj;
 }
 
 
@@ -53,7 +51,7 @@ void CHexObject::setPosition(CHex& hex) {
 }
 
 void CHexObject::setLineModel(const std::string& name) {
-	lineModel = hexRendr->getLineModel(name);
+	lineModel = hexRendr2.getLineModel(name);
 }
 
 /** Set the rotation and facing direction of this object. */
@@ -73,7 +71,7 @@ void CHexObject::setZheight(float height) {
 
 
 void CHexObject::draw(){
-	hexRendr->drawLineModel(lineModel);
+	hexRendr2.drawLineModel(lineModel);
 }
 
 

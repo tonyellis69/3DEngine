@@ -89,7 +89,7 @@ std::tuple<CHex, CHex> findTriangle(CHex& apex, int hexLength, float angle, floa
 THexList* findArc(CHex& apex, int hexLength, float angle, float rotation);
 THexList* findRing( int radius, CHex& centre);
 std::tuple<int, int> findRingHex(int radius, float angle);
-THexList* findArc2(CHex& apex, int radius, float angle, float rotation);
+THexList findArc2(CHex& apex, int radius, float angle, float rotation);
 CHex findRingCornerHex(int radius, int corner);
 
 THexDir findCornerExit(glm::vec3& start, glm::vec3& corner, CHex& hex);

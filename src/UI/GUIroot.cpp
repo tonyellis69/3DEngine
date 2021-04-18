@@ -1,6 +1,8 @@
 #include "GUIroot.h"
 #include "GUImouse.h"
 
+#include "UI/uiRender.h"
+
 CGUIroot* CGUIbase::rootUI = NULL;
 CDrawFuncs* CGUIdragDrop::pDrawFuncs = NULL;
 
@@ -67,7 +69,7 @@ bool CGUIroot::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheelDelt
 	CMessage msg;
 	msg.Msg = uiMouseWheel;
 	msg.value = wheelDelta;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 
 	return false;
 }
@@ -112,7 +114,7 @@ void CGUIroot::Draw(float dT) {
 	//CGUIbase::Draw(); //draw every other child control of root first
 
 	UIrect* parentClipbox = &parent->Clipbox;
-	pDrawFuncs->setClip(Clipbox);
+	uiDraw::setClip(Clipbox);
 
 	//then draw each subcontrol
 	for (size_t i = 0; i < controls.size(); i++) {
@@ -126,7 +128,7 @@ void CGUIroot::Draw(float dT) {
 	}
 
 	//draw mouse control if any
-	pDrawFuncs->setClip(Clipbox);
+	uiDraw::setClip(Clipbox);
 	//mouse->DrawSelf();
 	if (dragDropObj) {
 		dragDropObj->drawSelf(mousePos.x, mousePos.y);
@@ -145,7 +147,7 @@ bool CGUIroot::OnMouseMove(const int mouseX, const int mouseY, int key) {
 	msg.value = key;
 	msg.x = mouseX;
 	msg.y = mouseY;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 	return false;
 }
 
@@ -157,7 +159,7 @@ bool CGUIroot::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	msg.x = mouseX;
 	msg.y = mouseY;
 	msg.value = key;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 	return true;
 }
 
@@ -167,7 +169,7 @@ void CGUIroot::onLMouseUp(const int mouseX, const int mouseY) {
 	msg.x = mouseX;
 	msg.y = mouseY;
 	//msg.value = key;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 
 	
 }
@@ -177,7 +179,7 @@ void CGUIroot::OnRMouseDown(const  int mouseX, const  int mouseY) {
 	msg.Msg = uiMsgRMdown;
 	msg.x = mouseX;
 	msg.y = mouseY;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 }
 
 /** Root response to being clicked. */
@@ -185,7 +187,7 @@ bool CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
 	msg.x = mouseX; msg.y = mouseY;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 	return true;
 }
 
@@ -194,7 +196,7 @@ bool CGUIroot::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = uiMsgRMouseUp;
 	msg.x = mouseX; msg.y = mouseY;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 } */
 
 /** add this control as something that must be dismissed before the user can return to
@@ -211,6 +213,15 @@ void CGUIroot::addModal(CGUIbase* control) {
 isn't over it. */
 void CGUIroot::setFocus(CGUIbase * control) {
 	focusControl = control;
+}
+
+/** Provides a mouse capture/release service for controls such as scrollbars.
+	TO DO: make Win global and call it directly instead? */	
+void CGUIroot::captureMouse(bool on) {
+	TGUImessage msg;
+	msg.msg = uiMouseCapture;
+	msg.value = on ? 1 : 0; 
+	msgObj->GUImsg(uniqueID, msg);
 }
 
 

@@ -12,20 +12,8 @@
     <Filter Include="Header Files\renderer">
       <UniqueIdentifier>{356f4523-7ed1-410d-8c19-c853150844af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="physics">
-      <UniqueIdentifier>{68bf13a4-7614-482d-9d7c-c43c43446815}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="plants">
-      <UniqueIdentifier>{f8095697-a025-4e4c-a489-51c83798dc72}</UniqueIdentifier>
-    </Filter>
     <Filter Include="vm">
       <UniqueIdentifier>{0182bb3e-e9c5-4d69-aa75-cd0204fe3489}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="texGen">
-      <UniqueIdentifier>{d613a150-3276-4d6b-a9f8-110f621a3eef}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="terrain2">
-      <UniqueIdentifier>{27ed68a3-1a9e-4120-8c53-13d02f5fcf55}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\external">
       <UniqueIdentifier>{5ab26ddf-a872-492b-af73-be35d5beb9bb}</UniqueIdentifier>
@@ -56,13 +44,7 @@
     <ClCompile Include="..\Src\BaseApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\chunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\colour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIbase.cpp">
@@ -107,29 +89,14 @@
     <ClCompile Include="..\src\simplexnoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\superChunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\terrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\TexLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UIengine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\vertBufs.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\2d.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\3d.cpp">
-      <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\3dobject.cpp">
       <Filter>Header Files\renderer</Filter>
@@ -140,34 +107,16 @@
     <ClCompile Include="..\src\renderer\light.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\model.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\renderer.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\direction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\multiBuf.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\buf.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\baseBuf.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\skyDome.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\material.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\texManager.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\renderModel.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\modelMulti.cpp">
@@ -185,44 +134,11 @@
     <ClCompile Include="..\src\renderer\billboard.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\physics\physObj.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\physObjManager.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\basePhysObj.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\terrainPhysObj.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\bsphere.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\collision.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\contacts.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\aabb.cpp">
-      <Filter>physics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\playerObj.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\renderDrawFuncs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIimage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\poisson.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Plants\fractalTree.cpp">
-      <Filter>plants</Filter>
     </ClCompile>
     <ClCompile Include="..\src\shapes.cpp">
       <Filter>Source Files</Filter>
@@ -241,9 +157,6 @@
     </ClCompile>
     <ClCompile Include="..\src\renderer\baseTexture.cpp">
       <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\font.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SysFnt.cpp">
       <Filter>Source Files</Filter>
@@ -293,12 +206,6 @@
     <ClCompile Include="..\src\renderer\fontManager.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\texGen\compositor.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\texGen.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -311,35 +218,11 @@
     <ClCompile Include="..\src\colourGradient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\terrain\terrain2.cpp">
-      <Filter>terrain2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\terrain\shell.cpp">
-      <Filter>terrain2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\texGenUI.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\GUInoiseCtrl.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\composeTest.cpp">
-      <Filter>texGen</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\rowObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIdropdownMenu.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\terrain\scArray.cpp">
-      <Filter>terrain2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\terrain\superChunk2.cpp">
-      <Filter>terrain2</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\texGen\GUItrackImage.cpp">
-      <Filter>texGen</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\mesh.cpp">
       <Filter>Header Files\renderer</Filter>
@@ -368,17 +251,8 @@
     <ClCompile Include="..\src\UI\GUIposition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIbutton.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\material2.cpp">
       <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\terrain\chunk2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\physics\terrainPhysObj2.cpp">
-      <Filter>physics</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIscrollbar2.cpp">
       <Filter>Source Files</Filter>
@@ -397,9 +271,6 @@
     </ClCompile>
     <ClCompile Include="..\src\hex\hexObject.cpp">
       <Filter>Source Files\hex</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\multiBuf2.cpp">
-      <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\imageBuf.cpp">
       <Filter>Header Files</Filter>
@@ -434,9 +305,6 @@
     <ClCompile Include="..\src\sharedBuf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\terrain\chunkDataCache.cpp">
-      <Filter>terrain2</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\messaging\messenger.cpp">
       <Filter>Source Files\messaging</Filter>
     </ClCompile>
@@ -455,21 +323,24 @@
     <ClCompile Include="..\src\utils\random.cpp">
       <Filter>Header Files\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\buf.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\uiRender.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\texManager.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\chunk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\cnode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\colour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Delegate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIbase.h">
@@ -517,19 +388,10 @@
     <ClInclude Include="..\Src\Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Reader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\simplexnoise.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\superChunk.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\SysFnt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Src\TexLoader.h">
@@ -541,17 +403,8 @@
     <ClInclude Include="..\Src\Types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UIengine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\vertBufs.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\2d.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\3d.h">
-      <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\3dobject.h">
       <Filter>Header Files\renderer</Filter>
@@ -562,34 +415,16 @@
     <ClInclude Include="..\src\renderer\light.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\model.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\renderer.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\direction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\multiBuf.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\buf.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\baseBuf.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\skyDome.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\material.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\texManager.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\renderModel.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\modelMulti.h">
@@ -607,36 +442,6 @@
     <ClInclude Include="..\src\renderer\billboard.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\physics\physObj.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\physObjManager.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\basePhysObj.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\terrainPhysObj.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\bsphere.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\collision.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\contacts.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\aabb.h">
-      <Filter>physics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\playerObj.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\renderDrawFuncs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\GUIimage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -645,9 +450,6 @@
     </ClInclude>
     <ClInclude Include="..\src\poisson.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Plants\fractalTree.h">
-      <Filter>plants</Filter>
     </ClInclude>
     <ClInclude Include="..\src\shapes.h">
       <Filter>Header Files</Filter>
@@ -715,12 +517,6 @@
     <ClInclude Include="..\src\renderer\fontManager.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\texGen\compositor.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\texGen.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\GUIpaletteBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -733,35 +529,11 @@
     <ClInclude Include="..\src\colourGradient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\terrain\terrain2.h">
-      <Filter>terrain2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrain\shell.h">
-      <Filter>terrain2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\texGenUI.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\GUInoiseCtrl.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\composeTest.h">
-      <Filter>texGen</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\rowObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIdropdownMenu.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrain\scArray.h">
-      <Filter>terrain2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrain\superChunk2.h">
-      <Filter>terrain2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\texGen\GUItrackImage.h">
-      <Filter>texGen</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\mesh.h">
       <Filter>Header Files\renderer</Filter>
@@ -796,20 +568,8 @@
     <ClInclude Include="..\src\UI\GUIposition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\GUIbutton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\material2.h">
       <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\3DTest\src\worldUI.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrain\chunk2.h">
-      <Filter>terrain2</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\physics\terrainPhysObj2.h">
-      <Filter>physics</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIcontrols.h">
       <Filter>Header Files</Filter>
@@ -819,9 +579,6 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\text.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\BaseApp.h">
-      <Filter>Header Files\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\src\importer\importer.h">
       <Filter>Source Files\importer</Filter>
@@ -841,9 +598,6 @@
     <ClInclude Include="..\src\hex\hexObject.h">
       <Filter>Source Files\hex</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\multiBuf2.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\imageBuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -855,9 +609,6 @@
     </ClInclude>
     <ClInclude Include="..\..\VMtest\src\ITigObj.h">
       <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\terrain\iterrain.h">
-      <Filter>terrain2</Filter>
     </ClInclude>
     <ClInclude Include="..\..\VMtest\src\Ivm.h">
       <Filter>vm</Filter>
@@ -886,9 +637,6 @@
     <ClInclude Include="..\src\sharedBuf.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\terrain\chunkDataCache.h">
-      <Filter>terrain2</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\messaging\events.h">
       <Filter>Source Files\messaging</Filter>
     </ClInclude>
@@ -915,6 +663,21 @@
     </ClInclude>
     <ClInclude Include="..\src\utils\random.h">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\BaseApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\buf.h">
+      <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\uiRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\texManager.h">
+      <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 
-
 #include "GUIbutton2.h"
+
+#include "UI/uiRender.h"
 
 using namespace glm;
 
@@ -11,8 +12,6 @@ CGUIbutton2::CGUIbutton2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	label->setText("Button");
 	label->setTextAlignment(tcentred);
 	add(label);
-	setBackColour1(oldbackColour1);
-	setBackColour2(oldbackColour2);
 }
 
 void CGUIbutton2::DrawSelf() {
@@ -21,22 +20,26 @@ void CGUIbutton2::DrawSelf() {
 	if (MouseDown == this) {
 		//setBackColour1(oldbackColour2);
 		//setBackColour2(oldbackColour1);
-		pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour2, (glm::vec4&)backColour1);
+		//uiDraw::drawRect(drawBox, (glm::vec4&)backColour2, (glm::vec4&)backColour1);
+		uiDraw::drawRect(drawBox, style::uiOldbackColour2, style::uiOldbackColour1);
 	}
 	else {
 		//setBackColour1(oldbackColour1);
 		//setBackColour2(oldbackColour2);
-		pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
+		//uiDraw::drawRect(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
+		uiDraw::drawRect(drawBox, style::uiOldbackColour1, style::uiOldbackColour2);
 	}
 	//pDrawFuncs->drawCtrlRect(*this);
-//	pDrawFuncs->drawRect2(drawBox, style::uiOldbackColour1, style::uiOldbackColour2);
+//	uiDraw::drawRect(drawBox, style::uiOldbackColour1, style::uiOldbackColour2);
 
 	if (MouseOver == this)
 		//setBorderColour(UIdarkGrey);
-		pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
+		uiDraw::drawBorder(drawBox, style::uiDarkGrey);
+		
 	else
 		//setBorderColour(UIlightGrey);
-		pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
+		//uiDraw::drawBorder(drawBox, style::uiLightGrey);
+		uiDraw::drawBorder(drawBox, style::uiLightGrey);
 //	pDrawFuncs->drawCtrlBorder(*this);
 }
 

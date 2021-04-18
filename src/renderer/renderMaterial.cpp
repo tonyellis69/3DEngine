@@ -1,8 +1,8 @@
 #include "renderMaterial.h"
-
+#include "renderer.h"
 
 CRenderMaterial::CRenderMaterial() {
-	pRenderer = &CRenderer::getInstance();
+	pRenderer = &renderer; // &CRenderer::getInstance();
 }
 
 void CRenderMaterial::addImage(std::string filename) {

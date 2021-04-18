@@ -8,7 +8,7 @@
 using namespace glm;
 
 CModel2::CModel2() {
-	CRenderer* pRenderer = &CRenderer::getInstance();
+	CRenderer* pRenderer = &renderer; // &CRenderer::getInstance();
 	setDrawCallout(pRenderer->phongDrawCallout, pRenderer);
 	material.diffuse = vec4(col::randHue(),1.0f);
 	material.ambient = material.diffuse;
@@ -32,18 +32,37 @@ void CModel2::loadMesh(CMesh& newMesh) {
 }
 
 /** Upload the mesh data to a graphics hardware buffer. */
+//!!!!Adapted to CBuf2 without testing!!!!!!!!!!!!
 void CModel2::bufferMesh() {
 	if (mesh.texCoords.empty()) {
-		buffer.storeVertexes(mesh.vertices, mesh.normals);
+		/*buffer.storeVertexes(mesh.vertices, mesh.normals);
 		buffer.storeIndex(mesh.indices.data(), mesh.indices.size());
-		buffer.storeLayout(3, 3, 0, 0);
+		buffer.storeLayout(3, 3, 0, 0);*/
+
+		std::vector<vBuf::T3DnormVert> normVerts;
+		int i = 0;
+		for (auto v : mesh.vertices) {
+			vBuf::T3DnormVert nv;
+			nv.v = v; nv.normal = mesh.normals[i++];
+			normVerts.push_back(nv);
+		}
+
+		buffer.storeVerts(normVerts, mesh.indices, 3, 3);
 		return;
 	}
 
-	buffer.storeVertexes(mesh.vertices, mesh.normals,mesh.texCoords);
+	/*buffer.storeVertexes(mesh.vertices, mesh.normals,mesh.texCoords);
 	buffer.storeIndex(mesh.indices.data(), mesh.indices.size());
-	buffer.storeLayout(3, 3, 2, 0);
+	buffer.storeLayout(3, 3, 2, 0);*/
 
+	std::vector<vBuf::T3DnormTexVert> normTexVerts;
+	int i = 0;
+	for (auto v : mesh.vertices) {
+		normTexVerts.push_back({ v,mesh.normals[i],mesh.texCoords[i] });
+		i++;
+	}
+	unsigned int nVerts = normTexVerts.size();
+	buffer.storeVerts(normTexVerts, mesh.indices, 3, 3, 2);
 }
 
 void CModel2::draw() {

@@ -8,7 +8,7 @@
 #include "glm\gtc\matrix_transform.hpp"
 
 CTextSprite::CTextSprite() {
-	pRenderer = &CRenderer::getInstance();
+	pRenderer = &renderer; // &CRenderer::getInstance();
 	bufId = { INT_MAX,INT_MAX };
 	causesNewLine = false;
 }
@@ -51,6 +51,9 @@ void CTextSprite::setTextColour(glm::vec4& colour) {
 
 /** Create the temporary polygons required to render this text. */
 void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
+
+
+	//std::vector<vBuf::T2DtexVert> textQuads;
 	std::vector<vBuf::T2DtexVert> textQuads;
 	std::vector<unsigned int> textQuadsIndex;
 	int v = 0;
@@ -77,9 +80,11 @@ void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
 		}
 	}
 
+
 	tmpQuadBuf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
 	tmpQuadBuf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
 	tmpQuadBuf.storeLayout(2, 2, 0, 0);
+
 
 	this->font = font;
 	size = glm::i32vec2(blCorner.x, font->lineHeight);

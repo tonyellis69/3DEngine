@@ -1,6 +1,7 @@
 
-
 #include "GUIimage1D.h"
+
+#include "uiRender.h"
 
 using namespace glm;
 
@@ -22,13 +23,13 @@ void CGUIimage1D::setTextureData(void * pixels) {
 
 void CGUIimage1D::DrawSelf() {
 	if (texture) { //let's draw a texture!
-		pDrawFuncs->drawTextureGradient(drawBox, *texture);
+		uiDraw::drawTextureGradient(drawBox, *texture);
 	}
 	else
-		pDrawFuncs->drawRect2(drawBox, (vec4&)backColour1, (vec4&)backColour2);
+		uiDraw::drawRect(drawBox, (vec4&)backColour1, (vec4&)backColour2);
 
 	if (drawBorder) {
-		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
+		uiDraw::drawBorder(drawBox, (vec4&)borderColour);
 	}
 }
 

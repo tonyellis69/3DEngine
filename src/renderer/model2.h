@@ -2,7 +2,7 @@
 
 #include "3dobject.h"
 #include "mesh.h"
-#include "buf.h"
+//#include "buf.h"
 #include "material2.h"
 #include "renderTexture.h"
 
@@ -24,7 +24,7 @@ public:
 	void calcBBextent();
 
 	CMesh mesh; ///<Stores the verts locally.
-	CBuf buffer; ///<Stores the verts in graphics memory.
+	CBuf2 buffer; ///<Stores the verts in graphics memory.
 
 	CMaterial2 material; ///TO DO: should this be a pointer to a material instead?
 	glm::vec3 scaleVec;

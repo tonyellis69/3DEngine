@@ -11,12 +11,14 @@
 #include "renderer\renderShader.h"
 #include "physics\physObj.h"
 
+#include "renderer\renderer.h"
+
 #include "shapes.h"
 
 //using namespace glm;
 using namespace vBuf;
 
-CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
+CEngine::CEngine() : Renderer(renderer) {
 
 	//CurrentTileSet = 0; //TO DO - should be the built-in default;
 	CurrentTexture = 0; //TO DO - should be the built-in default;
@@ -27,8 +29,8 @@ CEngine::CEngine() : Renderer(CRenderer::getInstance()) {
 	cursorFlash = 0;
 	tmpCursorPos = -1;
 	userScale = glm::vec2(1.0f,1.0f);
-	p2dR = &Renderer.rend2d;
-	skyDome = NULL;
+	//p2dR = &Renderer.rend2d;
+	//skyDome = NULL;
 }
 
 
@@ -328,7 +330,7 @@ unsigned int CEngine::getShaderDataHandle(std::string varName) {
 
 
 
-
+/*
 CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 	float ringStep = 360.0f / steps;
 	const int noRings = steps / 4;
@@ -392,7 +394,9 @@ CModel * CEngine::createHemisphere(glm::vec3 & pos, float radius, int steps) {
 
 	return dome;
 }
+*/
 
+/*
 CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int steps) {
 	//calculate the number of verts
 	const int noVerts = (steps + 1) * (steps + 1);
@@ -452,16 +456,16 @@ CModel * CEngine::createPlane(glm::vec3 & pos, float width, float depth, int ste
 }
 
 
-
+*/
 
 
 
 
 /** Free the various graphics memory buffers connected to this model.*/
-void CEngine::freeModel(CModel* model) {
-	model->freeBuffers();
-	model->init();
-}
+//void CEngine::freeModel(CModel* model) {
+//	model->freeBuffers();
+//	model->init();
+//}
 
 
 /** Draw the model with the given shader, offscreen, and store the returned vertex data
@@ -499,67 +503,67 @@ unsigned int CEngine::acquireFeedbackVerts(CBaseBuf& srcBuf, TdrawMode srcDrawMo
 }
 
 
-unsigned int CEngine::drawModelCount(CModel& model) {
-	Renderer.initQuery();
-	model.drawNew();
-	return Renderer.query();
-}
+//unsigned int CEngine::drawModelCount(CModel& model) {
+//	Renderer.initQuery();
+//	model.drawNew();
+//	return Renderer.query();
+//}
 
 
 
 /**	Create a CModel (subclassed to CRenderModel) and return a pointer to it. */
-CModel * CEngine::createModel() {
-	CRenderModel* model = new CRenderModel();
-	//model->pRenderer = &Renderer; //TO DO: do in a setter!
-	//model->buf.setRenderer(&Renderer); //TO DO: above setter should handle this!
-	CMaterial* material = createMaterial();
-	model->setMaterial(*material);
-	modelList.push_back(model);
-	return model;
-}
+//CModel * CEngine::createModel() {
+//	CRenderModel* model = new CRenderModel();
+//	//model->pRenderer = &Renderer; //TO DO: do in a setter!
+//	//model->buf.setRenderer(&Renderer); //TO DO: above setter should handle this!
+//	CMaterial* material = createMaterial();
+//	model->setMaterial(*material);
+//	modelList.push_back(model);
+//	return model;
+//}
 
 
 
-CBaseBuf * CEngine::createBuffer() {
-	return Renderer.createBuffer();
-}
+//CBaseBuf * CEngine::createBuffer() {
+//	return Renderer.createBuffer();
+//}
 
-CSkyDome * CEngine::createSkyDome() {
-	if (skyDome != NULL) {
-		cerr << "\nAttemp to create skydome when it already exists.";
-		return NULL;
-	}
-
-	CModel* dome = createHemisphere(glm::vec3(0, 0, 0), 1, 25);
-
-	skyDome = new CSkyDome();
-	skyDome->setModel(dome);
-
-	//load skyDome shader
-	skyDome->skyShader = Renderer.createShader(dataPath + "skyDome");
-	skyDome->skyShader->setType(userShader);
-	skyDome->hSkyDomeHeightColours = skyDome->skyShader->getUniformHandle("heightColour");
-	skyDome->hSkyDomeMVP = skyDome->skyShader->getUniformHandle("mvpMatrix");
-	dome->getMaterial()->setShader(skyDome->skyShader);
-
-	//cloud plane:
-	skyDome->plane = createPlane(glm::vec3(0, 450, -4), 10000, 10000, 20);
-
-	//create cloud material
-	skyDome->cloud = createMaterial(dataPath + "cloud001.png");
-	skyDome->cloud->setShader(Renderer.multiTexShader);
-	skyDome->cloud->setTile(0, glm::vec2(20));
-	skyDome->cloud->addImage(dataPath + "cloud002.png");
-	skyDome->cloud->setTile(1, glm::vec2(20));
-	skyDome->plane->setMaterial(*skyDome->cloud);
-
-	//create sun billboard
-	skyDome->sunBoard = createBillboard(glm::vec3(0, 400, -400), glm::vec2(50, 50));
-	skyDome->sunMat = createMaterial(dataPath + "sun2.png");
-	skyDome->sunMat->setShader(Renderer.billboardShader);
-	skyDome->sunBoard->setMaterial(*skyDome->sunMat);
-	return skyDome;
-}
+//CSkyDome * CEngine::createSkyDome() {
+//	if (skyDome != NULL) {
+//		cerr << "\nAttemp to create skydome when it already exists.";
+//		return NULL;
+//	}
+//
+//	CModel* dome = createHemisphere(glm::vec3(0, 0, 0), 1, 25);
+//
+//	skyDome = new CSkyDome();
+//	skyDome->setModel(dome);
+//
+//	//load skyDome shader
+//	skyDome->skyShader = Renderer.createShader(dataPath + "skyDome");
+//	skyDome->skyShader->setType(userShader);
+//	skyDome->hSkyDomeHeightColours = skyDome->skyShader->getUniformHandle("heightColour");
+//	skyDome->hSkyDomeMVP = skyDome->skyShader->getUniformHandle("mvpMatrix");
+//	dome->getMaterial()->setShader(skyDome->skyShader);
+//
+//	//cloud plane:
+//	skyDome->plane = createPlane(glm::vec3(0, 450, -4), 10000, 10000, 20);
+//
+//	//create cloud material
+//	skyDome->cloud = createMaterial(dataPath + "cloud001.png");
+//	skyDome->cloud->setShader(Renderer.multiTexShader);
+//	skyDome->cloud->setTile(0, glm::vec2(20));
+//	skyDome->cloud->addImage(dataPath + "cloud002.png");
+//	skyDome->cloud->setTile(1, glm::vec2(20));
+//	skyDome->plane->setMaterial(*skyDome->cloud);
+//
+//	//create sun billboard
+//	skyDome->sunBoard = createBillboard(glm::vec3(0, 400, -400), glm::vec2(50, 50));
+//	skyDome->sunMat = createMaterial(dataPath + "sun2.png");
+//	skyDome->sunMat->setShader(Renderer.billboardShader);
+//	skyDome->sunBoard->setMaterial(*skyDome->sunMat);
+//	return skyDome;
+//}
 
 CMaterial * CEngine::createMaterial(std::string filename) {
 	CMaterial* material = createMaterial();
@@ -592,18 +596,18 @@ CShader * CEngine::createShader() {
 
 
 
-CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
-	//create the object
-	CBillboard* billboard = new CBillboard(pos, size);
-	//billboard->pRenderer = &Renderer;
-	CMaterial* material = createMaterial();
-	material->setShader(Renderer.billboardShader);
-	billboard->setMaterial(*material);
-	modelList.push_back(billboard);
-		 
-	//return it
-	return billboard;
-}
+//CBillboard * CEngine::createBillboard(glm::vec3 & pos, glm::vec2 size) {
+//	//create the object
+//	CBillboard* billboard = new CBillboard(pos, size);
+//	//billboard->pRenderer = &Renderer;
+//	CMaterial* material = createMaterial();
+//	material->setShader(Renderer.billboardShader);
+//	billboard->setMaterial(*material);
+//	modelList.push_back(billboard);
+//		 
+//	//return it
+//	return billboard;
+//}
 
 
 //void CEngine::setCurrentCamera(CCamera * camera) {
@@ -615,9 +619,9 @@ CCamera * CEngine::getCurrentCamera() {
 	return Renderer.currentCamera;
 }
 
-CBasePhysObj * CEngine::addPhysics(C3dObject * model) {
-	return	physObjManager.addModel(model);
-}
+//CBasePhysObj * CEngine::addPhysics(C3dObject * model) {
+//	return	NULL; // physObjManager.addModel(model);
+//}
 
 void CEngine::recompileShaders() {
 	for (size_t s = 0; s < Renderer.shaderList.size(); s++)
@@ -632,8 +636,8 @@ CEngine::~CEngine(void) {
 	//	delete cameraList[c];
 	for (size_t m = 0; m < modelList.size(); m++)
 		 delete modelList[m];
-	if (skyDome)
-		delete skyDome;
+	//if (skyDome)
+	//	delete skyDome;
 	for (size_t m = 0; m<materialList.size(); m++)
 		delete materialList[m];
 	for (size_t s = 0; s<Renderer.shaderList.size(); s++)

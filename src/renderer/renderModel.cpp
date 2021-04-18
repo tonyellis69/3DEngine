@@ -4,7 +4,7 @@
 #include "renderer.h"
 
 CRenderModel::CRenderModel() : CModel() {
-	pRenderer = &CRenderer::getInstance();
+	pRenderer = &renderer;// &CRenderer::getInstance();
 }
 
 void CRenderModel::drawNew() {

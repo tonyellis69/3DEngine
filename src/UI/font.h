@@ -4,7 +4,8 @@
 #include <iostream>
 #include <vector>
 
-
+#include <string>
+#include <istream>
 
 #include "..\renderer\renderTexture.h"
 

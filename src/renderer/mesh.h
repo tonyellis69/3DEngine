@@ -7,7 +7,7 @@
 
 
 
-#include "buf.h"
+//#include "buf.h"
 #include "buf2.h"
 
 enum TMesh { meshTrisIndexed, meshTriStripIndexed };
@@ -49,7 +49,7 @@ class CMesh {
 public:
 	CMesh();
 	void calculateVertexNormals();
-	void exportToBuffer(CBuf& buf);
+	//void exportToBuffer(CBuf& buf);
 	void exportToBuffer(CBuf2& buf);
 	void clear();
 	void mergeUniqueVerts();

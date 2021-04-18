@@ -1,5 +1,7 @@
 #include "GUImenu.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 CGUImenu::CGUImenu(int x, int y, int w, int h) {
@@ -57,7 +59,7 @@ void CGUImenu::DrawSelf() {
 	//}
 	CGUIpanel::DrawSelf();
 	//if (selected >= 0 && highlightStyle == menuHighlightBar) {
-	//pDrawFuncs->drawRect2(items[selected]->drawBox, selectedColour, selectedColour);
+	//uiDraw::drawRect(items[selected]->drawBox, selectedColour, selectedColour);
 
 	//}
 }
@@ -152,7 +154,7 @@ bool CGUImenu::OnLMouseDown(const  int mouseX, const  int mouseY, int key) {
 	CMessage msg;
 	msg.Msg = uiMsgLMdown;
 	msg.value = focusItem;
-	pDrawFuncs->handleUImsg(*this, msg);
+	//pDrawFuncs->handleUImsg(*this, msg);
 	return true;
 }
 
@@ -175,7 +177,7 @@ bool CGUImenu::OnClick(const  int mouseX, const  int mouseY) {
 		msg.Msg = uiClickOutside;
 	msg.value = focusItem;
 
-	pDrawFuncs->handleUImsg(*this, msg);
+	//pDrawFuncs->handleUImsg(*this, msg);
 	if (callbackObj) {
 		callbackObj->GUIcallback(this, msg);
 	}
@@ -235,11 +237,11 @@ CGUImenuItem::CGUImenuItem(int x, int y, int w, int h) : CGUIlabel2(x,y,w,h) {
 
 void CGUImenuItem::DrawSelf() {
 	if (hasHighlight  && highlightStyle == menuHighlightBar) {
-		pDrawFuncs->drawRect2(drawBox, highlightColour, highlightColour);
+		uiDraw::drawRect(drawBox, highlightColour, highlightColour);
 	}
 
 	if (hasFocus  && focusStyle == menuHighlightBar) {
-		pDrawFuncs->drawRect2(drawBox, focusColour, focusColour);
+		uiDraw::drawRect(drawBox, focusColour, focusColour);
 	}
 	CGUIlabel2::DrawSelf();
 }

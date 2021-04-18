@@ -25,12 +25,12 @@ void CMesh::calculateVertexNormals() {
 }
 
 /** Write the vert data to the given graphics buffer object. */
-void CMesh::exportToBuffer(CBuf& buf) {
-	buf.storeVertexes(vertices.data(), sizeof(glm::vec3) * vertices.size(), vertices.size());
-	buf.storeIndex(indices.data(), indices.size());
-	buf.storeLayout(3, 0, 0, 0);
-
-}
+//void CMesh::exportToBuffer(CBuf& buf) {
+//	buf.storeVertexes(vertices.data(), sizeof(glm::vec3) * vertices.size(), vertices.size());
+//	buf.storeIndex(indices.data(), indices.size());
+//	buf.storeLayout(3, 0, 0, 0);
+//
+//}
 
 void CMesh::exportToBuffer(CBuf2& buf) {
 	buf.storeVerts(vertices, indices, 3);
@@ -86,7 +86,7 @@ void CMesh::linesToLineStrip() {
 
 	//run through index line pairs
 	std::vector<unsigned int> stripIndices;
-	for (int i = 0; i < indices.size(); i++) {
+	for (unsigned int i = 0; i < indices.size(); i++) {
 		stripIndices.push_back(indices[i]);
 		if (i % 2 && i < indices.size() - 1) { //second vertex of a line pair
 			if (indices[i] == indices[i + 1])

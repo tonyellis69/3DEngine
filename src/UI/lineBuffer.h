@@ -71,7 +71,7 @@ private:
 	int height;
 
 	ILineBuffer* pCallbackObj;
-	CRenderer* pRenderer;
+	//CRenderer* pRenderer;
 
 	//std::vector<CTextSprite*> textSprites;
 	std::vector< std::unique_ptr<CTextSprite> > textSprites;

@@ -1,5 +1,7 @@
 #include "GUIlabel2.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
@@ -22,12 +24,21 @@ void CGUIlabel2::setFont(CFont* newFont) {
 }
 
 void CGUIlabel2::setFont(const std::string& fontName) {
-	setFont(pDrawFuncs->getFont(fontName));
+	setFont(uiDraw::getFont(fontName));
 }
 
 void CGUIlabel2::setText(std::string newText) {
 	textData.text = newText;
-	renderText();
+	int oldWidth = lineRenderedWidth;
+	if (resizeToFit) {
+		calcLineRenderedWidth();
+		if (lineRenderedWidth > oldWidth) {
+			setWidth(lineRenderedWidth);
+			textBuf.setSize(getWidth(), getHeight());
+		}
+	}
+
+	//renderText();
 }
 
 void CGUIlabel2::setTextColour(UIcolour  colour) {
@@ -59,12 +70,10 @@ TTextAlign CGUIlabel2::getJustification() {
 
 
 void CGUIlabel2::DrawSelf() {
-	//if (textData.text.size()) //TO DO: blank text is sometimes corrupted, not sure why
-		pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
+	uiDraw::drawTexture(drawBox, textBuf.textTexture);
 	
 	 if (drawBorder) {
-		//pDrawFuncs->drawCtrlBorder(*this);
-		 pDrawFuncs->drawBorder2(drawBox, (glm::vec4&)borderColour);
+		 uiDraw::drawBorder(drawBox, borderColour);
 	}
 }
 

@@ -22,6 +22,61 @@
 //int totalchunks = 0;
 
 
+
+void APIENTRY glDebugOutput(GLenum source,
+	GLenum type,
+	unsigned int id,
+	GLenum severity,
+	GLsizei length,
+	const char* message,
+	const void* userParam)
+{
+	// ignore non-significant error/warning codes
+	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
+
+	if (severity == GL_DEBUG_SEVERITY_LOW)
+		return;
+
+	std::cout << "---------------" << std::endl;
+	std::cout << "Debug message (" << id << "): " << message << std::endl;
+
+	switch (source)
+	{
+	case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
+	case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
+	case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
+	} std::cout << std::endl;
+
+	switch (type)
+	{
+	case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
+	case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
+	case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
+	case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
+	case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
+	case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
+	case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
+	} std::cout << std::endl;
+
+	switch (severity)
+	{
+	case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
+	case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
+	case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
+	} std::cout << std::endl;
+	std::cout << std::endl;
+}
+
+
+CRenderer renderer;
+
+
 /** Initialise the high-level renderer. */
 CRenderer::CRenderer() {
 	initialised = false;
@@ -32,7 +87,7 @@ CRenderer::~CRenderer() {
 			delete cameraList[c];
 	for (size_t b = 0; b<bufferList.size(); b++)
 		delete bufferList[b];
-	_CrtDumpMemoryLeaks();
+	//_CrtDumpMemoryLeaks();
 }
 
 void CRenderer::getGLinfo() {
@@ -54,6 +109,8 @@ void CRenderer::getGLinfo() {
 
 	sysLog << "\nglsl version: " << glGetString(GL_SHADING_LANGUAGE_VERSION);
 	sysLog << "\n";
+
+
 }
 
 
@@ -91,6 +148,20 @@ void CRenderer::resetMatrix() {
 /** Set up standard rendering paramaters. */
 void CRenderer::init() {
 	getGLinfo();
+
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+
+
+	int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+	{
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		glDebugMessageCallback(glDebugOutput, nullptr);
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+	}
+
+
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //	glBlendFunc(GL_SRC_ALPHA, GL_ONE);;
@@ -162,16 +233,7 @@ void CRenderer::setCurrentTexture(int textureHandle) {
 	glBindTexture(GL_TEXTURE_2D,textureHandle);
 }
 
-/** Save the current state of the modelview matrix. */
-void CRenderer::saveDisplayMatrix() {
-	glGetFloatv(GL_MODELVIEW_MATRIX,DisplayMatrix.M);
-}
 
-/** Load the saved matrix, which will usually contain any transformations used by the engine to fit drawing onscreen. */
-void CRenderer::useDisplayMatrix() {
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(DisplayMatrix.M);
-}
 
 /** Push a copy of the current matrix onto a stack for quick retrieval. */
 void CRenderer::pushMatrix() {
@@ -281,84 +343,9 @@ unsigned int CRenderer::attachShaders() {
 	return program;
 }
 
-/** Store the given vertex data in a buffer and return a handle.*/
-void CRenderer::storeVertexData(unsigned int& handle, glm::vec3* data,int size) {
-	if (handle ==0) {
-		glGenBuffers(1, &handle); //TO DO: generate buffer name *only* if it's still 0
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, handle);
-	glBufferData(GL_ARRAY_BUFFER,  size, (void*)data, GL_DYNAMIC_DRAW); //was static
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-/** Store the given index data in a buffer and return a handle.*/
-void CRenderer::storeIndexData(unsigned int& hIndex, unsigned short* data,int size) {
-	if (hIndex == 0)
-		glGenBuffers(1, &hIndex);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, (void*)data, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	
-}
-
-/** Store info on how to use given vertex data, eg, positionHint, colour, etc.*/
-void CRenderer::storeVertexLayout(unsigned int& hVAO, unsigned int bufferObj, unsigned int hIndex, int nAttributes) {
-	//GLuint vaoObject;
-	if ( hVAO == 0)
-		glGenVertexArrays(1, &hVAO);
-	setVAO(hVAO);
-		
-	glBindBuffer(GL_ARRAY_BUFFER, bufferObj);
 
 
 
-	if (nAttributes == 3) {
-		int stride = (sizeof(glm::vec3) * 2) + sizeof(glm::vec4);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,(void*) 0);
-
-
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride,(void*) (sizeof(glm::vec3) ));
-
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, stride,(void*) (sizeof(glm::vec3) + sizeof(glm::vec4) ));
-	}
-	else {
-
-			//establish first attribute - the vector itself
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3),(void*) 0);
-	}
-
-
-	/*for (int attrib = 0;attrib < nAttributes; attrib++) {
-		glEnableVertexAttribArray(attrib);
-		glVertexAttribPointer(attrib, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3) * nAttributes,(void*) (sizeof(glm::vec3) * (attrib)));
-	}*/
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	
-	setVAO(0);
-
-}
-
-/** Delete the given buffer, freeing up the memory it uses.*/
-void CRenderer::freeBuffer(unsigned int buffer) {
-
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-
-	glDeleteBuffers(1,&buffer);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void CRenderer::freeVAO(unsigned int hVAO){
-	glDeleteVertexArrays(1,&hVAO);
-}
 
 
 /** Get a handle for the given variable used in the given shader. */
@@ -416,6 +403,12 @@ void CRenderer::setShader(int program) {
 
 void CRenderer::setShader(CShader * shader) {	
 	glUseProgram(shader->getShaderHandle());
+}
+
+
+/** Create a clipping area, outside of which is drawn. */
+void CRenderer::setClip(int x, int y, int width, int height) {
+	glScissor(x, y, width, height);
 }
 
 void CRenderer::drawModel(CRenderModel& model) {
@@ -512,6 +505,12 @@ void CRenderer::renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset,
 void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
 	beginRenderToTexture(texture);
 	drawBuf(buffer, drawTris);
+	endRenderToTexture();
+}
+
+void CRenderer::renderToTextureTris(CBuf2& buffer, CBaseTexture& texture) {
+	beginRenderToTexture(texture);
+	drawTrisBuf(buffer,0,buffer.numElements);
 	endRenderToTexture();
 }
 
@@ -812,6 +811,7 @@ void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
 void CRenderer::drawLinesBuf(CBuf2& buf, void* start, int count ) {
 	buf.setVAO();
 	glDrawElements(GL_LINES, count, GL_UNSIGNED_SHORT, start);
+	buf.clearVAO();
 }
 
 
@@ -823,16 +823,19 @@ void CRenderer::drawLineStripBuf(CBuf2& buf, void* start, int count) {
 void CRenderer::drawLineStripAdjBuf(CBuf2& buf, void* start, int count) {
 	buf.setVAO();
 	glDrawElements(GL_LINE_STRIP_ADJACENCY, count, GL_UNSIGNED_SHORT, start);
+	buf.clearVAO();
 }
 
 void CRenderer::drawPointsBuf(CBuf2& buf, void* start, int count) {
 	buf.setVAO();
 	glDrawElements(GL_POINTS, count, GL_UNSIGNED_SHORT, start);
+	buf.clearVAO();
 }
 
 void CRenderer::drawTrisBuf(CBuf2& buf, void* start, int count) {
 	buf.setVAO();
 	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, start);
+	buf.clearVAO();
 }
 
 
@@ -841,6 +844,18 @@ void CRenderer::drawTriStripBuf(CBuf& buf) {
 	setVAO(buf.hVAO);
 	glDrawElements(GL_TRIANGLE_STRIP, buf.frameIndices, buf.indexType, 0);
 	setVAO(0);
+}
+
+void CRenderer::drawTriStripBuf(CBuf2& buf) {
+	buf.setVAO();
+	glDrawElements(GL_TRIANGLE_STRIP, buf.numElements, GL_UNSIGNED_SHORT, 0);
+	buf.clearVAO();
+}
+
+void CRenderer::drawLineLoopBuf(CBuf2& buf) {
+	buf.setVAO();
+	glDrawElements(GL_LINE_LOOP, buf.numElements, GL_UNSIGNED_SHORT, 0);
+	buf.clearVAO();
 }
 
 unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
@@ -900,7 +915,7 @@ void CRenderer::createStandardPhongShader() {
 
 //The default phong shader draw. *//
  void CRenderer::phongDrawCallout(void* callee, CModel2* model) {
-	 CRenderer* pThis = &CRenderer::getInstance();
+	 CRenderer* pThis = &renderer;// &CRenderer::getInstance();
 	 pThis->setShader(pThis->phongShader);
 	 pThis->phongShader->setShaderValue(pThis->hLightPosition, pThis->defaultLightPos);
 	 pThis->phongShader->setShaderValue(pThis->hLightSpecular, glm::vec4(0.8f, 0.8f, 0.8f, 1));
@@ -917,7 +932,7 @@ void CRenderer::createStandardPhongShader() {
 	 pThis->phongShader->setShaderValue(pThis->hMVP, pThis->currentCamera->clipMatrix * model->worldMatrix);
 	 pThis->phongShader->setShaderValue(pThis->hModel, model->worldMatrix);
 	 pThis->phongShader->setShaderValue(pThis->hView, pThis->currentCamera->camMatrix);
-	 pThis->drawBuf(model->buffer, drawTris);
+	// pThis->drawBuf(model->buffer, drawTris);
 	 pThis->attachTexture(0, 0);
 }
 

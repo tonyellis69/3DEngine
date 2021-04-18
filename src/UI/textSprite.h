@@ -45,6 +45,8 @@ public:
 	virtual void setHotId(unsigned int hotId) {}
 	virtual unsigned int getHotId() { return -1; }
 
+	CBuf tmpQuadBuf;
+
 	//unsigned int bufId;
 	glm::i32vec2 bufId;
 	
@@ -64,7 +66,7 @@ protected:
 	TTextSpriteShader* textSpriteShader;
 	glm::mat4 matrix;
 	CRenderTexture* pageTexture;
-	CBuf tmpQuadBuf;
+
 	ITextSpriteCallback* callbackObj;
 
 private:

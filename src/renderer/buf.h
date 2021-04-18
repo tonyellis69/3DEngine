@@ -62,6 +62,9 @@ public:
 
 	int frameCount; ///<Number of animation frames
 	int frameIndices;	///<Number of indices per frame
+
+	int tmpDbg = 0;
+
 private:
 	CRenderer* pRenderer;
 };

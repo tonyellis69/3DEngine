@@ -11,7 +11,6 @@
 
 /** Constructor for user-created default textures. Creating via Renderer hereby deprecated. */
 CRenderTexture::CRenderTexture()  {
-	pRenderer = &CRenderer::getInstance();
 	handle = 0;
 	//create a simple 2x2 texture with a default pattern.
 	//DON'T register with textureManager, which is starting to look redundant.
@@ -19,7 +18,7 @@ CRenderTexture::CRenderTexture()  {
 	//TO DO: the below will NOT work with textures declared as members of CBaseApp
 	//because engine hasn't initialised renderer yet!
 	
-	if (!pRenderer->initialised)
+	if (!renderer.initialised)
 		return;
 	isData = false;
 	 channels = 4; //lazily assume rgba
@@ -55,10 +54,16 @@ CRenderTexture::~CRenderTexture() {
 /** Resize this texture, freeing any previously used memory. */
 //TO DO: careful! We may not want to set mipmapping to GL_NEAREST.
 void CRenderTexture::resize(int w, int h) {
+	glBindVertexArray(0); 
+	//TO DO: have had gl drawing errors "access violition" without this. Assuming I've 
+	//bound a vert array somewhere and not unbound it again, but who knows where.
+
+
 	channels = 4; //lazily assume rgba
 	width = w;
 	height = h;
 	isData = false;
+
 	glDeleteTextures(1, &handle);
 	glGenTextures(1, &handle);
 	if (h > 0) {
@@ -70,6 +75,8 @@ void CRenderTexture::resize(int w, int h) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, chequerBoardPixels); //GL_FLOAT was GL_UNSIGNED_BYTE
 		delete chequerBoardPixels;
+		glBindTexture(GL_TEXTURE_2D, 0);
+ 
 		return;
 	}
 	
@@ -86,6 +93,7 @@ void CRenderTexture::resize(int w, int h) {
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA, width, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	glBindTexture(GL_TEXTURE_1D, 0);
 	delete pixels;
 }
 

@@ -583,7 +583,7 @@ std::tuple<int, int> findRingHex(int radius, float angle) {
 }
 
 /** Return the hexes in the arc lying at the given rotation around apex. */
-THexList* findArc2(CHex& apex, int radius, float angle, float rotation) {
+THexList findArc2(CHex& apex, int radius, float angle, float rotation) {
 	
 	float rotationToA = rotation - (angle / 2.0f);
 	if (rotationToA < 0)
@@ -612,7 +612,7 @@ THexList* findArc2(CHex& apex, int radius, float angle, float rotation) {
 		hex = getNeighbour(hex,intToDir(startCorner + 2));
 	}
 
-	return &hexes;
+	return hexes;
 }
 
 /** Calculate the hex at the given corner of the hex 'ring' of this

@@ -5,7 +5,7 @@
 #include <windows.h>  //for file dialogues
 #include <glew.h>
 //#include "Window.h"
-#include "Engine.h"
+//#include "Engine.h"
 #include "UI\GUIbase.h"
 #include "UI\GUIroot.h"
 #include "UI\GUIradio.h"
@@ -17,10 +17,10 @@
 #include "UI\GUIlabel2.h"
 #include "UI\GUIrichText.h"
 #include <stdio.h>
-#include "Reader.h"
-#include "UIengine.h"
+//#include "Reader.h"
+//#include "UIengine.h"
 
-#include "UI\renderDrawFuncs.h"
+//#include "UI\renderDrawFuncs.h"
 #include "UI\font.h"
 
 #include "SysFnt.h"
@@ -35,7 +35,7 @@
 #include "importer/importer.h"
 
 
-#include <iostream> //for cerr
+//#include <iostream> //for cerr
 //using namespace std;
 
 #include "UI\iGuiMsg.h"
@@ -44,6 +44,7 @@
 
 #include "messaging/messenger.h"
 
+#include "timer.h"
 
 
 //class CVMapp;
@@ -75,47 +76,30 @@ public:
 	void DrawUI();
 	void RegisterUIfunctors();
 	virtual void onStart() {};
-	void drawSkyDome();
-	
-	//void initWatches();
-	//void updateWatches();
+
 	void initLogWindow();
 	void logCallback(std::stringstream& logStream);
 	void logAlertCallback();
 	void logFatalCallback(std::stringstream& logStream);
 
-	string getExePath();
+	std::string getExePath();
 
 	virtual void vmMessage(TvmAppMsg) {};
 
 	void initialiseSystemStylesheet();
 
-	//CGUIstyleSheet sysStyleSheet;
-
 	CGUIrichText* logWindow; ///<Points to the system log window.
 
-	CEngine Engine;
-	//CWindow Window;
-	CGUIengine UIeng;
-	//CSoundLib snd;
+	//CEngine Engine;
+	//CGUIengine UIeng;
 	CGUIroot GUIroot;
 	CWin win;
 
-	FILE* ErrStream;	///<Filestream error messages are written to.
+	FILE* ErrStream;	///<Filestream log error messages are written to.
 
-	CRenderDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
-
-
-//	TSpecificFunctor<CBaseApp> KeyDownFunc;
-//	TSpecificFunctor<CBaseApp> KeyUpFunc;
-//	TSpecificFunctor<CBaseApp> CharEntryFunc;
-//	TMouseMsgFunctor<CBaseApp> MouseMsgFunc;
-//	TSpecificFunctor<CBaseApp> MouseWheelMsgFunc;
-//	TSpecificFunctor<CBaseApp> OnWinResizeFunc;
-//	TPlainFunctor<CBaseApp>	AppTasksFunc;
+	//CDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
 
 
-	//bool KeyDown[0x100]; 
 	bool BuiltInFullScrn; ///<If true, Tab toggles fullscreen.
 
 	double Time;
@@ -123,13 +107,13 @@ public:
 	double dT; ///<Elapsed time in milliseconds since last frame.
 	bool Paused; ///<If true, app is paused. Update functions will not be called.
 	bool quitOnEsc; ///<If true, Escape key instant-quits.
-	string homeDir; ///<Pathname of our home directory, typically the .exe directory.
+	std::string homeDir; ///<Pathname of our home directory, typically the .exe directory.
 
 	virtual void HandleUImsg(CGUIbase& Control, CMessage& Message) {};
 
 	void mouseCaptured(bool capture);
-	string getFilenameDlg(const std::string& title, const char* path);
-	string saveFilenameDlg(const std::string& title, const char* path);
+	std::string getFilenameDlg(const std::string& title, const char* path);
+	std::string saveFilenameDlg(const std::string& title, const char* path);
 	void toggleLogWindow();
 	void exit();
 	void showMouse(bool on);
@@ -137,6 +121,7 @@ public:
 	glm::i32vec2 getMousePos();
 	bool keyNow(int vKey);
 	bool mouseButtonNow(int button);
+	void GUImsg(int ctrlId, TGUImessage& msg);
 
 	glm::i32vec2 lastMousePos = { 0,0 };
 	int mouseX,mouseY;
@@ -145,9 +130,9 @@ public:
 
 	int viewWidth, viewHeight;
 
-	unsigned int hTextureShader;
-	unsigned int hTexture;
-	unsigned int hTextureMVP;
+	//unsigned int hTextureShader;
+	//unsigned int hTexture;
+	//unsigned int hTextureMVP;
 
 	CFont* sysFont; ///<Default font
 	CFont* smallSysFont; ///<Default font for GUI
@@ -155,12 +140,14 @@ public:
 
 	CVMapp vm; ///<The Tig virtual machine.
 
-	CRenderer& renderer;
+	//CRenderer& renderer;
 
 	std::string dataPath; //<Path to app data folder
 
 	CImporter importer; ///<Object for importing 3D scenes.
 
 	CPhysEng physEng;
+
+	CTimer timer;
 	};
 

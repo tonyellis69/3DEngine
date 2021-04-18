@@ -1,5 +1,5 @@
 #include "model.h"
-#include "buf.h"
+//#include "buf.h"
 #include "renderer.h"
 #include "../colour.h"
 

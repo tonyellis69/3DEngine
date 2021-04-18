@@ -3,7 +3,7 @@
 #include "3dobject.h"
 #include <glew.h>//for GL_TRIANGLES
 #include "../vertBufs.h"
-#include "buf.h"
+//#include "buf.h"
 #include "multiBuf.h"
 #include "material.h"
 

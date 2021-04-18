@@ -3,6 +3,8 @@
 #include "GUIswatchContainer.h"
 #include "..\colour.h"
 
+#include "uiRender.h"
+
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/color_space.hpp>
 #include <glm/gtx/component_wise.hpp>
@@ -326,7 +328,8 @@ void CGUIpaletteBar::DrawSelf() {
 		indicatorRect.pos = { paletteImage->drawBox.pos.x + paletteImageProportion,paletteImage->getHeight() - 10 };
 		indicatorRect.size = { 2,10 };
 
-		pDrawFuncs->drawRect2(indicatorRect,style::uiBlack,style::uiBlack);
+		//uiDraw::drawRect(indicatorRect,style::uiBlack,style::uiBlack);
+		uiDraw::drawRect(indicatorRect, style::uiBlack, style::uiBlack);
 	}
 }
 
@@ -372,7 +375,7 @@ void CGUIpaletteBar::onDrop(const int mouseX, const int mouseY) {
 
 bool CGUIpaletteTab::onDoubleClick(const int mouseX, const int mouseY, int key) {
 	scrollbarHasMouse = NULL;
-	pDrawFuncs->mouseCaptured(false);
+	rootUI->captureMouse(false);
 
 	CMessage msg;
 	msg.Msg = MY_DOUBLECLICK;
@@ -385,7 +388,7 @@ bool CGUIpaletteTab::OnLMouseDown(const  int mouseX, const  int mouseY, int key)
 	int mousePos;
 
 	scrollbarHasMouse = this;
-	pDrawFuncs->mouseCaptured(true);
+	rootUI->captureMouse(true);
 	lastMouseX = mouseX; 
 	return true;
 }

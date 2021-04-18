@@ -4,20 +4,24 @@
 
 #include <glm/glm.hpp>
 
-//#include "watch.h"
+#include "renderer/renderer.h"
+
+#include "UI/font.h"
 
 #include "utils/log.h"
 
 #include "sound/sound.h"
 
+#include "UI/uiRender.h"
+
 CFont* style::defaultFont;
 
-CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
+CBaseApp::CBaseApp(void)  {
 	homeDir = getExePath();
 #ifdef _DEBUG
 	homeDir += "..\\";
 #endif
-	string logpath = homeDir + "ErrorLog.txt";
+	std::string logpath = homeDir + "ErrorLog.txt";
 	freopen_s(&ErrStream,logpath.c_str(),"w",stderr);
 
 	logWindow = NULL;
@@ -27,14 +31,14 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 	sysLog << startMsg << "\nBaseApp constructor starting...";
 	
 
-	Engine.dataPath = homeDir + "Data\\";
+	//Engine.dataPath = homeDir + "Data\\";
 	dataPath = homeDir + "Data\\";
-	Engine.Renderer.dataPath = homeDir + "Data\\";
+	renderer.dataPath = homeDir + "Data\\";
 	
 	//Set up our handlers for window events
 	//RegisterHandlers();
 
-	UIeng.pEngine = &Engine;
+	//UIeng.pEngine = &Engine;
 
 	Time = LastTime = 0;
 	mouseX = mouseY = 0;
@@ -58,7 +62,7 @@ CBaseApp::CBaseApp(void) : renderer(CRenderer::getInstance()) {
 //	GUIroot.setStyleSheet(&sysStyleSheet);
 	GUIroot.setMessageObject(this); //Makes this the default for all gui messages
 
-	RegisterUIfunctors();
+	//RegisterUIfunctors();
 
 	
 	quitOnEsc = true;
@@ -99,7 +103,8 @@ void CBaseApp::loadSystemFonts() {
 /** Starts the application loop. This will not return until the app is shut down. */
 void CBaseApp::start() {
 	
-	LastTime = Engine.Time.seconds();
+	//LastTime = Engine.Time.seconds();
+	LastTime = timer.elapsed();
 	onStart();
 
 	win.hideWindow(false);
@@ -124,7 +129,8 @@ void CBaseApp::onWinResize( int w, int h) {
 	viewWidth = w; viewHeight = h;
 	renderer.set2DView(0, 0, w, h); //We need to change shape of view.
 	renderer.currentCamera->setAspectRatio((float)w, (float)h);
-	drawFuncs->setScreenSize(w, h);
+	//drawFuncs->setScreenSize(w, h); //!!!!!!!!!!!!TO DO scrap
+	uiDraw::init();
 	GUIroot.setLocalDimensions(0,0,w,h); //Resize the base UI control so it's always the size of the view.
 	onResize(w,h); //Call the user's resize handler, in case they want to do something;
 }
@@ -224,17 +230,21 @@ bool CBaseApp::OnMouseWheelMsg(float xoffset, float yoffset) {
 
 
 void CBaseApp::AppTasks() {
+	if (renderer.dbgFrame != -1)
+		renderer.dbgFrame++;
 
-	//if (Engine.MakingFit) //activate the global scaling matrix, if we're using one.
-	//	Engine.applyGlobalScale(); //TO DO: messes GUI - look into or scrap - prob due to line-drawing methods
+	guiRect drawBox = { 20,40, 100,100 };
 
-	Engine.clearFrame();
+
+	renderer.clearFrame();
 
 	vm.execute();
 
-	Time = Engine.Time.seconds();
+
+	//Time = Engine.Time.seconds();
+	Time = timer.elapsed();
 	dT = Time - LastTime;
-	Engine.dT = dT;
+	//Engine.dT = dT;
 	LastTime = Time;
 
 	win.getMousePos(mouseX, mouseY);
@@ -251,30 +261,30 @@ void CBaseApp::AppTasks() {
 	if (!Paused) {
 		Update();
 	}
-	
 
 	keyCheck(); //happens every frame, therefore responsive
 
-	if (Engine.skyDome) {
-		drawSkyDome();
-	}
 
 
 	
 
 
-	Engine.physObjManager.update(float(dT * 10.0f));
+	//Engine.physObjManager.update(float(dT * 10.0f));
 
 	physEng.update((float)dT * 10.0f);
 
 
-	Engine.drawModels();
+	//Engine.drawModels();
 	
-	
-
 //	Engine.drawSceneLayers();
 	//Engine.drawRegisteredSprites();
+
+
+
+
 	draw(); //Do user drawing
+
+
 
 	//aftyer here
 	
@@ -282,6 +292,7 @@ void CBaseApp::AppTasks() {
 	//Engine.removeUserScale();
 
 	//logWindow->update((float)dT);
+
 
 	DrawUI(); 
 
@@ -295,71 +306,43 @@ void CBaseApp::AppTasks() {
 
 /** Draw the UI system. */
 void CBaseApp::DrawUI() {
-	Engine.setCurrentShader(0);
-	Engine.setDrawColour(engineWhite);
+	//Engine.setCurrentShader(0);
+	//Engine.setDrawColour(engineWhite);
 	GUIroot.Draw(dT);
-	Engine.setClip(0,0,GUIroot.drawBox.size.x, GUIroot.drawBox.size.y);
+	//Engine.setClip(0,0,GUIroot.drawBox.size.x, GUIroot.drawBox.size.y);
+	//UIrect
+	uiDraw::setClip((UIrect&)GUIroot.drawBox);
 }
 
 /** Assign engine functions to the UI so it can draw itself, etc. */
 void CBaseApp::RegisterUIfunctors() {	
 	//drawFuncs = new CDrawFuncs;
 	//TO DO: rename this when it's been updated
-	drawFuncs = new CRenderDrawFuncs();
-	drawFuncs->setRenderer(&Engine.Renderer);
-	drawFuncs->loadShaders();
+	//drawFuncs = new CDrawFuncs();
+	//drawFuncs->setRenderer(&Engine.Renderer);
+	//drawFuncs->loadShaders();
 
 
 //	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
 //	drawFuncs->drawIcon.Set(&UIeng, &CGUIengine::drawIcon);
-	drawFuncs->handleUImsg.Set(this, &CBaseApp::HandleUImsg);
+//	drawFuncs->handleUImsg.Set(this, &CBaseApp::HandleUImsg);
 	//drawFuncs->drawRect.Set(&UIeng, &CGUIengine::drawRect);
 //	drawFuncs->drawBorder.Set(&UIeng, &CGUIengine::DrawBorder);
-	drawFuncs->setClip.Set(&UIeng, &CGUIengine::setClip);
+	//drawFuncs->setClip.Set(&UIeng, &CGUIengine::setClip);
 //	drawFuncs->drawLine.Set(&UIeng, &CGUIengine::drawLine);
 //	drawFuncs->setIconset.Set(&UIeng, &CGUIengine::setIconset);
 //	drawFuncs->drawTile.Set(&UIeng, &CGUIengine::drawTile);
 //	drawFuncs->drawImage.Set(&UIeng, &CGUIengine::drawImage);
-	drawFuncs->mouseCaptured.Set(this, &CBaseApp::mouseCaptured);
+	//drawFuncs->mouseCaptured.Set(this, &CBaseApp::mouseCaptured);
 //	drawFuncs->setCursor.Set(&UIeng, &CGUIengine::setCursor);
 //	drawFuncs->setDrawColoursConditional.Set(&UIeng, &CGUIengine::setDrawColoursConditional);
 //	drawFuncs->drawDottedRect.Set(&UIeng,&CGUIengine::drawDottedRect);
 //	drawFuncs->setScale.Set(&UIeng,&CGUIengine::setScale);
 
-	GUIroot.setDrawFuncs(drawFuncs);
+//	GUIroot.setDrawFuncs(drawFuncs);
 }
 
-void CBaseApp::drawSkyDome() {
-	Engine.Renderer.setDepthTest(false);
 
-	CCamera* currentCamera = Engine.getCurrentCamera();
-	Engine.skyDome->dome->setPos(currentCamera->getPos() + glm::vec3(0, -0.5f, 0));
-	glm::mat4 mvp = currentCamera->clipMatrix * Engine.skyDome->dome->worldMatrix;
-	Engine.Renderer.setShader(Engine.skyDome->skyShader);
-	Engine.skyDome->skyShader->setShaderValue(Engine.skyDome->hSkyDomeMVP,mvp);
-	Engine.Renderer.setShaderValue(Engine.skyDome->hSkyDomeHeightColours, 4, (glm::vec3&)Engine.skyDome->heightColours);
-	Engine.skyDome->dome->drawNew();
-
-	Engine.skyDome->sunBoard->setPos(currentCamera->getPos() + glm::vec3(0,200, -400));
-	mvp = currentCamera->clipMatrix * Engine.skyDome->sunBoard->worldMatrix;
-	Engine.Renderer.setShader(Engine.Renderer.billboardShader);
-	Engine.Renderer.billboardShader->setShaderValue(Engine.Renderer.hBillMVP,mvp);
-	Engine.Renderer.billboardShader->setShaderValue(Engine.Renderer.hBillCamWorldMatrix, Engine.Renderer.currentCamera->worldMatrix);
-
-	Engine.skyDome->sunBoard->drawNew();
-
-
-
-
-	//draw cloud plane
-	Engine.skyDome->plane->setPos(currentCamera->getPos() + glm::vec3(0,-400.0f, 0));
-	Engine.Renderer.setShader(Engine.Renderer.multiTexShader);
-	mvp = currentCamera->clipMatrix * Engine.skyDome->plane->worldMatrix;
-	Engine.Renderer.multiTexShader->setShaderValue(Engine.Renderer.hMultMVP,mvp);
-	Engine.skyDome->plane->drawNew();
-
-	Engine.Renderer.setDepthTest(true);
-}
 
 
 
@@ -436,8 +419,9 @@ void CBaseApp::initLogWindow() {
 /** Sends data from the liveLog stream to a console window. If the window hasn't been
 	created yet, send it to the sysLog (which can write it to a file.) */
 void CBaseApp::logCallback(std::stringstream & logStream) {
-	if (logWindow)
-		 logWindow->appendMarkedUpText(logStream.str());
+	if (logWindow) {
+		logWindow->appendMarkedUpText(logStream.str());
+	}
 	else
 		sysLog << logStream.str();
 }
@@ -466,10 +450,10 @@ void CBaseApp::logFatalCallback(std::stringstream& logStream) {
 }
 
 /** Returns the file path of the current program. */
-string CBaseApp::getExePath() {
+std::string CBaseApp::getExePath() {
 	char path[512];
 	GetModuleFileName(NULL,(char*)path,512);
-	string tmp(path);
+	std::string tmp(path);
 	int n  = tmp.find_last_of(('\\'));
 	tmp = tmp.substr( 0, n+1 );
 	return tmp;
@@ -488,7 +472,7 @@ void CBaseApp::initialiseSystemStylesheet() {
 }
 
 /** Use the Windows Common Dialog to get a filename. */
-string CBaseApp::getFilenameDlg(const std::string&  title, const char* path) {
+std::string CBaseApp::getFilenameDlg(const std::string&  title, const char* path) {
 	const int BUFSIZE = 1024;
 	CHAR buffer[BUFSIZE] = { 0 };
 	OPENFILENAME ofns = { 0 };
@@ -501,7 +485,7 @@ string CBaseApp::getFilenameDlg(const std::string&  title, const char* path) {
 	return buffer;
 }
 
-string CBaseApp::saveFilenameDlg(const std::string&  title, const char* path) {
+std::string CBaseApp::saveFilenameDlg(const std::string&  title, const char* path) {
 	const int BUFSIZE = 1024;
 	CHAR buffer[BUFSIZE] = { 0 };
 	OPENFILENAME ofns = { 0 };
@@ -529,14 +513,20 @@ void CBaseApp::toggleLogWindow() {
 
 }
 
+/** Handle messages from GUI controls. */
+void CBaseApp::GUImsg(int ctrlId, TGUImessage& msg) {
+	if (msg.msg == uiMouseCapture) {
+		mouseCaptured((bool)msg.value);
+	}
+}
+
 
 
 CBaseApp::~CBaseApp() {
 	fflush(ErrStream);
 	fclose(ErrStream);
-	delete drawFuncs;
+	//delete drawFuncs;
 	GUIroot.setDrawFuncs(NULL);
-
 }
 
 

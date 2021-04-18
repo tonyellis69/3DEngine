@@ -149,7 +149,7 @@ namespace shape {
 	}
 
 	/** Create a cylinder stored in a CMesh object and return it .*/
-	CMesh cylinderMesh(float radius, float height, float steps) {
+	CMesh cylinderMesh(float radius, float height, int steps) {
 		CMesh mesh;
 		cylinder(mesh,radius,height,steps);
 		mesh.type = meshTrisIndexed;

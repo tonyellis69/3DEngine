@@ -7,7 +7,7 @@
 #include "font.h"
 #include "..\renderer\renderer.h"
 
-#include "renderDrawFuncs.h"
+//#include "renderDrawFuncs.h"
 
 #include "text.h"
 
@@ -27,7 +27,7 @@ public:
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
 	
-	CRenderer* pRenderer;
+	//CRenderer* pRenderer;
 
 	CBuf buf;
 private:

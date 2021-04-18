@@ -3,6 +3,8 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "../renderer/renderer.h"
 #include "../utils/log.h"
+#include <set>
+
 
 CLineBuffer::CLineBuffer() {
 	initShader();
@@ -48,6 +50,7 @@ void CLineBuffer::addTextSprite(TLineFragment& fragment) {
 	sprite->createTextImage(spriteBuffer.getBuffer());
 	textSprites.push_back(std::move(sprite));
 	recalcPageState();
+
 }
 
 void CLineBuffer::draw() {
@@ -59,16 +62,16 @@ void CLineBuffer::draw() {
 void CLineBuffer::renderSprites(float dT) {
 	updateHotTextPeriods(dT);
 
-	pRenderer->rendertToTextureClear(pageBuf, glm::vec4(0,1, 1, 0));
-	pRenderer->setShader(textSpriteShader.shader);
-	pRenderer->attachTexture(0, spriteBuffer.getBuffer().handle);
+	renderer.rendertToTextureClear(pageBuf, glm::vec4(0,1, 1, 0));
+	renderer.setShader(textSpriteShader.shader);
+	renderer.attachTexture(0, spriteBuffer.getBuffer().handle);
 	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
 
-	pRenderer->beginRenderToTexture(pageBuf);
+	renderer.beginRenderToTexture(pageBuf);
 	for (auto &sprite : textSprites) {
 		sprite->draw();
 	}
-	pRenderer->endRenderToTexture();
+	renderer.endRenderToTexture();
 }
 
 /** Move all text sprites up by the given amount, deleting any that end up outside the page entirely.*/
@@ -175,8 +178,8 @@ void CLineBuffer::onMouseMove(glm::i32vec2& mousePos) {
 ///////Private functions
 
 void CLineBuffer::initShader() {
-	pRenderer = &CRenderer::getInstance();
-	textSpriteShader.shader = pRenderer->textSpriteShader;
+	//pRenderer = &renderer; // &CRenderer::getInstance();
+	textSpriteShader.shader = renderer.textSpriteShader;
 	textSpriteShader.hOrthoMatrix = textSpriteShader.shader->getUniformHandle("orthoMatrix");
 	textSpriteShader.hTextureUnit = textSpriteShader.shader->getUniformHandle("textureUnit");
 	textSpriteShader.hOffset = textSpriteShader.shader->getUniformHandle("blockOffset");
@@ -261,9 +264,10 @@ CTextSprite* CLineBuffer::createSprite(TLineFragment& fragment) {
 	sprite->setCallbackObj(this);
 
 	//TO DO: textObj should carry an up-to-date pointer to font
-	CFont* font = &CRenderer::getInstance().fontManager.getFont(textObj->style.font);
+	CFont* font = &renderer.fontManager.getFont(textObj->style.font);
 	//should only do this once
 	std::string text = textObj->text.substr(fragment.textPos, fragment.textLength);
+
 	sprite->makeTextQuads(text, font);
 
 	sprite->setTextObjData(fragment.textObj, fragment.textPos, fragment.textLength);

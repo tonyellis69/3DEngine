@@ -1,5 +1,7 @@
 #include "GUIiconButton.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 CGUIsysIconButton::CGUIsysIconButton(int x, int y){
@@ -23,19 +25,19 @@ CGUIsysIconButton::CGUIsysIconButton(int x, int y, int w, int h) {
 }
 
 void CGUIsysIconButton::DrawSelf( ) {
-	//pDrawFuncs->setClip(Clipbox);
+	//uiDraw::setClip(Clipbox);
 
 	if (MouseDown == this) {
 		//pDrawFuncs->setDrawColours(backColour2, backColour1);
 		//setBackColour1(oldbackColour2);
 		//setBackColour2(oldbackColour1);
-		pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour2, (glm::vec4&)backColour1);
+		uiDraw::drawRect(drawBox, (glm::vec4&)backColour2, (glm::vec4&)backColour1);
 	}
 	else {
 		//pDrawFuncs->setDrawColours(backColour1, backColour2);
 		//setBackColour1(oldbackColour1);
 		//setBackColour2(oldbackColour2);
-		pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
+		uiDraw::drawRect(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
 
 	}
 	//draw button 
@@ -45,11 +47,11 @@ void CGUIsysIconButton::DrawSelf( ) {
 	if (MouseOver == this)
 		//pDrawFuncs->setDrawColours(UIdarkGrey, UIdarkGrey);
 		//setBorderColour(UIdarkGrey);
-		pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
+		uiDraw::drawBorder(drawBox, style::uiDarkGrey);
 	else
 		//pDrawFuncs->setDrawColours(UIlightGrey, UIlightGrey);
 		//setBorderColour(UIlightGrey);
-		pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
+		uiDraw::drawBorder(drawBox, style::uiLightGrey);
 	//pDrawFuncs->drawBorder(screenPos.x,screenPos.y,width,height);
 	//pDrawFuncs->drawCtrlBorder(*this);
 
@@ -67,7 +69,7 @@ CGUIiconButton::CGUIiconButton(int x, int y) : CGUIsysIconButton(x,y) {
 bool CGUIiconButton::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 	return true;
 }
 

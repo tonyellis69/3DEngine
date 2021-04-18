@@ -26,7 +26,6 @@ public:
 	void resizeSafe(int w, int h);
 
 	unsigned int handle;
-	CRenderer* pRenderer;
 	bool isData;
 };
 

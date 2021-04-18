@@ -7,6 +7,8 @@
 #include "GUItextbox2.h"
 #include "GUIroot.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 using namespace std;
 
@@ -236,10 +238,12 @@ void CGUIswatchGroup::DrawSelf() {
 	guiRect swatchBox = { drawBox.pos.x + swatchGap,nameTextbox->drawBox.pos.y + nameTextbox->drawBox.size.y + surroundGap,
 		swatchSize,swatchSize };
 	int columnCount = 1;
-	for (auto swatch : swatches) {
+	for (auto& swatch : swatches) {
 		vec4 colour = vec4(swatch) / 255.0f;
-		pDrawFuncs->drawRect2(swatchBox, colour, colour);
-		pDrawFuncs->drawBorder2(swatchBox, style::uiLightGrey);
+		//uiDraw::drawRect(swatchBox, colour, colour);
+		uiDraw::drawRect(swatchBox, colour, colour);
+		//uiDraw::drawBorder(swatchBox, style::uiLightGrey);
+		uiDraw::drawBorder(swatchBox, style::uiLightGrey);
 		if (columnCount < totalColumns) {
 			columnCount++;
 			swatchBox.pos.x += swatchSize + swatchGap;
@@ -402,7 +406,9 @@ int CGUIswatchGroup::calcRequiredHeight(int width) {
 void CGUIdragDropSwatch::drawSelf(int mouseX, int mouseY) {
 	guiRect swatchBox = { mouseX, mouseY, swatchSize,swatchSize };
 	vec4 realColour = vec4(colour) / 255.0f;
-	pDrawFuncs->drawRect2(swatchBox, realColour, realColour);
-	pDrawFuncs->drawBorder2(swatchBox, style::uiLightGrey);
+	//uiDraw::drawRect(swatchBox, realColour, realColour);
+	//uiDraw::drawBorder(swatchBox, style::uiLightGrey);
 
+	uiDraw::drawRect(swatchBox, realColour, realColour);
+	uiDraw::drawBorder(swatchBox, style::uiLightGrey);
 }

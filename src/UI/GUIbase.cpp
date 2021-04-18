@@ -9,7 +9,9 @@
 #include "GUIpopMenu.h"
 #include "GUIroot.h"
 #include "GUIlabel.h"
-#include "GUIbutton.h"
+//#include "GUIbutton.h"
+
+#include "UI/uiRender.h"
 
 #include "..//3DEngine/src/utils/log.h"
 
@@ -463,7 +465,7 @@ bool CGUIbase::OnLMouseUp(const int mouseX, const int mouseY)
 	if (MouseOver != this)
 		MouseOver = this;
 	scrollbarHasMouse = NULL;
-	pDrawFuncs->mouseCaptured(false);
+	rootUI->captureMouse(false);
 	CGUIbase* lastMouseDown = MouseDown;
 	MouseDown = NULL;
 
@@ -614,7 +616,7 @@ void CGUIbase::Draw(float dT) {
 		updateAppearance();
 	
 	//declare a box beyond which we do not draw
-	pDrawFuncs->setClip(Clipbox);
+	uiDraw::setClip(Clipbox);
 
 	DrawSelf(); 
 

@@ -55,7 +55,7 @@ public:
 	glm::vec3 worldPosCornerDist; ///<Dist from origin to corner.
 
 	std::vector<TMapEffects> effectsData; ///<Fog state, etcc, for each hex of the map.
-	bool effectsNeedUpdate = false; ///<Notifies that effects need redrawing.
+	bool effectsNeedUpdate = true; ///<Notifies that effects need redrawing.
 
 
 private:

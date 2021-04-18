@@ -3,8 +3,9 @@
 #include <wglew.h>
 #include "renderer.h"
 
+
 CBuf::CBuf() {
-	pRenderer = &CRenderer::getInstance();
+	pRenderer = &renderer; // &CRenderer::getInstance();
 	hBuffer = 0;
 	hVAO = 0;
 	hIndex = 0;
@@ -80,11 +81,19 @@ void CBuf::storeIndex(unsigned int * indices,  unsigned int nIndices) {
 		size = nIndices * sizeof(unsigned int);
 		indicesPtr = indices;
 	}
+
+
+
 	if (hIndex == 0)
 		glGenBuffers(1, &hIndex);
+
+	
+	//error not triggered here
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indicesPtr, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); //????
+
 	noIndices = nIndices;
 	frameIndices = noIndices; //default. Overrule for multi frame buffers
 	if (shortBuf)
@@ -98,11 +107,13 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 
 	glGenVertexArrays(1, &hVAO);
 
+	glBindVertexArray(hVAO);
+
 	if (hInstancedBuf)
 		glBindBuffer(GL_ARRAY_BUFFER, hInstancedBuf);
 	else
 		glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-	pRenderer->setVAO(hVAO);
+
 	attr[0] = attr1;
 	attr[1] = attr2;
 	attr[2] = attr3;
@@ -164,9 +175,10 @@ void CBuf::storeLayout(int attr1, int attr2, int attr3, int attr4) {
 	else
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	pRenderer->setVAO(0);
 }
 
 /** Create a OGL buffer of the requested size. Note that this will erase any existing buffer attached to this CBuf.*/

@@ -10,10 +10,13 @@ class CBuf2 {
 public:
 	CBuf2();
 	void setVAO();
+	void clearVAO();
 	void setSize(unsigned int size);
+	void freeMem();
 
 	template <typename V, typename... T>
 	void storeVerts(std::vector<V>& verts, T... t) {
+		freeMem();
 		numVerts = verts.size();
 		processParam( t...);
 
@@ -38,8 +41,9 @@ public:
 		storeIndexInt(index);
 	}
 
-	int numElements; ///<For indexed buffers, the total indices
+	int numElements = 0; ///<For indexed buffers, the total indices
 
+	unsigned int err = 0;
 
 private:
 	void storeVerts(void* data, unsigned int numVerts, int vertSize);

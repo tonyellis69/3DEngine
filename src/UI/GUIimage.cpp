@@ -1,5 +1,7 @@
 #include "GUIimage.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 CGUIimage::CGUIimage(int x, int y, int w, int h) {
@@ -14,14 +16,14 @@ CGUIimage::CGUIimage(int x, int y, int w, int h) {
 
 void CGUIimage::DrawSelf() {
 	if (texture) { //let's draw a texture!
-		pDrawFuncs->drawTexture(drawBox,*texture);
+		uiDraw::drawTexture(drawBox,(CRenderTexture&)texture);
 	} else
 		//pDrawFuncs->drawCtrlRect(*this);
-		pDrawFuncs->drawRect2(drawBox, (vec4&)backColour1, (vec4&) backColour2);
+		uiDraw::drawRect(drawBox, (vec4&)backColour1, (vec4&) backColour2);
 
 	if (drawBorder) {
 		//pDrawFuncs->drawCtrlBorder(*this);
-		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
+		uiDraw::drawBorder(drawBox, (vec4&)borderColour);
 	}
 
 }

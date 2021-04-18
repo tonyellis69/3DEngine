@@ -1,6 +1,8 @@
 #pragma once
 
 #include <map>
+#include <string>
+#include <istream>
 
 #include "..\UI\font.h"
 

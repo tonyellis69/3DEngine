@@ -1,6 +1,9 @@
 #include "GUIscrollbar.h"
 #include <iostream> //for cerr
 
+#include "UI/uiRender.h"
+#include "UI/GUIroot.h"
+
 using namespace std;
 
 CGUIbaseScrollbar::CGUIbaseScrollbar(ScrollbarOrientationType axis, int x, int y, int length) {
@@ -53,7 +56,7 @@ void CGUIbaseScrollbar::setValue(int newValue) {
 
 
 void CGUIbaseScrollbar::DrawSelf( ) {
-	pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
+	uiDraw::drawRect(drawBox, (glm::vec4&)backColour1, (glm::vec4&)backColour2);
 
 	glm::vec4 drawColour;
 	if ((MouseOver == this)||(KeyCapture == this)) {
@@ -78,7 +81,7 @@ void CGUIbaseScrollbar::DrawSelf( ) {
 			sliderBox.size.x = getWidth() - 4;
 			sliderBox.size.y = SliderSize - 4;
 		}
-		pDrawFuncs->drawRect2(sliderBox, drawColour, drawColour);
+		uiDraw::drawRect(sliderBox, drawColour, drawColour);
 }
 
 
@@ -104,7 +107,7 @@ bool CGUIbaseScrollbar::OnLMouseDown(const  int mouseX, const  int mouseY, int k
 	}
 	mouseSliderOffset = mousePos - SliderPos;
 	scrollbarHasMouse = this;
-	pDrawFuncs->mouseCaptured(true);
+	rootUI->captureMouse(true);
 	return true;
 }
 
@@ -133,7 +136,7 @@ void CGUIbaseScrollbar::updateValue() {
 	//call the user's event handler.
 	CMessage msg;
 	msg.Msg = change;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 
 }
 

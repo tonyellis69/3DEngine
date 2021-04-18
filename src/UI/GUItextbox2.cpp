@@ -1,5 +1,7 @@
 #include "GUItextbox2.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 CGUItextbox2::CGUItextbox2(int x, int y, int w, int h) {
@@ -40,30 +42,30 @@ void CGUItextbox2::setTextColour(UIcolour  colour) {
 
 
 void CGUItextbox2::DrawSelf() {
-	pDrawFuncs->setClip(Clipbox);
+	uiDraw::setClip(Clipbox);
 
 	//draw box
 	//setBackColour1(style::uiWhite);
 //	setBackColour2(style::uiWhite);
 //	pDrawFuncs->drawCtrlRect(*this);
-	pDrawFuncs->drawRect2(drawBox, (vec4&)backColour1, (vec4&)backColour2);
+	uiDraw::drawRect(drawBox, (vec4&)backColour1, (vec4&)backColour2);
 
 	if (KeyCapture == this) {
 		//draw cursor
 		pDrawFuncs->drawCursor2(cursor);
 	}
 
-	pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
+	uiDraw::drawTexture(drawBox, textBuf.textTexture);
 
 	//draw border
 	if (drawBorder) {
 		if (MouseOver == this || KeyCapture == this) {
 			//setBorderColour(UIdarkGrey);
-			pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
+			uiDraw::drawBorder(drawBox, style::uiDarkGrey);
 		}
 		else {
 			//setBorderColour(UIlightGrey);
-			pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
+			uiDraw::drawBorder(drawBox, style::uiLightGrey);
 		}
 		//pDrawFuncs->drawCtrlBorder(*this);
 	}

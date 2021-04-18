@@ -40,7 +40,7 @@ public:
 	CTextBuffer textBuf;
 	//std::string text;
 	glm::i32vec2 renderOffset;///<Due to centering, multiline, etc.
-	int lineRenderedWidth;
+	int lineRenderedWidth = 0;
 	TTextAlign textAlign; ///<Records whether the text is centred, etc, in its area.
 	bool multiLine;
 
@@ -48,5 +48,7 @@ public:
 
 	
 	int leftAlignIndent; ///<How much left-aligned text is indented.
+
+	bool resizeToFit = true;
 
 	};

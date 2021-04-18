@@ -12,11 +12,11 @@ public:
 	void addAttribute(int attr);
 	void setAttribs();
 	void setVAO();
+	void clearVAO();
 	void setSize(unsigned int size);
 	void setNumVerts(unsigned int n) {
 		numVerts = n;
 	}
-
 
 	~CSharedBuf();
 

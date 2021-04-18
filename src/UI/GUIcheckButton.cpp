@@ -1,5 +1,7 @@
 #include "GUIcheckButton.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 const int checked = 2;
@@ -36,17 +38,17 @@ void CGUIcheckButton::DrawSelf( ) {
 	checkBox.pos = drawBox.pos + i32vec2(drawBox.size.x - (checkBox.size.x+inset), inset);
 	if (Set)
 		//pDrawFuncs->drawIcon(checked, iconPos,drawBox.pos.y + (drawBox.size.y >> 1));
-		pDrawFuncs->drawRect2(checkBox, style::uiBlack, style::uiBlack);
+		uiDraw::drawRect(checkBox, style::uiBlack, style::uiBlack);
 	else
 		//pDrawFuncs->drawIcon(unChecked, iconPos, drawBox.pos.y + (drawBox.size.y >> 1));
-		pDrawFuncs->drawRect2(checkBox, style::uiWhite, style::uiWhite);
+		uiDraw::drawRect(checkBox, style::uiWhite, style::uiWhite);
 	
 	if (MouseOver == this)
 		//setBorderColour(UIdarkGrey);
-		pDrawFuncs->drawBorder2(checkBox, style::uiDarkGrey);
+		uiDraw::drawBorder(checkBox, style::uiDarkGrey);
 	else
 		//setBorderColour(UIlightGrey);
-		pDrawFuncs->drawBorder2(checkBox, style::uiLightGrey);
+		uiDraw::drawBorder(checkBox, style::uiLightGrey);
 	//pDrawFuncs->drawCtrlBorder(*this);
 }
 
@@ -56,7 +58,7 @@ bool CGUIcheckButton::OnClick(const  int mouseX, const  int mouseY) {
 	CMessage msg;
 	msg.Msg = uiClick;
 	msg.value = Set;
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 	parent->message(this, msg);
 	return true;
 }

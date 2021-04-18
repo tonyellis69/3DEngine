@@ -9,6 +9,8 @@
 
 CBaseApp* CWin::pApp = NULL;
 
+
+
 void error_callback(int error, const char* description) {
 	std::cerr << "Error here: " << description;
 }
@@ -27,8 +29,11 @@ CWin::~CWin() {
 
 /** Create a window for rendering to. */
 void CWin::createWindow(int w, int h, std::string title) {
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 	window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
 	glfwMakeContextCurrent(window);
+
+
 }
 
 void CWin::createWindowHidden(int w, int h, std::string title) {
@@ -178,3 +183,5 @@ void CWin::characterCallback(GLFWwindow* window, unsigned int codepoint) {
 void CWin::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	pApp->OnMouseWheelMsg(xoffset,yoffset);
 }
+
+

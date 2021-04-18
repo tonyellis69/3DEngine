@@ -1,5 +1,7 @@
 #include "GUIcontainer.h"
 
+#include "uiRender.h"
+
 using namespace glm;
 
 int CGUIcontainer::Count = 1;
@@ -89,7 +91,7 @@ bool CGUIsysContainer::MouseWheelMsg(const  int mouseX, const  int mouseY, int w
 }
 
 void CGUIsysContainer::DrawSelf( ) {
-	pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
+	uiDraw::drawBorder(drawBox, style::uiDarkGrey);
 }
 
 

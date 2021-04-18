@@ -1,6 +1,6 @@
 #pragma once
 
-#include "renderer/buf.h"
+//#include "renderer/buf.h"
 
 #include "renderer/mesh.h"
 
@@ -14,7 +14,7 @@ public:
 	bool BBcollision(glm::vec3& segA, glm::vec3& segB);
 
 	TModelNode model;
-	CBuf* buffer;
+	//CBuf* buffer;
 	CBuf2* buffer2;
 
 private:

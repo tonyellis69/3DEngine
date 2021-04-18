@@ -2,12 +2,10 @@
 
 
 
-#include "2d.h"
+//#include "2d.h"
 //#include <windows.h> 
 #include <string>
 #include <vector>
-
-//#include "..\soil.h"
 
 
 #include "camera.h"
@@ -17,8 +15,8 @@
 
 #include "buf2.h"
 
-#include "texManager.h"
-#include "..\terrain.h"
+//#include "texManager.h"
+//#include "..\terrain.h"
 #include "shaderDraw.h"
 
 #include "renderShader.h"
@@ -40,17 +38,20 @@ extern int totalbufsize;
 extern int totalchunks;
 
 
+extern CRenderer renderer;
+
+
 /** The high-level renderer class. */
 class CBaseBuf;
 class CRenderer  {
 public:
 	CRenderer();
 	~CRenderer();
-	/** Return a reference to the renderer singleton, initialising it if necessary. */
-	static CRenderer & CRenderer::getInstance() {
-		static CRenderer *instance = new CRenderer();
-		return *instance;
-	}
+	///** Return a reference to the renderer singleton, initialising it if necessary. */
+	//static CRenderer & CRenderer::getInstance() {
+	//	static CRenderer *instance = new CRenderer();
+	//	return *instance;
+	//}
 	void getGLinfo();
 	void clearFrame();
 	void setBackColour(const rgba& colour);
@@ -67,11 +68,11 @@ public:
 	unsigned int linkShaders(unsigned int program);
 	unsigned int linkShaders();
 	unsigned int attachShaders();
-	void storeVertexData(unsigned int& handle, glm::vec3* data,int size);
-	void storeIndexData(unsigned int& hIndex,unsigned short* data,int size);
-	void storeVertexLayout(unsigned int& hVAO,unsigned int bufferObj, unsigned int hIndex,int nAttributes);
-	void freeBuffer(unsigned int buffer);
-	void freeVAO(unsigned int hVAO);
+	//void storeVertexData(unsigned int& handle, glm::vec3* data,int size);
+	//void storeIndexData(unsigned int& hIndex,unsigned short* data,int size);
+	//void storeVertexLayout(unsigned int& hVAO,unsigned int bufferObj, unsigned int hIndex,int nAttributes);
+	//void freeBuffer(unsigned int buffer);
+	//void freeVAO(unsigned int hVAO);
 	unsigned int getShaderDataHandle(int program, std::string varName);
 	void setShaderValue(unsigned int matrixHandle,int elements, glm::mat4& matrix);
 	void setShaderValue(unsigned int matrixHandle, int elements, glm::mat3& matrix);
@@ -83,6 +84,7 @@ public:
 	void setShaderValue(unsigned int floatHandle, int elements, float value);
 	void setShader(int program);
 	void setShader(CShader* shader);
+	void setClip(int x, int y, int width, int height);
 	void drawModel(CRenderModel& model);
 	//void initRenderToTextureBufs();
 	void createFrameBuffer();
@@ -90,6 +92,7 @@ public:
 	void renderToTextureQuad(CBaseTexture & texture);
 	void renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset, glm::i32vec2& size);
 	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
+	void renderToTextureTris(CBuf2& buffer, CBaseTexture& texture);
 	void renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture);
 	void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
 	void beginRenderToTexture(CBaseTexture & texture);
@@ -122,6 +125,8 @@ public:
 	void drawPointsBuf(CBuf2& buf, void* start, int count);
 	void drawTrisBuf(CBuf2& buf, void* start, int count);
 	void drawTriStripBuf(CBuf& buf);
+	void drawTriStripBuf(CBuf2& buf);
+	void drawLineLoopBuf(CBuf2& buf);
 	unsigned int getGLdrawMode(TdrawMode);
 	CBaseBuf* createBuffer();
 	void createStandardPhongShader();
@@ -144,9 +149,8 @@ public:
 	int Width; ///<Width of the view
 	int Height; ///<Height of the view
 
-	TMatrix DisplayMatrix; ///<A matrix storing whatever global translations, scaling, etc, we use every frame.
-
-	C2dRenderer rend2d; ///<2D renderer.
+	
+	//C2dRenderer rend2d; ///<2D renderer.
 
 	CTextureManagerOGL textureManager;
 
@@ -231,6 +235,10 @@ public:
 	glm::vec3 defaultLightDir; //TO DO: scrap. Default light is not a spotlight!
 
 	CRenderTexture* texture1x1; ///<1x1 white texture, useful as a default.
+	 
+	int tmpDbg = 0;
+	int dbgFrame = -1;
+	int entityNo;
 
 
 
@@ -243,8 +251,8 @@ private:
 
 	//render to texture stuff:
 	//unsigned int r2texQuadBuffer;
-	unsigned int r2texFrameBuf;
-	unsigned int  r2texTex;
+	//unsigned int r2texFrameBuf;
+	//unsigned int  r2texTex;
 
 	GLuint primitivesQuery; ///<Used in primitives generated queries.
 

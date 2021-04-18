@@ -6,7 +6,7 @@
 
 
 CTextBuffer::CTextBuffer() {
-	pRenderer = &CRenderer::getInstance();
+	// pRenderer = &renderer;
 }
 
 /** Set the absolute dimensions, in pixels, of the buffer texture.*/
@@ -34,7 +34,7 @@ void CTextBuffer::renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, f
 void CTextBuffer::clearBuffer() {
 	
 	//	return;
-	pRenderer->rendertToTextureClear(textTexture, glm::vec4(0, 0, 0, 0));
+	renderer.rendertToTextureClear(textTexture, glm::vec4(0, 0, 0, 0));
 }
 
 
@@ -46,14 +46,14 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads, float fadeInX) {
 	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, 0, size.y);
 
 
-	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, mDrawData->font->texture); //attach texture to textureUnit (0)
-	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, orthoMatrix);
-	pRenderer->texShader->setShaderValue(pRenderer->hFadeInX, fadeInX);
+	renderer.setShader(renderer.textShader);
+	renderer.attachTexture(0, mDrawData->font->texture); //attach texture to textureUnit (0)
+	renderer.texShader->setTextureUnit(renderer.hTextTexture, 0);
+	renderer.texShader->setShaderValue(renderer.hTextColour, textColour);
+	renderer.texShader->setShaderValue(renderer.hTextOrthoMatrix, orthoMatrix);
+	renderer.texShader->setShaderValue(renderer.hFadeInX, fadeInX);
 
-	pRenderer->renderToTextureTris(glyphQuads, textTexture);
+	renderer.renderToTextureTris(glyphQuads, textTexture);
 
 }
 

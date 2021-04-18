@@ -10,6 +10,8 @@
 #include "..\3DEngine\src\utils\log.h"
 #include "..\3DEngine\src\UI\GUIroot.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 std::uniform_real_distribution<> CGUIrichText::randomPeriod{ 0,1.0f };
@@ -52,6 +54,7 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	autoscrollingDown = true;
 }
 
+
 void CGUIrichText::Draw(float dT) {
 	update(dT);
 	CGUIbase::Draw(dT);
@@ -69,16 +72,18 @@ void CGUIrichText::applyStyleSheet() {
 }
 
 void CGUIrichText::DrawSelf() {
+	
 	lineBuffer2.renderSprites(dT);
 	//if (uniqueID == 402) {
 	//	int b = 9;// lineBuffer2.getTextBuf()->savePNG("d:\\statBuf.png");
 
 	//}
-	pDrawFuncs->drawTexture(drawBox, *lineBuffer2.getTextBuf());
+	uiDraw::drawTexture(drawBox, *lineBuffer2.getTextBuf());
 
 	if (drawBorder) { //should be an overridable basic drawborder routine in the superclass
-		pDrawFuncs->drawBorder2(drawBox, (vec4&)borderColour);
+		uiDraw::drawBorder(drawBox, borderColour);
 	}
+
 }
 
 TRichTextRec* CGUIrichText::getTexObjCallback(int objNo) {
@@ -93,7 +98,7 @@ void CGUIrichText::setFont(CFont* newFont) {
 
 
 CFont * CGUIrichText::getFont() {
-	return pDrawFuncs->getFont(currentTextStyle.font);
+	return uiDraw::getFont(currentTextStyle.font);
 }
 
 /** Set the current text drawing colour. */
@@ -262,8 +267,7 @@ void CGUIrichText::compileFragmentsToEnd(TPagePos fragmentStart) {
 TLineFragment CGUIrichText::compileSingleLine(TLineFragment lineFragment) {
 	readPoint = { lineFragment.textObj, lineFragment.textPos + lineFragment.textLength };
 
-	//check for rwHead = eof 
-
+	//check for rwHead = eof ;
 	do { 
 		lineFragment = getNextLineFragment(lineFragment);
 
@@ -535,7 +539,7 @@ void CGUIrichText::resizeToFit() {
 	in a loop. */
 void CGUIrichText::resizeByRatio() {
 	float ratio = 2;// 1.618;
-	int heightModifier = pDrawFuncs->getFont(textObjs[currentTextObj].style.font)->lineHeight;
+	int heightModifier = uiDraw::getFont(textObjs[currentTextObj].style.font)->lineHeight;
 	int newHeight = getHeight(); int newWidth = getWidth();
 	bool previouslyOverrun = false;
 
@@ -763,7 +767,7 @@ TLineFragment CGUIrichText::findFragmentEnd( TLineFragment fragment) {
 	unsigned int textStartPos = fragment.textPos;
 	int renderX = fragment.renderStartX;
 
-	CFont* font = pDrawFuncs->getFont(textObjs[textObj].style.font);
+	CFont* font = uiDraw::getFont(textObjs[textObj].style.font);
 
 	std::string& text = textObjs[textObj].text;
 

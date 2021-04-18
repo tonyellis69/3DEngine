@@ -1,5 +1,7 @@
 #include "GUIlabel.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 
@@ -96,11 +98,11 @@ TTextAlign CGUIlabel::getJustification() {
 
 void CGUIlabel::DrawSelf() {
 	//if (textData.text.size()) //TO DO: blank text is sometimes corrupted, not sure why
-		pDrawFuncs->drawTexture(drawBox, textBuf.textTexture);
+		uiDraw::drawTexture(drawBox, textBuf.textTexture);
 	
 	 if (drawBorder) {
 		//pDrawFuncs->drawCtrlBorder(*this);
-		 pDrawFuncs->drawBorder2(drawBox, (glm::vec4&)borderColour);
+		 uiDraw::drawBorder(drawBox, (glm::vec4&)borderColour);
 	}
 }
 

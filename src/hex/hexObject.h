@@ -3,10 +3,9 @@
 #define _USE_MATH_DEFINES //for cmath
 #include <glm/glm.hpp>
 
-#include "../renderer/buf.h"
+//#include "../renderer/buf.h"
 #include "hex.h"
 
-#include "../3DTest/src/IHexRenderer.h"
 #include "lineModel.h"
 
 struct TFov { //describes a fov shape
@@ -19,7 +18,6 @@ class CHexObject  {
 public:
 	CHexObject();
 	virtual ~CHexObject() {}
-	static void setHexRenderer(IHexRenderer* rendrObj);
 	virtual void setPosition(int x, int y, int z);
 	void setPosition(int x, int y);
 	void setPosition(CHex& hex);
@@ -49,11 +47,6 @@ protected:
 	
 	THexDir facing; ///<Direction entity is facing.
 	float rotation; ///<Angle of object's z-rotation in world space.
-
-
-
-	inline static IHexRenderer* hexRendr;
-
 
 	float moveSpeed;
 

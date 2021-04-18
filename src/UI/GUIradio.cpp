@@ -70,7 +70,7 @@ bool CGUIradio::OnClick(const  int mouseX, const  int mouseY) {
 	parent->message(this,msg);
 
 	//call the user's event handler.
-	pDrawFuncs->handleUImsg(*this,msg);
+	//pDrawFuncs->handleUImsg(*this,msg);
 	return true;
 }
 

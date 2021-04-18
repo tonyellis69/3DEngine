@@ -1,9 +1,6 @@
 #include "fontManager.h"
 
 
-
-
-
 /** Create a new font from a file and store it. */
 CFont& CFontManager::createFromFile(std::string name, std::string filename) {
 	CFont* font = new CFont();
@@ -22,7 +19,7 @@ CFont & CFontManager::createFromStream(std::string name, std::istream & input) {
 }
 
 CFont & CFontManager::getFont(std::string name) {
-	for (auto font : fonts) {
+	for (auto& font : fonts) {
 		if (font.first == name)
 			return *font.second;
 	}
@@ -33,7 +30,7 @@ CFont & CFontManager::getFont(std::string name) {
 
 
 CFontManager::~CFontManager() {
-	for (auto font : fonts) {
+	for (auto& font : fonts) {
 		delete font.second;
 	}
 }

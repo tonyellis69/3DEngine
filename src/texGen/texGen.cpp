@@ -4,12 +4,13 @@
 #include <functional>
 
 #include<unordered_map>
+#include <queue>
 
 using namespace glm;
 
 CTexGen::CTexGen(TexGenType derivedType) :
 	texGenType(derivedType), srcTex1(NULL), srcTex2(NULL), srcTex3(NULL)  {
-	pRenderer = &CRenderer::getInstance();
+	pRenderer = &renderer; // &CRenderer::getInstance();
 	mTarget.resize(512, 512);
 	//TO DO: do without magic numbers!!!!!!!!!!!!!!!!!!!!!
 	count = 0;

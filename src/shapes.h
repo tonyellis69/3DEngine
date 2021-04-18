@@ -20,5 +20,5 @@ namespace shape {
 
 	CMesh cubeMesh();
 	CMesh fustrumMesh(float gradient);
-	CMesh cylinderMesh(float radius, float height, float steps);
+	CMesh cylinderMesh(float radius, float height, int steps);
 }

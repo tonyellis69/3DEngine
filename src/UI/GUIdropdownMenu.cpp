@@ -1,6 +1,8 @@
 #include "GUIdropdownMenu.h"
 #include "GUIroot.h"
 
+#include "UI/uiRender.h"
+
 using namespace glm;
 
 CGUIdropdownMenu::CGUIdropdownMenu(int x, int y, int w, int h) {
@@ -43,12 +45,12 @@ void CGUIdropdownMenu::setText(const std::string & title) {
 
 
 void CGUIdropdownMenu::DrawSelf() {
-	pDrawFuncs->drawRect2(drawBox, (glm::vec4&)backColour1, (glm::vec4&) backColour2);
+	uiDraw::drawRect(drawBox, (glm::vec4&)backColour1, (glm::vec4&) backColour2);
 
 	if(MouseOver == this)
-		pDrawFuncs->drawBorder2(drawBox, style::uiDarkGrey);
+		uiDraw::drawBorder(drawBox, style::uiDarkGrey);
 	else
-		pDrawFuncs->drawBorder2(drawBox, style::uiLightGrey);
+		uiDraw::drawBorder(drawBox, style::uiLightGrey);
 
 }
 

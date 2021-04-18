@@ -4,7 +4,7 @@
 #include "Delegate.h"
 #include "renderer\texManager.h"
 #include "font.h"
-#include "renderer\buf.h"
+//#include "renderer\buf.h"
 #include "rowObject.h"
 #include "GUIdragDrop.h"
 #include "GUIstyleSheet.h"
@@ -103,15 +103,15 @@ public:
 
 	//DelegatePP<void,const UIcolour&,const UIcolour&> setDrawColours;
 	//DelegatePPP<void,int,int,int> drawIcon;
-	DelegatePP<void,CGUIbase&, CMessage&> handleUImsg;
+	//DelegatePP<void,CGUIbase&, CMessage&> handleUImsg;
 	//DelegatePPP<void,UIcoord&,int,int> drawRect;
 	//DelegatePPPP<void,int,int,int,int> drawBorder;
-	DelegateP<void,UIrect&> setClip;
+	//DelegateP<void,UIrect&> setClip;
 //	DelegatePPPP<void,int,int,int,int> drawLine;
 //	DelegateP<void,int> setIconset;
 //	DelegatePP<void,int,UIrect&> drawTile;
 //	DelegatePP<void,int,UIrect&> drawImage;
-	DelegateP<void,bool> mouseCaptured;
+	//DelegateP<void,bool> mouseCaptured;
 //	DelegateP<void,int> setCursor;
 //	DelegatePPP<void, UIcolour, UIcolour, bool> setDrawColoursConditional;
 //	DelegatePPPP<void,int,int,int,int> drawDottedRect;
@@ -122,13 +122,13 @@ public:
 	virtual void drawCtrlRect(CGUIbase& control) {};
 	virtual void drawCtrlBorder(CGUIbase& control) {};
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
-	virtual void drawTexture(guiRect& drawBox, CBaseTexture& texture) {};
+	//virtual void drawTexture(guiRect& drawBox, CBaseTexture& texture) {};
 	virtual void updateScreenDimensions(CGUIbase& control) {};
 	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
-	virtual CFont* getFont(std::string name) { return NULL; };
-	virtual void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture) {};
-	virtual void drawRect2(guiRect& drawBox,const glm::vec4& colour1, const glm::vec4&  colour2) {};
-	virtual void drawBorder2(guiRect& drawBox, const glm::vec4& colour) {};
+	//virtual CFont* getFont(std::string name) { return NULL; };
+	//virtual void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture) {};
+	//virtual void drawRect2(guiRect& drawBox,const glm::vec4& colour1, const glm::vec4&  colour2) {};
+	//virtual void drawBorder2(guiRect& drawBox, const glm::vec4& colour) {};
 	virtual void drawCursor2(guiRect & drawBox) {};
 
 };
@@ -152,7 +152,7 @@ public:
 
 /** A class defining the basis of all GUI controls. */
 //class CGUIlabel;
-class CGUIbutton;
+//class CGUIbutton;
 class CGUIradio;
 class CGUImouse;
 class CGUIroot;
@@ -459,7 +459,7 @@ enum Messagetypes {
 	change, userDraw, uiMsgDrop, uiMsgLMdown, uiMsgRMdown, uiMsgMouseMove,
 	uiMsgLMouseUp, uiMsgRMouseUp, uiMouseWheel, uiClick, uiClickOutside, uiDataEntered, uiSpin, uiLostKeyboard,
 	uiMsgHotTextClick, uiMsgHotTextChange, uiMsgChildResize, uiMsgSlide, uiMsgUpdate, uiMsgSave, uiMsgRestore,
-	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete, uiMsgDragging
+	uiMsgMouseOff, uiMsgDoubleClick, uiMsgDelete, uiMsgDragging, uiMouseCapture
 };
 
 

@@ -27,6 +27,7 @@ public:
 	void deleteModal();
 	void removeModal();
 	void setFocus(CGUIbase* control);
+	void captureMouse(bool on);
 
 	//CGUIbase* modalControl; ///<Pointer to the current modal control, if any.
 	CGUIbase* focusControl; ///<The current control with focus, if any.
