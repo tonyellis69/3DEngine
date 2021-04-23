@@ -38,13 +38,8 @@ void CTextBuffer::clearBuffer() {
 }
 
 
-void CTextBuffer::writeToTexture2(CBuf& glyphQuads, float fadeInX) {
-	
-		//return;
-
-
+void CTextBuffer::writeToTexture2(CBuf2& glyphQuads, float fadeInX) {
 	glm::mat4 orthoMatrix = glm::ortho<float>(0, (float)size.x, 0, size.y);
-
 
 	renderer.setShader(renderer.textShader);
 	renderer.attachTexture(0, mDrawData->font->texture); //attach texture to textureUnit (0)
@@ -54,7 +49,6 @@ void CTextBuffer::writeToTexture2(CBuf& glyphQuads, float fadeInX) {
 	renderer.texShader->setShaderValue(renderer.hFadeInX, fadeInX);
 
 	renderer.renderToTextureTris(glyphQuads, textTexture);
-
 }
 
 /** Prepare to compose a buffer-full of text for rendering. */
@@ -106,9 +100,12 @@ void CTextBuffer::render() {
 }
 
 void CTextBuffer::render(float fadeInX) {
-	buf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
-	buf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
-	buf.storeLayout(2, 2, 0, 0);
+	//buf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
+	//buf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
+	//buf.storeLayout(2, 2, 0, 0);
+
+	buf.storeVerts(textQuads, textQuadsIndex, 2, 2);
+
 	writeToTexture2(buf, fadeInX);
 
 }

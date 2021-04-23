@@ -7,8 +7,6 @@
 #include "font.h"
 #include "..\renderer\renderer.h"
 
-//#include "renderDrawFuncs.h"
-
 #include "text.h"
 
 /** A class that maintains a rectangular buffer of rendered text for displaying. */
@@ -26,12 +24,10 @@ public:
 	bool notEmpty();
 
 	CRenderTexture textTexture; ///<The texture holding the rendered text.
-	
-	//CRenderer* pRenderer;
 
-	CBuf buf;
+	CBuf2 buf;
 private:
-	void writeToTexture2(CBuf & glyphQuads, float fadeInX);
+	void writeToTexture2(CBuf2 & glyphQuads, float fadeInX);
 
 	glm::i32vec2 size;
 

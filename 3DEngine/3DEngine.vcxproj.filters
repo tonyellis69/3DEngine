@@ -110,16 +110,7 @@
     <ClCompile Include="..\src\renderer\renderer.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\multiBuf.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\baseBuf.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\renderer\material.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\modelMulti.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\renderMaterial.cpp">
@@ -129,9 +120,6 @@
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\renderShader.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\renderer\billboard.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIimage.cpp">
@@ -323,9 +311,6 @@
     <ClCompile Include="..\src\utils\random.cpp">
       <Filter>Header Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\buf.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\uiRender.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -338,9 +323,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\colour.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Delegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIbase.h">
@@ -418,16 +400,7 @@
     <ClInclude Include="..\src\renderer\renderer.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\multiBuf.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\baseBuf.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\renderer\material.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\modelMulti.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\renderMaterial.h">
@@ -437,9 +410,6 @@
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\renderer\renderShader.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\billboard.h">
       <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIimage.h">
@@ -666,9 +636,6 @@
     </ClInclude>
     <ClInclude Include="..\Src\BaseApp.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\renderer\buf.h">
-      <Filter>Header Files\renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\uiRender.h">
       <Filter>Header Files</Filter>

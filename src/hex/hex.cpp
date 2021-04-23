@@ -125,9 +125,9 @@ CHex offsetToCube(int x, int y) {
 
 /** Round floating point coordinates to the nearest hex. */
 CHex hexRound(glm::vec3& cubePos) {
-	int rx = round(cubePos.x);
-	int ry = round(cubePos.y);
-	int rz = round(cubePos.z);
+	int rx = (int) round(cubePos.x);
+	int ry = (int) round(cubePos.y);
+	int rz = (int) round(cubePos.z);
 
 	float x_diff = abs(rx - cubePos.x);
 	float y_diff = abs(ry - cubePos.y);
@@ -171,12 +171,12 @@ CHex worldSpaceToHex(glm::vec3& worldSpace) {
 	float hexQuarterHeight = hexHeight / 4.0f;
 	float rectHeight = hexHeight * 0.75f;
 	
-	int row = -floor(((worldSpace.y + hexQuarterHeight) ) / rectHeight);
+	int row = (int)  -floor(((worldSpace.y + hexQuarterHeight) ) / rectHeight);
 
-	bool rowIsOdd = int(row) & 1 == 1;
+	bool rowIsOdd = int(row & 1) == 1;
 
 	float offset = rowIsOdd ? 0 : halfHexWidth;
-	int col = floor((worldSpace.x + offset) / hexWidth);
+	int col = (int) floor((worldSpace.x + offset) / hexWidth);
 
 
 	//now check if we're in the upper triangles
@@ -436,9 +436,9 @@ bool isNeighbour(CHex& hex, CHex& neighbour) {
 	return false;
 }
 
-/** Return the relative angle of the neighbouring hex, where hexEas = 0; */
+/** Return the relative angle of the neighbouring hex, where hexEast = 0; */
 float dirToAngle(THexDir direction) {
-	return (float)direction * M_PI / 3.0f;
+	return float(direction * M_PI) / 3.0f;
 }
 
 /** Convert a cube direction as a normalised 3D space vector. */
@@ -458,11 +458,11 @@ bool badHex(CHex& hex) {
 
 /** Return the shortest angle of rotation required to get from start to end. */
 float shortestRotation(THexDir start, THexDir end) {
-	float dist = (6 + end - start) % 6;
+	float dist = float ( (6 + end - start) % 6 );
 	if (dist > 3)
 		dist = -(6 - dist);
 
-	return dist * M_PI / 3.0f;
+	return float(dist * M_PI) / 3.0f;
 }
 
 /** Return the angle the end hex lies at, relative to the start hex. */
@@ -472,7 +472,7 @@ float hexAngle(CHex& start, CHex& end) {
 	
 	float angle = glm::acos(glm::dot(angleVec,glm::vec3(1,0,0)) );
 	if (angleVec.y > 0)
-		angle = 2 * M_PI - angle;
+		angle = float(2.0f * M_PI) - angle;
 	return angle;
 }
 

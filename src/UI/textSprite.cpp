@@ -81,9 +81,10 @@ void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
 	}
 
 
-	tmpQuadBuf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
-	tmpQuadBuf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
-	tmpQuadBuf.storeLayout(2, 2, 0, 0);
+	//tmpQuadBuf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
+	//tmpQuadBuf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
+	//tmpQuadBuf.storeLayout(2, 2, 0, 0);
+	tmpQuadBuf.storeVerts(textQuads, textQuadsIndex, 2, 2);
 
 
 	this->font = font;
@@ -130,7 +131,7 @@ void CTextSprite::draw() {
 
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, 0.0f);
 
-	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
+	pRenderer->drawTriStripBuf(renderer.screenQuad);
 }
 
 /** Modify the vertical position of this sprite on the page by the given amount. */
@@ -205,7 +206,7 @@ void CHotTextSprite::draw() {
 
 	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, alpha);
 
-	pRenderer->drawTriStripBuf(*pRenderer->screenQuad);
+	pRenderer->drawTriStripBuf(renderer.screenQuad);
 }
 
 void CHotTextSprite::setHotId(unsigned int hotId)  {

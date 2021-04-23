@@ -17,6 +17,9 @@ public:
 	void setNumVerts(unsigned int n) {
 		numVerts = n;
 	}
+	unsigned int getBufferHandle() {
+		return hBuffer;
+	}
 
 	~CSharedBuf();
 

@@ -85,8 +85,8 @@ CRenderer::CRenderer() {
 CRenderer::~CRenderer() {
 	for (size_t c = 0; c < cameraList.size(); c++)
 			delete cameraList[c];
-	for (size_t b = 0; b<bufferList.size(); b++)
-		delete bufferList[b];
+	//for (size_t b = 0; b<bufferList.size(); b++)
+	//	delete bufferList[b];
 	//_CrtDumpMemoryLeaks();
 }
 
@@ -411,14 +411,14 @@ void CRenderer::setClip(int x, int y, int width, int height) {
 	glScissor(x, y, width, height);
 }
 
-void CRenderer::drawModel(CRenderModel& model) {
-	setVAO(model.buf.hVAO);
-	if (model.buf.hIndex == 0)
-		glDrawArrays(model.drawMode, 0, model.buf.noVerts);
-	else
-		glDrawElements(model.drawMode, model.buf.noIndices, model.buf.indexType, 0);
-	setVAO(0);
-}
+//void CRenderer::drawModel(CRenderModel& model) {
+//	setVAO(model.buf.hVAO);
+//	if (model.buf.hIndex == 0)
+//		glDrawArrays(model.drawMode, 0, model.buf.noVerts);
+//	else
+//		glDrawElements(model.drawMode, model.buf.noIndices, model.buf.indexType, 0);
+//	setVAO(0);
+//}
 
 
 
@@ -465,9 +465,9 @@ void CRenderer::createFrameBuffer() {
 
 /** Create a reusable quad in NDC coordinated for when we want to render to the entire screen, */
 void CRenderer::createScreenQuad() {
-	screenQuad = (CBuf*)createBuffer();
-	vBuf::T2DtexVert vert[4];
-	//glm::vec2 vert[4];
+	//screenQuad = (CBuf*)createBuffer();
+
+	std::vector<vBuf::T2DtexVert> vert(4);
 	vert[0].v = glm::vec2(-1, 1);
 	vert[1].v = glm::vec2(1, 1);
 	vert[2].v = glm::vec2(-1, -1);
@@ -478,16 +478,17 @@ void CRenderer::createScreenQuad() {
 	vert[2].tex = glm::vec2(0, 0);
 	vert[3].tex = glm::vec2(1, 0);
 
-	unsigned int index[4] = { 2,3,0,1 };
-	screenQuad->storeVertexes(vert, sizeof(vert), 4);
-	screenQuad->storeIndex(index, 4);
-	screenQuad->storeLayout(2, 2, 0, 0);
+	std::vector<unsigned int> index = { 2,3,0,1 };
+	//screenQuad->storeVertexes(vert, sizeof(vert), 4);
+	//screenQuad->storeIndex(index, 4);
+	//screenQuad->storeLayout(2, 2, 0, 0);
+	screenQuad.storeVerts(vert, index, 2, 2);
 }
 
 /** Draw a full-screen quad to the given texture using the current shader. */
 void CRenderer::renderToTextureQuad(CBaseTexture& texture) {
 	beginRenderToTexture(texture);
-	drawBuf(*screenQuad, drawTriStrip);
+	drawTriStripBuf(screenQuad);
 	endRenderToTexture();
 }
 
@@ -496,17 +497,17 @@ void CRenderer::renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset,
 	beginRenderToTexture(texture);
 //	setBackColour((rgba&)glm::vec4(1,0,0,1));
 	//glClear(GL_COLOR_BUFFER_BIT);
-	drawBuf(*screenQuad, drawTriStrip);
+	drawTriStripBuf(screenQuad);
 	endRenderToTexture();
 	//setBackColour(clearColour);
 }
 
 /** Draw the given buffer of tris to the texture using the current shader. */
-void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
-	beginRenderToTexture(texture);
-	drawBuf(buffer, drawTris);
-	endRenderToTexture();
-}
+//void CRenderer::renderToTextureTris(CBuf& buffer, CBaseTexture& texture) {
+//	beginRenderToTexture(texture);
+//	drawBuf(buffer, drawTris);
+//	endRenderToTexture();
+//}
 
 void CRenderer::renderToTextureTris(CBuf2& buffer, CBaseTexture& texture) {
 	beginRenderToTexture(texture);
@@ -515,17 +516,17 @@ void CRenderer::renderToTextureTris(CBuf2& buffer, CBaseTexture& texture) {
 }
 
 /** Draw the given tri strip buffer to the texture using the current shader. */
-void CRenderer::renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture) {
-	beginRenderToTexture(texture);
-	drawTriStripBuf(buffer);
-	endRenderToTexture();
-}
+//void CRenderer::renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture) {
+//	beginRenderToTexture(texture);
+//	drawTriStripBuf(buffer);
+//	endRenderToTexture();
+//}
 
-void CRenderer::renderToTexturePoints(CBuf& buffer, CBaseTexture& texture) {
-	beginRenderToTexture(texture);
-	drawBuf(buffer, drawPoints);
-	endRenderToTexture();
-}
+//void CRenderer::renderToTexturePoints(CBuf& buffer, CBaseTexture& texture) {
+//	beginRenderToTexture(texture);
+//	drawBuf(buffer, drawPoints);
+//	endRenderToTexture();
+//}
 
 
 /**	Prepare to render to the given texture, leaving the actual drawing to the user. */
@@ -576,7 +577,7 @@ void CRenderer::rendertToTextureClear(CBaseTexture& texture,glm::vec4& colour) {
 
 /** Draw the model with the current shader, offscreen, and store the returned vertex data
 	in a buffer. */
-unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode) {
+unsigned int CRenderer::getGeometryFeedback(CBuf2& srcBuf, TdrawMode srcDrawMode, CBuf2& destBuf, TdrawMode destDrawMode) {
 
 	
 	glEnable(GL_RASTERIZER_DISCARD);
@@ -593,7 +594,7 @@ unsigned int CRenderer::getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode,
 	glGenQueries(1, &query);
 	//glGenQueries(1, &speedQuery);
 
-	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, destBuf.getBufHandle());
+	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, destBuf.getBufferHandle());
 	//glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, hDestBuf);
 
 	glBeginQuery(GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN, query);
@@ -719,20 +720,12 @@ unsigned long CRenderer::getTimerQuery() {
 
 
 /** Draw a range of geometry from the given childbuffer of a multibuffer. */
-void CRenderer::drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
-	//setVAO(multiBuf.childBufs[childBufNo].hVAO);
-	glDrawArrays(getGLdrawMode(drawMode), vertStart, vertCount);
+//void CRenderer::drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
+//	//setVAO(multiBuf.childBufs[childBufNo].hVAO);
+//	glDrawArrays(getGLdrawMode(drawMode), vertStart, vertCount);
+//
+//}
 
-}
-
-/** Draw an instanced model using instancing data from the given childbuffer of a multibuffer. */
-void CRenderer::drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount) {
-	setVAO(multiBuf.childBufs[childBufNo].hVAO);
-	int nIndices = multiBuf.instancedBuf->getNoIndices();
-	glDrawElementsInstancedBaseInstance(getGLdrawMode(drawMode), nIndices, multiBuf.indexType, 0,
-		vertCount, vertStart);
-//	cerr << "\nnIndices " << nIndices << " vertCount" << vertCount << " vertStart " << vertStart;
-} 
 
 
 
@@ -770,43 +763,51 @@ void CRenderer::attachTexture(unsigned int textureUnit, CBaseTexture & texture) 
 
 
 
+//!!!!!Deprecated, try to scrap
+//void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
+//	setVAO(buf.hVAO);
+//	if (buf.hIndex == 0)
+//		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
+//	else
+//		glDrawElements(getGLdrawMode(drawMode), buf.frameIndices, buf.indexType, 0);
+//	setVAO(0);
+//}
 
-void CRenderer::drawBuf(CBuf & buf, TdrawMode drawMode) {
-
-	setVAO(buf.hVAO);
-	if (buf.hIndex == 0)
-		glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
-	else
-		glDrawElements(getGLdrawMode(drawMode), buf.frameIndices, buf.indexType, 0);
+void CRenderer::drawBuf(CBuf2& buf, TdrawMode drawMode) {
+	buf.setVAO();
+	//if (buf.hIndex == 0)
+	//	glDrawArrays(getGLdrawMode(drawMode), 0, buf.noVerts);
+	//else
+		glDrawElements(getGLdrawMode(drawMode), buf.numElements, GL_UNSIGNED_SHORT, 0);
 	setVAO(0);
 }
 
 /////!!!!Prefer this kind of specialised drawing command from now on.
 /////The decision of which to use should be taken higher up 
 /** Draw a buffer of line loop vertices using the current shader. */
-void CRenderer::drawLineLoopBuf(CBuf& buf) {
-	setVAO(buf.hVAO);
-	glDrawElements(GL_LINE_LOOP, buf.frameIndices, buf.indexType, 0);
-	setVAO(0);
-}
+//void CRenderer::drawLineLoopBuf(CBuf& buf) {
+//	setVAO(buf.hVAO);
+//	glDrawElements(GL_LINE_LOOP, buf.frameIndices, buf.indexType, 0);
+//	setVAO(0);
+//}
 
-void CRenderer::drawLineStripBuf(CBuf& buf) {
-	setVAO(buf.hVAO);
-	glDrawElements(GL_LINE_STRIP, buf.noIndices, buf.indexType, 0);
-	setVAO(0);
-}
+//void CRenderer::drawLineStripBuf(CBuf& buf) {
+//	setVAO(buf.hVAO);
+//	glDrawElements(GL_LINE_STRIP, buf.noIndices, buf.indexType, 0);
+//	setVAO(0);
+//}
 
-void CRenderer::drawLinesBuf(CBuf& buf) {
-	setVAO(buf.hVAO);
-	glDrawElements(GL_LINES, buf.frameIndices, buf.indexType, 0);
-	setVAO(0);
-}
+//void CRenderer::drawLinesBuf(CBuf& buf) {
+//	setVAO(buf.hVAO);
+//	glDrawElements(GL_LINES, buf.frameIndices, buf.indexType, 0);
+//	setVAO(0);
+//}
 
-void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
-	setVAO(buf.hVAO); //TO DO: set VAO outside
-	glDrawElements(GL_LINES, count, buf.indexType, (void*)(start * buf.indexStride));
-	setVAO(0);
-}
+//void CRenderer::drawLinesRange(int start, int count, CBuf& buf) {
+//	setVAO(buf.hVAO); //TO DO: set VAO outside
+//	glDrawElements(GL_LINES, count, buf.indexType, (void*)(start * buf.indexStride));
+//	setVAO(0);
+//}
 
 void CRenderer::drawLinesBuf(CBuf2& buf, void* start, int count ) {
 	buf.setVAO();
@@ -840,11 +841,11 @@ void CRenderer::drawTrisBuf(CBuf2& buf, void* start, int count) {
 
 
 
-void CRenderer::drawTriStripBuf(CBuf& buf) {
-	setVAO(buf.hVAO);
-	glDrawElements(GL_TRIANGLE_STRIP, buf.frameIndices, buf.indexType, 0);
-	setVAO(0);
-}
+//void CRenderer::drawTriStripBuf(CBuf& buf) {
+//	setVAO(buf.hVAO);
+//	glDrawElements(GL_TRIANGLE_STRIP, buf.frameIndices, buf.indexType, 0);
+//	setVAO(0);
+//}
 
 void CRenderer::drawTriStripBuf(CBuf2& buf) {
 	buf.setVAO();
@@ -876,12 +877,12 @@ unsigned int CRenderer::getGLdrawMode(TdrawMode iDrawMode) {
 	return NULL;
 }
 
-CBaseBuf* CRenderer::createBuffer() {
-	CBuf* newBuf = new CBuf();
-	//newBuf->setRenderer(this);
-	bufferList.push_back(newBuf);
-	return newBuf;
-}
+//CBaseBuf* CRenderer::createBuffer() {
+//	CBuf* newBuf = new CBuf();
+//	//newBuf->setRenderer(this);
+//	bufferList.push_back(newBuf);
+//	return newBuf;
+//}
 
 void CRenderer::createStandardPhongShader() {
 	phongShader = createShader(dataPath + "default");

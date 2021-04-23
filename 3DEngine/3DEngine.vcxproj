@@ -120,10 +120,7 @@
     <ClCompile Include="..\src\poisson.cpp" />
     <ClCompile Include="..\src\Reader.cpp" />
     <ClCompile Include="..\src\renderer\3dobject.cpp" />
-    <ClCompile Include="..\src\renderer\baseBuf.cpp" />
     <ClCompile Include="..\src\renderer\baseTexture.cpp" />
-    <ClCompile Include="..\src\renderer\billboard.cpp" />
-    <ClCompile Include="..\src\renderer\buf.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
     <ClCompile Include="..\src\renderer\fontManager.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
@@ -132,8 +129,6 @@
     <ClCompile Include="..\src\renderer\mesh.cpp" />
     <ClCompile Include="..\src\renderer\model2 .cpp" />
     <ClCompile Include="..\src\renderer\model2.cpp" />
-    <ClCompile Include="..\src\renderer\modelMulti.cpp" />
-    <ClCompile Include="..\src\renderer\multiBuf.cpp" />
     <ClCompile Include="..\src\renderer\renderer.cpp" />
     <ClCompile Include="..\src\renderer\renderMaterial.cpp" />
     <ClCompile Include="..\src\renderer\renderShader.cpp" />
@@ -207,7 +202,6 @@
     <ClInclude Include="..\src\colour.h" />
     <ClInclude Include="..\src\colourGradient.h" />
     <ClInclude Include="..\src\createShape.h" />
-    <ClInclude Include="..\src\Delegate.h" />
     <ClInclude Include="..\src\external\stb_image.h" />
     <ClInclude Include="..\src\external\stb_image_write.h" />
     <ClInclude Include="..\src\hex\hex.h" />
@@ -229,10 +223,7 @@
     <ClInclude Include="..\src\physics2\physObj2.h" />
     <ClInclude Include="..\src\poisson.h" />
     <ClInclude Include="..\src\renderer\3dobject.h" />
-    <ClInclude Include="..\src\renderer\baseBuf.h" />
     <ClInclude Include="..\src\renderer\baseTexture.h" />
-    <ClInclude Include="..\src\renderer\billboard.h" />
-    <ClInclude Include="..\src\renderer\buf.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
     <ClInclude Include="..\src\renderer\fontManager.h" />
     <ClInclude Include="..\src\renderer\light.h" />
@@ -240,8 +231,6 @@
     <ClInclude Include="..\src\renderer\material2.h" />
     <ClInclude Include="..\src\renderer\mesh.h" />
     <ClInclude Include="..\src\renderer\model2.h" />
-    <ClInclude Include="..\src\renderer\modelMulti.h" />
-    <ClInclude Include="..\src\renderer\multiBuf.h" />
     <ClInclude Include="..\src\renderer\renderer.h" />
     <ClInclude Include="..\src\renderer\renderMaterial.h" />
     <ClInclude Include="..\src\renderer\renderShader.h" />

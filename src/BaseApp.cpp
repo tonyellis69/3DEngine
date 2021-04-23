@@ -308,7 +308,7 @@ void CBaseApp::AppTasks() {
 void CBaseApp::DrawUI() {
 	//Engine.setCurrentShader(0);
 	//Engine.setDrawColour(engineWhite);
-	GUIroot.Draw(dT);
+	GUIroot.Draw((float)dT);
 	//Engine.setClip(0,0,GUIroot.drawBox.size.x, GUIroot.drawBox.size.y);
 	//UIrect
 	uiDraw::setClip((UIrect&)GUIroot.drawBox);

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "Delegate.h"
+//#include "Delegate.h"
 #include "renderer\texManager.h"
 #include "font.h"
 //#include "renderer\buf.h"
@@ -26,8 +26,8 @@ public:
 		if (h < 8) h = 8;
 		size = glm::i32vec2(w, h);
 	}
-	glm::i32vec2 pos;
-	glm::i32vec2 size;
+	glm::i32vec2 pos = { 0,0 };
+	glm::i32vec2 size = { 0,0 };
 };
 
 /** Simple message struct. */
@@ -93,7 +93,7 @@ const UIcolour oldbackColour2 = {0.75f, 0.75f, 0.75f,1.0f};
 class CGUIbase;
 
 //TO DO: remove test
-extern DelegateP<void,int> setFont; 
+//extern DelegateP<void,int> setFont; 
 
 /////////////////////class CGUIbetterBase;
 /** Contains member function pointers to the various drawing function the GUI needs. It is the user's responsibility
@@ -124,7 +124,7 @@ public:
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
 	//virtual void drawTexture(guiRect& drawBox, CBaseTexture& texture) {};
 	virtual void updateScreenDimensions(CGUIbase& control) {};
-	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
+//	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
 	//virtual CFont* getFont(std::string name) { return NULL; };
 	//virtual void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture) {};
 	//virtual void drawRect2(guiRect& drawBox,const glm::vec4& colour1, const glm::vec4&  colour2) {};

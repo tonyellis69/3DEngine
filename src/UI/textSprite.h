@@ -6,8 +6,9 @@
 #include <glm/glm.hpp>
 
 #include "font.h"
-#include "../renderer/buf.h"
+//#include "../renderer/buf.h"
 #include "../renderer/shader.h"
+#include "buf2.h"
 
 struct TTextSpriteShader {
 	unsigned int hOrthoMatrix;
@@ -45,7 +46,7 @@ public:
 	virtual void setHotId(unsigned int hotId) {}
 	virtual unsigned int getHotId() { return -1; }
 
-	CBuf tmpQuadBuf;
+	CBuf2 tmpQuadBuf;
 
 	//unsigned int bufId;
 	glm::i32vec2 bufId;

@@ -13,6 +13,7 @@ public:
 	void clearVAO();
 	void setSize(unsigned int size);
 	void freeMem();
+	unsigned int getBufferHandle();
 
 	template <typename V, typename... T>
 	void storeVerts(std::vector<V>& verts, T... t) {

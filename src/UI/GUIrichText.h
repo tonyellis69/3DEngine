@@ -13,6 +13,8 @@
 
 #include "..\VMtest\src\Ivm.h"
 
+#include "glm\glm.hpp"
+
 
 enum TStyleChange {
 	styleNone, styleBold, styleHotOn, styleHotOff, styleSuspendedHotOn, styleSuspendedHotOff, styleStyle,

@@ -9,9 +9,17 @@
 
 
 #include "camera.h"
-#include "modelMulti.h"
-#include "renderModel.h"
-#include "buf.h"
+//#include "modelMulti.h"
+//#include "renderModel.h"
+//#include "buf.h"
+
+
+
+//#include "3dobject.h"
+#include <glew.h>//for GL_TRIANGLES
+#include "../vertBufs.h"
+
+#include "../userTypes.h"
 
 #include "buf2.h"
 
@@ -85,20 +93,20 @@ public:
 	void setShader(int program);
 	void setShader(CShader* shader);
 	void setClip(int x, int y, int width, int height);
-	void drawModel(CRenderModel& model);
+	//void drawModel(CRenderModel& model);
 	//void initRenderToTextureBufs();
 	void createFrameBuffer();
 	void createScreenQuad();
 	void renderToTextureQuad(CBaseTexture & texture);
 	void renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset, glm::i32vec2& size);
-	void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
+	//void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
 	void renderToTextureTris(CBuf2& buffer, CBaseTexture& texture);
-	void renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture);
-	void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
+	//void renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture);
+	//void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
 	void beginRenderToTexture(CBaseTexture & texture);
 	void endRenderToTexture();
 	void rendertToTextureClear(CBaseTexture& texture, glm::vec4 & colour);
-	unsigned int getGeometryFeedback(CBuf& srcBuf, TdrawMode srcDrawMode, CBuf& destBuf, TdrawMode destDrawMode);
+	unsigned int getGeometryFeedback(CBuf2& srcBuf, TdrawMode srcDrawMode, CBuf2& destBuf, TdrawMode destDrawMode);
 	CBaseTexture* createDataTexture(renderTextureFormat dataType, int w, int h, const void* data);
 	void uploaddataTexture(int hShader, int hTexture);
 	void setDataTexture(unsigned int textureHandle);
@@ -107,28 +115,28 @@ public:
 	unsigned int query();
 	void initTimerQuery();
 	unsigned long getTimerQuery();
-	void drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
-	void drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
+//	void drawMultiBufChildVerts(TdrawMode drawMode, CMultiBuf& multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
+//	void drawMultiBufChildInstanced(TdrawMode drawMode, CMultiBuf & multiBuf, int childBufNo, unsigned int vertStart, unsigned int vertCount);
 	void setDepthTest(bool on);
 	void createTextureFromImageFile(std::string filename);
 	void attachTexture(unsigned int textureUnit, unsigned int hTexture);
 	void attachTexture1D(unsigned int textureUnit, unsigned int hTexture);
 	void attachTexture(unsigned int textureUnit, CBaseTexture& texture);
-	void drawBuf(CBuf& buf, TdrawMode drawMode);
-	void drawLineLoopBuf(CBuf& buf);
-	void drawLineStripBuf(CBuf& buf);
-	void drawLinesBuf(CBuf& buf);
-	void drawLinesRange(int start, int count, CBuf& buf);
+	//void drawBuf(CBuf& buf, TdrawMode drawMode);
+	void drawBuf(CBuf2& buf, TdrawMode drawMode);
+	//void drawLineLoopBuf(CBuf& buf);
+	//void drawLineStripBuf(CBuf& buf);
+//	void drawLinesRange(int start, int count, CBuf& buf);
 	void drawLinesBuf(CBuf2& buf, void* start, int count);
 	void drawLineStripBuf(CBuf2& buf, void* start, int count);
 	void drawLineStripAdjBuf(CBuf2& buf, void* start, int count);
 	void drawPointsBuf(CBuf2& buf, void* start, int count);
 	void drawTrisBuf(CBuf2& buf, void* start, int count);
-	void drawTriStripBuf(CBuf& buf);
+	//void drawTriStripBuf(CBuf& buf);
 	void drawTriStripBuf(CBuf2& buf);
 	void drawLineLoopBuf(CBuf2& buf);
 	unsigned int getGLdrawMode(TdrawMode);
-	CBaseBuf* createBuffer();
+	//CBaseBuf* createBuffer();
 	void createStandardPhongShader();
 	static void phongDrawCallout(void* callee, CModel2* model);
 	void createStandardTexShader();
@@ -161,7 +169,7 @@ public:
 
 	std::string dataPath;
 
-	CBuf* screenQuad; ///<A re-usable quad for rendering to the entire screen.
+	CBuf2 screenQuad; ///<A re-usable quad for rendering to the entire screen.
 	GLuint hFrameBuffer; ///<Handle for our internally used framebuffer.
 
 	unsigned int tmpHandle;
@@ -258,7 +266,7 @@ private:
 
 	GLuint currentVAO; ///<The currently bound VAO. Used to avoid expensive rebinds. 
 	
-	std::vector<CBuf*> bufferList; ///<Kill list of renderer-created buffers.
+	//std::vector<CBuf*> bufferList; ///<Kill list of renderer-created buffers.
 
 	std::vector<CCamera*> cameraList; ///<Tracks renderer-created cameras.
 
