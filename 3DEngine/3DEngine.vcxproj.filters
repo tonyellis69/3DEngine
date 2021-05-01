@@ -320,6 +320,9 @@
     <ClCompile Include="..\src\renderer\texManager.cpp">
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\messaging\msg2.cpp">
+      <Filter>Source Files\messaging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\colour.h">
@@ -645,6 +648,9 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\texManager.h">
       <Filter>Header Files\renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\messaging\msg2.h">
+      <Filter>Source Files\messaging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

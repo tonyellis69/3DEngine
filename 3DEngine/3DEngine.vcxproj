@@ -113,6 +113,7 @@
     <ClCompile Include="..\src\intersect.cpp" />
     <ClCompile Include="..\src\lineModel.cpp" />
     <ClCompile Include="..\src\messaging\messenger.cpp" />
+    <ClCompile Include="..\src\messaging\msg2.cpp" />
     <ClCompile Include="..\src\physics2\contact.cpp" />
     <ClCompile Include="..\src\physics2\physEng.cpp" />
     <ClCompile Include="..\src\physics2\physModel.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="..\src\messaging\events.h" />
     <ClInclude Include="..\src\messaging\messenger.h" />
     <ClInclude Include="..\src\messaging\msg.h" />
+    <ClInclude Include="..\src\messaging\msg2.h" />
     <ClInclude Include="..\src\physics2\collisions.h" />
     <ClInclude Include="..\src\physics2\contact.h" />
     <ClInclude Include="..\src\physics2\physEng.h" />
