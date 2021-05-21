@@ -86,6 +86,11 @@ void CGUIrichText::DrawSelf() {
 
 }
 
+//TO DO: ugh, this is a sign of deep problems. FIXME
+bool CGUIrichText::isEmpty() {
+	return textObjs.empty() || (textObjs.size() == 1 && textObjs[0].text =="");
+}
+
 TRichTextRec* CGUIrichText::getTexObjCallback(int objNo) {
 	return &textObjs[objNo];
 }

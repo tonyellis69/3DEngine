@@ -82,3 +82,6 @@ struct order {
 	}
 };
 
+const int solidHex = 2;
+const int emptyHex = 1;
+

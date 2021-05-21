@@ -38,7 +38,7 @@ void CGUIlabel2::setText(std::string newText) {
 		}
 	}
 
-	//renderText();
+	renderText();
 }
 
 void CGUIlabel2::setTextColour(UIcolour  colour) {

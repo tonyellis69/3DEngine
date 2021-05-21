@@ -43,17 +43,19 @@ public:
 	callbackCallerT callbackCaller;
 };
 
+template <typename T>
+std::map<T, std::vector< std::shared_ptr<CDispatcherBase> > > slots; //stores a pointer to each callback dispatcher.
 
-extern std::map<int, std::vector< std::shared_ptr<CDispatcherBase> > > slots; //stores a pointer to each callback dispatcher.
+extern std::map < std::type_index, int> objIds; //Stores a unique id for each object that registers a callback.
 
-extern std::unordered_map < std::type_index, int> objIds; //Stores a unique id for each object that registers a callback.
-
-
+static int nextId = 0;
 namespace msg {
 
+	enum TMsgBuiltin {tmpMsg};
+
 	/** Register the given member function as a callback for this message type. */
-	template <typename objT, typename memberFuncT, typename... Args>
-	void attach(int msgId, objT* obj, void (memberFuncT::* memberFn) (Args...)) {
+	template <typename T, typename objT, typename memberFuncT, typename... Args>
+	void attach(T msgId, objT* obj, void (memberFuncT::* memberFn) (Args...)) {
 
 		using specialisedDispatcher = CDispatcher<std::function<void(Args  ...)>>;
 
@@ -62,22 +64,24 @@ namespace msg {
 				 (obj->*memberFn)(args ...); };
 
 		//...store it in a dispatcher and store a pointer to that with others of the same message type.
-		slots[msgId].push_back(std::make_shared<specialisedDispatcher>(callbackCaller));
+		slots<T>[msgId].push_back(std::make_shared<specialisedDispatcher>(callbackCaller));
 
-		static int nextId = 0;
-		slots[msgId].back()->objId = nextId;
-		objIds[typeid(obj)] = nextId++;
-
+		//identify dispatcher by the id of the callback object (in case object wants to delete it)
+		auto [objIdMapEntry,newObject] = objIds.insert({ std::type_index(typeid(obj)), nextId});
+		if (newObject == true)
+			nextId++;
+		slots<T>[msgId].back()->objId = objIdMapEntry->second;
+		
 	}
 
 	/** If the given object has registered a callback for msgId, remove it from the register. */
-	template <typename objT>
-	void remove(int msgId, objT* obj )
+	template <typename T, typename objT>
+	void remove(T msgId, objT* obj )
 	{
 		int id = objIds[typeid(obj)];
-		for (auto it = slots[msgId].begin(); it != slots[msgId].end(); it++) {
+		for (auto it = slots<T>[msgId].begin(); it != slots<T>[msgId].end(); it++) {
 			if ((*it)->objId == id) {
-				slots[msgId].erase(it);
+				slots<T>[msgId].erase(it);
 				return;
 			}
 		}
@@ -85,12 +89,12 @@ namespace msg {
 
 
 	/** Call all registered callbacks for this message type, passing the given arguments. */
-	template <typename... Args>
-	void emit(int msgId, Args ... args) {
+	template <typename T, typename... Args>
+	void emit(T msgId, Args ... args) {
 
 		using specialisedDispatcher = CDispatcher<std::function<void(Args  ...)>>;
 
-		for (auto& slot : slots[msgId]) {
+		for (auto& slot : slots<T>[msgId]) {
 			std::static_pointer_cast<specialisedDispatcher>(slot)->callbackCaller(args...);
 		}
 	}

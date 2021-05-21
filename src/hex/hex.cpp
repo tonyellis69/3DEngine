@@ -552,7 +552,7 @@ THexList* findArc(CHex& apex, int hexLength, float angle, float rotation) {
 }
 
 /**  Create a hexagonal 'ring' of hexes of the given radius, centred at centre.. */
-THexList* findRing(int radius, CHex& centre = CHex( 0,0,0)) {
+THexList findRing(int radius, CHex& centre = CHex( 0,0,0)) {
 	CHex hex(radius, -radius, 0);
 	static THexList hexes;
 	hexes.clear();
@@ -565,7 +565,7 @@ THexList* findRing(int radius, CHex& centre = CHex( 0,0,0)) {
 	}
 
 
-	return &hexes;
+	return hexes;
 }
 
 /** Return the corner and offset of the hex that lies at the given angle
@@ -638,4 +638,13 @@ THexDir findCornerExit(glm::vec3& start, glm::vec3& corner, CHex& hex) {
 	//ensures borderline cases default to the same hex other hex code would provide
 
 	return neighbourDirection(hex,newHex);
+}
+
+/** Return the hexes surrounding the given one. */
+THexList getNeighbours(CHex& hex) {
+	THexList getNeighbours(6);
+	for (int x = 0; x < 6; x++)
+		getNeighbours[x] = hex + moveVectorCube[x];
+	return getNeighbours;
+
 }

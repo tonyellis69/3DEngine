@@ -46,6 +46,7 @@ public:
 	void appendMarkedUpText(const std::string& text);
 	void Draw(float dT);
 	void DrawSelf();
+	bool isEmpty();
 	TRichTextRec* getTexObjCallback(int objNo);
 	void setFont(CFont* newFont);
 	CFont* getFont();
