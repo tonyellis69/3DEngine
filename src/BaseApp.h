@@ -1,5 +1,7 @@
 #pragma once
 
+
+#define _USE_MATH_DEFINES //for cmath
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <windows.h>  //for file dialogues

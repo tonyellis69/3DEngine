@@ -108,7 +108,6 @@
     <ClCompile Include="..\src\hex\hex.cpp" />
     <ClCompile Include="..\src\hex\hexElement.cpp" />
     <ClCompile Include="..\src\hex\hexArray.cpp" />
-    <ClCompile Include="..\src\hex\hexObject.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
     <ClCompile Include="..\src\intersect.cpp" />
     <ClCompile Include="..\src\lineModel.cpp" />
@@ -208,7 +207,6 @@
     <ClInclude Include="..\src\hex\hex.h" />
     <ClInclude Include="..\src\hex\hexElement.h" />
     <ClInclude Include="..\src\hex\hexArray.h" />
-    <ClInclude Include="..\src\hex\hexObject.h" />
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\src\intersect.h" />

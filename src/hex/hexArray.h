@@ -5,7 +5,7 @@
 
 #include "hexElement.h"
 #include "hex.h"
-#include "hexObject.h"
+//#include "entity.h"
 
 typedef std::unordered_map<glm::i32vec2, CHex> TCameFrom; 
 
@@ -85,3 +85,13 @@ struct order {
 const int solidHex = 2;
 const int emptyHex = 1;
 
+
+const int blocksNone = 0;
+const int blocksEast = 1;
+const int blocksSE = 2;
+const int blocksSW = 4;
+const int blocksWest = 8;
+const int blocksNW = 16;
+const int blocksNE = 32;
+const int blocksAll = 63;
+const int blocksAsDoor = 54;
