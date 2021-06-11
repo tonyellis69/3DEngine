@@ -46,11 +46,25 @@ void CLineBuffer::clear() {
 
 /**	add this text fragment as a text sprite. */
 void CLineBuffer::addTextSprite(TLineFragment& fragment) {
+	//return;
 	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
 	sprite->createTextImage(spriteBuffer.getBuffer());
 	textSprites.push_back(std::move(sprite));
 	recalcPageState();
+}
 
+bool CLineBuffer::addTextSprite(TFragment2& fragment) {
+
+	return true;
+	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
+	sprite->createTextImage(spriteBuffer.getBuffer());
+	bool overrun = false;
+	if (sprite->positionOnPage.y + sprite->size.y > height)
+		overrun = true;
+	textSprites.push_back(std::move(sprite));
+	recalcPageState();
+
+	return overrun;
 }
 
 void CLineBuffer::draw() {
@@ -288,6 +302,36 @@ CTextSprite* CLineBuffer::createSprite(TLineFragment& fragment) {
 	return sprite;
 }
 
+CTextSprite* CLineBuffer::createSprite(TFragment2& fragment) {
+	CTextSprite* sprite;
+	sprite = new CTextSprite();
+	sprite->setCallbackObj(this);
+
+	CFont* font = &renderer.fontManager.getFont(fragment.style.fontName.data() );
+	sprite->makeTextQuads(fragment.text, font);
+
+	//sprite->setTextObjData(fragment.textObj, fragment.textPos, fragment.textLength);
+	sprite->setPageOthoMatrix(&pageOrthoView);
+
+	//if (insertAtTop) {
+	//	sprite->setPagePosition(0, pageStart.screenPos.y - fragment.pixelHeight);
+	//}
+	//else
+	//	sprite->setPagePosition(pageEnd.screenPos.x, pageEnd.screenPos.y);
+
+	glm::i32vec2 pageEnd = calcPageTextEnd();
+	sprite->setPagePosition(pageEnd.x, pageEnd.y);
+
+	sprite->setTextColour(fragment.style.colour);
+
+	sprite->setPageTexture(&pageBuf);
+	sprite->setShader(&textSpriteShader);
+
+	sprite->causesNewLine = fragment.causesNewline;
+
+	return sprite;
+}
+
 glm::i32vec2 CLineBuffer::reserveSpriteImageSpace(glm::i32vec2& size) {
 	return spriteBuffer.reserve(size);
 }
@@ -373,6 +417,22 @@ void CLineBuffer::onMousedHotTextChange() {
 	hotTexts[mousedHotText] = { 0,selWarmup };
 
 	pCallbackObj->hotTextMouseOver(mousedHotText);
+}
+
+/** Return the pixel position where text on this page ends. */
+glm::i32vec2 CLineBuffer::calcPageTextEnd() {
+	glm::i32vec2 endPos = { 0,0 };
+
+	if (!textSprites.empty()) {
+		auto endSprite = textSprites.back().get();
+		if (endSprite->causesNewLine) {
+			endPos = { 0, endSprite->positionOnPage.y + endSprite->size.y };
+		}
+		else
+			endPos = { endSprite->positionOnPage.x + endSprite->size.x, endSprite->positionOnPage.y };
+	}
+
+	return endPos;
 }
 
 

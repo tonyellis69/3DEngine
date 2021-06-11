@@ -8,6 +8,8 @@
 #include "textSprite.h"
 #include "../renderer/shader.h"
 
+#include "richText.h"
+
 struct THotRec {
 	CHotTextSprite* sprite;
 	unsigned int hotId;
@@ -30,6 +32,7 @@ public:
 	void setPageSize(int width, int height);
 	void clear();
 	void addTextSprite(TLineFragment& fragment);
+	bool addTextSprite(TFragment2& fragment);
 	void draw();
 	void renderSprites(float dT);
 	int scrollDown(int scrollAmount);
@@ -54,6 +57,7 @@ private:
 	void initShader();
 	void recalcPageState();
 	CTextSprite* createSprite(TLineFragment& fragment);
+	CTextSprite* createSprite(TFragment2& fragment);
 	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
 	void freeSpriteImageSpace(glm::i32vec2& bufId);
 	glm::vec4 getHotTextColour();
@@ -63,7 +67,7 @@ private:
 	void freeHotTextSprite(CHotTextSprite* sprite);
 	void onMousedHotTextChange();
 
-		
+	glm::i32vec2 calcPageTextEnd();
 	
 	CRenderTexture pageBuf; ///The buffer we're drawing text sprites on.
 	

@@ -15,6 +15,8 @@
 
 #include "glm\glm.hpp"
 
+#include "richText.h"
+
 
 enum TStyleChange {
 	styleNone, styleBold, styleHotOn, styleHotOff, styleSuspendedHotOn, styleSuspendedHotOff, styleStyle,
@@ -184,6 +186,7 @@ private:
 	std::string findNextTag( std::string& remainingTxt, TStyleRec& styleRec);
 	std::tuple<unsigned int, size_t> extractHotParams(std::string_view& text);
 	void setStyleChange(TStyleRec& styleRec);
+	void setStyle(TextStyle& newStyle);
 	void appendText(const std::string& newText);
 
 	TLineFragment findNextFragmentStart(const TLineFragment& fragment);
@@ -194,6 +197,10 @@ private:
 
 	void initialisePage();
 	void writePageToLineBuffer();
+	void writePageToLineBuffer2();
+	bool writeLineToLineBuffer();
+
+	int findLastBreakableChar();
 
 	void checkHotTextContact(const  int mouseX, const  int mouseY);
 
@@ -227,4 +234,7 @@ private:
 	Ivm* pVM; ///<Interface to virtual machine for hot text calls.
 
 	std::vector<TTempTestRec> tempObjs;
+
+	CRichText bodyText;
+	TextStyle currentStyle; ///<Font, colour, etc given to lineBuffer.
 };

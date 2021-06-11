@@ -320,6 +320,9 @@
     <ClCompile Include="..\src\messaging\msg2.cpp">
       <Filter>Source Files\messaging</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\richText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\colour.h">
@@ -645,6 +648,9 @@
     </ClInclude>
     <ClInclude Include="..\src\messaging\msg2.h">
       <Filter>Source Files\messaging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\richText.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
