@@ -36,7 +36,9 @@ public:
 	void draw();
 	void renderSprites(float dT);
 	int scrollDown(int scrollAmount);
+	int scrollDown3(int scrollAmount);
 	int scrollUp(int scrollAmount);
+	int scrollUp3(int scrollAmount);
 	int getOverlap();
 	int getUnderrun();
 	int getTopOverlap();
@@ -48,6 +50,8 @@ public:
 	bool doesPageEndWithNewline() {
 		return pageEndNewline;
 	}
+	int getPageTextStart();
+	int getPageTextEnd();
 
 	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
@@ -68,6 +72,8 @@ private:
 	void onMousedHotTextChange();
 
 	glm::i32vec2 calcPageTextEnd();
+
+	glm::i32vec2 calcPageTextStart();
 	
 	CRenderTexture pageBuf; ///The buffer we're drawing text sprites on.
 	
@@ -97,6 +103,8 @@ private:
 	int prevMousedHotText;
 
 	bool pageEndNewline; ///<Records if page ends by forcing a newline.
+
+	int current1stSprite;
 };
 
 class ILineBuffer {

@@ -29,9 +29,10 @@
 
 #include "renderShader.h"
 
-#include "fontManager.h"
 
 #include "model2.h"
+
+#include "UI/fonts.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, 
@@ -162,7 +163,7 @@ public:
 
 	CTextureManagerOGL textureManager;
 
-	CFontManager fontManager;
+	//CFontManager fontManager;
 
 	CCamera* currentCamera;
 	CCamera* defaultCamera; ///<Initially available camera.

@@ -50,8 +50,8 @@ void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	}
 
 
-	//autoscrollingDown = true;
-	//11/06/2021 commented out to test new system.
+	autoscrollingDown = true;
+
 
 	bodyText.addText(text);
 }
@@ -98,6 +98,11 @@ void CGUIrichText::setFont(CFont* newFont) {
 	currentTextObj = getStyleChangeTextObjAt(currentTextObj);
 	currentTextStyle.font = newFont->name;
 	textObjs[currentTextObj].style = currentTextStyle;
+}
+
+/** Set the font to be used by subsequent text we receive. */
+void CGUIrichText::setFont(const std::string& fontName) {
+	bodyText.setWriteFont(fontName);
 }
 
 
@@ -413,7 +418,7 @@ void CGUIrichText::update(float dT) {
 	{
 		updateDt = 0;
 		if (autoscrollingDown) {
-			 autoscrollingDown = scrollDown2(smoothScrollStep);
+			 autoscrollingDown = scrollDown3(smoothScrollStep);
 		}
 	}
 	
@@ -436,10 +441,12 @@ bool CGUIrichText::MouseWheelMsg(const  int mouseX, const  int mouseY, int wheel
 /** Scroll the visible text by the given number of pixels, if possible. */
 void CGUIrichText::smoothScroll(int dist) {
 	if (dist > 0) {
-		scrollUp2(dist);
+		//scrollUp2(dist);
+		scrollUp3(dist);
 	}
 	else {
-		scrollDown2(abs(dist));
+		//scrollDown2(abs(dist));
+		scrollDown3(abs(dist));
 	}
 }
 
@@ -854,8 +861,11 @@ void CGUIrichText::writePageToLineBuffer2() {
 /** Send the line at the current read position to lineBuffer, 
 	updating the read position in the process. */ 
 bool CGUIrichText::writeLineToLineBuffer() {
-	setStyle(bodyText.getReadStyle());
-	CFont* currentFont = &renderer.fontManager.getFont(currentStyle.fontName.data());
+	if (bodyText.endOfText())
+		return false;
+
+	TextStyle currentStyle = bodyText.getReadStyle();
+	CFont* currentFont = fnt::get(currentStyle.fontName.data());
 	int leadingPixelY = currentFont->lineHeight;
 
 	int breakOnChar = findLastBreakableChar();
@@ -863,12 +873,13 @@ bool CGUIrichText::writeLineToLineBuffer() {
 	int fragCharCount = 1;
 	int totalCharCount = 0;
 
-	TFragment2 fragment = { currentStyle,"",currentFont->lineHeight,false };
+	TFragment2 fragment = { currentStyle,"",currentFont->lineHeight,false, fragTextStart};
 
 	char c = bodyText.readNextChar();
 	while (!bodyText.endOfText()) {
 		if (bodyText.styleChange()) {
 			fragment.text = bodyText.getStringAt(fragTextStart, fragCharCount);
+
 			if (totalCharCount+1 == breakOnChar) {
 				fragment.causesNewline = true;
 				return lineBuffer2.addTextSprite(fragment);
@@ -876,20 +887,19 @@ bool CGUIrichText::writeLineToLineBuffer() {
 			else
 				lineBuffer2.addTextSprite(fragment);
 
-			setStyle(bodyText.getReadStyle());
-			currentFont = &renderer.fontManager.getFont(currentStyle.fontName.data());
+			currentStyle = bodyText.getReadStyle();
+			currentFont = fnt::get(currentStyle.fontName.data());
 			leadingPixelY = max(leadingPixelY, currentFont->lineHeight);
-			fragCharCount = 1;
-			fragment = { currentStyle,"",currentFont->lineHeight,false };
+			fragCharCount = 0;
 			fragTextStart = bodyText.getReadPos();
+			fragment = { currentStyle,"",currentFont->lineHeight,false };
 		}
 
 		totalCharCount++;
 
 		if (totalCharCount == breakOnChar) {
-			if (c == '\n')
-				fragCharCount--;
 			fragment.text = bodyText.getStringAt(fragTextStart, fragCharCount);
+			fragment.textStart = fragTextStart;
 			fragment.causesNewline = true;
 			return lineBuffer2.addTextSprite(fragment);
 		}
@@ -902,12 +912,45 @@ bool CGUIrichText::writeLineToLineBuffer() {
 	return lineBuffer2.addTextSprite(fragment);
 }
 
+/** Send to lineBuffer the line ending immediately before the current start of page position.*/
+void CGUIrichText::writePrevLineToLineBuffer() {
+	int pageTextStart = lineBuffer2.getPageTextStart();
+	if (pageTextStart == 0)
+		return;
+
+	int currentPos = bodyText.getReadPos();
+	int prevPara = bodyText.getPrevPara(pageTextStart);
+
+	//find start of line before page text starts
+	bodyText.setReadPos(prevPara);
+	int lineStart = prevPara;
+	int newStart = prevPara;
+	int lineEnd = lineStart + findLastBreakableChar();
+	while (lineEnd < pageTextStart) {
+		newStart = lineEnd;
+		lineEnd += findLastBreakableChar();
+	}
+
+	
+	bodyText.setReadPos(newStart);
+	writeLineToLineBuffer();
+
+	bodyText.setReadPos(currentPos);
+}
+
+/** Send to lineBuffer the line starting immediately after the current last line of the page.*/
+void CGUIrichText::writeNextLineToLineBuffer() {
+	int pageTextEnd = lineBuffer2.getPageTextEnd();
+	bodyText.setReadPos(pageTextEnd);
+	writeLineToLineBuffer();
+}
+
 /** Return the position of the last breakable character in the
 	line that can be composed from the current read position. */
 int CGUIrichText::findLastBreakableChar() {
 	int start = bodyText.getReadPos();
-	setStyle(bodyText.getReadStyle());
-	CFont* currentFont = &renderer.fontManager.getFont(currentStyle.fontName.data());
+	
+	CFont* currentFont = fnt::get(bodyText.getReadStyle().fontName);
 
 	int lastBreakableChar; int totalLineChars = 0;
 	int leadingPixelX = 0;
@@ -915,8 +958,7 @@ int CGUIrichText::findLastBreakableChar() {
 	while (!bodyText.endOfText()) {
 		totalLineChars++;
 		if (bodyText.styleChange()) {
-			setStyle(bodyText.getReadStyle());
-			currentFont = &renderer.fontManager.getFont(currentStyle.fontName.data());
+			currentFont = fnt::get(bodyText.getReadStyle().fontName);
 		}
 
 		leadingPixelX += currentFont->table[c]->width;
@@ -979,6 +1021,33 @@ bool CGUIrichText::scrollDown2(int dist) {
 	int result = lineBuffer2.scrollDown(dist);
 	return result;
 }
+
+bool CGUIrichText::scrollDown3(int dist) {
+	int result = lineBuffer2.scrollDown3(dist);
+
+	if (result < dist) {
+		writeNextLineToLineBuffer();
+		result = lineBuffer2.scrollDown3(result);
+	}
+
+	return result;
+}
+
+
+bool CGUIrichText::scrollUp3(int dist) {
+	int result = lineBuffer2.scrollUp3(dist);
+
+	if (result < dist) {
+		lineBuffer2.setaddFragmentsAtTop(true);
+		writePrevLineToLineBuffer();
+		lineBuffer2.setaddFragmentsAtTop(false);
+		result = lineBuffer2.scrollUp3(result);
+	}
+
+	return result;
+}
+
+
 
 /** Attempt to scroll up by the given distance in pixels. */
 bool CGUIrichText::scrollUp2(int dist) {
@@ -1050,15 +1119,7 @@ void CGUIrichText::setStyleChange(TStyleRec& styleRec) {
 		setTextStyle(styleRec.styleName);
 }
 
-/** Set the font, colour, etc, for the next text we send to the
-	lineBuffer. */
-void CGUIrichText::setStyle(TextStyle& newStyle) {
-	currentStyle = newStyle;
-	//In case we don't have this font...
-	//TO DO: replace font manager with something that tells us if we have this
-	//font. If not, implement and call getDefaultFont().
-	//renderer.fontManager.getFont(currentStyle.fontName.data());
-}
+
 
 void CGUIrichText::resize(int w, int h) {
 	if (w < 1) //because bad things happen if we make the texture 0 in height or width

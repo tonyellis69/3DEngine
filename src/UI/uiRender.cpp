@@ -93,7 +93,8 @@ void uiDraw::drawTextureGradient(guiRect& drawBox, CBaseTexture& texture) {
 }
 
 CFont* uiDraw::getFont(const std::string& name) {
-	return &renderer.fontManager.getFont(name);
+	//return &renderer.fontManager.getFont(name);
+	return fnt::get(name);
 }
 
 void uiDraw::setClip(UIrect& rect) {

@@ -8,7 +8,7 @@
 
 struct TextStyle {
 	bool operator == (const TextStyle& style2) const;
-	std::string_view fontName;
+	std::string fontName;
 	glm::vec4 colour = { 1,1,1,1 };
 	bool bold = false;
 	//more to follow
@@ -21,6 +21,7 @@ struct TFragment2 {
 	std::string text;
 	int pixelHeight;
 	bool causesNewline = false;
+	int textStart;
 };
 
 struct CRWhead {
@@ -41,8 +42,12 @@ public:
 	bool endOfText();
 	bool styleChange();
 	char readNextChar();
+	char readPrevChar();
 	TextStyle getReadStyle();
+	TextStyle getWriteStyle();
 	std::string getStringAt(int pos, int length);
+	int getPrevPara(int endPos);
+	void setWriteFont(const std::string& fontName);
 
 private:
 	std::tuple<std::string, std::string, TextStyle>getNextText(const std::string& text);
@@ -50,6 +55,7 @@ private:
 	void appendText(const std::string& text);
 	void appendStyle(TextStyle& newStyle);
 	TextStyle getStyleAt(CRWhead& head);
+
 
 
 public: //temp! for debugging
@@ -60,6 +66,7 @@ public: //temp! for debugging
 	CRWhead writeHead;
 
 	bool endOfTextFlag = false; ///<read to end of text flag
+	bool startOfTextFlag = false;
 	bool styleChangeFlag = false;
 };
 

@@ -191,9 +191,6 @@
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\renderer\fontManager.cpp">
-      <Filter>Header Files\renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -321,6 +318,9 @@
       <Filter>Source Files\messaging</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\richText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\fonts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -487,9 +487,6 @@
     <ClInclude Include="..\src\UI\GUIpopMenu.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\renderer\fontManager.h">
-      <Filter>Header Files\renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\GUIpaletteBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -650,6 +647,9 @@
       <Filter>Source Files\messaging</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\richText.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\fonts.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -122,7 +122,6 @@
     <ClCompile Include="..\src\renderer\3dobject.cpp" />
     <ClCompile Include="..\src\renderer\baseTexture.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
-    <ClCompile Include="..\src\renderer\fontManager.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
     <ClCompile Include="..\src\renderer\material.cpp" />
     <ClCompile Include="..\src\renderer\material2.cpp" />
@@ -144,6 +143,7 @@
     <ClCompile Include="..\Src\TexLoader.cpp" />
     <ClCompile Include="..\src\Texture.cpp" />
     <ClCompile Include="..\src\UI\font.cpp" />
+    <ClCompile Include="..\src\UI\fonts.cpp" />
     <ClCompile Include="..\src\UI\gui.cpp" />
     <ClCompile Include="..\src\UI\GUIbase.cpp" />
     <ClCompile Include="..\src\UI\GUIbutton2.cpp" />
@@ -226,7 +226,6 @@
     <ClInclude Include="..\src\renderer\3dobject.h" />
     <ClInclude Include="..\src\renderer\baseTexture.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
-    <ClInclude Include="..\src\renderer\fontManager.h" />
     <ClInclude Include="..\src\renderer\light.h" />
     <ClInclude Include="..\src\renderer\material.h" />
     <ClInclude Include="..\src\renderer\material2.h" />
@@ -249,6 +248,7 @@
     <ClInclude Include="..\src\timer.h" />
     <ClInclude Include="..\Src\Types.h" />
     <ClInclude Include="..\src\UI\font.h" />
+    <ClInclude Include="..\src\UI\fonts.h" />
     <ClInclude Include="..\src\UI\gui.h" />
     <ClInclude Include="..\src\UI\GUIbase.h" />
     <ClInclude Include="..\src\UI\GUIbutton2.h" />

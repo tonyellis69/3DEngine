@@ -2,7 +2,7 @@
 
 CRichText::CRichText() {
 	//create default font identifier
-	fontNames.push_back("default");
+	fontNames.push_back("smallSysFont");
 
 	//Create a starter text obj.
 	CStyleBlock starterObj;
@@ -84,8 +84,6 @@ std::tuple<std::string, TextStyle> CRichText::getNextStyle(const std::string& te
 		remainingText = text.substr(2);
 	}
 
-
-
 	return { remainingText,nextStyle };
 }
 
@@ -109,6 +107,31 @@ void CRichText::appendStyle(TextStyle& newStyle) {
 /** Return the style at the given read/write head position.*/
 TextStyle CRichText::getStyleAt(CRWhead& head) {
 	return textObjs[head.blockNo].style;
+}
+
+/** Return start of previous paragraph*/
+int CRichText::getPrevPara(int endPos) {
+	CRWhead currentPos = readHead;
+
+	setReadPos(endPos);
+	int charCount = endPos;
+	char c;
+	while (charCount > 0 ) {
+		c = readPrevChar();
+		if (c == '\n' && charCount < endPos -1)
+			break;
+		charCount--;
+	}
+
+	readHead = currentPos;
+	return charCount;
+}
+
+/** Set font storing for any subsequent text we receive. */
+void CRichText::setWriteFont(const std::string& fontName) {
+	TextStyle currentWriteStyle = getWriteStyle();
+	currentWriteStyle.fontName = fontName;
+	appendStyle(currentWriteStyle);
 }
 
 /** If we can, return the character at the current read position and
@@ -140,9 +163,34 @@ char CRichText::readNextChar() {
 	return c;
 }
 
+/** If it exists, return the character before the current read head position,
+	otherwise set the startOfText flag. */
+char CRichText::readPrevChar() {
+	startOfTextFlag = false;
+
+	if (readHead.blockNo == 0 && (textObjs[0].text.empty() || readHead.charNo == 0)) {
+		endOfTextFlag = true;
+		return 0;
+	}
+
+	if (readHead.charNo == 0) {
+		readHead.blockNo--;
+		readHead.charNo = textObjs[readHead.blockNo].text.size() - 1;
+	}
+	else
+		readHead.charNo--;
+
+	return textObjs[readHead.blockNo].text[readHead.charNo];
+}
+
 /**  Return the text style at the read position. */
 TextStyle CRichText::getReadStyle() {
 	return textObjs[readHead.blockNo].style;
+}
+
+/** Return the text style at the write position. */
+TextStyle CRichText::getWriteStyle() {
+	return textObjs[writeHead.blockNo].style;
 }
 
 /** Return the string at the given position. */

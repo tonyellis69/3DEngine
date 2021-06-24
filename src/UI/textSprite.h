@@ -60,6 +60,7 @@ public:
 	int textEnd;
 	int textLength;
 	bool causesNewLine;
+	int textStart;
 
 protected:
 	CRenderer* pRenderer;

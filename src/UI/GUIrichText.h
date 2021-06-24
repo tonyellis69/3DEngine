@@ -51,6 +51,7 @@ public:
 	bool isEmpty();
 	TRichTextRec* getTexObjCallback(int objNo);
 	void setFont(CFont* newFont);
+	void setFont(const std::string& fontName);
 	CFont* getFont();
 	void setTextColour(float r, float g, float b, float a);
 	void setAppendStyleHot(bool isOn, bool unsuspended, unsigned int hotId);
@@ -186,7 +187,7 @@ private:
 	std::string findNextTag( std::string& remainingTxt, TStyleRec& styleRec);
 	std::tuple<unsigned int, size_t> extractHotParams(std::string_view& text);
 	void setStyleChange(TStyleRec& styleRec);
-	void setStyle(TextStyle& newStyle);
+
 	void appendText(const std::string& newText);
 
 	TLineFragment findNextFragmentStart(const TLineFragment& fragment);
@@ -199,12 +200,17 @@ private:
 	void writePageToLineBuffer();
 	void writePageToLineBuffer2();
 	bool writeLineToLineBuffer();
+	void writePrevLineToLineBuffer();
+
+	void writeNextLineToLineBuffer();
 
 	int findLastBreakableChar();
 
 	void checkHotTextContact(const  int mouseX, const  int mouseY);
 
 	bool scrollDown2(int dist);
+	bool scrollDown3(int dist);
+	bool scrollUp3(int dist);
 	bool scrollUp2(int dist);
 
 	glm::vec4& getHotTextColour();

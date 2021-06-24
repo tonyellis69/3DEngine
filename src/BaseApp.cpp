@@ -6,13 +6,15 @@
 
 #include "renderer/renderer.h"
 
-#include "UI/font.h"
+//#include "UI/font.h"
 
 #include "utils/log.h"
 
 #include "sound/sound.h"
 
 #include "UI/uiRender.h"
+
+#include "UI/fonts.h"
 
 CFont* style::defaultFont;
 
@@ -89,13 +91,15 @@ void CBaseApp::loadSystemFonts() {
 	std::istringstream ss;
 	std::string tmp((char*)SysFnt + 2, 33600);
 	ss.str(tmp);
-	sysFont = &renderer.fontManager.createFromStream("sysFont",ss);
+	//sysFont = &renderer.fontManager.createFromStream("sysFont",ss);
+	sysFont = fnt::loadFromStream(ss, "sysFont");
 
 	ss.clear();
 	tmp.clear();
 	tmp = std::string((char*)SmallSysFnt + 2, 17728);
 	ss.str(tmp);
-	smallSysFont = &renderer.fontManager.createFromStream("smallSysFont",ss);
+	//smallSysFont = &renderer.fontManager.createFromStream("smallSysFont",ss);
+	smallSysFont = fnt::loadFromStream(ss,"smallSysFont");
 
 }
 
@@ -466,7 +470,8 @@ void CBaseApp::initialiseSystemStylesheet() {
 	//scrap the systemFont* member. More streamlined, less duplication
 	//sysStyleSheet.defaultFont = &renderer.fontManager.getFont("smallSysFont");
 
-	style::defaultFont = &renderer.fontManager.getFont("smallSysFont");
+	//style::defaultFont = &renderer.fontManager.getFont("smallSysFont");
+	style::defaultFont = fnt::get("smallSysFont");
 
 
 }

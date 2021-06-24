@@ -3,6 +3,7 @@
 #include "glm\gtc\matrix_transform.hpp"
 #include "../renderer/renderer.h"
 #include "../utils/log.h"
+#include "UI/fonts.h"
 #include <set>
 
 
@@ -46,7 +47,7 @@ void CLineBuffer::clear() {
 
 /**	add this text fragment as a text sprite. */
 void CLineBuffer::addTextSprite(TLineFragment& fragment) {
-	//return;
+	return;
 	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
 	sprite->createTextImage(spriteBuffer.getBuffer());
 	textSprites.push_back(std::move(sprite));
@@ -54,14 +55,16 @@ void CLineBuffer::addTextSprite(TLineFragment& fragment) {
 }
 
 bool CLineBuffer::addTextSprite(TFragment2& fragment) {
-
-	return true;
 	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
 	sprite->createTextImage(spriteBuffer.getBuffer());
 	bool overrun = false;
 	if (sprite->positionOnPage.y + sprite->size.y > height)
 		overrun = true;
-	textSprites.push_back(std::move(sprite));
+	if (insertAtTop) {
+		textSprites.insert(textSprites.begin() + current1stSprite++, std::move(sprite));
+	}
+	else
+		textSprites.push_back(std::move(sprite));
 	recalcPageState();
 
 	return overrun;
@@ -104,6 +107,21 @@ int CLineBuffer::scrollDown(int scrollAmount) {
 	return scrollAchieved;
 }
 
+int CLineBuffer::scrollDown3(int scrollAmount) {
+	int overlap = getOverlap();
+	int scrollAchieved = std::min(scrollAmount, overlap);
+	for (auto& sprite = textSprites.begin(); sprite != textSprites.end();) {
+		(*sprite)->adjustYPos(-scrollAchieved);
+		if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
+			sprite = textSprites.erase(sprite);
+		}
+		else
+			sprite++;
+	}
+	//recalcPageState();
+	return scrollAchieved;
+}
+
 /** Move all text sprites down by the given amount, deleting any that end up outside the page entirely.*/
 int CLineBuffer::scrollUp(int scrollAmount) {
 
@@ -120,6 +138,22 @@ int CLineBuffer::scrollUp(int scrollAmount) {
 			sprite++;
 	}
 	recalcPageState();
+	return scrollAchieved;
+}
+
+int CLineBuffer::scrollUp3(int scrollAmount) {
+	int overlap = getTopOverlap();
+	int scrollAchieved = std::min(scrollAmount, overlap);
+
+	for (auto& sprite = textSprites.begin(); sprite != textSprites.end();) {
+		(*sprite)->adjustYPos(scrollAchieved);
+		if ((*sprite)->positionOnPage.y > height) {
+			sprite = textSprites.erase(sprite);
+		}
+		else
+			sprite++;
+	}
+
 	return scrollAchieved;
 }
 
@@ -171,6 +205,8 @@ TPagePos CLineBuffer::getPageEnd() {
 
 void CLineBuffer::setaddFragmentsAtTop(bool onOff) {
 	insertAtTop = onOff;
+	if (insertAtTop)
+		current1stSprite = 0;
 }
 
 
@@ -188,6 +224,27 @@ void CLineBuffer::onMouseMove(glm::i32vec2& mousePos) {
 	if (mousedHotText != prevMousedHotText)
 		onMousedHotTextChange();
 }
+
+/** Return body text position for the start of the page. */
+int CLineBuffer::getPageTextStart() {
+	int start = INT_MAX;
+	for (auto& sprite : textSprites) {
+		start = std::min(start, sprite->textStart);
+	}
+	return start;
+}
+
+/** Return body text position for the end of the page. */
+int CLineBuffer::getPageTextEnd() {
+	int end = INT_MIN;
+	for (auto& sprite : textSprites) {
+		end = std::max(end, sprite->textStart + sprite->textLength);
+	}
+	return end;
+}
+
+
+
 
 ///////Private functions
 
@@ -278,7 +335,9 @@ CTextSprite* CLineBuffer::createSprite(TLineFragment& fragment) {
 	sprite->setCallbackObj(this);
 
 	//TO DO: textObj should carry an up-to-date pointer to font
-	CFont* font = &renderer.fontManager.getFont(textObj->style.font);
+	//CFont* font = &renderer.fontManager.getFont(textObj->style.font);
+	CFont* font = fnt::get(textObj->style.font);
+
 	//should only do this once
 	std::string text = textObj->text.substr(fragment.textPos, fragment.textLength);
 
@@ -307,20 +366,20 @@ CTextSprite* CLineBuffer::createSprite(TFragment2& fragment) {
 	sprite = new CTextSprite();
 	sprite->setCallbackObj(this);
 
-	CFont* font = &renderer.fontManager.getFont(fragment.style.fontName.data() );
+	//CFont* font = &renderer.fontManager.getFont(fragment.style.fontName.data() );
+	CFont* font = fnt::get(fragment.style.fontName.data());
 	sprite->makeTextQuads(fragment.text, font);
 
-	//sprite->setTextObjData(fragment.textObj, fragment.textPos, fragment.textLength);
 	sprite->setPageOthoMatrix(&pageOrthoView);
-
-	//if (insertAtTop) {
-	//	sprite->setPagePosition(0, pageStart.screenPos.y - fragment.pixelHeight);
-	//}
-	//else
-	//	sprite->setPagePosition(pageEnd.screenPos.x, pageEnd.screenPos.y);
-
-	glm::i32vec2 pageEnd = calcPageTextEnd();
-	sprite->setPagePosition(pageEnd.x, pageEnd.y);
+	
+	if (insertAtTop) {
+		glm::i32vec2 pageStart = calcPageTextStart();
+		sprite->setPagePosition(pageStart.x, pageStart.y - fragment.pixelHeight);
+	}
+	else {
+		glm::i32vec2 pageEnd = calcPageTextEnd();
+		sprite->setPagePosition(pageEnd.x, pageEnd.y);
+	}
 
 	sprite->setTextColour(fragment.style.colour);
 
@@ -328,7 +387,8 @@ CTextSprite* CLineBuffer::createSprite(TFragment2& fragment) {
 	sprite->setShader(&textSpriteShader);
 
 	sprite->causesNewLine = fragment.causesNewline;
-
+	sprite->textStart = fragment.textStart;
+	sprite->textLength = fragment.text.size();
 	return sprite;
 }
 
@@ -423,17 +483,61 @@ void CLineBuffer::onMousedHotTextChange() {
 glm::i32vec2 CLineBuffer::calcPageTextEnd() {
 	glm::i32vec2 endPos = { 0,0 };
 
-	if (!textSprites.empty()) {
-		auto endSprite = textSprites.back().get();
-		if (endSprite->causesNewLine) {
-			endPos = { 0, endSprite->positionOnPage.y + endSprite->size.y };
+	//if (!textSprites.empty()) {
+	//	auto endSprite = textSprites.back().get();
+	//	if (endSprite->causesNewLine) {
+	//		endPos = { 0, endSprite->positionOnPage.y + endSprite->size.y };
+	//	}
+	//	else
+	//		endPos = { endSprite->positionOnPage.x + endSprite->size.x, endSprite->positionOnPage.y };
+	//}
+
+	if (textSprites.empty())
+		return endPos;
+
+	//find lowest sprites
+	//then rightmost of those
+	auto lowest = textSprites.begin()->get();
+	for (auto& sprite : textSprites) {
+		if (sprite->positionOnPage.y > lowest->positionOnPage.y) { //new contender
+			lowest = sprite.get();
+			continue;
 		}
-		else
-			endPos = { endSprite->positionOnPage.x + endSprite->size.x, endSprite->positionOnPage.y };
+		if (sprite->positionOnPage.y == lowest->positionOnPage.y) {
+			if (sprite->positionOnPage.x > lowest->positionOnPage.x)
+				lowest = sprite.get();
+
+		}
 	}
+
+	if (lowest->causesNewLine)
+		endPos = { 0, lowest->positionOnPage.y + lowest->size.y };
+	else
+		endPos = { lowest->positionOnPage.x + lowest->size.x, lowest->positionOnPage.y };
 
 	return endPos;
 }
+
+/** Return the pixel position where text on this page starts. */
+glm::i32vec2 CLineBuffer::calcPageTextStart() {
+	glm::i32vec2 startPos = { 0,0 };
+	if (textSprites.empty())
+		return startPos;
+
+	auto followingSprite = textSprites[current1stSprite].get();
+
+	if (current1stSprite == 0) {
+		startPos = { 0, followingSprite->positionOnPage.y };
+	}
+	else {
+		auto prevSprite = textSprites[current1stSprite - 1].get();
+		startPos = { prevSprite->positionOnPage.x + prevSprite->size.x,
+			followingSprite->positionOnPage.y };
+	}
+
+	return startPos;
+}
+
 
 
 

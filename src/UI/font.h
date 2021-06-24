@@ -28,7 +28,7 @@ public:
 	CFont();
 	void loadFromStream(std::istream &input);
 	void loadFromFile(std::string filename);
-	
+
 	int lineHeight;
 	std::vector<glyph> glyphs;
 	glyph* table[256];
