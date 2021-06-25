@@ -407,12 +407,12 @@ void CBaseApp::initLogWindow() {
 	logWindow->anchorBottom = 10;
 	logWindow->setVisible(false);
 	logWindow->setBorderOn(true);
-	logWindow->setFont(smallSysFont);
+	//logWindow->setFont(smallSysFont);
 
-	logWindow->setTextColour(glm::vec4(1));
+	//logWindow->setTextColour(glm::vec4(1));
 
 	logWindow->resizeMode = resizeNone;
-	//sysLog.setCallback(this);
+
 
 	GUIroot.add(logWindow);
 

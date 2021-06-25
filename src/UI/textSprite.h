@@ -101,6 +101,6 @@ public:
 	virtual glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size) = 0;
 	virtual void freeSpriteImageSpace(glm::i32vec2& bufId) = 0;
 	virtual void freeHotTextSprite(CHotTextSprite* sprite) = 0;
-	virtual glm::vec4 getHotTextColour() = 0;
+	//virtual glm::vec4 getHotTextColour() = 0;
 	virtual float getHotPeriod(unsigned int hotId) = 0;
 };

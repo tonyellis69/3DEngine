@@ -48,6 +48,8 @@ public:
 	std::string getStringAt(int pos, int length);
 	int getPrevPara(int endPos);
 	void setWriteFont(const std::string& fontName);
+	void setWriteColour(glm::vec4& colour);
+	void clear();
 
 private:
 	std::tuple<std::string, std::string, TextStyle>getNextText(const std::string& text);
@@ -55,12 +57,13 @@ private:
 	void appendText(const std::string& text);
 	void appendStyle(TextStyle& newStyle);
 	TextStyle getStyleAt(CRWhead& head);
+	void initialise();
 
 
 
 public: //temp! for debugging
 	std::vector<CStyleBlock> textObjs;
-	std::vector<std::string> fontNames;
+	//std::vector<std::string> fontNames;
 
 	CRWhead readHead;
 	CRWhead writeHead;

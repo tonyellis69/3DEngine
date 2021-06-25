@@ -182,7 +182,7 @@ void CHotTextSprite::createTextImage(CRenderTexture& storageTexture) {
 
 void CHotTextSprite::setTextColour(glm::vec4& colour) {
 	textColour = colour;
-	hotTextColour = callbackObj->getHotTextColour();
+	//hotTextColour = callbackObj->getHotTextColour();
 }
 
 

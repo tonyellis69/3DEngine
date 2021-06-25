@@ -27,24 +27,19 @@ class ILineBuffer;
 class CLineBuffer : public ITextSpriteCallback {
 public:
 	CLineBuffer();
-	~CLineBuffer();
 	void setCallbackObj(ILineBuffer* obj);
 	void setPageSize(int width, int height);
 	void clear();
-	void addTextSprite(TLineFragment& fragment);
 	bool addTextSprite(TFragment2& fragment);
 	void draw();
 	void renderSprites(float dT);
-	int scrollDown(int scrollAmount);
 	int scrollDown3(int scrollAmount);
-	int scrollUp(int scrollAmount);
 	int scrollUp3(int scrollAmount);
 	int getOverlap();
 	int getUnderrun();
 	int getTopOverlap();
 	CRenderTexture* getTextBuf();
-	TPagePos getPageStart();
-	TPagePos getPageEnd();
+
 	void setaddFragmentsAtTop(bool onOff);
 	void onMouseMove(glm::i32vec2& mousePos);
 	bool doesPageEndWithNewline() {
@@ -59,12 +54,12 @@ public:
 
 private:
 	void initShader();
-	void recalcPageState();
-	CTextSprite* createSprite(TLineFragment& fragment);
+	//void recalcPageState();
+//	CTextSprite* createSprite(TLineFragment& fragment);
 	CTextSprite* createSprite(TFragment2& fragment);
 	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
 	void freeSpriteImageSpace(glm::i32vec2& bufId);
-	glm::vec4 getHotTextColour();
+//	glm::vec4 getHotTextColour();
 	void updateHotTextPeriods(float dT);
 	float getHotPeriod(unsigned int hotId);
 	float randomPeriod(float start);
@@ -89,7 +84,7 @@ private:
 	TTextSpriteShader textSpriteShader;
 	glm::mat4 pageOrthoView;
 
-	TPagePos pageStart; ///<Identifies where in the textObjs this page starts.
+	//TPagePos pageStart; ///<Identifies where in the textObjs this page starts.
 	TPagePos pageEnd;  ///<Identifies where in the textObjs this page ends.
 
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
@@ -105,16 +100,22 @@ private:
 	bool pageEndNewline; ///<Records if page ends by forcing a newline.
 
 	int current1stSprite;
+
+	bool pageDirty = true; ///<If true we re-render the page.
 };
 
-class ILineBuffer {
-public:
-	virtual TRichTextRec* getTexObjCallback(int objNo) = 0;
-	virtual glm::vec4& getHotTextColour() = 0;
-	virtual glm::vec4& getHotTextSelectedColour() = 0;
-	virtual void hotTextMouseOver(int hotId) = 0;
-};
 
+
+
+
+//class ILineBuffer {
+//public:
+//	//virtual TRichTextRec* getTexObjCallback(int objNo) = 0;
+//	//virtual glm::vec4& getHotTextColour() = 0;
+//	//virtual glm::vec4& getHotTextSelectedColour() = 0;
+//	virtual void hotTextMouseOver(int hotId) = 0;
+//};
+//
 
 
 

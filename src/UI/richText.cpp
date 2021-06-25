@@ -1,13 +1,7 @@
 #include "richText.h"
 
 CRichText::CRichText() {
-	//create default font identifier
-	fontNames.push_back("smallSysFont");
-
-	//Create a starter text obj.
-	CStyleBlock starterObj;
-	starterObj.style.fontName = fontNames.begin()->c_str();
-	textObjs.push_back(starterObj);
+	initialise();
 }
 
 /** Add text at the position of the write head. */
@@ -109,6 +103,13 @@ TextStyle CRichText::getStyleAt(CRWhead& head) {
 	return textObjs[head.blockNo].style;
 }
 
+void CRichText::initialise() {
+	//Create a starter text obj.
+	CStyleBlock starterObj;
+	starterObj.style.fontName = "smallSysFont";
+	textObjs.push_back(starterObj);
+}
+
 /** Return start of previous paragraph*/
 int CRichText::getPrevPara(int endPos) {
 	CRWhead currentPos = readHead;
@@ -132,6 +133,19 @@ void CRichText::setWriteFont(const std::string& fontName) {
 	TextStyle currentWriteStyle = getWriteStyle();
 	currentWriteStyle.fontName = fontName;
 	appendStyle(currentWriteStyle);
+}
+
+/** Set colour storing for any subsequent text we receive. */
+void CRichText::setWriteColour(glm::vec4& colour) {
+	TextStyle currentWriteStyle = getWriteStyle();
+	currentWriteStyle.colour = colour;
+	appendStyle(currentWriteStyle);
+}
+
+/** Remove all text and reset, ready for more. */
+void CRichText::clear() {
+	textObjs.clear();
+	initialise();
 }
 
 /** If we can, return the character at the current read position and
