@@ -35,7 +35,7 @@ public:
 	CHex(int q, int r);
 	CHex operator + (CHex& hex2);
 	CHex operator + (glm::i32vec3& hex2);
-	CHex operator - (CHex& hex2);
+	CHex operator - (const CHex& hex2) const;
 	bool operator == (const CHex& hex2) const;
 	bool operator != (CHex& hex2);
 	CHex(glm::vec3& worldSpace);
@@ -63,18 +63,18 @@ glm::vec3 axialToCube(float q, float r);
 CHex axialToCube(int q, int r);
 glm::i32vec2 cubeToOffset(const CHex& hex);
 glm::i32vec2 axialToOffset(int q, int r);
-glm::vec3 cubeToWorldSpace(CHex& hex);
+glm::vec3 cubeToWorldSpace(const CHex& hex);
 CHex offsetToCube(int x, int y);
 CHex hexRound(glm::vec3& cubePos);
 CHex hexRound(float q, float r);
-CHex worldSpaceToHex(glm::vec3& worldSpace);
+CHex worldSpaceToHex(const glm::vec3& worldSpace);
 CHex OLDworldSpaceToHex(glm::vec3& worldSpace);
 int cubeDistance(CHex& cubeA, CHex& cubeB);
 THexList* hexLine(CHex& cubeA, CHex& cubeB);
 THexList* hexLine2(CHex& cubeA, CHex& cubeB);
 THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner);
 THexList* hexLine4(CHex& cubeA, CHex& cubeB, int offset);
-THexDir neighbourDirection(CHex& hex, CHex& neighbour);
+THexDir neighbourDirection(const CHex & hex, const CHex & neighbour);
 bool isNeighbour(CHex& hex, CHex& neighbour);
 float dirToAngle(THexDir direction);
 glm::vec3 directionToVec(THexDir direction);
@@ -92,6 +92,6 @@ std::tuple<int, int> findRingHex(int radius, float angle);
 THexList findArc2(CHex& apex, int radius, float angle, float rotation);
 CHex findRingCornerHex(int radius, int corner);
 
-THexDir findCornerExit(glm::vec3& start, glm::vec3& corner, CHex& hex);
+THexDir findCornerExit(const glm::vec3 & start, const glm::vec3 & corner, const CHex & hex);
 
 THexList getNeighbours(CHex& hex);

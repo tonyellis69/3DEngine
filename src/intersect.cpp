@@ -2,7 +2,7 @@
 
 
 
-bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B) {
+bool segIntersect(const glm::vec3 & seg1A, const glm::vec3 & seg1B, const glm::vec3 & seg2A, const glm::vec3 & seg2B) {
 	float a1 = signed2DTriArea(seg1A, seg1B, seg2B);
 	float a2 = signed2DTriArea(seg1A, seg1B, seg2A);
 
@@ -12,7 +12,7 @@ bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec
 	return false;
 }
 
-bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B, glm::vec3& intersect) {
+bool segIntersect(const glm::vec3 & seg1A, const glm::vec3 & seg1B, const glm::vec3 & seg2A, const glm::vec3 & seg2B, glm::vec3& intersect) {
 	
 	//Find the area of the triangles formed by seg1 and each end of seg2
 	float a1 = signed2DTriArea(seg1A, seg1B, seg2B);
@@ -46,13 +46,13 @@ bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec
 
 
 /** Returns area of triangle. */
-float signed2DTriArea(glm::vec3& a, glm::vec3& b, glm::vec3& c) {
+float signed2DTriArea(const glm::vec3 & a, const glm::vec3 & b, const glm::vec3 & c) {
 	return (a.x - c.x) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x);
 }
 
 
 /** Returns true if pt is within the bounds of the given colinear segment. */
-bool inColinearSegment(glm::vec3& segA, glm::vec3& segB, glm::vec3& pt) {
+bool inColinearSegment(const glm::vec3 & segA, const glm::vec3 & segB, const glm::vec3 & pt) {
 	if (segA.x > segB.x || segB.x > segA.x) {
 		if (segA.x > segB.x) 
 			return pt.x >= segB.x && pt.x <= segA.x;

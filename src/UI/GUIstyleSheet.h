@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "text.h" //for TtextTheme
+//#include "text.h" //for TtextTheme
 #include "renderer/renderer.h"
 
 
@@ -51,13 +51,13 @@ namespace style {
 
 
 
-	const std::map<std::string, TtextStyle> defaultStyles = { 
-		{ {"default"}, { "default","defaultFont",uiBlack } },
-		{ {"hot"}, { "hot","defaultFont",glm::vec4(0,0,0.5,1) } },
-		{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } }
+	//const std::map<std::string, TtextStyle> defaultStyles = { 
+	//	{ {"default"}, { "default","defaultFont",uiBlack } },
+	//	{ {"hot"}, { "hot","defaultFont",glm::vec4(0,0,0.5,1) } },
+	//	{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } }
 
-	};
-	const TtextTheme defaultTheme = { "defaultTheme", { defaultStyles} };
+	//};
+	//const TtextTheme defaultTheme = { "defaultTheme", { defaultStyles} };
 
 /////////////old game additions
 	const glm::vec4 darkGray = { 0.25, 0.25, 0.25, 1 };
@@ -67,41 +67,41 @@ namespace style {
 	const glm::vec4 hottextSelectedColour = { 1, 0.547, 0.0, 1 };
 	const glm::vec4 gameReservedColour = { 0,1,0,0.75f };
 
-	const std::map<std::string, TtextStyle> gameNormalStyles = {
-		{ {"default"}, { "default", "main", darkGray } },
-		{ {"mainBody"}, { "mainBody", "main", darkGray } },
-		{ {"mainHeader"}, { "mainHeader","mainHeader",darkGray } },
-		{ {"hot"}, { "hot", "main", hottextColour } },
-		{ {"hotSelected"}, { "hotSelected", "main", hottextSelectedColour } },
-		{ {"choice"}, { "choice", "main", choiceColour } }
-	};
+	//const std::map<std::string, TtextStyle> gameNormalStyles = {
+	//	{ {"default"}, { "default", "main", darkGray } },
+	//	{ {"mainBody"}, { "mainBody", "main", darkGray } },
+	//	{ {"mainHeader"}, { "mainHeader","mainHeader",darkGray } },
+	//	{ {"hot"}, { "hot", "main", hottextColour } },
+	//	{ {"hotSelected"}, { "hotSelected", "main", hottextSelectedColour } },
+	//	{ {"choice"}, { "choice", "main", choiceColour } }
+	//};
 
-	const std::map<std::string, TtextStyle> smallNormalStyles = {
-		{ {"default"}, { "default","smallFnt",uiWhite } },
-		{ {"reserved"}, { "reserved","smallFnt",gameReservedColour } },
-		{ {"small"}, { "small","small",darkGray } },
-		{ {"smallHeader"}, { "smallHeader","smallHeader",darkGray } },
-		{ {"hot"}, { "hot", "small", hottextColour } },
-		{ {"hotSelected"}, { "hotSelected", "small", hottextSelectedColour } }
-	};
+	//const std::map<std::string, TtextStyle> smallNormalStyles = {
+	//	{ {"default"}, { "default","smallFnt",uiWhite } },
+	//	{ {"reserved"}, { "reserved","smallFnt",gameReservedColour } },
+	//	{ {"small"}, { "small","small",darkGray } },
+	//	{ {"smallHeader"}, { "smallHeader","smallHeader",darkGray } },
+	//	{ {"hot"}, { "hot", "small", hottextColour } },
+	//	{ {"hotSelected"}, { "hotSelected", "small", hottextSelectedColour } }
+	//};
 
-	const TtextTheme gameNormalTheme = { "gameNormal", { gameNormalStyles} };
-	const TtextTheme smallNormalTheme = { "smallNormal", { smallNormalStyles} };
+	//const TtextTheme gameNormalTheme = { "gameNormal", { gameNormalStyles} };
+	//const TtextTheme smallNormalTheme = { "smallNormal", { smallNormalStyles} };
 
-	//////////////new game additions
-	const std::map<std::string, TtextStyle> gameDefaultStyles = {
-		{ {"default"}, { "default","defaultFont",uiWhite } },
-		{ {"hot"}, { "hot","defaultFont",glm::vec4(0,0,0.5,1) } },
-		{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } },
-		{ {"mainBody"}, { "mainBody", "smallFnt", uiWhite } },
-		{ {"mainHeader"}, { "mainHeader","smallHeaderFnt",uiWhite } }
-	};
-
-
+	////////////////new game additions
+	//const std::map<std::string, TtextStyle> gameDefaultStyles = {
+	//	{ {"default"}, { "default","defaultFont",uiWhite } },
+	//	{ {"hot"}, { "hot","defaultFont",glm::vec4(0,0,0.5,1) } },
+	//	{ {"hotSelected"}, { "hotSelected","defaultFont",glm::vec4(0,0,1.0,1) } },
+	//	{ {"mainBody"}, { "mainBody", "smallFnt", uiWhite } },
+	//	{ {"mainHeader"}, { "mainHeader","smallHeaderFnt",uiWhite } }
+	//};
 
 
 
-	const TtextTheme gameTheme = { "gameTheme", { gameDefaultStyles} };
+
+
+	//const TtextTheme gameTheme = { "gameTheme", { gameDefaultStyles} };
 
 	const glm::vec4 gameBackColour = { 0,0,0,1 };
 	const glm::vec4 gameBorderColour = { 1,1,1,1 };
@@ -109,12 +109,12 @@ namespace style {
 
 
 
-	const std::map<std::string, TtextTheme> themes2 = {
-		{ {"defaultTheme"}, {defaultTheme} },
-		{ {"gameNormal"}, {gameNormalTheme} },
-		{ {"smallNormal"}, {smallNormalTheme} },
-		{ {"gameTheme"}, {gameTheme} }
-	};
+	//const std::map<std::string, TtextTheme> themes2 = {
+	//	{ {"defaultTheme"}, {defaultTheme} },
+	//	{ {"gameNormal"}, {gameNormalTheme} },
+	//	{ {"smallNormal"}, {smallNormalTheme} },
+	//	{ {"gameTheme"}, {gameTheme} }
+	//};
 
 	const int mainWinCtrlBorder = 20; ///<Indent around main window for placing controls
 

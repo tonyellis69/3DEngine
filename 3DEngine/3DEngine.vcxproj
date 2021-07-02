@@ -122,6 +122,9 @@
     <ClCompile Include="..\src\renderer\3dobject.cpp" />
     <ClCompile Include="..\src\renderer\baseTexture.cpp" />
     <ClCompile Include="..\src\renderer\camera.cpp" />
+    <ClCompile Include="..\src\renderer\imRendr\drawCmd.cpp" />
+    <ClCompile Include="..\src\renderer\imRendr\CImRendr.cpp" />
+    <ClCompile Include="..\src\renderer\imRendr\imRendr.cpp" />
     <ClCompile Include="..\src\renderer\light.cpp" />
     <ClCompile Include="..\src\renderer\material.cpp" />
     <ClCompile Include="..\src\renderer\material2.cpp" />
@@ -178,7 +181,6 @@
     <ClCompile Include="..\src\UI\lineBuffer.cpp" />
     <ClCompile Include="..\src\UI\richText.cpp" />
     <ClCompile Include="..\src\UI\rowObject.cpp" />
-    <ClCompile Include="..\src\UI\text.cpp" />
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\textSprite.cpp" />
     <ClCompile Include="..\src\UI\uiRender.cpp" />
@@ -226,6 +228,9 @@
     <ClInclude Include="..\src\renderer\3dobject.h" />
     <ClInclude Include="..\src\renderer\baseTexture.h" />
     <ClInclude Include="..\src\renderer\camera.h" />
+    <ClInclude Include="..\src\renderer\imRendr\drawCmd.h" />
+    <ClInclude Include="..\src\renderer\imRendr\CImRendr.h" />
+    <ClInclude Include="..\src\renderer\imRendr\imRendr.h" />
     <ClInclude Include="..\src\renderer\light.h" />
     <ClInclude Include="..\src\renderer\material.h" />
     <ClInclude Include="..\src\renderer\material2.h" />
@@ -288,7 +293,6 @@
     <ClInclude Include="..\src\UI\lineBuffer.h" />
     <ClInclude Include="..\src\UI\richText.h" />
     <ClInclude Include="..\src\UI\rowObject.h" />
-    <ClInclude Include="..\src\UI\text.h" />
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\textSprite.h" />
     <ClInclude Include="..\src\UI\uiRender.h" />

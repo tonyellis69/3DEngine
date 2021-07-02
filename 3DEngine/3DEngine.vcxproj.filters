@@ -39,6 +39,9 @@
     <Filter Include="Source Files\sound">
       <UniqueIdentifier>{f0fb6ba5-ec8a-41db-8fe3-f2b22aa225f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\renderer\imRendr">
+      <UniqueIdentifier>{11d7b24b-0aa5-479c-a6a8-baa33500a743}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -260,9 +263,6 @@
     <ClCompile Include="..\src\UI\textSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\text.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\VMtest\src\tigObj.cpp">
       <Filter>vm</Filter>
     </ClCompile>
@@ -322,6 +322,15 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\fonts.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\imRendr\CImRendr.cpp">
+      <Filter>Header Files\renderer\imRendr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\imRendr\drawCmd.cpp">
+      <Filter>Header Files\renderer\imRendr</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\renderer\imRendr\imRendr.cpp">
+      <Filter>Header Files\renderer\imRendr</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -547,9 +556,6 @@
     <ClInclude Include="..\src\UI\GUIscrollbar2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\text.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\importer\importer.h">
       <Filter>Source Files\importer</Filter>
     </ClInclude>
@@ -651,6 +657,15 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\fonts.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\imRendr\CImRendr.h">
+      <Filter>Header Files\renderer\imRendr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\imRendr\drawCmd.h">
+      <Filter>Header Files\renderer\imRendr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\imRendr\imRendr.h">
+      <Filter>Header Files\renderer\imRendr</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

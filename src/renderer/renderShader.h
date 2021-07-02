@@ -35,7 +35,7 @@ public:
 	
 	unsigned int hShader; ///<OpenGL shader handle.
 
-
+	std::string name;
 
 protected:
 	CRenderer* pRenderer;

@@ -4,10 +4,10 @@
 
 /** Some basic geometry utils. */
 
-bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B);
+bool segIntersect(const glm::vec3 & seg1A, const glm::vec3 & seg1B, const glm::vec3 & seg2A, const glm::vec3 & seg2B);
 
-bool segIntersect(glm::vec3& seg1A, glm::vec3& seg1B, glm::vec3& seg2A, glm::vec3& seg2B, glm::vec3& intersect);
+bool segIntersect(const glm::vec3 & seg1A, const glm::vec3 & seg1B, const glm::vec3 & seg2A, const glm::vec3 & seg2B, glm::vec3& intersect);
 
-float signed2DTriArea(glm::vec3& a, glm::vec3& b, glm::vec3& c);
+float signed2DTriArea(const glm::vec3 & a, const glm::vec3 & b, const glm::vec3 & c);
 
-bool inColinearSegment(glm::vec3& segA, glm::vec3& segB, glm::vec3& pt);
+bool inColinearSegment(const glm::vec3 & segA, const glm::vec3 & segB, const glm::vec3 & pt);

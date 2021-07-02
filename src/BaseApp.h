@@ -76,7 +76,7 @@ public:
 	virtual void OnEvent() {};
 	void AppTasks();
 	void DrawUI();
-	void RegisterUIfunctors();
+	//void RegisterUIfunctors();
 	virtual void onStart() {};
 
 	void initLogWindow();

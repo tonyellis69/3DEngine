@@ -6,7 +6,7 @@
 //#include <windows.h> 
 #include <string>
 #include <vector>
-
+#include <unordered_map>
 
 #include "camera.h"
 //#include "modelMulti.h"
@@ -33,6 +33,8 @@
 #include "model2.h"
 
 #include "UI/fonts.h"
+
+#include "imRendr/CImRendr.h"
 
 enum renderTextureFormat {floatTex,intTex, uintTex};
 enum  TUidrawMode { uiDrawPoints=0, uiDrawLines=1, uiDrawLineLoop = 2, uiDrawLineStrip=3, uiDrawTris=4, 
@@ -181,7 +183,9 @@ public:
 	CShader* textShader;
 	CShader* textSpriteShader;
 
-	std::vector<CShader*> shaderList; ///<Tracks all shaders
+	//std::vector<CShader*> shaderList; 
+	std::unordered_map<std::string, CRenderShader*> shaderList; ///<Tracks all shaders
+	//TO DO: use shared ptr for garbage collection
 
 	//TO DO: phongshader handles, hopefully temp
 	GLuint hNormalModelToCameraMatrix;
@@ -250,7 +254,7 @@ public:
 	int entityNo;
 
 
-
+	CImRendr imRendr; ///<Immediate renderer.
 private:
 
 	GLenum DrawBuffers[1];

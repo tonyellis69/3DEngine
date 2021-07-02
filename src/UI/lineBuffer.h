@@ -3,7 +3,7 @@
 #include <random>
 
 //include "../renderer/renderer.h"
-#include "text.h"
+//#include "text.h"
 #include "imageBuf.h"
 #include "textSprite.h"
 #include "../renderer/shader.h"
@@ -54,12 +54,9 @@ public:
 
 private:
 	void initShader();
-	//void recalcPageState();
-//	CTextSprite* createSprite(TLineFragment& fragment);
 	CTextSprite* createSprite(TFragment2& fragment);
 	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
 	void freeSpriteImageSpace(glm::i32vec2& bufId);
-//	glm::vec4 getHotTextColour();
 	void updateHotTextPeriods(float dT);
 	float getHotPeriod(unsigned int hotId);
 	float randomPeriod(float start);
@@ -67,7 +64,6 @@ private:
 	void onMousedHotTextChange();
 
 	glm::i32vec2 calcPageTextEnd();
-
 	glm::i32vec2 calcPageTextStart();
 	
 	CRenderTexture pageBuf; ///The buffer we're drawing text sprites on.
@@ -76,16 +72,14 @@ private:
 	int height;
 
 	ILineBuffer* pCallbackObj;
-	//CRenderer* pRenderer;
 
-	//std::vector<CTextSprite*> textSprites;
 	std::vector< std::unique_ptr<CTextSprite> > textSprites;
 
 	TTextSpriteShader textSpriteShader;
 	glm::mat4 pageOrthoView;
 
 	//TPagePos pageStart; ///<Identifies where in the textObjs this page starts.
-	TPagePos pageEnd;  ///<Identifies where in the textObjs this page ends.
+	//TPagePos pageEnd;  ///<Identifies where in the textObjs this page ends.
 
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
 

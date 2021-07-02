@@ -68,9 +68,6 @@ void CSharedBuf::setAttribs() {
 	for (auto attr : attribs)
 		stride += attr * sizeof(float);
 
-	if (hVAO == 8)
-		int b = 0;
-
 	if (hVAO != 0)
 		glDeleteVertexArrays(1, &hVAO);
 	glGenVertexArrays(1, &hVAO);

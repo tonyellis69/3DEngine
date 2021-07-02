@@ -297,6 +297,8 @@ void CBaseApp::AppTasks() {
 
 	//logWindow->update((float)dT);
 
+	renderer.imRendr.draw(renderer.currentCamera->clipMatrix);
+
 
 	DrawUI(); 
 
@@ -317,35 +319,6 @@ void CBaseApp::DrawUI() {
 	//UIrect
 	uiDraw::setClip((UIrect&)GUIroot.drawBox);
 }
-
-/** Assign engine functions to the UI so it can draw itself, etc. */
-void CBaseApp::RegisterUIfunctors() {	
-	//drawFuncs = new CDrawFuncs;
-	//TO DO: rename this when it's been updated
-	//drawFuncs = new CDrawFuncs();
-	//drawFuncs->setRenderer(&Engine.Renderer);
-	//drawFuncs->loadShaders();
-
-
-//	drawFuncs->setDrawColours.Set(&UIeng, &CGUIengine::setDrawColours);
-//	drawFuncs->drawIcon.Set(&UIeng, &CGUIengine::drawIcon);
-//	drawFuncs->handleUImsg.Set(this, &CBaseApp::HandleUImsg);
-	//drawFuncs->drawRect.Set(&UIeng, &CGUIengine::drawRect);
-//	drawFuncs->drawBorder.Set(&UIeng, &CGUIengine::DrawBorder);
-	//drawFuncs->setClip.Set(&UIeng, &CGUIengine::setClip);
-//	drawFuncs->drawLine.Set(&UIeng, &CGUIengine::drawLine);
-//	drawFuncs->setIconset.Set(&UIeng, &CGUIengine::setIconset);
-//	drawFuncs->drawTile.Set(&UIeng, &CGUIengine::drawTile);
-//	drawFuncs->drawImage.Set(&UIeng, &CGUIengine::drawImage);
-	//drawFuncs->mouseCaptured.Set(this, &CBaseApp::mouseCaptured);
-//	drawFuncs->setCursor.Set(&UIeng, &CGUIengine::setCursor);
-//	drawFuncs->setDrawColoursConditional.Set(&UIeng, &CGUIengine::setDrawColoursConditional);
-//	drawFuncs->drawDottedRect.Set(&UIeng,&CGUIengine::drawDottedRect);
-//	drawFuncs->setScale.Set(&UIeng,&CGUIengine::setScale);
-
-//	GUIroot.setDrawFuncs(drawFuncs);
-}
-
 
 
 

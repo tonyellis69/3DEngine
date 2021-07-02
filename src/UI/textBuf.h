@@ -7,7 +7,43 @@
 #include "font.h"
 #include "..\renderer\renderer.h"
 
-#include "text.h"
+//#include "text.h"
+struct TtextStyle {
+	std::string name;
+	std::string font;
+	glm::vec4 colour;
+	bool operator == (const TtextStyle& style) const {
+		return this->font == style.font && this->colour == style.colour &&
+			this->name == style.name;
+	};
+};
+
+
+struct TtextTheme {
+	std::string themeName;
+	//std::vector<TtextStyle> styles;
+	std::map<std::string, TtextStyle> styles;
+
+};
+
+
+/** Holds the minimum data the textBuffer needs to draw: text, font, text colour. */
+struct TLineFragDrawRec {
+	std::string* text;
+	CFont* font;
+	glm::vec4 textColour;
+};
+
+/** Stores the style details of a homogenous piece of text, ie, one with the same
+font, colour, etc, together with the text itself. */
+struct textRec {
+	textRec() { firstLineIndent = 0; }
+	std::string text;
+	CFont* font;
+	TtextStyle style;
+	int firstLineIndent;
+	//others to follow
+};
 
 /** A class that maintains a rectangular buffer of rendered text for displaying. */
 class CTextBuffer {

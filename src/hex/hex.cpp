@@ -43,7 +43,7 @@ CHex CHex::operator+(glm::i32vec3& hex2) {
 	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
 }
 
-CHex CHex::operator-(CHex& hex2) {
+CHex CHex::operator-(const CHex& hex2) const {
 	return CHex(x - hex2.x, y - hex2.y, z - hex2.z);
 }
 
@@ -105,7 +105,7 @@ glm::i32vec2 axialToOffset(int q, int r) {
 }
 
 /** Convert cube coordinates to a point in worldspace. */
-glm::vec3 cubeToWorldSpace(CHex& hex) {
+glm::vec3 cubeToWorldSpace(const CHex& hex) {
 	//float x = (hex.x + (-0.5f * (hex.z & 1))) * hexWidth;
 	//float y = -hex.z * 1.5f;
 	glm::i32vec2 offset = cubeToOffset(hex);
@@ -165,7 +165,7 @@ CHex OLDworldSpaceToHex(glm::vec3& worldSpace) {
 	return hexRound(q, r);
 }
 
-CHex worldSpaceToHex(glm::vec3& worldSpace) {
+CHex worldSpaceToHex(const glm::vec3& worldSpace) {
 	//first find the rectangle for this point
 	float halfHexHeight = hexHeight / 2.0f;
 	float hexQuarterHeight = hexHeight / 4.0f;
@@ -418,7 +418,7 @@ THexList* hexLine4(CHex& cubeA, CHex& cubeB, int offset) {
 
 
 /** Return the direction of the neighbouring hex. */
-THexDir neighbourDirection(CHex& hex, CHex& neighbour) {
+THexDir neighbourDirection(const CHex & hex, const CHex & neighbour) {
 	CHex dirVector = neighbour - hex;
 	for (int dir = hexEast; dir <= hexNE; dir++) {
 		if (dirVector.x == moveVectorCube[dir].x && dirVector.y == moveVectorCube[dir].y
@@ -631,7 +631,7 @@ CHex findRingCornerHex(int radius, int corner) {
 
 
 /** Returns a consistent exit direction for a segment leaving a hex via a corner. */
-THexDir findCornerExit(glm::vec3& start, glm::vec3& corner, CHex& hex) {
+THexDir findCornerExit(const glm::vec3 & start, const glm::vec3 & corner, const CHex & hex) {
 	glm::vec3 extension = glm::normalize(corner - start) * 0.1f;
 	glm::vec3 exitPoint = corner + extension;
 	CHex newHex = worldSpaceToHex(exitPoint);

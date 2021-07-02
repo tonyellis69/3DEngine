@@ -1008,19 +1008,22 @@ void CRenderer::createTextShader() {
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */
 CShader* CRenderer::createShader(std::string name) {
 	CRenderShader* shader = new CRenderShader();
+	shader->name = name;
 	if (name.compare(0, dataPath.size(), dataPath))
 		name = dataPath + name;
 	shader->create( name);
-	shaderList.push_back(shader);
+	
+	shaderList[shader->name] = shader;
 	return shader;
 }
 
 CShader * CRenderer::createShader(std::string name,  char** strings,int nFeedbacks) {
 	CRenderShader* shader = new CRenderShader();
+	shader->name = name;
 	for (int s=0; s < nFeedbacks; s++)
 		shader->feedbackVaryings[s] = strings[s];
 	shader->create(name, nFeedbacks);
-	shaderList.push_back(shader);
+	shaderList[shader->name] = shader;
 	return shader;
 }
 
