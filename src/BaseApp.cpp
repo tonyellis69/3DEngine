@@ -237,18 +237,14 @@ void CBaseApp::AppTasks() {
 	if (renderer.dbgFrame != -1)
 		renderer.dbgFrame++;
 
-	guiRect drawBox = { 20,40, 100,100 };
-
-
 	renderer.clearFrame();
+
+	//physEng.update((float)dT * 10.0f);
 
 	vm.execute();
 
-
-	//Time = Engine.Time.seconds();
 	Time = timer.elapsed();
 	dT = Time - LastTime;
-	//Engine.dT = dT;
 	LastTime = Time;
 
 	win.getMousePos(mouseX, mouseY);
@@ -258,55 +254,21 @@ void CBaseApp::AppTasks() {
 		//TO DO: see onWinMouseMove for how to provide mouse buttons if ever needed
 	}
 
+	keyCheck(); //happens every frame, therefore responsive
 
-
-	//TO DO: mouseCheck, which calls user with last reported mouse position.
-
+	
 	if (!Paused) {
 		Update();
 	}
 
-	keyCheck(); //happens every frame, therefore responsive
-
-
-
-	
-
-
-	//Engine.physObjManager.update(float(dT * 10.0f));
-
-	physEng.update((float)dT * 10.0f);
-
-
-	//Engine.drawModels();
-	
-//	Engine.drawSceneLayers();
-	//Engine.drawRegisteredSprites();
-
-
-
-
 	draw(); //Do user drawing
-
-
-
-	//aftyer here
-	
-
-	//Engine.removeUserScale();
-
-	//logWindow->update((float)dT);
 
 	renderer.imRendr.draw(renderer.currentCamera->clipMatrix);
 
-
 	DrawUI(); 
 
-	//Engine.showFrame();
 	win.swapBuffers();
 	win.pollEvents();
-
-
 }
 
 

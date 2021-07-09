@@ -17,7 +17,7 @@ public:
 
 	template <typename V, typename... T>
 	void storeVerts(std::vector<V>& verts, T... t) {
-		freeMem();
+		//freeMem();
 		numVerts = verts.size();
 		processParam( t...);
 

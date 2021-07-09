@@ -13,6 +13,8 @@ public:
 	int vertStart;
 	int vertCount;
 
+	glm::mat4 matrix;
+
 	//uniforms
 	glm::vec4 vec4_0;
 	glm::vec4 vec4_1;

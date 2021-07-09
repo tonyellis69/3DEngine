@@ -33,4 +33,6 @@ private:
 
 	unsigned int hVAO;
 	std::vector<int> attribs;
+
+	unsigned int size = 0;
 };

@@ -13,12 +13,18 @@ CSharedBuf::CSharedBuf() {
 
 
 void CSharedBuf::attachData(void* verts, int numVerts, int vertSize) {
-	if (hBuffer == 0)
+	if (hBuffer == 0) {
 		glGenBuffers(1, &hBuffer);
+		size = 0;
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-	glBufferData(GL_ARRAY_BUFFER, numVerts * vertSize, verts, GL_STATIC_DRAW); 
+	if (numVerts * vertSize == size)
+		glBufferSubData(GL_ARRAY_BUFFER,0, numVerts * vertSize, verts);
+	else
+		glBufferData(GL_ARRAY_BUFFER, numVerts * vertSize, verts, GL_STATIC_DRAW); 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	this->numVerts = numVerts;
+	size = numVerts * vertSize;
 }
 
 void CSharedBuf::attachIndex(unsigned int* indices, unsigned int numIndices) {
@@ -119,6 +125,7 @@ void CSharedBuf::setSize(unsigned int size) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	hIndex = 0;
 	hVAO = 0;
+	this->size = size;
 }
 
 

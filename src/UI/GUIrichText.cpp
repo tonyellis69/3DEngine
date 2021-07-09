@@ -28,6 +28,7 @@ CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
 void CGUIrichText::appendMarkedUpText(const std::string& text) {
 	autoscrollingDown = true;
 	bodyText.addText(text);
+	createPage();
 }
 
 

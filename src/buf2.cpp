@@ -51,6 +51,8 @@ void CBuf2::storeIndexInt(std::vector<unsigned int>& index) {
 	numElements = index.size();
 }
 void CBuf2::addAttributeSize(int attr) {
+	if (!sharedBuf)
+		sharedBuf = std::make_shared<CSharedBuf>();
 	sharedBuf->addAttribute(attr);
 }
 

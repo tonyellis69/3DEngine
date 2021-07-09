@@ -35,7 +35,7 @@ bool segIntersect(const glm::vec3 & seg1A, const glm::vec3 & seg1B, const glm::v
 	}
 
 	//if seg1 intersects either end of seg2, report this
-	float t = 1E-03f; 
+	float t = 1E-05f; 
 	if (abs(a1) < t && inColinearSegment(seg1A, seg1B, seg2B))
 		intersect = { 0,1,0 };
 	else if (abs(a2) < t && inColinearSegment(seg1A, seg1B, seg2A))
@@ -58,6 +58,10 @@ bool inColinearSegment(const glm::vec3 & segA, const glm::vec3 & segB, const glm
 			return pt.x >= segB.x && pt.x <= segA.x;
 		return pt.x >= segA.x && pt.x <= segB.x;
 	}
+
+	//NB! for segments with only microscopic differences in x, this will return true
+	//without checking if pt lies outside in the y direction!
+	//in case of problems, enforce y check as well as x.
 
 	if (segA.y > segB.y) 
 		return pt.y >= segB.y && pt.y <= segA.y;
