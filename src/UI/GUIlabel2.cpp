@@ -6,9 +6,8 @@ using namespace glm;
 
 CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	
-	
 	textData.font = defaultFont;
-	textBuf.setSize(getWidth(), getHeight());
+	//textBuf.setSize(getWidth(), getHeight());
 
 	type = uiLabel;
 	setTextColour(style::uiDarkGrey);
@@ -17,24 +16,30 @@ CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
 	renderOffset = i32vec2(0, 0);
 	leftAlignIndent = 0;
 	textAlign = tleft;
+
+	drawText.setFont(defaultFont);
 }
 
 void CGUIlabel2::setFont(CFont* newFont) {
 	textData.font = newFont;
+	drawText.setFont(newFont);
 }
 
 void CGUIlabel2::setFont(const std::string& fontName) {
-	setFont(uiDraw::getFont(fontName));
+	setFont(fnt::get(fontName));
+	drawText.setFont(fontName);
 }
 
 void CGUIlabel2::setText(std::string newText) {
 	textData.text = newText;
+	drawText.setText(newText);
+
 	int oldWidth = lineRenderedWidth;
 	if (resizeToFit) {
 		calcLineRenderedWidth();
 		if (lineRenderedWidth > oldWidth) {
 			setWidth(lineRenderedWidth);
-			textBuf.setSize(getWidth(), getHeight());
+			//textBuf.setSize(getWidth(), getHeight());
 		}
 	}
 
@@ -47,6 +52,7 @@ void CGUIlabel2::setTextColour(UIcolour  colour) {
 
 void CGUIlabel2::setTextColour(vec4  colour) {
 	textData.style.colour = colour;
+	drawText.setColour(colour);
 	renderText();
 }
 
@@ -70,7 +76,8 @@ TTextAlign CGUIlabel2::getJustification() {
 
 
 void CGUIlabel2::DrawSelf() {
-	uiDraw::drawTexture(drawBox, textBuf.textTexture);
+	//uiDraw::drawTexture(drawBox, textBuf.textTexture);
+	drawText.draw();
 	
 	 if (drawBorder) {
 		 uiDraw::drawBorder(drawBox, borderColour);
@@ -80,7 +87,8 @@ void CGUIlabel2::DrawSelf() {
 /** Catch any resizing, to ensure the text buffer is resized. */
 void CGUIlabel2::updateAppearance() {
 	CGUIbase::updateAppearance();
-	textBuf.setSize(getWidth(), getHeight());
+	//textBuf.setSize(getWidth(), getHeight());
+	drawText.setPosition(drawBox.pos.x, drawBox.pos.y);
 	renderText();
 }
 
@@ -110,17 +118,14 @@ void CGUIlabel2::calcLineOffset() {
 
 /** Determine how wide the text line will be when rendered. */
 void CGUIlabel2::calcLineRenderedWidth() {
-	lineRenderedWidth = 0;
-	for (int c = 0; c < textData.text.size(); c++) {
-		lineRenderedWidth += textData.font->table[textData.text[c]]->width;
-	}
+	lineRenderedWidth = drawText.getTextWidth();
 }
 
 /** Render the text according to current settings. */
 void CGUIlabel2::renderText() {
 	if (!textData.text.size())
 		return;
-	textBuf.clearBuffer();
+	//textBuf.clearBuffer();
 	calcLineOffset();
 
 	TLineFragDrawRec dataRec;
@@ -132,17 +137,20 @@ void CGUIlabel2::renderText() {
 			nextLineStart = getNextLineStart(lineStart);
 			renderLine = textData.text.substr(lineStart, nextLineStart - lineStart);
 			dataRec = { &renderLine,textData.font,textData.style.colour };
-			textBuf.renderTextAt(renderOffset.x, lineYpos, dataRec);
+			//textBuf.renderTextAt(renderOffset.x, lineYpos, dataRec);
 			lineYpos += textData.font->lineHeight;
 			lineStart = nextLineStart;
 		} while (nextLineStart < textData.text.size());
 	}
 	else {
 		dataRec = { &textData.text,textData.font,textData.style.colour };
-		textBuf.renderTextAt(renderOffset.x, renderOffset.y, dataRec);
+		//textBuf.renderTextAt(renderOffset.x, renderOffset.y, dataRec);
 	}
+
+	drawText.setPosition(drawBox.pos.x + renderOffset.x, drawBox.pos.y + renderOffset.y);
 }
 
+////TO DO: probably scrap whole multiline thing. Never use it.
 /** Returns the point at which whitespace lets us wrap the text onto the next line. */
 int CGUIlabel2::getNextLineStart(int lineStart) {
 	int breakDist = textData.text.size(); int dist = 0;

@@ -44,7 +44,8 @@ public:
 
 	int numElements = 0; ///<For indexed buffers, the total indices
 
-	unsigned int err = 0;
+
+	unsigned int numVerts = 0;
 
 private:
 	void storeVerts(void* data, unsigned int numVerts, int vertSize);
@@ -54,6 +55,6 @@ private:
 
 	std::shared_ptr<CSharedBuf> sharedBuf;
 
-	unsigned int numVerts;
+
 
 };

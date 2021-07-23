@@ -1,8 +1,12 @@
 #pragma once
 
+#include <memory>
+
 #include <glm/glm.hpp>
 
-enum TDrawCmd {drwCmdDrawLine};
+#include "renderer/drawText.h"
+
+enum TDrawCmd {drwCmdDrawLine, drwCmdText};
 
 /** Class for encapsulating an OpenGL drawing command.*/
 class CDrawCmd {
@@ -25,4 +29,7 @@ public:
 
 	glm::vec2 vec2_0;
 	glm::vec2 vec2_1;
+
+	std::shared_ptr<CDrawText> drawText;
+	unsigned int hTexture;
 };

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "GUIbase.h"
-#include "font.h"
+#include "fonts.h"
 #include "textBuf.h"
+
+#include "renderer/drawText.h"
 
 /** A class to render text to the screen. */
 class CGUIlabel2 : public CGUIbase {
@@ -37,8 +39,10 @@ public:
 	std::string& getText();
 
 
-	CTextBuffer textBuf;
-	//std::string text;
+	//CTextBuffer textBuf;
+
+	CDrawText drawText;
+
 	glm::i32vec2 renderOffset;///<Due to centering, multiline, etc.
 	int lineRenderedWidth = 0;
 	TTextAlign textAlign; ///<Records whether the text is centred, etc, in its area.

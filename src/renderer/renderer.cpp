@@ -515,6 +515,13 @@ void CRenderer::renderToTextureTris(CBuf2& buffer, CBaseTexture& texture) {
 	endRenderToTexture();
 }
 
+
+void CRenderer::renderToTextureTriStrip(CBuf2& buffer, CBaseTexture& texture) {
+	beginRenderToTexture(texture);
+	drawTriStripBuf(buffer);
+	endRenderToTexture();
+}
+
 /** Draw the given tri strip buffer to the texture using the current shader. */
 //void CRenderer::renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture) {
 //	beginRenderToTexture(texture);

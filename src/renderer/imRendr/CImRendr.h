@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 
@@ -10,12 +11,15 @@
 
 class CImRendr {
 public:
+	CImRendr();
 	void init();
 	void draw(glm::mat4& mvp);
 	void drawLine(const glm::vec3& a, const glm::vec3& b);
+	void drawText(int x, int y, const std::string& text);
 	void addVert(const glm::vec3& v);
 	void setDrawColour(const glm::vec4& colour);
 	void setMatrix(glm::mat4* matrix);
+	void setFont(const std::string& fontName);
 
 
 private:
@@ -30,4 +34,7 @@ private:
 
 	glm::vec4 drawColour = { 1,1,1,1 };
 	glm::mat4* pMatrix;
+	CFont* font;
+
+	std::unordered_map<std::string, std::shared_ptr<CDrawText>> drawTexts;
 };

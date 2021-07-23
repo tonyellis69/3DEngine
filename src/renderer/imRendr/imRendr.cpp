@@ -14,3 +14,11 @@ void imRendr::setMatrix(glm::mat4* matrix) {
 void imRendr::setDrawColour(const glm::vec4& colour) {
 	renderer.imRendr.setDrawColour(colour);
 }
+
+void imRendr::drawText(int x, int y, const std::string& text) {
+	renderer.imRendr.drawText(x, y, text);
+}
+
+void imRendr::setFont(const std::string& fontName) {
+	renderer.imRendr.setFont(fontName);
+}

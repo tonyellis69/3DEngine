@@ -104,6 +104,7 @@ public:
 	void renderToTextureQuad(CBaseTexture& texture, glm::i32vec2& offset, glm::i32vec2& size);
 	//void renderToTextureTris(CBuf & buffer, CBaseTexture & texture);
 	void renderToTextureTris(CBuf2& buffer, CBaseTexture& texture);
+	void renderToTextureTriStrip(CBuf2& buffer, CBaseTexture& texture);
 	//void renderToTextureTriStrip(CBuf& buffer, CBaseTexture& texture);
 	//void renderToTexturePoints(CBuf & buffer, CBaseTexture & texture);
 	void beginRenderToTexture(CBaseTexture & texture);

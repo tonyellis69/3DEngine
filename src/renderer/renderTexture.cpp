@@ -54,6 +54,10 @@ CRenderTexture::~CRenderTexture() {
 /** Resize this texture, freeing any previously used memory. */
 //TO DO: careful! We may not want to set mipmapping to GL_NEAREST.
 void CRenderTexture::resize(int w, int h) {
+	if (width == w && height == h)
+		return;
+
+
 	glBindVertexArray(0); 
 	//TO DO: have had gl drawing errors "access violition" without this. Assuming I've 
 	//bound a vert array somewhere and not unbound it again, but who knows where.

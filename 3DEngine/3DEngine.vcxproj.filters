@@ -332,6 +332,9 @@
     <ClCompile Include="..\src\renderer\imRendr\imRendr.cpp">
       <Filter>Header Files\renderer\imRendr</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\renderer\drawText.cpp">
+      <Filter>Header Files\renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\colour.h">
@@ -666,6 +669,9 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\imRendr\imRendr.h">
       <Filter>Header Files\renderer\imRendr</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\renderer\drawText.h">
+      <Filter>Header Files\renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

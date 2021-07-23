@@ -16,6 +16,7 @@ void CBuf2::clearVAO() {
 void CBuf2::setSize(unsigned int size) {
 	sharedBuf = std::make_shared<CSharedBuf>();
 	sharedBuf->setSize(size);
+	numVerts = 0;
 }
 
 /** Free the memory associated with this buffer by throwing it away.
@@ -36,8 +37,9 @@ void CBuf2::storeVerts(void* data, unsigned int numVerts, int vertSize) {
 		sharedBuf = std::make_shared<CSharedBuf>();
 	
 	sharedBuf->attachData(data,  numVerts, vertSize);
-
 	sharedBuf->setAttribs();
+
+	this->numVerts = numVerts;
 
 }
 
