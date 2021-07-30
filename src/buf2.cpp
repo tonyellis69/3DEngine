@@ -33,8 +33,9 @@ unsigned int CBuf2::getBufferHandle() {
 
 /** Stores the given vertex array in a shareable internal buffer. */
 void CBuf2::storeVerts(void* data, unsigned int numVerts, int vertSize) {
-	if (!sharedBuf)
+	if (!sharedBuf) {
 		sharedBuf = std::make_shared<CSharedBuf>();
+	}
 	
 	sharedBuf->attachData(data,  numVerts, vertSize);
 	sharedBuf->setAttribs();

@@ -85,10 +85,10 @@ int CLineBuffer::scrollDown3(int scrollAmount) {
 	int scrollAchieved = std::min(scrollAmount, overlap);
 	for (auto& sprite = textSprites.begin(); sprite != textSprites.end();) {
 		(*sprite)->adjustYPos(-scrollAchieved);
-		if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
-			sprite = textSprites.erase(sprite);
-		}
-		else
+		//if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
+		//	sprite = textSprites.erase(sprite);
+		//}
+		//else
 			sprite++;
 	}
 	pageDirty = true;

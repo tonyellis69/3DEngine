@@ -423,7 +423,7 @@ int CGUIrichText::findLastBreakableChar() {
 	
 	CFont* currentFont = fnt::get(bodyText.getReadStyle().fontName);
 
-	int lastBreakableChar; int totalLineChars = 0;
+	int lastBreakableChar = 0; int totalLineChars = 0;
 	int leadingPixelX = 0;
 	char c = bodyText.readNextChar();
 	while (!bodyText.endOfText()) {

@@ -18,7 +18,15 @@ void CSharedBuf::attachData(void* verts, int numVerts, int vertSize) {
 		size = 0;
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
-	if (numVerts * vertSize == size)
+
+	GLint actualSize = 0;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &actualSize);
+	//!!!!! size != actualSize on some occasions - currently with the hBuffer for the status label
+	//in hexWorld after a restart.
+	//Suspect lineBuffer is responsible, see if persists after installing 
+	//CDrawText there
+
+	if (numVerts * vertSize == actualSize)
 		glBufferSubData(GL_ARRAY_BUFFER,0, numVerts * vertSize, verts);
 	else
 		glBufferData(GL_ARRAY_BUFFER, numVerts * vertSize, verts, GL_STATIC_DRAW); 
@@ -71,7 +79,7 @@ void CSharedBuf::addAttribute(int attr) {
 
 void CSharedBuf::setAttribs() {
 	stride = 0;
-	for (auto attr : attribs)
+	for (auto& attr : attribs)
 		stride += attr * sizeof(float);
 
 	if (hVAO != 0)
@@ -86,7 +94,7 @@ void CSharedBuf::setAttribs() {
 
 	int index = 0;
 	int pointer = 0;
-	for (auto attrib : attribs) {
+	for (auto& attrib : attribs) {
 		glEnableVertexAttribArray(index);
 		glVertexAttribPointer(index, attrib, GL_FLOAT, GL_FALSE, stride, (void*)pointer);
 		glVertexAttribDivisor(index, 0);
@@ -130,6 +138,7 @@ void CSharedBuf::setSize(unsigned int size) {
 
 
 CSharedBuf::~CSharedBuf() {
+
 
 	glDeleteVertexArrays(1, &hVAO);
 	hVAO = 0;

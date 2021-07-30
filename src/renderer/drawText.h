@@ -14,6 +14,7 @@
 class CDrawText {
 public:
 	CDrawText();
+	~CDrawText();
 	void drawText(int x, int y, const std::string& text);
 	void setPosition(int x, int y);
 	void setText(const std::string& text);

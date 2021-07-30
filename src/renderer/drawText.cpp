@@ -10,6 +10,11 @@ CDrawText::CDrawText() {
 	pos = { 0, 0 };
 }
 
+CDrawText::~CDrawText()
+{
+	//int b = 0;
+}
+
 void CDrawText::drawText(int x, int y, const std::string& text) {
 	setText(text);
 	setPosition(x, y);
