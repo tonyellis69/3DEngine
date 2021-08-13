@@ -28,6 +28,10 @@ CHex::CHex(int x, int y, int z) {
 	this->x = x; this->y = y; this->z = z;
 }
 
+//CHex::CHex(glm::i32vec3& v) {
+//	this->x = v.x; this->y = v.y; this->z = v.z;
+//}
+
 /** Construct from axial coordinates. */
 CHex::CHex(int q, int r) {
 	x = q;
@@ -39,8 +43,13 @@ CHex CHex::operator+(CHex& hex2) {
 	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
 }
 
-CHex CHex::operator+(glm::i32vec3& hex2) {
-	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
+//CHex CHex::operator+(glm::i32vec3& hex2) {
+//	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
+//}
+
+CHex CHex::operator * (int& s) {
+	return CHex(x * s, y * s, z * s);
+
 }
 
 CHex CHex::operator-(const CHex& hex2) const {
@@ -448,7 +457,7 @@ glm::vec3 directionToVec(THexDir direction) {
 
 /** Return the adjacent hex in this direction. */
 CHex getNeighbour(CHex& hex, THexDir direction){
-	return hex + moveVectorCube[direction];
+	return hex + neighbourHex[direction];
 }
 
 /** Return true if cube coordinated ar malformed. */
@@ -552,7 +561,7 @@ THexList* findArc(CHex& apex, int hexLength, float angle, float rotation) {
 }
 
 /**  Create a hexagonal 'ring' of hexes of the given radius, centred at centre.. */
-THexList findRing(int radius, CHex& centre = CHex( 0,0,0)) {
+THexList findRing(int radius, CHex& centre ) {
 	CHex hex(radius, -radius, 0);
 	static THexList hexes;
 	hexes.clear();
@@ -644,7 +653,76 @@ THexDir findCornerExit(const glm::vec3 & start, const glm::vec3 & corner, const 
 THexList getNeighbours(CHex& hex) {
 	THexList getNeighbours(6);
 	for (int x = 0; x < 6; x++)
-		getNeighbours[x] = hex + moveVectorCube[x];
+		getNeighbours[x] = hex + neighbourHex[x];
 	return getNeighbours;
 
+}
+
+TIntersections getIntersectedHexes(const glm::vec3& segA, const glm::vec3& segB) {
+	TIntersections intersectedHexes;
+	CHex startHex = worldSpaceToHex(segA);
+	CHex endHex = worldSpaceToHex(segB);
+	THexDir exitDir = hexNone; glm::vec3 intersection;
+	while (startHex != endHex) {
+		std::tie(exitDir, intersection) = findSegmentExit(segA, segB, startHex);
+		if (exitDir == hexNone) {
+			//std::tie(exitDir, intersection) = findSegmentExit(segA, segB, startHex);
+			break; //hopefully catch rare case where leading point on hex border.
+
+		}
+		CHex entryHex = getNeighbour(startHex, exitDir);
+		//if (outsideArray(entryHex))
+			//return intersectedHexes;
+		//TO DO: if map bounded by solid hexes, above shouldn't be 
+		//needed! Find why some segments break through
+
+		intersectedHexes.push_back({ entryHex, intersection });
+		startHex = entryHex;
+	}
+
+	return intersectedHexes;
+}
+
+std::tuple<THexDir, glm::vec3> findSegmentExit(const glm::vec3 A, const glm::vec3 B, const CHex& hex) {
+	glm::vec3 segmentDir = B - A;
+	glm::vec3 hexCentre = cubeToWorldSpace(hex);
+	glm::vec3 intersection(0);
+	THexDir exitDir = hexNone;
+
+	for (int face = 0; face < 6; face++) {
+		glm::vec3 faceA = hexCentre + corners[face];
+		glm::vec3 faceB = hexCentre + corners[(face + 1) % 6];
+
+		glm::vec3 faceDir = glm::normalize(faceB - faceA);
+		glm::vec3 facePerp = { faceDir.y,-faceDir.x , 0 };
+
+		if (glm::dot(A - faceA, facePerp) < 0) //discard faces where the segment enters the hex
+			continue;
+
+		if (segIntersect(A, B, faceA, faceB, intersection)) {
+			exitDir = THexDir(face);
+			return { exitDir, intersection };
+		}
+
+		//still here? We may have hit a corner, in which case
+		//extrapolate which hex we've entered.
+
+		if (intersection.x > 0) {
+			intersection = faceA;
+			exitDir = findCornerExit(A, intersection, hex);
+			return { exitDir, intersection };
+		}
+		if (intersection.y > 0) {
+			intersection = faceB;
+			exitDir = findCornerExit(A, intersection, hex);
+			return { exitDir, intersection };
+		}
+
+
+
+
+	}
+
+	//getting here is an error! fix!!
+	return { exitDir, intersection };
 }

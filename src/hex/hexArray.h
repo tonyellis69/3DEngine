@@ -15,6 +15,8 @@ struct TMapEffects {
 	float highlight;
 };
 
+using TFlatArray = std::vector<CHexElement>;
+
 /** A 2D container for CHexElement objects. */
 class CHexArray {
 public:
@@ -48,6 +50,10 @@ public:
 	void setHighlight(CHex& hex, float highlight);
 
 	void setVisibility(CHex& hex, float visibility);
+
+	TFlatArray getFlatArray();
+	CHexArray getArray();
+	void setArray(CHexArray& array);
 		 
 	int width;
 	int height;
@@ -64,7 +70,7 @@ private:
 		return false;
 	};
 
-	std::vector<CHexElement> flatArray;
+	TFlatArray flatArray;
 
 
 
@@ -82,16 +88,3 @@ struct order {
 	}
 };
 
-const int solidHex = 2;
-const int emptyHex = 1;
-
-
-const int blocksNone = 0;
-const int blocksEast = 1;
-const int blocksSE = 2;
-const int blocksSW = 4;
-const int blocksWest = 8;
-const int blocksNW = 16;
-const int blocksNE = 32;
-const int blocksAll = 63;
-const int blocksAsDoor = 54;

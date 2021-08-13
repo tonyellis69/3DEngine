@@ -415,6 +415,18 @@ void CHexArray::setVisibility(CHex& hex, float visibility) {
 	effectsNeedUpdate = true;
 }
 
+TFlatArray CHexArray::getFlatArray() {
+	return flatArray;
+}
+
+CHexArray CHexArray::getArray() {
+	return *this;
+}
+
+void CHexArray::setArray(CHexArray& array) {
+	flatArray = array.getFlatArray();
+}
+
 
 
 ///////////////PRIVATE//////////////
