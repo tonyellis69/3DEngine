@@ -17,6 +17,8 @@ static glm::i32vec3 moveVectorCube[]{ {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0
 const float hexWidth = sqrt(3.0f);
 const float halfHexWidth = sqrt(3.0f) / 2.0f;
 const float hexHeight = 2;
+const float halfHexHeight = hexHeight / 1.0f;
+const float hexRowHeight = hexHeight * 0.75f;
 
 static glm::vec3 moveVector3D[]{ {hexWidth,0,0}, {hexWidth * 0.5f,-1.5f,0}, 
 	{-hexWidth * 0.5f,-1.5f,0}, {-hexWidth,0,0}, {-hexWidth * 0.5f,1.5f,0}, {hexWidth * 0.5f,1.5f,0} };
@@ -68,6 +70,7 @@ using TIntersections = std::vector<std::pair<CHex, glm::vec3>>;
 
 
 CHex cubeToAxial(CHex& cube);
+glm::vec3 cubeToAxialFloat(CHex& cube);
 glm::vec3 axialToCube(float q, float r);
 CHex axialToCube(int q, int r);
 glm::i32vec2 cubeToOffset(const CHex& hex);
@@ -94,6 +97,7 @@ float hexAngle(CHex& start, CHex& end);
 THexDir angleToDir(float angle);
 THexDir opposite(THexDir direction);
 THexDir intToDir(int n);
+THexDir relativeDir(CHex& A, CHex& B);
 std::tuple<CHex, CHex> findTriangle(CHex& apex, int hexLength, float angle, float rotation);
 THexList* findArc(CHex& apex, int hexLength, float angle, float rotation);
 THexList findRing( int radius, CHex& centre = CHex(0, 0, 0));

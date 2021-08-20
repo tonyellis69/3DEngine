@@ -88,6 +88,10 @@ CHex cubeToAxial(CHex & cube) {
 	return CHex(cube.x, cube.z);
 }
 
+glm::vec3 cubeToAxialFloat(CHex& cube) {
+	return { cube.x,cube.z,0 };
+}
+
 /**Convert axial coordinates to cube (float version). */
 glm::vec3 axialToCube(float q, float r) {
 	float x = q;
@@ -238,7 +242,7 @@ THexList* hexLine(CHex& cubeA, CHex& cubeB) {
 	results.clear();
 
 	glm::vec3 A(cubeA.x, cubeA.y, cubeA.z);
-	A += glm::vec3(1e-6, 2e-6, -3e-6);
+	A += glm::vec3(1e-4, 2e-4, -3e-4);
 	glm::vec3 B(cubeB.x, cubeB.y, cubeB.z);
 	for (int h = 0; h <= N; h++) {
 		results.push_back(hexRound(glm::mix(A, B, 1.0 / N * h)  ));
@@ -487,7 +491,8 @@ float hexAngle(CHex& start, CHex& end) {
 
 /** Return the nearest hex direction to the given angle. */
 THexDir angleToDir(float angle) {
-	glm::vec3 A = glm::rotate(glm::vec3(1, 0, 0), angle, glm::vec3(0, 0, 1));
+	glm::vec3 A = glm::rotate(glm::vec3(1, 0, 0), angle, glm::vec3(0, 0, -1));
+	//NB assumes CW polar coords, try to be consistent about this!
 
 	float nearestDot = -FLT_MAX; int nearestFace;
 	for (int face = 0; face < 6; face++) {
@@ -511,6 +516,12 @@ THexDir opposite(THexDir direction) {
 /**	Convert n to a direction, with wraparound. */
 THexDir intToDir(int n) {
 	return THexDir(n % 6);
+}
+
+/** Return relative hex directiob of B from A. */
+THexDir relativeDir(CHex& A, CHex& B) {
+	float angle = hexAngle(A, B);
+	return angleToDir(angle);
 }
 
 /** Return the corner hexes of this triangle. */
