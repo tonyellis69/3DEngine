@@ -427,6 +427,9 @@ void CHexArray::setArray(CHexArray& array) {
 	flatArray = array.getFlatArray();
 }
 
+void CHexArray::setArray(TFlatArray& array) {
+	flatArray = array;
+}
 
 
 ///////////////PRIVATE//////////////

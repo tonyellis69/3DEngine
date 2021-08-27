@@ -54,6 +54,7 @@ public:
 	TFlatArray getFlatArray();
 	CHexArray getArray();
 	void setArray(CHexArray& array);
+	void setArray(TFlatArray& array);
 		 
 	int width;
 	int height;
@@ -70,10 +71,8 @@ private:
 		return false;
 	};
 
+protected:
 	TFlatArray flatArray;
-
-
-
 
 };
 

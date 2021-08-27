@@ -15,6 +15,7 @@
 #include "UI/uiRender.h"
 
 #include "UI/fonts.h"
+#include "utils/files.h"
 
 CFont* style::defaultFont;
 
@@ -36,6 +37,7 @@ CBaseApp::CBaseApp(void)  {
 	//Engine.dataPath = homeDir + "Data\\";
 	dataPath = homeDir + "Data\\";
 	renderer.dataPath = homeDir + "Data\\";
+	file::setDataPath(dataPath);
 	
 	//Set up our handlers for window events
 	//RegisterHandlers();

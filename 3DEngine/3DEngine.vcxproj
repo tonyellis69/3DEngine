@@ -185,6 +185,7 @@
     <ClCompile Include="..\src\UI\textBuf.cpp" />
     <ClCompile Include="..\src\UI\textSprite.cpp" />
     <ClCompile Include="..\src\UI\uiRender.cpp" />
+    <ClCompile Include="..\src\utils\files.cpp" />
     <ClCompile Include="..\src\utils\idContainer.cpp" />
     <ClCompile Include="..\src\utils\log.cpp" />
     <ClCompile Include="..\src\utils\random.cpp" />
@@ -299,6 +300,7 @@
     <ClInclude Include="..\src\UI\textSprite.h" />
     <ClInclude Include="..\src\UI\uiRender.h" />
     <ClInclude Include="..\src\userTypes.h" />
+    <ClInclude Include="..\src\utils\files.h" />
     <ClInclude Include="..\src\utils\idContainer.h" />
     <ClInclude Include="..\src\utils\log.h" />
     <ClInclude Include="..\src\utils\random.h" />
