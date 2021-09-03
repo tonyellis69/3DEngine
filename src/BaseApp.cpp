@@ -252,8 +252,18 @@ void CBaseApp::AppTasks() {
 	win.getMousePos(mouseX, mouseY);
 	if (mouseX != lastMousePos.x || mouseY != lastMousePos.y) {
 		lastMousePos = { mouseX, mouseY };
-		mouseMove(mouseX, mouseY,NULL);
-		//TO DO: see onWinMouseMove for how to provide mouse buttons if ever needed
+		int key = -1;
+		if (win.leftMouseHeldDown())
+			key = GLFW_MOUSE_BUTTON_LEFT;
+		else if (win.rightMouseDown())
+			key = GLFW_MOUSE_BUTTON_RIGHT;
+		else if (win.middleMouseDown())
+			key = GLFW_MOUSE_BUTTON_MIDDLE;
+		mouseMove(mouseX, mouseY,key);
+		//TO DO: why am I doing this here and at onWinMouseMove??
+		//see if i can do it all at onWinMouseMove without probs
+
+
 	}
 
 	keyCheck(); //happens every frame, therefore responsive

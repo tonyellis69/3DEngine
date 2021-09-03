@@ -1,6 +1,8 @@
 #include "buf2.h"
 
 CBuf2::CBuf2() {
+	sharedBuf = std::make_shared<CSharedBuf>();
+	//in case someone tries to use this without initialising
 }
 
 void CBuf2::setVAO() {

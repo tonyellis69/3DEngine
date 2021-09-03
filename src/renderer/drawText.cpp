@@ -30,7 +30,7 @@ void CDrawText::setPosition(int x, int y) {
 
 
 void CDrawText::setText(const std::string& text) {
-	if (this->text == text)
+	if (!text.empty() && this->text == text)
 		return;
 
 	this->text = text;
