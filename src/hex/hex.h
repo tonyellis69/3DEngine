@@ -82,6 +82,7 @@ CHex hexRound(float q, float r);
 CHex worldSpaceToHex(const glm::vec3& worldSpace);
 CHex OLDworldSpaceToHex(glm::vec3& worldSpace);
 int cubeDistance(CHex& cubeA, CHex& cubeB);
+THexList vertLine(CHex A, CHex B, bool veer = false);
 THexList* hexLine(CHex& cubeA, CHex& cubeB);
 THexList* hexLine2(CHex& cubeA, CHex& cubeB);
 THexList* hexLine3(CHex& cubeA, CHex& cubeB, int corner);

@@ -228,6 +228,28 @@ int cubeDistance(CHex& cubeA, CHex& cubeB) {
 	return (abs(cubeA.x - cubeB.x) + abs(cubeA.y - cubeB.y) +  abs(cubeA.z - cubeB.z)) / 2;
 }
 
+/** Return the approximate vertical line between A and B. */
+THexList vertLine(CHex A, CHex B, bool veer) {
+
+	if (A.z > B.z) {
+		std::swap(A, B);
+	}
+
+	THexList hexes;
+
+	CHex hex = A;
+	for (int z = A.z; z < B.z; z++) {
+		if (veer)
+			hex = getNeighbour(hex, hexSE);
+		else
+			hex = getNeighbour(hex, hexSW);
+		veer = !veer;
+		hexes.push_back(hex);
+	}
+
+	return hexes;
+}
+
 glm::vec3 hexLerp(CHex& cubeA, CHex& cubeB, float t) {
 	return glm::vec3(glm::mix(cubeA.x, cubeB.x, t),
 		glm::mix(cubeA.y, cubeB.y, t),
