@@ -30,7 +30,7 @@ void CGUIlabel2::setFont(const std::string& fontName) {
 	drawText.setFont(fontName);
 }
 
-void CGUIlabel2::setText(std::string newText) {
+void CGUIlabel2::setText(const std::string& newText) {
 	textData.text = newText;
 	drawText.setText(newText);
 

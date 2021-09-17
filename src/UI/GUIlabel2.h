@@ -16,7 +16,7 @@ public:
 
 	void setFont(CFont* font);
 	void setFont(const std::string& fontName);
-	void setText(std::string newText);
+	void setText(const std::string& newText);
 	//void setTextColour(float r, float g, float b, float a);
 	void setTextColour(UIcolour colour);
 	void setMultiLine(bool onOff);

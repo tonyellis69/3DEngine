@@ -252,7 +252,7 @@ public:
 	 
 	int tmpDbg = 0;
 	int dbgFrame = -1;
-	int entityNo;
+
 
 
 	CImRendr imRendr; ///<Immediate renderer.

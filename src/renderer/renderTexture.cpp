@@ -71,14 +71,14 @@ void CRenderTexture::resize(int w, int h) {
 	glDeleteTextures(1, &handle);
 	glGenTextures(1, &handle);
 	if (h > 0) {
-		unsigned char* chequerBoardPixels = getChequePattern();
+		//unsigned char* chequerBoardPixels = getChequePattern();
 		glBindTexture(GL_TEXTURE_2D, handle);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, chequerBoardPixels); //GL_FLOAT was GL_UNSIGNED_BYTE
-		delete chequerBoardPixels;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL /*chequerBoardPixels*/); //GL_FLOAT was GL_UNSIGNED_BYTE
+		//delete chequerBoardPixels;
 		glBindTexture(GL_TEXTURE_2D, 0);
  
 		return;
