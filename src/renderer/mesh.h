@@ -18,7 +18,7 @@ struct TMeshRec {
 	int indexStart;
 	int indexSize;
 	int vertStart;
-	glm::vec4 colour;
+
 	bool isLine = true;
 	bool isLineLoop = false;
 };
@@ -31,26 +31,26 @@ struct TMeshExtents {
 
 /** Holds the reference data for a model or part of a multipart
 	model, including all sub-parts. Does not store the actual vertices. */
-struct TModelNode {
+struct TModelData {
 	std::string name;
 	glm::mat4 matrix;
 	std::vector<TMeshRec> meshes;
-	std::vector<TModelNode> subNodes;
-	//glm::vec3 furthestVert;
-	//glm::vec3 BBnw;
-	//glm::vec3 BBse;
+	std::vector<TModelData> subModels;
+
 	TMeshExtents extents;
 
 };
 
 
-/** A class for storing vertices organised for drawing. */
+/** A class for the intermediate storage and management of 
+	the vertices of a model, on the PC-side. */
 class CMesh {
 public:
 	CMesh();
 	void calculateVertexNormals();
 	//void exportToBuffer(CBuf& buf);
 	void exportToBuffer(CBuf2& buf);
+	CBuf2 exportToBuffer();
 	void clear();
 	void mergeUniqueVerts();
 	void linesToLineStrip();

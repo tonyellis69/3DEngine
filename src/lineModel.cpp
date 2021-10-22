@@ -8,7 +8,7 @@ void CLineModel::setColourR(glm::vec4& colour) {
 }
 
 /** Return a pointer to the node named. */
-TModelNode* CLineModel::getNode(const std::string& name) {
+TModelData* CLineModel::getNode(const std::string& name) {
 	return recurseName(model, name);
 }
 
@@ -69,22 +69,30 @@ bool CLineModel::BBcollision(glm::vec3& segA, glm::vec3& segB) {
 	return false;
 }
 
-
-/** Recurse through meshes, setting colour. */
-void CLineModel::recurseColour(TModelNode& node, glm::vec4& colour) {
-	for (auto& mesh : node.meshes)
-		mesh.colour = colour;
-
-	for (auto& subNode : node.subNodes)
-		recurseColour(subNode, colour);
+float CLineModel::getRadius() {
+	return glm::length(model.extents.furthestVert);
 }
 
-TModelNode* CLineModel::recurseName(TModelNode& node, const std::string& name) {
+
+/** Recurse through meshes, setting colour. */
+void CLineModel::recurseColour(TModelData& node, glm::vec4& colour) {
+	this->colour = colour;
+
+	//TO DO: temp fix
+
+	//for (auto& mesh : node.meshes)
+	//	mesh.colour = colour;
+
+	//for (auto& subNode : node.subModels)
+	//	recurseColour(subNode, colour);
+}
+
+TModelData* CLineModel::recurseName(TModelData& node, const std::string& name) {
 	if (node.name == name)
 		return &node;
 
-	for (auto& subNode : node.subNodes) {
-		TModelNode* found = recurseName(subNode, name);
+	for (auto& subNode : node.subModels) {
+		TModelData* found = recurseName(subNode, name);
 		if (found)
 			return found;
 	}

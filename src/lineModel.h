@@ -1,22 +1,23 @@
 #pragma once
 
-//#include "renderer/buf.h"
-
 #include "renderer/mesh.h"
 
-/** A class encapsulating the vertex buffer, sub meshes 
-	and 3D operations required to draw a line model. */
+/** A high-level class representing a line-based model.
+	Stores the meshes, matrices and any sub meshes,
+	and a pointer to a buffer for the verts. */
 class CLineModel {
 public:
 	void setColourR(glm::vec4& colour);
-	TModelNode* getNode(const std::string&  name);
+	TModelData* getNode(const std::string&  name);
 	bool circleCollision(glm::vec3& segA, glm::vec3& segB);
 	bool BBcollision(glm::vec3& segA, glm::vec3& segB);
+	float getRadius();
 
-	TModelNode model;
+	TModelData model;
 	CBuf2* buffer2;
+	glm::vec4 colour; //temporary solution, may become an array etc
 
 private:
-	void recurseColour(TModelNode& node, glm::vec4& colour);
-	TModelNode* recurseName(TModelNode& node, const std::string& name);
-};
+	void recurseColour(TModelData& node, glm::vec4& colour);
+	TModelData* recurseName(TModelData& node, const std::string& name);
+};			

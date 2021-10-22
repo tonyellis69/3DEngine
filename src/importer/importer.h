@@ -16,19 +16,19 @@ public:
 	void loadFile(const std::string& filename);
 	//void addFrame(const std::string& filename);
 	CMesh& getSingleMesh();
-	TModelNode getMeshNodes();
+	TModelData getMeshNodes();
 
 private:
-	TModelNode processNode(aiNode* node, const aiScene* scene);
+	TModelData processNode(aiNode* node, const aiScene* scene);
 	std::tuple<TMeshRec,TMeshExtents> processMesh(aiMesh* mesh, const aiNode* node);
 	void copyMatrix(aiMatrix4x4& src, glm::mat4& dest);
-	void updateNodeExtents(TModelNode& node, TModelNode& subNode);
+	void updateNodeExtents(TModelData& node, TModelData& subNode);
 
 	//std::vector<CMesh> meshes;
 
 	CMesh singleMesh; ///<All the imported 3D model objects stored as one mesh object.
 
-	TModelNode rootNode; 
+	TModelData rootNode; 
 };
 
 

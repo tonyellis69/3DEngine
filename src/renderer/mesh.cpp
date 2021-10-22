@@ -35,7 +35,13 @@ void CMesh::calculateVertexNormals() {
 void CMesh::exportToBuffer(CBuf2& buf) {
 	buf.storeVerts(vertices, indices, 3);
 }
-//TO DO: look into making a general purpose template-based writeToBuffer
+
+
+CBuf2 CMesh::exportToBuffer() {
+	CBuf2 buf;
+	buf.storeVerts(vertices, indices, 3);
+	return buf;
+}
 
 
 /** Clear all vertex buffers etc so mesh can be resused. */
@@ -78,26 +84,95 @@ void CMesh::mergeUniqueVerts() {
 	together if they share vertexes, and separate them with the
 	primitive restart value if not. */
 void CMesh::linesToLineStrip() {
-	orderLines();
+//	orderLines();
 
 	unsigned int primitiveRestart = 0xFFFF;
 	if (vertices.size() > 0xFFFE)
 		primitiveRestart = 0xFFFFFFFF;
 
-	//run through index line pairs
-	std::vector<unsigned int> stripIndices;
-	for (unsigned int i = 0; i < indices.size(); i++) {
-		stripIndices.push_back(indices[i]);
-		if (i % 2 && i < indices.size() - 1) { //second vertex of a line pair
-			if (indices[i] == indices[i + 1])
-				i++; //skip next vertex
-			else {
-				stripIndices.push_back(primitiveRestart);
+	//int stripCount = 1;
+	////run through index line pairs
+	//std::vector<unsigned int> stripIndices;
+	//for (unsigned int i = 0; i < indices.size(); i++) {
+	//	stripIndices.push_back(indices[i]);
+	//	if (i % 2 && i < indices.size() - 1) { //second vertex of a line pair
+	//		if (indices[i] == indices[i + 1])
+	//			i++; //skip next vertex
+	//		else {
+	//			stripIndices.push_back(primitiveRestart);
+	//			stripCount++;
+	//		}
+	//	}
+	//}
+
+	//find all pairs
+	struct TLinePair {
+		unsigned int A;
+		unsigned int B;
+	};
+	std::vector<TLinePair> pairs;
+	for (unsigned int i = 0; i < indices.size(); i += 2) {
+		TLinePair linePair = { indices[i], indices[i + 1] };
+		pairs.push_back(linePair);
+	}
+
+	//for each pair...
+	std::vector<std::vector<TLinePair>> lines;
+	for (unsigned int p = 0; p < pairs.size(); p++) {
+		TLinePair currentPair = pairs[p];
+		bool found = false;
+		for (int attempt = 0; attempt < 2; attempt++) {
+			for (auto& line : lines) { //...can it be added to an existing line?
+				if (currentPair.B == line.front().A) {
+					line.insert(line.begin(), currentPair);
+					found = true;
+					break;
+				}
+				else if (currentPair.A == line.back().B) {
+					line.push_back(currentPair);
+					found = true;
+					break;
+				}
 			}
+			if (found)
+				break;
+			std::swap(currentPair.A, currentPair.B);
+		}
+
+		if (!found) { 	//...no? start a new line
+			std::vector<TLinePair> newLine = { currentPair };
+			lines.push_back(newLine);
 		}
 	}
 
-	indices = stripIndices;
+	//combine lines if possible
+		for (auto& line = lines.begin(); line != lines.end();) {
+			bool found = false;
+			for (auto& lineB = line + 1; lineB != lines.end(); lineB++) {
+				if (line->front().A == lineB->back().B) {
+					lineB->insert(lineB->end(), line->begin(), line->end());
+					line = lines.erase(line);
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				line++;
+		}
+
+	std::vector<unsigned int> sortedIndices;
+	for (auto& line : lines) {
+		for (auto& pair : line) {
+			sortedIndices.push_back(pair.A);
+		}
+		sortedIndices.push_back(line.back().B);
+		sortedIndices.push_back(primitiveRestart);
+	}
+	sortedIndices.erase(sortedIndices.end()-1); //don't need a final restart
+
+
+	//indices = stripIndices;
+	indices = sortedIndices;
 }
 
 /** Ensure loops end at their starting vertex, and insert primitive restarts 
@@ -137,6 +212,12 @@ void CMesh::addAdjacencyVerts() {
 
 	std::vector<unsigned int> adjacencyIndices;
 
+	//TO DO: can do all this much more cleanly if I break the indices back into lines
+	//check each to see if it loops, create adjacency verts accordingly. 
+
+
+
+
 	adjacencyIndices.push_back(makeAdjacencyVert(vertices[indices[0]],vertices[indices[1]]));
 
 	auto lineStart = indices.begin(); //position in the indices vector of the line's starting index
@@ -147,6 +228,7 @@ void CMesh::addAdjacencyVerts() {
 			if (*(linePos - 1) == *lineStart) { //this line loops
 				adjacencyIndices[lineAdjacencyA] = *(linePos - 2);
 				adjacencyIndices.push_back(*(lineStart + 1));
+				//vertices.erase(vertices.end() - 2, vertices.end());
 			}
 			else
 				adjacencyIndices.push_back(makeAdjacencyVert(vertices[*(linePos - 1)], vertices[*(linePos - 2)]));
@@ -164,9 +246,23 @@ void CMesh::addAdjacencyVerts() {
 	if (indices.back() == *lineStart) { //this line loops
 		adjacencyIndices[lineAdjacencyA] = indices.end()[-2];
 		adjacencyIndices.push_back(*(lineStart+1));
+		//vertices.erase(vertices.end() - 2, vertices.end());
 	}
 	else
 		adjacencyIndices.push_back(makeAdjacencyVert(vertices[indices.back()], vertices[indices.end()[-2]]));
+
+
+	//remove reduntant adjacency verts
+	for (unsigned int v = 0; v < vertices.size(); v++) {
+		if (std::find(adjacencyIndices.begin(), adjacencyIndices.end(), v) == adjacencyIndices.end()) {
+			vertices.erase(vertices.begin() + v);
+			for (auto& i : adjacencyIndices) {
+				if (i != primitiveRestart && i > v)
+					i--;
+			}
+
+		}
+	}
 
 
 	indices = adjacencyIndices;

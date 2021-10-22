@@ -31,13 +31,13 @@ CMesh& CImporter::getSingleMesh() {
 	return singleMesh;
 }
 
-TModelNode CImporter::getMeshNodes() {
+TModelData CImporter::getMeshNodes() {
 	return rootNode;
 }
 
 /** Recursively retrieve all the verts etc from each node in the scene. */
-TModelNode CImporter::processNode(aiNode* node, const aiScene* scene) {
-	TModelNode currentNode;
+TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {
+	TModelData currentNode;
 	currentNode.name = node->mName.C_Str();
 	copyMatrix(node->mTransformation,currentNode.matrix);
 
@@ -49,8 +49,8 @@ TModelNode CImporter::processNode(aiNode* node, const aiScene* scene) {
 	}
 
 	for (unsigned int n = 0; n < node->mNumChildren; n++) {
-		TModelNode newNode = processNode(node->mChildren[n], scene);
-		currentNode.subNodes.push_back(newNode);
+		TModelData newNode = processNode(node->mChildren[n], scene);
+		currentNode.subModels.push_back(newNode);
 
 		updateNodeExtents(currentNode, newNode);
 	}
@@ -139,7 +139,7 @@ void CImporter::copyMatrix(aiMatrix4x4& src, glm::mat4& dest) {
 
 
 /** Modify node's extents if the subnode out-extends them. */
-void CImporter::updateNodeExtents(TModelNode& node, TModelNode& subNode) {
+void CImporter::updateNodeExtents(TModelData& node, TModelData& subNode) {
 	node.extents.furthestVert = glm::max(node.extents.furthestVert, subNode.extents.furthestVert);
 	node.extents.BBmin = glm::min(node.extents.BBmin, subNode.extents.BBmin);
 	node.extents.BBmax = glm::max(node.extents.BBmax, subNode.extents.BBmax);

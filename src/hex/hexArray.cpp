@@ -411,6 +411,8 @@ void CHexArray::setVisibility(CHex& hex, float visibility) {
 	glm::i32vec2 offset = cubeToOffset(hex);
 	offset.x += width / 2;
 	offset.y = offset.y + height / 2;
+	offset.x = std::clamp(offset.x, 0, width - 1);
+	offset.y = std::clamp(offset.y, 0, height - 1);
 	effectsData[offset.y * width + offset.x].visibility = visibility;
 	effectsNeedUpdate = true;
 }
