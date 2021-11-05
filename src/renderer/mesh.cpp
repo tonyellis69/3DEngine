@@ -215,6 +215,37 @@ void CMesh::addAdjacencyVerts() {
 	//TO DO: can do all this much more cleanly if I break the indices back into lines
 	//check each to see if it loops, create adjacency verts accordingly. 
 
+	std::vector<std::vector<unsigned int>> lines(1);
+	for (unsigned int i = 0; i < indices.size(); i++) {
+		if (indices[i] == primitiveRestart) {
+			lines.resize(lines.size() + 1);
+		} 
+		else
+			lines.back().push_back(indices[i]);
+	}
+
+
+	for (auto& line : lines) {
+		if (line.front() == line.back()) { //this line loops
+			line.insert(line.begin(), *(line.end() -2) );
+			line.push_back( *(line.begin() + 2) );
+		}
+		else {
+			line.push_back(makeAdjacencyVert(vertices[line.back()], vertices[*(line.end() - 2)])); //end adjacency vert
+			line.insert(line.begin(), makeAdjacencyVert(vertices[line[0]], vertices[line[1]]) ); //leading adjacency vert
+		}
+	}
+
+	//convert lines back to one stream of indices
+	for (auto& line : lines) {
+		adjacencyIndices.insert(adjacencyIndices.end(), line.begin(), line.end());
+		adjacencyIndices.push_back(primitiveRestart);
+	}
+	//adjacencyIndices.erase(adjacencyIndices.end() - 1); //don't need a final restart
+
+	indices = adjacencyIndices;
+
+	return;
 
 
 
@@ -280,6 +311,10 @@ unsigned int CMesh::makeAdjacencyVert(glm::vec3& A, glm::vec3& B) {
 
 /** Append the given mesh, updating its index data in the process. */
 TMeshRec CMesh::add(CMesh& mesh) {
+	unsigned int primitiveRestart = 0xFFFF;
+	if (vertices.size() > 0xFFFE)
+		primitiveRestart = 0xFFFFFFFF;
+
 	TMeshRec meshRec;
 	meshRec.indexStart = indices.size();
 	meshRec.indexSize = mesh.indices.size();
@@ -287,7 +322,10 @@ TMeshRec CMesh::add(CMesh& mesh) {
 
 	vertices.insert(vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
 	for (auto& index : mesh.indices) {
-		indices.push_back(index + meshRec.vertStart);
+		if (index == primitiveRestart)
+			indices.push_back(primitiveRestart);
+		else
+			indices.push_back(index + meshRec.vertStart);
 	}
 
 	return meshRec;
