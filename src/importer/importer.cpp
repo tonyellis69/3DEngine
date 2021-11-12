@@ -52,7 +52,7 @@ TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {
 		TModelData newNode = processNode(node->mChildren[n], scene);
 		currentNode.subModels.push_back(newNode);
 
-		//updateNodeExtents(currentNode, newNode);
+		updateNodeExtents(currentNode, newNode);
 	}
 	
 
