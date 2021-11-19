@@ -15,7 +15,7 @@ public:
 
 	TModelData model;
 	CBuf2* buffer2;
-	glm::vec4 colour; //temporary solution, may become an array etc
+	glm::vec4 colour = { 0.5f,0.5f,0.5f,1.0f }; //temporary solution, may become an array etc
 
 private:
 	void recurseColour(TModelData& node, glm::vec4& colour);
