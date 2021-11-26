@@ -10,6 +10,7 @@
 #include <assimp/postprocess.h>
 
 #include "../renderer/mesh.h"
+#include "model.h"
 
 class CImporter {
 public:
@@ -17,6 +18,7 @@ public:
 	//void addFrame(const std::string& filename);
 	CMesh& getSingleMesh();
 	TModelData getMeshNodes();
+	CModel getModel();
 
 private:
 	TModelData processNode(aiNode* node, const aiScene* scene);
@@ -29,6 +31,8 @@ private:
 	CMesh singleMesh; ///<All the imported 3D model objects stored as one mesh object.
 
 	TModelData rootNode; 
+
+	std::vector<TModelMesh> modelMeshes;
 };
 
 

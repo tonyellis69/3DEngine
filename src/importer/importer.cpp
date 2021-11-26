@@ -9,7 +9,7 @@ void CImporter::loadFile(const std::string& filename) {
 	singleMesh.clear();
 
 
-	const aiScene* scene = importer.ReadFile(filename , /*aiProcess_JoinIdenticalVertices |*/ 0 /*aiProcess_Triangulate*/) ;
+	const aiScene* scene = importer.ReadFile(filename , /*aiProcess_JoinIdenticalVertices |*/ 0   /*aiProcess_Triangulate*/) ;
 	
 	aiNode* startNode = scene->mRootNode;
 	if (startNode->mNumMeshes == 0 && startNode->mNumChildren == 1)
@@ -35,6 +35,22 @@ TModelData CImporter::getMeshNodes() {
 	return rootNode;
 }
 
+/** Create a model from the imported scene and return it. */
+CModel CImporter::getModel() {
+	CModel model;
+
+	auto buf = std::make_shared<CBuf2>();
+	singleMesh.exportToBuffer(*buf);
+
+	for (auto& mesh : modelMeshes) {
+		model.meshes.push_back(mesh);
+		model.meshes.back().buf = buf;
+	}
+	
+	model.extents = rootNode.extents; //temp!
+	return model;
+}
+
 /** Recursively retrieve all the verts etc from each node in the scene. */
 TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {
 	TModelData currentNode;
@@ -46,6 +62,8 @@ TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {
 		auto[meshRec,extents] = processMesh(mesh, node);
 		currentNode.meshes.push_back(meshRec);
 		currentNode.extents = extents;
+		TModelMesh modelMesh = { node->mName.C_Str(),currentNode.matrix,meshRec };
+		modelMeshes.push_back(modelMesh);
 	}
 
 	for (unsigned int n = 0; n < node->mNumChildren; n++) {
@@ -84,8 +102,8 @@ std::tuple<TMeshRec, TMeshExtents> CImporter::processMesh(aiMesh* mesh, const ai
 
 	bool isLine;
 	bool isLineLoop = false;
-	//if(strcmp("solid\0", mesh->mName.C_Str()) == 0)
-	if (std::string(mesh->mName.C_Str()).find("solid") != std::string::npos)
+	//if (std::string(mesh->mName.C_Str()).find("solid") != std::string::npos)
+	if (std::string(node->mName.C_Str()).find("solid") != std::string::npos)
 		isLine = false;
 	else {
 		isLine = true;

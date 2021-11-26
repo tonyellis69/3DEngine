@@ -38,6 +38,15 @@ struct TModelData {
 	std::vector<TModelData> subModels;
 
 	TMeshExtents extents;
+};
+
+struct TModelMesh {
+	std::string name;
+	glm::mat4 matrix;
+	TMeshRec mesh;
+
+	std::shared_ptr<CBuf2> buf;
+	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; 
 
 };
 

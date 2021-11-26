@@ -36,6 +36,7 @@ void CLineBuffer::clear() {
 	insertAtTop = false;
 	mousedHotText = -1;
 	prevMousedHotText = -1;
+	pageDirty = true;
 }
 
 

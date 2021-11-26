@@ -12,6 +12,7 @@ void CRichText::addText(std::string text) {
 		appendStyle(nextStyle);
 		text = remainingText;
 	}
+
 }
 
 /** Set the read head to this position in the text. */
@@ -85,6 +86,7 @@ std::tuple<std::string, TextStyle> CRichText::getNextStyle(const std::string& te
 void CRichText::appendText(const std::string& text) {
 	textObjs[writeHead.blockNo].text += text;
 	writeHead.charNo += text.length();
+	textEmpty = false;
 }
 
 /** Start a new style block at the current write point. */
@@ -108,6 +110,8 @@ void CRichText::initialise() {
 	CStyleBlock starterObj;
 	starterObj.style.fontName = "smallSysFont";
 	textObjs.push_back(starterObj);
+	readHead = { 0,0 };
+	writeHead = { 0,0 };
 }
 
 /** Return start of previous paragraph*/
@@ -145,6 +149,7 @@ void CRichText::setWriteColour(glm::vec4& colour) {
 /** Remove all text and reset, ready for more. */
 void CRichText::clear() {
 	textObjs.clear();
+	textEmpty = true;
 	initialise();
 }
 

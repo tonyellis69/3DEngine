@@ -61,6 +61,7 @@ private:
 
 
 
+
 public: //temp! for debugging
 	std::vector<CStyleBlock> textObjs;
 	//std::vector<std::string> fontNames;
@@ -71,6 +72,8 @@ public: //temp! for debugging
 	bool endOfTextFlag = false; ///<read to end of text flag
 	bool startOfTextFlag = false;
 	bool styleChangeFlag = false;
+
+	bool textEmpty = true;
 };
 
 

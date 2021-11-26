@@ -55,7 +55,7 @@ void CGUIrichText::DrawSelf() {
 //TO DO: ugh, this is a sign of deep problems. FIXME
 bool CGUIrichText::isEmpty() {
 	//return textObjs.empty() || (textObjs.size() == 1 && textObjs[0].text =="");
-	return true;
+	return bodyText.textEmpty;
 }
 
 
@@ -183,6 +183,7 @@ void CGUIrichText::clear() {
 	//firstVisibleObject = 0;
 	//selectedHotObj = -1;
 	bodyText.clear();
+	lineBuffer2.clear();
 	createPage();
 }
 

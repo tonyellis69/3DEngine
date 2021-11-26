@@ -110,7 +110,7 @@
     <ClCompile Include="..\src\hex\hexArray.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
     <ClCompile Include="..\src\intersect.cpp" />
-    <ClCompile Include="..\src\lineModel.cpp" />
+    <ClCompile Include="..\src\model.cpp" />
     <ClCompile Include="..\src\messaging\messenger.cpp" />
     <ClCompile Include="..\src\messaging\msg2.cpp" />
     <ClCompile Include="..\src\physics2\contact.cpp" />
@@ -215,8 +215,8 @@
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\src\intersect.h" />
-    <ClInclude Include="..\src\lineModel.h" />
     <ClInclude Include="..\Src\Macros.h" />
+    <ClInclude Include="..\src\model.h" />
     <ClInclude Include="..\src\messaging\events.h" />
     <ClInclude Include="..\src\messaging\messenger.h" />
     <ClInclude Include="..\src\messaging\msg.h" />
