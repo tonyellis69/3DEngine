@@ -32,7 +32,7 @@ void CLineBuffer::clear() {
 	spriteBuffer.clear();
 	textSprites.clear();
 	hotTexts.clear();
-	hotTextSprites.clear();
+	//hotTextSprites.clear();
 	insertAtTop = false;
 	mousedHotText = -1;
 	prevMousedHotText = -1;
@@ -67,7 +67,7 @@ void CLineBuffer::renderSprites(float dT) {
 
 	updateHotTextPeriods(dT);
 
-	renderer.rendertToTextureClear(pageBuf, glm::vec4(0,1, 1, 0));
+	renderer.rendertToTextureClear(pageBuf, glm::vec4(1,0, 0, 0));
 	renderer.setShader(textSpriteShader.shader);
 	renderer.attachTexture(0, spriteBuffer.getBuffer().handle);
 	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
@@ -84,6 +84,10 @@ void CLineBuffer::renderSprites(float dT) {
 int CLineBuffer::scrollDown3(int scrollAmount) {
 	int overlap = getOverlap();
 	int scrollAchieved = std::min(scrollAmount, overlap);
+	if (scrollAchieved == 0) {
+		return scrollAchieved;
+	}
+
 	for (auto& sprite = textSprites.begin(); sprite != textSprites.end();) {
 		(*sprite)->adjustYPos(-scrollAchieved);
 		//if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
@@ -160,17 +164,32 @@ void CLineBuffer::setaddFragmentsAtTop(bool onOff) {
 
 void CLineBuffer::onMouseMove(glm::i32vec2& mousePos) {
 	mousedHotText = -1;
-	for (auto hotTextSprite : hotTextSprites) {
-		CHotTextSprite* sprite = hotTextSprite.sprite;
-		if (all(greaterThan(mousePos, sprite->positionOnPage))
-			&& all(lessThan(mousePos, sprite->positionOnPage + sprite->size))) {		
-			mousedHotText = hotTextSprite.hotId;
-			break;
+	//for (auto hotTextSprite : hotTextSprites) {
+	//	CHotTextSprite* sprite = hotTextSprite.sprite;
+	//	if (all(greaterThan(mousePos, sprite->positionOnPage))
+	//		&& all(lessThan(mousePos, sprite->positionOnPage + sprite->size))) {		
+	//		mousedHotText = hotTextSprite.hotId;
+	//		break;
+	//	}
+	//}
+	for (auto& sprite : textSprites) {
+		if (sprite->isHotText) {
+			CHotTextSprite* hotSprite = (CHotTextSprite*)sprite.get();
+			hotSprite->highlighted = false;
+			//check for collision
+
+
+
+
 		}
 	}
 	
 	if (mousedHotText != prevMousedHotText)
 		onMousedHotTextChange();
+
+
+
+
 }
 
 /** Return body text position for the start of the page. */
@@ -209,7 +228,10 @@ void CLineBuffer::initShader() {
 
 CTextSprite* CLineBuffer::createSprite(TFragment2& fragment) {
 	CTextSprite* sprite;
-	sprite = new CTextSprite();
+	if (fragment.style.hotText != "")
+		sprite = new CHotTextSprite();
+	else
+		sprite = new CTextSprite();
 	sprite->setCallbackObj(this);
 
 	CFont* font = fnt::get(fragment.style.fontName.data());
@@ -293,21 +315,21 @@ float CLineBuffer::randomPeriod(float start) {
 	return period(randEngine);
 }
 
-/** Free whatever memory this hot text sprite is using. */
-void CLineBuffer::freeHotTextSprite(CHotTextSprite* sprite) {
-//	freeSpriteImageSpace(sprite->bufId); //dealt with by base destructor!
-
-	freeSpriteImageSpace(sprite->bufId2);
-
-	for (auto hotRec = hotTextSprites.begin(); hotRec != hotTextSprites.end(); ) {
-		if (hotRec->sprite == sprite) {
-			hotTextSprites.erase(hotRec);
-			break;
-		}
-		else
-			hotRec++;
-	}
-}
+///** Free whatever memory this hot text sprite is using. */
+//void CLineBuffer::freeHotTextSprite(CHotTextSprite* sprite) {
+////	freeSpriteImageSpace(sprite->bufId); //dealt with by base destructor!
+//
+//	freeSpriteImageSpace(sprite->bufId2);
+//
+//	for (auto hotRec = hotTextSprites.begin(); hotRec != hotTextSprites.end(); ) {
+//		if (hotRec->sprite == sprite) {
+//			hotTextSprites.erase(hotRec);
+//			break;
+//		}
+//		else
+//			hotRec++;
+//	}
+//}
 
 void CLineBuffer::onMousedHotTextChange() {
 	if (prevMousedHotText != -1) {

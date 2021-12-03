@@ -11,7 +11,7 @@
 #include "richText.h"
 
 struct THotRec {
-	CHotTextSprite* sprite;
+	//CHotTextSprite* sprite;
 	unsigned int hotId;
 };
 
@@ -60,7 +60,7 @@ private:
 	void updateHotTextPeriods(float dT);
 	float getHotPeriod(unsigned int hotId);
 	float randomPeriod(float start);
-	void freeHotTextSprite(CHotTextSprite* sprite);
+//	void freeHotTextSprite(CHotTextSprite* sprite);
 	void onMousedHotTextChange();
 
 	glm::i32vec2 calcPageTextEnd();
@@ -84,7 +84,7 @@ private:
 	bool insertAtTop; ///<Set true to add new sprites above the current ones, instead of below.
 
 	std::map<unsigned int, THotState> hotTexts; ///<The hotIds and periods of all displayed hot texts
-	std::vector<THotRec> hotTextSprites; ///<Pointers to and hot ids of all hot text sprites
+//	std::vector<THotRec> hotTextSprites; ///<Pointers to and hot ids of all hot text sprites
 
 	std::mt19937 randEngine;
 

@@ -42,11 +42,18 @@ CModel CImporter::getModel() {
 	auto buf = std::make_shared<CBuf2>();
 	singleMesh.exportToBuffer(*buf);
 
+	//Sort by tag if present, to get the correct drawing order.
+	std::sort(begin(modelMeshes), end(modelMeshes), []( auto const& A, auto const& B ) {	
+		return A.name.substr(A.name.length() -3) < B.name.substr(B.name.length() - 3); 
+	});
+
 	for (auto& mesh : modelMeshes) {
 		model.meshes.push_back(mesh);
 		model.meshes.back().buf = buf;
 	}
 	
+
+
 	model.extents = rootNode.extents; //temp!
 	return model;
 }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <string_view>
+#include <stack>
 
 #include "glm/glm.hpp"
 
@@ -11,6 +12,7 @@ struct TextStyle {
 	std::string fontName;
 	glm::vec4 colour = { 1,1,1,1 };
 	bool bold = false;
+	std::string hotText;
 	//more to follow
 };
 
@@ -59,6 +61,7 @@ private:
 	TextStyle getStyleAt(CRWhead& head);
 	void initialise();
 
+	std::stack< TextStyle> styleStack;
 
 
 

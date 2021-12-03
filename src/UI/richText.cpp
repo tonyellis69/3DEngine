@@ -78,6 +78,22 @@ std::tuple<std::string, TextStyle> CRichText::getNextStyle(const std::string& te
 		nextStyle.bold = !nextStyle.bold;
 		remainingText = text.substr(2);
 	}
+	else if (text[1] == 'h') {
+		if (!nextStyle.hotText.empty()) {
+			nextStyle = styleStack.top();
+			styleStack.pop();
+			remainingText = text.substr(2);
+		}
+		else {
+			styleStack.push(nextStyle);
+			auto start = text.find("{");
+			auto end = text.find("}");
+			nextStyle.hotText = text.substr(start+1, end - start -1);
+			nextStyle.colour = { 1,1,0,1 }; //TO DO: temp! create official style
+			remainingText = text.substr(end+1);
+		}
+
+	}
 
 	return { remainingText,nextStyle };
 }
@@ -231,5 +247,6 @@ std::string CRichText::getStringAt(int pos, int length) {
 bool TextStyle::operator == (const TextStyle& style2) const {
 	return (fontName == style2.fontName &&
 		colour == style2.colour &&
-		bold == style2.bold);
+		bold == style2.bold &&
+		hotText == style2.hotText);
 }

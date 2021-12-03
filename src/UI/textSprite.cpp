@@ -20,12 +20,14 @@ CTextSprite::~CTextSprite() {
 	}
 }
 
+
 /** Draw this sprite's text to the given texture. */
 void CTextSprite::createTextImage(CRenderTexture& texture) {
 	if (size.x == 0)
 		return;
 	bufId = callbackObj->reserveSpriteImageSpace(size);
 	renderTextQuads(texture, bufId , textColour);
+
 	freeQuadBuffer();
 }
 
@@ -158,61 +160,65 @@ void CTextSprite::updateMatrix() {
 
 
 //////////////////////////Hot text sprite stuff
+//
+//CHotTextSprite::~CHotTextSprite() {
+//	if (bufId.x != INT_MAX) {
+//		//callbackObj->freeSpriteImageSpace(bufId);
+//		//callbackObj->freeSpriteImageSpace(bufId2);
+//		callbackObj->freeHotTextSprite(this);
+//	}
+//}
+//
+///** Draw the two alternating text images to the given storage texture. */
+//void CHotTextSprite::createTextImage(CRenderTexture& storageTexture) {
+//	if (size.x == 0)
+//		return;
+//
+//	bufId = callbackObj->reserveSpriteImageSpace(size);
+//	renderTextQuads(storageTexture, bufId, textColour);
+//
+//	bufId2 = callbackObj->reserveSpriteImageSpace(size);
+//	renderTextQuads(storageTexture, bufId2, hotTextColour);
+//	freeQuadBuffer();
+//}
+//
+//void CHotTextSprite::setTextColour(glm::vec4& colour) {
+//	textColour = colour;
+//	//hotTextColour = callbackObj->getHotTextColour();
+//}
+//
+//
+//void CHotTextSprite::draw() {
+//	textSpriteShader->shader->setShaderValue(textSpriteShader->hOrthoMatrix, matrix);
+//	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(bufId));
+//	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset2, glm::vec2(bufId2));
+//	textSpriteShader->shader->setShaderValue(textSpriteShader->hSize, glm::vec2(size));
+//
+//	
+//	float alpha;
+//	
+//
+//	//give the shader offsets for both sprite images
+//	
+//	//get period for hotId (getter can multiply it up
+//	//get working as alpha
+//	//then use as mix between two samples
+//
+//	alpha = callbackObj->getHotPeriod(hotId);
+//
+//	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, alpha);
+//
+//	pRenderer->drawTriStripBuf(renderer.screenQuad);
+//}
+//
+//void CHotTextSprite::setHotId(unsigned int hotId)  {
+//	this->hotId = hotId;
+//}
+//
+//unsigned int CHotTextSprite::getHotId() {
+//	return hotId;
+//}
 
-CHotTextSprite::~CHotTextSprite() {
-	if (bufId.x != INT_MAX) {
-		//callbackObj->freeSpriteImageSpace(bufId);
-		//callbackObj->freeSpriteImageSpace(bufId2);
-		callbackObj->freeHotTextSprite(this);
-	}
-}
-
-/** Draw the two alternating text images to the given storage texture. */
-void CHotTextSprite::createTextImage(CRenderTexture& storageTexture) {
-	if (size.x == 0)
-		return;
-
-	bufId = callbackObj->reserveSpriteImageSpace(size);
-	renderTextQuads(storageTexture, bufId, textColour);
-
-	bufId2 = callbackObj->reserveSpriteImageSpace(size);
-	renderTextQuads(storageTexture, bufId2, hotTextColour);
-	freeQuadBuffer();
-}
-
-void CHotTextSprite::setTextColour(glm::vec4& colour) {
-	textColour = colour;
-	//hotTextColour = callbackObj->getHotTextColour();
-}
-
-
-void CHotTextSprite::draw() {
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOrthoMatrix, matrix);
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(bufId));
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset2, glm::vec2(bufId2));
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hSize, glm::vec2(size));
-
-	
-	float alpha;
-	
-
-	//give the shader offsets for both sprite images
-	
-	//get period for hotId (getter can multiply it up
-	//get working as alpha
-	//then use as mix between two samples
-
-	alpha = callbackObj->getHotPeriod(hotId);
-
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, alpha);
-
-	pRenderer->drawTriStripBuf(renderer.screenQuad);
-}
-
-void CHotTextSprite::setHotId(unsigned int hotId)  {
-	this->hotId = hotId;
-}
-
-unsigned int CHotTextSprite::getHotId() {
-	return hotId;
+CHotTextSprite::CHotTextSprite() {
+	isHotText = true;
 }

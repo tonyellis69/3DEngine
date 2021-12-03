@@ -23,7 +23,7 @@ public:
 	void Draw(float dT);
 	void DrawSelf();
 	bool isEmpty();
-	void setFont(const std::string& fontName);
+	void setDefaultFont(const std::string& fontName);
 	void setColour(glm::vec4& colour);
 	void setAutoscrollDown(bool onOff);
 
@@ -55,6 +55,8 @@ public:
 	void onDrag(const  int mouseX, const  int mouseY);
 
 	void setHotTextVM(Ivm* vm);
+
+
 
 
 	int maxResizeHeight;
@@ -99,5 +101,7 @@ private:
 	Ivm* pVM; ///<Interface to virtual machine for hot text calls.
 
 	CRichText bodyText;
+
+	std::string defaultFontName;
 
 };

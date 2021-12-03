@@ -60,7 +60,8 @@ bool CGUIrichText::isEmpty() {
 
 
 /** Set the font to be used by subsequent text we receive. */
-void CGUIrichText::setFont(const std::string& fontName) {
+void CGUIrichText::setDefaultFont(const std::string& fontName) {
+	defaultFontName = fontName;
 	bodyText.setWriteFont(fontName);
 }
 
@@ -183,6 +184,8 @@ void CGUIrichText::clear() {
 	//firstVisibleObject = 0;
 	//selectedHotObj = -1;
 	bodyText.clear();
+	if (!defaultFontName.empty())
+		bodyText.setWriteFont(defaultFontName);
 	lineBuffer2.clear();
 	createPage();
 }
@@ -365,6 +368,7 @@ bool CGUIrichText::writeLineToLineBuffer() {
 			fragCharCount = 0;
 			fragTextStart = bodyText.getReadPos();
 			fragment = { currentStyle,"",currentFont->lineHeight,false };
+			fragment.textStart = fragTextStart; //021221 added to correct lineBuffer.getPageTextEnd(), but keep an eye on
 		}
 
 		totalCharCount++;
@@ -379,6 +383,7 @@ bool CGUIrichText::writeLineToLineBuffer() {
 		c = bodyText.readNextChar();
 		fragCharCount++;
 	}
+
 
 	fragment.text = bodyText.getStringAt(fragTextStart, fragCharCount);
 	return lineBuffer2.addTextSprite(fragment);
@@ -468,7 +473,7 @@ void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
 bool CGUIrichText::scrollDown3(int dist) {
 	int result = lineBuffer2.scrollDown3(dist);
 
-	if (result < dist) {
+	if (result < dist && result > 0) {
 		writeNextLineToLineBuffer();
 		result = lineBuffer2.scrollDown3(result);
 	}

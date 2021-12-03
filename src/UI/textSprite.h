@@ -62,6 +62,8 @@ public:
 	bool causesNewLine;
 	int textStart;
 
+	bool isHotText = false;
+
 protected:
 	CRenderer* pRenderer;
 	CFont* font;
@@ -81,26 +83,36 @@ private:
 
 class CHotTextSprite : public CTextSprite {
 public:
-	 ~CHotTextSprite();
-	void createTextImage(CRenderTexture& texture);
-	void setTextColour(glm::vec4& colour);
-	void draw();
-	void setHotId(unsigned int hotId);
-	unsigned int getHotId();
+	CHotTextSprite();
 
-	glm::vec4 hotTextColour;
-	glm::i32vec2 bufId2;
-private:
-	//CBuf tmpVertBuf2;
-
-	unsigned int hotId;
+	bool highlighted = false;
 };
 
+
+
+
+//class CHotTextSprite : public CTextSprite {
+//public:
+//	 ~CHotTextSprite();
+//	void createTextImage(CRenderTexture& texture);
+//	void setTextColour(glm::vec4& colour);
+//	void draw();
+//	void setHotId(unsigned int hotId);
+//	unsigned int getHotId();
+//
+//	glm::vec4 hotTextColour;
+//	glm::i32vec2 bufId2;
+//private:
+//	//CBuf tmpVertBuf2;
+//
+//	unsigned int hotId;
+//};
+//
 class ITextSpriteCallback {
 public:
 	virtual glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size) = 0;
 	virtual void freeSpriteImageSpace(glm::i32vec2& bufId) = 0;
-	virtual void freeHotTextSprite(CHotTextSprite* sprite) = 0;
+	//virtual void freeHotTextSprite(CHotTextSprite* sprite) = 0;
 	//virtual glm::vec4 getHotTextColour() = 0;
 	virtual float getHotPeriod(unsigned int hotId) = 0;
 };
