@@ -68,14 +68,24 @@ void CLineBuffer::renderSprites(float dT) {
 	updateHotTextPeriods(dT);
 
 	renderer.rendertToTextureClear(pageBuf, glm::vec4(1,0, 0, 0));
-	renderer.setShader(textSpriteShader.shader);
+	/*renderer.setShader(textSpriteShader.shader);
 	renderer.attachTexture(0, spriteBuffer.getBuffer().handle);
 	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
 
 	renderer.beginRenderToTexture(pageBuf);
 	for (auto &sprite : textSprites) {
 		sprite->draw();
+	}*/
+	
+	
+	renderer.setShader(renderer.textShader);
+	renderer.beginRenderToTexture(pageBuf);
+	for (auto& sprite : textSprites) {
+		sprite->draw2();
 	}
+
+	
+	
 	renderer.endRenderToTexture();
 	pageDirty = false;
 }

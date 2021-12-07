@@ -28,7 +28,7 @@ void CTextSprite::createTextImage(CRenderTexture& texture) {
 	bufId = callbackObj->reserveSpriteImageSpace(size);
 	renderTextQuads(texture, bufId , textColour);
 
-	freeQuadBuffer();
+	//freeQuadBuffer(); //06122021
 }
 
 /** Store data about where this sprite's text is found in its textObj. */
@@ -53,9 +53,6 @@ void CTextSprite::setTextColour(glm::vec4& colour) {
 
 /** Create the temporary polygons required to render this text. */
 void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
-
-
-	//std::vector<vBuf::T2DtexVert> textQuads;
 	std::vector<vBuf::T2DtexVert> textQuads;
 	std::vector<unsigned int> textQuadsIndex;
 	int v = 0;
@@ -82,12 +79,7 @@ void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
 		}
 	}
 
-
-	//tmpQuadBuf.storeVertexes(textQuads.data(), sizeof(vBuf::T2DtexVert) * textQuads.size(), textQuads.size());
-	//tmpQuadBuf.storeIndex(textQuadsIndex.data(), textQuadsIndex.size());
-	//tmpQuadBuf.storeLayout(2, 2, 0, 0);
 	tmpQuadBuf.storeVerts(textQuads, textQuadsIndex, 2, 2);
-
 
 	this->font = font;
 	size = glm::i32vec2(blCorner.x, font->lineHeight);
@@ -136,6 +128,15 @@ void CTextSprite::draw() {
 	pRenderer->drawTriStripBuf(renderer.screenQuad);
 }
 
+void CTextSprite::draw2() {
+	pRenderer->attachTexture(0, font->texture); //attach texture to textureUnit (0)
+	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
+	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
+	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, matrix2);
+	pRenderer->drawTrisBuf(tmpQuadBuf, 0, tmpQuadBuf.numElements);
+
+}
+
 /** Modify the vertical position of this sprite on the page by the given amount. */
 bool CTextSprite::adjustYPos(int change) {
 	positionOnPage.y += change;
@@ -156,6 +157,11 @@ void CTextSprite::updateMatrix() {
 	matrix = glm::translate(glm::mat4(1), spriteTranslation);
 	matrix = glm::scale(matrix, spriteOriginDist);
 	matrix = *pageOrthoViewMatrix * matrix;
+
+
+
+	matrix2 = glm::translate(glm::mat4(1), glm::vec3(positionOnPage, 0));
+	matrix2 = *pageOrthoViewMatrix * matrix2;
 }
 
 

@@ -41,6 +41,7 @@ public:
 	void setPageOthoMatrix(glm::mat4* pageOrthoViewMatrix);
 	void setShader(TTextSpriteShader* shader);
 	virtual void draw();
+	virtual void draw2();
 	bool adjustYPos(int change);
 	void freeQuadBuffer();
 	virtual void setHotId(unsigned int hotId) {}
@@ -69,6 +70,7 @@ protected:
 	CFont* font;
 	TTextSpriteShader* textSpriteShader;
 	glm::mat4 matrix;
+	glm::mat4 matrix2;
 	CRenderTexture* pageTexture;
 
 	ITextSpriteCallback* callbackObj;
