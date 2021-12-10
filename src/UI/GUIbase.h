@@ -101,21 +101,6 @@ class CGUIbase;
 class CDrawFuncs {
 public:
 
-	//DelegatePP<void,const UIcolour&,const UIcolour&> setDrawColours;
-	//DelegatePPP<void,int,int,int> drawIcon;
-	//DelegatePP<void,CGUIbase&, CMessage&> handleUImsg;
-	//DelegatePPP<void,UIcoord&,int,int> drawRect;
-	//DelegatePPPP<void,int,int,int,int> drawBorder;
-	//DelegateP<void,UIrect&> setClip;
-//	DelegatePPPP<void,int,int,int,int> drawLine;
-//	DelegateP<void,int> setIconset;
-//	DelegatePP<void,int,UIrect&> drawTile;
-//	DelegatePP<void,int,UIrect&> drawImage;
-	//DelegateP<void,bool> mouseCaptured;
-//	DelegateP<void,int> setCursor;
-//	DelegatePPP<void, UIcolour, UIcolour, bool> setDrawColoursConditional;
-//	DelegatePPPP<void,int,int,int,int> drawDottedRect;
-//	DelegatePP<void,float,float> setScale;
 
 	//virtual void registerControl(CGUIbase& control) {};
 	virtual void deregisterControl(CGUIbase & control) {};
@@ -124,11 +109,6 @@ public:
 	virtual unsigned int getTextureHandle(const std::string & textureName) { return 0; };
 	//virtual void drawTexture(guiRect& drawBox, CBaseTexture& texture) {};
 	virtual void updateScreenDimensions(CGUIbase& control) {};
-//	virtual void drawCursor(CGUIbase& control, CBuf& cursorPos) {};
-	//virtual CFont* getFont(std::string name) { return NULL; };
-	//virtual void drawTextureGradient(guiRect & drawBox, CBaseTexture& texture) {};
-	//virtual void drawRect2(guiRect& drawBox,const glm::vec4& colour1, const glm::vec4&  colour2) {};
-	//virtual void drawBorder2(guiRect& drawBox, const glm::vec4& colour) {};
 	virtual void drawCursor2(guiRect & drawBox) {};
 
 };
@@ -267,6 +247,8 @@ public:
 	}
 
 	bool isMouseOver();
+	glm::i32vec2 getLocalMousePos();
+
 
 
 	static	CMessage Message; ///<Any UI messages are returned here.

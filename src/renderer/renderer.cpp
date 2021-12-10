@@ -549,7 +549,7 @@ void CRenderer::beginRenderToTexture(CBaseTexture& texture) {
 
 	glGenFramebuffers(1, &hFrameBuffer);
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, hFrameBuffer); //NB: bulk of overhead is here
 	
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, glTex->handle, 0);
 
@@ -578,7 +578,7 @@ void CRenderer::rendertToTextureClear(CBaseTexture& texture,glm::vec4& colour) {
 	rgba clr = { colour.r,colour.g, colour.b, colour.a };
 	setBackColour((rgba&)colour);
 	glClear(GL_COLOR_BUFFER_BIT);
-	endRenderToTexture();
+//	endRenderToTexture();
 	setBackColour(clearColour);
 }
 

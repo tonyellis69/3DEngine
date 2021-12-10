@@ -8,27 +8,7 @@
 #include "glm\gtc\matrix_transform.hpp"
 
 CTextSprite::CTextSprite() {
-	pRenderer = &renderer; // &CRenderer::getInstance();
-	bufId = { INT_MAX,INT_MAX };
 	causesNewLine = false;
-}
-
-CTextSprite::~CTextSprite() {
-	if (bufId.x != INT_MAX) {
-		callbackObj->freeSpriteImageSpace(bufId);
-		//callbackObj->freeHotTextSprite(this);
-	}
-}
-
-
-/** Draw this sprite's text to the given texture. */
-void CTextSprite::createTextImage(CRenderTexture& texture) {
-	if (size.x == 0)
-		return;
-	bufId = callbackObj->reserveSpriteImageSpace(size);
-	renderTextQuads(texture, bufId , textColour);
-
-	//freeQuadBuffer(); //06122021
 }
 
 /** Store data about where this sprite's text is found in its textObj. */
@@ -85,56 +65,17 @@ void CTextSprite::makeTextQuads( const std::string& text, CFont* font) {
 	size = glm::i32vec2(blCorner.x, font->lineHeight);
 }
 
-/** Render our temporary text quads to a texture for storage. */
-void CTextSprite::renderTextQuads(CRenderTexture& storageTexture, glm::i32vec2& storageId, glm::vec4& colour) {
-	glm::mat4 storageLocation = glm::translate(glm::mat4(1), glm::vec3( storageId, 0));
-	glm::mat4 storageMatrix = glm::ortho<float>(0, (float)storageTexture.width, 0, storageTexture.height)
-		* storageLocation;
-
-	pRenderer->setShader(pRenderer->textShader);
-	pRenderer->attachTexture(0, font->texture); //attach texture to textureUnit (0)
-	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, colour);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, storageMatrix);
-	pRenderer->renderToTextureTris(tmpQuadBuf, storageTexture);
-}
-
-/** The texture representing the finished page. */
-void CTextSprite::setPageTexture(CRenderTexture* pageTexture) {
-	this->pageTexture = pageTexture;
-}
-
 /** Use the given orthographic matrix when drawing this sprite's cached text image to the page. */
 void CTextSprite::setPageOthoMatrix(glm::mat4* pageOrthoViewMatrix) {
 	this->pageOrthoViewMatrix = pageOrthoViewMatrix;
 }
 
-/** Use the given shader to draw this sprite's cached text image to the page. */
-void CTextSprite::setShader(TTextSpriteShader* shader) {
-	this->textSpriteShader = shader;
-}
-
-/** Draw this sprite's cached text image to the page texture.*/
 void CTextSprite::draw() {
-	if (bufId.y == INT_MAX)
-		return; //TO DO: do this more elegantly with a virtual func?
-
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOrthoMatrix, matrix);
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hOffset, glm::vec2(bufId));
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hSize, glm::vec2(size));
-
-	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, 0.0f);
-
-	pRenderer->drawTriStripBuf(renderer.screenQuad);
-}
-
-void CTextSprite::draw2() {
-	pRenderer->attachTexture(0, font->texture); //attach texture to textureUnit (0)
-	pRenderer->texShader->setTextureUnit(pRenderer->hTextTexture, 0);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextColour, textColour);
-	pRenderer->texShader->setShaderValue(pRenderer->hTextOrthoMatrix, matrix2);
-	pRenderer->drawTrisBuf(tmpQuadBuf, 0, tmpQuadBuf.numElements);
-
+	renderer.attachTexture(0, font->texture); //attach texture to textureUnit (0)
+	renderer.texShader->setTextureUnit(renderer.hTextTexture, 0);
+	renderer.texShader->setShaderValue(renderer.hTextColour, textColour);
+	renderer.texShader->setShaderValue(renderer.hTextOrthoMatrix, matrix2);
+	renderer.drawTrisBuf(tmpQuadBuf, 0, tmpQuadBuf.numElements);
 }
 
 /** Modify the vertical position of this sprite on the page by the given amount. */
@@ -144,22 +85,9 @@ bool CTextSprite::adjustYPos(int change) {
 	return true;
 }
 
-/** Once we've cached this sprite's text image, we don't need the quads that created it. */
-void CTextSprite::freeQuadBuffer() {
-	tmpQuadBuf.freeMem();
-}
 
 /** Recalculate the matrix that defines this sprite's size and position in page space. */
 void CTextSprite::updateMatrix() {
-	glm::vec3 spriteOriginDist = glm::vec3(size, 0) * 0.5f;
-	glm::vec3 spriteTranslation = spriteOriginDist + glm::vec3(positionOnPage, 0);
-
-	matrix = glm::translate(glm::mat4(1), spriteTranslation);
-	matrix = glm::scale(matrix, spriteOriginDist);
-	matrix = *pageOrthoViewMatrix * matrix;
-
-
-
 	matrix2 = glm::translate(glm::mat4(1), glm::vec3(positionOnPage, 0));
 	matrix2 = *pageOrthoViewMatrix * matrix2;
 }
@@ -214,7 +142,7 @@ void CTextSprite::updateMatrix() {
 //
 //	textSpriteShader->shader->setShaderValue(textSpriteShader->hAlpha, alpha);
 //
-//	pRenderer->drawTriStripBuf(renderer.screenQuad);
+//	renderer.drawTriStripBuf(renderer.screenQuad);
 //}
 //
 //void CHotTextSprite::setHotId(unsigned int hotId)  {
@@ -225,6 +153,19 @@ void CTextSprite::updateMatrix() {
 //	return hotId;
 //}
 
-CHotTextSprite::CHotTextSprite() {
+CHotTextSprite::CHotTextSprite(const std::string& msg) {
 	isHotText = true;
+	this->msg = msg;
+}
+
+void CHotTextSprite::draw() {
+	if (highlighted) {
+		renderer.attachTexture(0, font->texture);
+		renderer.texShader->setTextureUnit(renderer.hTextTexture, 0);
+		renderer.texShader->setShaderValue(renderer.hTextColour, glm::vec4(1, 1, 0.3, 1)); //temp!!!
+		renderer.texShader->setShaderValue(renderer.hTextOrthoMatrix, matrix2);
+		renderer.drawTrisBuf(tmpQuadBuf, 0, tmpQuadBuf.numElements);
+	}
+	else
+		CTextSprite::draw();
 }

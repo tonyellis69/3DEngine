@@ -828,6 +828,11 @@ bool CGUIbase::isMouseOver(){
 	return true;
 }
 
+glm::i32vec2 CGUIbase::getLocalMousePos()
+{
+	return mousePos - drawBox.pos;
+}
+
 
 /** Return a pointer to the child control of this control with the given id number. */
 CGUIbase* CGUIbase::getChild(int childID) {
@@ -963,7 +968,7 @@ void CGUIbase::defaultMouseMoveResponse(int mouseX, int mouseY, int key)
 	bool mouseOffSuccess = true;
 	if (MouseOver != this) { //mouse has just entered this control 
 		MouseDown = NULL;	//so remove any mousedown effect the previous control was showing
-		if (MouseOver)
+		if (MouseOver )
 			mouseOffSuccess = MouseOver->onMouseOff(mouseX, mouseY, key);
 	}
 	if (mouseOffSuccess)

@@ -89,7 +89,7 @@ std::tuple<std::string, TextStyle> CRichText::getNextStyle(const std::string& te
 			auto start = text.find("{");
 			auto end = text.find("}");
 			nextStyle.hotText = text.substr(start+1, end - start -1);
-			nextStyle.colour = { 1,1,0,1 }; //TO DO: temp! create official style
+			nextStyle.colour = { 0.9,0.9,0,1 }; //TO DO: temp! create official style
 			remainingText = text.substr(end+1);
 		}
 

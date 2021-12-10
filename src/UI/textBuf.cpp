@@ -35,6 +35,7 @@ void CTextBuffer::clearBuffer() {
 	
 	//	return;
 	renderer.rendertToTextureClear(textTexture, glm::vec4(0, 0, 0, 0));
+	renderer.endRenderToTexture(); 
 }
 
 

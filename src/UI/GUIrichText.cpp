@@ -126,13 +126,9 @@ bool CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 
 /** Check for losing mouse while hot text selected. */
 bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
-	//if (currentHotText == -1) //no hot text selected, so mousing off doesn't matter
-	//	return true;
-	//clearSelection();
-	//CMessage msg = { uiMsgHotTextChange };
-	//msg.value = -1;
-	//parent->message(this, msg);
-
+	lineBuffer2.onMouseOff();
+	if (hotTextMouseoverHandler)
+		hotTextMouseoverHandler("mouseOff");
 	return true;
 }
 
@@ -292,10 +288,6 @@ void CGUIrichText::setResizeMode(TResizeMode mode) {
 	longestLine = 0;
 }
 
-/** Assign the virtual machine to send hot text calls to. */
-void CGUIrichText::setHotTextVM(Ivm* vm) {
-	pVM = vm;
-}
 
 
 /**	Set everything up for the first text to be appended.*/
@@ -465,7 +457,11 @@ int CGUIrichText::findLastBreakableChar() {
 
 void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
-	lineBuffer2.onMouseMove(localMouse);
+	std::string msg = lineBuffer2.onMouseMove(localMouse);
+	if (!msg.empty()) {
+		if (hotTextMouseoverHandler)
+			hotTextMouseoverHandler(msg);
+	}
 }
 
 
@@ -530,6 +526,7 @@ void CGUIrichText::onDrag(const int mouseX, const int mouseY) {
 	msg.y = mouseY;
 	parent->message(this, msg);
 }
+
 
 
 

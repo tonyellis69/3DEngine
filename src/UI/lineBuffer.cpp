@@ -8,7 +8,6 @@
 
 
 CLineBuffer::CLineBuffer() {
-	initShader();
 }
 
 
@@ -22,27 +21,22 @@ void CLineBuffer::setPageSize(int width, int height) {
 	this->width = width;
 	this->height = height;
 	clear();
-	spriteBuffer.setSize(this->width, this->height ); 
 	pageBuf.resize(width, height);
 	pageOrthoView = glm::ortho<float>(0, (float)width , 0, (float)height ); //moves origin to top left
 }
 
 /** Clear the page of any existing text and reset it. */
 void CLineBuffer::clear() {
-	spriteBuffer.clear();
 	textSprites.clear();
 	hotTexts.clear();
 	//hotTextSprites.clear();
 	insertAtTop = false;
-	mousedHotText = -1;
-	prevMousedHotText = -1;
 	pageDirty = true;
 }
 
 
 bool CLineBuffer::addTextSprite(TFragment2& fragment) {
 	std::unique_ptr<CTextSprite> sprite(createSprite(fragment));
-	sprite->createTextImage(spriteBuffer.getBuffer());
 	bool overrun = false;
 	if (sprite->positionOnPage.y + sprite->size.y > height)
 		overrun = true;
@@ -62,31 +56,28 @@ void CLineBuffer::draw() {
 
 /** Draw all the text sprites to an internal buffer representing the page. */
 void CLineBuffer::renderSprites(float dT) {
-	if (!pageDirty)
-		return;
 
-	updateHotTextPeriods(dT);
+	if (pageDirty) {
+		updateHotTextPeriods(dT);
+		renderer.rendertToTextureClear(pageBuf, glm::vec4(1, 0, 0, 0)); //600
+		renderer.setShader(renderer.textShader);
 
-	renderer.rendertToTextureClear(pageBuf, glm::vec4(1,0, 0, 0));
-	/*renderer.setShader(textSpriteShader.shader);
-	renderer.attachTexture(0, spriteBuffer.getBuffer().handle);
-	textSpriteShader.shader->setTextureUnit(textSpriteShader.hTextureUnit, 0);
 
-	renderer.beginRenderToTexture(pageBuf);
-	for (auto &sprite : textSprites) {
-		sprite->draw();
-	}*/
-	
-	
-	renderer.setShader(renderer.textShader);
-	renderer.beginRenderToTexture(pageBuf);
-	for (auto& sprite : textSprites) {
-		sprite->draw2();
+		for (auto& sprite : textSprites) {
+			sprite->draw();
+		}
+		renderer.endRenderToTexture();
+
+	}
+	else {
+
+
+
+
 	}
 
-	
-	
-	renderer.endRenderToTexture();
+
+
 	pageDirty = false;
 }
 
@@ -100,10 +91,10 @@ int CLineBuffer::scrollDown3(int scrollAmount) {
 
 	for (auto& sprite = textSprites.begin(); sprite != textSprites.end();) {
 		(*sprite)->adjustYPos(-scrollAchieved);
-		//if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
-		//	sprite = textSprites.erase(sprite);
-		//}
-		//else
+		if ((*sprite)->positionOnPage.y + (*sprite)->size.y < 0) {
+			sprite = textSprites.erase(sprite);
+		}
+		else
 			sprite++;
 	}
 	pageDirty = true;
@@ -172,33 +163,41 @@ void CLineBuffer::setaddFragmentsAtTop(bool onOff) {
 }
 
 
-void CLineBuffer::onMouseMove(glm::i32vec2& mousePos) {
-	mousedHotText = -1;
-	//for (auto hotTextSprite : hotTextSprites) {
-	//	CHotTextSprite* sprite = hotTextSprite.sprite;
-	//	if (all(greaterThan(mousePos, sprite->positionOnPage))
-	//		&& all(lessThan(mousePos, sprite->positionOnPage + sprite->size))) {		
-	//		mousedHotText = hotTextSprite.hotId;
-	//		break;
-	//	}
-	//}
+std::string CLineBuffer::onMouseMove(glm::i32vec2& mousePos) {
+	std::string msg = "mouseOff";
+
 	for (auto& sprite : textSprites) {
 		if (sprite->isHotText) {
 			CHotTextSprite* hotSprite = (CHotTextSprite*)sprite.get();
-			hotSprite->highlighted = false;
+		
+
 			//check for collision
-
-
-
-
+			if (all(greaterThan(mousePos, hotSprite->positionOnPage))
+			&& all(lessThan(mousePos, sprite->positionOnPage + sprite->size))) {		
+				hotSprite->highlighted = true;
+				pageDirty = true;
+				msg = hotSprite->msg;
+			}
+			else if (hotSprite->highlighted) {
+				hotSprite->highlighted = false;
+				pageDirty = true;
+			}
 		}
 	}
 	
-	if (mousedHotText != prevMousedHotText)
-		onMousedHotTextChange();
+	return msg;
+}
 
-
-
+void CLineBuffer::onMouseOff() {
+	for (auto& sprite : textSprites) {
+		if (sprite->isHotText) {
+			CHotTextSprite* hotSprite = (CHotTextSprite*)sprite.get();
+			if (hotSprite->highlighted) {
+				hotSprite->highlighted = false;
+				pageDirty = true;
+			}
+		}
+	}
 
 }
 
@@ -225,21 +224,11 @@ int CLineBuffer::getPageTextEnd() {
 
 ///////Private functions
 
-void CLineBuffer::initShader() {
-	textSpriteShader.shader = renderer.textSpriteShader;
-	textSpriteShader.hOrthoMatrix = textSpriteShader.shader->getUniformHandle("orthoMatrix");
-	textSpriteShader.hTextureUnit = textSpriteShader.shader->getUniformHandle("textureUnit");
-	textSpriteShader.hOffset = textSpriteShader.shader->getUniformHandle("blockOffset");
-	textSpriteShader.hOffset2 = textSpriteShader.shader->getUniformHandle("blockOffset2");
-	textSpriteShader.hSize = textSpriteShader.shader->getUniformHandle("blockSize");
-	textSpriteShader.hAlpha = textSpriteShader.shader->getUniformHandle("alpha");
-}
-
 
 CTextSprite* CLineBuffer::createSprite(TFragment2& fragment) {
 	CTextSprite* sprite;
 	if (fragment.style.hotText != "")
-		sprite = new CHotTextSprite();
+		sprite = new CHotTextSprite(fragment.style.hotText);
 	else
 		sprite = new CTextSprite();
 	sprite->setCallbackObj(this);
@@ -260,21 +249,10 @@ CTextSprite* CLineBuffer::createSprite(TFragment2& fragment) {
 
 	sprite->setTextColour(fragment.style.colour);
 
-	sprite->setPageTexture(&pageBuf);
-	sprite->setShader(&textSpriteShader);
-
 	sprite->causesNewLine = fragment.causesNewline;
 	sprite->textStart = fragment.textStart;
 	sprite->textLength = fragment.text.size();
 	return sprite;
-}
-
-glm::i32vec2 CLineBuffer::reserveSpriteImageSpace(glm::i32vec2& size) {
-	return spriteBuffer.reserve(size);
-}
-
-void CLineBuffer::freeSpriteImageSpace(glm::i32vec2& bufId) {
-	spriteBuffer.free(bufId);
 }
 
 
@@ -341,16 +319,7 @@ float CLineBuffer::randomPeriod(float start) {
 //	}
 //}
 
-void CLineBuffer::onMousedHotTextChange() {
-	if (prevMousedHotText != -1) {
-		hotTexts[prevMousedHotText].selectionState = selWarmdown;
-	}
 
-	prevMousedHotText = mousedHotText;
-	hotTexts[mousedHotText] = { 0,selWarmup };
-
-	//pCallbackObj->hotTextMouseOver(mousedHotText);
-}
 
 /** Return the pixel position where text on this page ends. */
 glm::i32vec2 CLineBuffer::calcPageTextEnd() {

@@ -41,22 +41,19 @@ public:
 	CRenderTexture* getTextBuf();
 
 	void setaddFragmentsAtTop(bool onOff);
-	void onMouseMove(glm::i32vec2& mousePos);
+	std::string onMouseMove(glm::i32vec2& mousePos);
+	void onMouseOff();
 	bool doesPageEndWithNewline() {
 		return pageEndNewline;
 	}
 	int getPageTextStart();
 	int getPageTextEnd();
 
-	C2DimageBuf spriteBuffer; ///<Provides storage for text sprite image buffers.
 
 
 
 private:
-	void initShader();
 	CTextSprite* createSprite(TFragment2& fragment);
-	glm::i32vec2 reserveSpriteImageSpace(glm::i32vec2& size);
-	void freeSpriteImageSpace(glm::i32vec2& bufId);
 	void updateHotTextPeriods(float dT);
 	float getHotPeriod(unsigned int hotId);
 	float randomPeriod(float start);
@@ -75,7 +72,6 @@ private:
 
 	std::vector< std::unique_ptr<CTextSprite> > textSprites;
 
-	TTextSpriteShader textSpriteShader;
 	glm::mat4 pageOrthoView;
 
 	//TPagePos pageStart; ///<Identifies where in the textObjs this page starts.
@@ -88,8 +84,7 @@ private:
 
 	std::mt19937 randEngine;
 
-	int mousedHotText;
-	int prevMousedHotText;
+
 
 	bool pageEndNewline; ///<Records if page ends by forcing a newline.
 

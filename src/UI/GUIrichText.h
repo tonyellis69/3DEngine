@@ -54,10 +54,15 @@ public:
 
 	void onDrag(const  int mouseX, const  int mouseY);
 
-	void setHotTextVM(Ivm* vm);
+	void setHotTextMouseoverHandler(std::function<void(const std::string&)> handler) {
+		hotTextMouseoverHandler = handler;
+	}
+	void setHotTextClickHandler(std::function<void(const std::string&)> handler) {
+		hotTextClickHandler = handler;
+	}
 
-
-
+	std::function<void(const std::string&)> hotTextMouseoverHandler;
+	std::function<void(const std::string&)> hotTextClickHandler;
 
 	int maxResizeHeight;
 	int longestLine;
@@ -90,9 +95,9 @@ private:
 	bool scrollDown3(int dist);
 	bool scrollUp3(int dist);
 
-	//void hotTextMouseOver(int hotId);
-
 	void update(float dT);
+
+
 	
 	bool autoscrollingDown; ///<If true, we scroll down if there's any text below.
 
