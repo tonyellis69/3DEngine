@@ -36,6 +36,8 @@ public:
 
 	bool onRMouseUp(const int mouseX, const int mouseY);
 
+	bool OnClick(const  int mouseX, const  int mouseY);
+
 	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);

@@ -517,6 +517,11 @@ void CGUIbase::setLocalPos(int x, int y) {
 	needsUpdate = true;
 }
 
+void CGUIbase::setLocalPos(glm::i32vec2& pos) {
+	localPos = pos;
+	needsUpdate = true;
+}
+
 void CGUIbase::setPosX(int x) {
 	setLocalPos(x, localPos.y);
 }

@@ -177,6 +177,7 @@ public:
 	virtual void onDrop(const  int mouseX, const  int mouseY);
 	void setLocalDimensions(int x, int y, int w, int h);
 	virtual void setLocalPos(int x, int y);
+	virtual void setLocalPos(glm::i32vec2& pos);
 	virtual void setPosX(int x);
 	virtual void setPosY(int y);
 	virtual void add(CGUIbase* child);

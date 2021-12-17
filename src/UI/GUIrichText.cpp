@@ -123,12 +123,22 @@ bool CGUIrichText::onRMouseUp(const int mouseX, const int mouseY) {
 	return true;
 }
 
+bool CGUIrichText::OnClick(const int mouseX, const int mouseY) {
+	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
+	std::string hotMsg = lineBuffer2.onMouseMove(localMouse);
+	if (hotTextClickHandler)
+		hotTextClickHandler(hotMsg);
+	return true;
+}
+
 
 /** Check for losing mouse while hot text selected. */
 bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
 	lineBuffer2.onMouseOff();
-	if (hotTextMouseoverHandler)
-		hotTextMouseoverHandler("mouseOff");
+	CMessage msg;
+	msg.Msg = uiMsgMouseOff;
+	parent->message(this, msg);
+
 	return true;
 }
 
@@ -455,13 +465,12 @@ int CGUIrichText::findLastBreakableChar() {
 	return lastBreakableChar;
 }
 
+/** Message the assigned handler with any mouse action on hotText. */
 void CGUIrichText::checkHotTextContact(const  int mouseX, const  int mouseY) {
 	i32vec2 localMouse = screenToLocalCoords(mouseX, mouseY);
 	std::string msg = lineBuffer2.onMouseMove(localMouse);
-	if (!msg.empty()) {
 		if (hotTextMouseoverHandler)
 			hotTextMouseoverHandler(msg);
-	}
 }
 
 

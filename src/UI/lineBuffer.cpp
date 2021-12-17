@@ -164,7 +164,7 @@ void CLineBuffer::setaddFragmentsAtTop(bool onOff) {
 
 
 std::string CLineBuffer::onMouseMove(glm::i32vec2& mousePos) {
-	std::string msg = "mouseOff";
+	std::string msg;
 
 	for (auto& sprite : textSprites) {
 		if (sprite->isHotText) {
