@@ -12,9 +12,6 @@
     <Filter Include="Header Files\renderer">
       <UniqueIdentifier>{356f4523-7ed1-410d-8c19-c853150844af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vm">
-      <UniqueIdentifier>{0182bb3e-e9c5-4d69-aa75-cd0204fe3489}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\external">
       <UniqueIdentifier>{5ab26ddf-a872-492b-af73-be35d5beb9bb}</UniqueIdentifier>
     </Filter>
@@ -42,15 +39,18 @@
     <Filter Include="Header Files\renderer\imRendr">
       <UniqueIdentifier>{11d7b24b-0aa5-479c-a6a8-baa33500a743}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\gui">
+      <UniqueIdentifier>{ae70c5d8-e25d-44e2-8ba4-ed23892fdfd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\listen">
+      <UniqueIdentifier>{889aa8e0-dc66-4e55-a1f5-a5c4b4c2d4c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\colour.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\GUIbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIcheckButton.cpp">
@@ -164,24 +164,6 @@
     <ClCompile Include="..\src\UI\GUInumeric2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\daemon.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\stack.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\var.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\vm.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\vmConsole.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\vmApp.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\win\win.cpp">
       <Filter>Source Files\win</Filter>
     </ClCompile>
@@ -263,9 +245,6 @@
     <ClCompile Include="..\src\UI\textSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\VMtest\src\tigObj.cpp">
-      <Filter>vm</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\lineBuffer.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -338,12 +317,24 @@
     <ClCompile Include="..\src\model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\UI\GUIbase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\guiBase2.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\winEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\listen\listen.cpp">
+      <Filter>Source Files\listen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UI\guiRoot2.cpp">
+      <Filter>Source Files\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\colour.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\GUIbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIcheckButton.h">
@@ -472,24 +463,6 @@
     <ClInclude Include="..\src\UI\GUInumeric2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\daemon.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\stack.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\var.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\vm.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\vmConsole.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\vmApp.h">
-      <Filter>vm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\win\win.h">
       <Filter>Source Files\win</Filter>
     </ClInclude>
@@ -583,15 +556,6 @@
     <ClInclude Include="..\src\UI\textSprite.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\tigObj.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\ITigObj.h">
-      <Filter>vm</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\VMtest\src\Ivm.h">
-      <Filter>vm</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\iGuiMsg.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -615,9 +579,6 @@
     </ClInclude>
     <ClInclude Include="..\src\sharedBuf.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\messaging\events.h">
-      <Filter>Source Files\messaging</Filter>
     </ClInclude>
     <ClInclude Include="..\src\messaging\msg.h">
       <Filter>Source Files\messaging</Filter>
@@ -678,6 +639,24 @@
     </ClInclude>
     <ClInclude Include="..\src\model.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\GUIbase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\guiBase2.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\listen\event.h">
+      <Filter>Source Files\listen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\listen\listen.h">
+      <Filter>Source Files\listen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\guiRoot2.h">
+      <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\guiMsg.h">
+      <Filter>Source Files\gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,9 +2,11 @@
 
 #include "UI/uiRender.h"
 
+//#include "guiBase2.h"
+
 using namespace glm;
 
-CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CGUIbase(x,y,w,h) {
+CGUIlabel2::CGUIlabel2(int x, int y, int w, int h) : CguiBase(x,y,w,h) {
 	
 	textData.font = defaultFont;
 	//textBuf.setSize(getWidth(), getHeight());

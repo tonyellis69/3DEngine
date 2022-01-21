@@ -1,10 +1,11 @@
 #pragma once
 
-#include "GUIbase.h"
+//#include "GUIbase.h"
+#include "guiBase2.h"
 
 #include "lineBuffer.h"
 
-#include "..\VMtest\src\Ivm.h"
+//#include "..\VMtest\src\Ivm.h"
 
 #include "glm\glm.hpp"
 
@@ -15,7 +16,7 @@ enum TResizeMode {resizeByRatioMode, resizeByWidthMode, resizeNone };
 
 
 /** A more versatile multiline text display class. */
-class CGUIrichText :  public CGUIbase
+class CGUIrichText :  public  CguiBase //CGUIbase
 {
 public:
 	CGUIrichText(int x, int y, int w, int h);
@@ -29,6 +30,8 @@ public:
 
 	void createPage();
 	bool OnMouseMove(const int mouseX, const int mouseY, int key);
+	void onMouseMove(glm::ivec2& mousePos);
+
 	void msgHotTextChange(glm::i32vec2& adjustedMousePos);
 
 	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
@@ -38,7 +41,9 @@ public:
 
 	bool OnClick(const  int mouseX, const  int mouseY);
 
-	bool onMouseOff(const  int mouseX, const  int mouseY, int key);
+	//bool onMouseOff(const  int mouseX, const  int mouseY, int key);
+
+	void onMouseOff();
 
 	bool MouseWheelMsg(const int mouseX, const int mouseY, int wheelDelta, int key);
 	void smoothScroll(int pixels);
@@ -62,6 +67,7 @@ public:
 	void setHotTextClickHandler(std::function<void(const std::string&)> handler) {
 		hotTextClickHandler = handler;
 	}
+
 
 	std::function<void(const std::string&)> hotTextMouseoverHandler;
 	std::function<void(const std::string&)> hotTextClickHandler;
@@ -105,10 +111,11 @@ private:
 
 	float dT;
 
-	Ivm* pVM; ///<Interface to virtual machine for hot text calls.
+	//Ivm* pVM; ///<Interface to virtual machine for hot text calls.
 
 	CRichText bodyText;
 
 	std::string defaultFontName;
-
+	
+	std::string lastHotTxt;
 };

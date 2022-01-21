@@ -17,6 +17,7 @@
 #include "UI/fonts.h"
 #include "utils/files.h"
 
+
 CFont* style::defaultFont;
 
 CBaseApp::CBaseApp(void)  {
@@ -50,40 +51,38 @@ CBaseApp::CBaseApp(void)  {
 	BuiltInFullScrn = true;
 	Paused = false;
 	
-	//Set up engine for rendering
 	win.setApp(this);
 
 	win.createWindowHidden(800, 600, "Base window");
 	win.setCallbacks();
 	
-	//Engine.init();
 	renderer.init();
 	
 
 	loadSystemFonts();
 	GUIroot.setDefaultFont(smallSysFont); //TO DO: stylesheet will replace this
 	initialiseSystemStylesheet();
-//	GUIroot.setStyleSheet(&sysStyleSheet);
+
 	GUIroot.setMessageObject(this); //Makes this the default for all gui messages
 
-	//RegisterUIfunctors();
+
 
 	
 	quitOnEsc = true;
-	//initWatches();
-	//pTimer = &Engine.Time; //last vestige of watch.h - get rid of!
+
 	initLogWindow();
 
-	//TO DO: temp
-	//logWindow->setVisible(true);
 
-	vm.setApp(this);
-
-	sysLog <<  "BaseApp constructor finished. Yay!\n";
 
 	if (!snd::init(44100)) {
 		fatalLog << "Sound initialisation failed.";
 	}
+
+
+	guiRoot2.init(&GUIroot);
+
+	sysLog << "BaseApp constructor finished. Yay!\n";
+
 }
 
 
@@ -192,6 +191,7 @@ void CBaseApp::onWinMouseMove(int x, int y) {
 		key += MK_MBUTTON;
 	mouseKey = key;
 	GUIroot.MouseMsg(msg, x, y, key);
+
 }
 
 void CBaseApp::onWinMouseButton(int button, int action, int mods) {
@@ -241,9 +241,6 @@ void CBaseApp::AppTasks() {
 
 	renderer.clearFrame();
 
-	//physEng.update((float)dT * 10.0f);
-
-	vm.execute();
 
 	Time = timer.elapsed();
 	dT = Time - LastTime;

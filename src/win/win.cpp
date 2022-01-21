@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "listen/listen.h"
+
 CBaseApp* CWin::pApp = NULL;
 
 
@@ -159,6 +161,10 @@ bool CWin::mouseButtonPressed(int button) {
 /** NB: only seems to trigger if mouse moves inside window. */
 void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
 	pApp->onWinMouseMove(xpos, ypos);
+	CEvent e;
+	e.type = eMouseMove;
+	e.pos = glm::i32vec2(xpos, ypos);
+	lis::event(e);
 }
 
 void CWin::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {

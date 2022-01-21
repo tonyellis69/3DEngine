@@ -2,7 +2,7 @@
 
 #include "UI/uiRender.h"
 
-CGUIpanel::CGUIpanel(int x, int y, int w, int h) : CGUIbase(x,y,w,h){
+CGUIpanel::CGUIpanel(int x, int y, int w, int h) : CguiBase(x,y,w,h){
 	drawBorder = true;
 	setBorderColour(UIdarkGrey);
 

@@ -1,13 +1,15 @@
 #pragma once
 
-#include "GUIbase.h"
+//#include "GUIbase.h"
+#include "guiBase2.h"
+
 #include "fonts.h"
 #include "textBuf.h"
 
 #include "renderer/drawText.h"
 
 /** A class to render text to the screen. */
-class CGUIlabel2 : public CGUIbase {
+class CGUIlabel2 : public CguiBase { //CGUIbase {
 public:
 	CGUIlabel2(int x, int y, int w, int h);
 	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key) { return false; };

@@ -6,8 +6,7 @@
 
 #include <windows.h>  //for file dialogues
 #include <glew.h>
-//#include "Window.h"
-//#include "Engine.h"
+
 #include "UI\GUIbase.h"
 #include "UI\GUIroot.h"
 #include "UI\GUIradio.h"
@@ -19,16 +18,13 @@
 #include "UI\GUIlabel2.h"
 #include "UI\GUIrichText.h"
 #include <stdio.h>
-//#include "Reader.h"
-//#include "UIengine.h"
 
-//#include "UI\renderDrawFuncs.h"
 #include "UI\font.h"
 
 #include "SysFnt.h"
 #include "smallsysf.h"
 
-#include "..\VMtest\src\vmApp.h"
+//#include "..\VMtest\src\vmApp.h"
 
 #include "win\win.h"
 
@@ -47,6 +43,8 @@
 #include "messaging/messenger.h"
 
 #include "timer.h"
+
+#include "UI/guiRoot2.h"
 
 
 //class CVMapp;
@@ -86,20 +84,15 @@ public:
 
 	std::string getExePath();
 
-	virtual void vmMessage(TvmAppMsg) {};
 
 	void initialiseSystemStylesheet();
 
 	CGUIrichText* logWindow; ///<Points to the system log window.
 
-	//CEngine Engine;
-	//CGUIengine UIeng;
 	CGUIroot GUIroot;
 	CWin win;
 
 	FILE* ErrStream;	///<Filestream log error messages are written to.
-
-	//CDrawFuncs* drawFuncs; ///<Handle for the collection of delegates we pass to the GUI system.
 
 
 	bool BuiltInFullScrn; ///<If true, Tab toggles fullscreen.
@@ -132,17 +125,9 @@ public:
 
 	int viewWidth, viewHeight;
 
-	//unsigned int hTextureShader;
-	//unsigned int hTexture;
-	//unsigned int hTextureMVP;
-
 	CFont* sysFont; ///<Default font
 	CFont* smallSysFont; ///<Default font for GUI
 
-
-	CVMapp vm; ///<The Tig virtual machine.
-
-	//CRenderer& renderer;
 
 	std::string dataPath; //<Path to app data folder
 
@@ -151,5 +136,7 @@ public:
 	CPhysEng physEng;
 
 	CTimer timer;
+
+	CguiRoot2 guiRoot2; ///<To replace GUIroot as basis of all gui.
 	};
 

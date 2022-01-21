@@ -1,4 +1,4 @@
-#include "GUIbase.h"
+
 #include <string>
 #include <sstream>
 
@@ -10,6 +10,8 @@
 #include "GUIroot.h"
 #include "GUIlabel.h"
 //#include "GUIbutton.h"
+
+#include "guiBase2.h"
 
 #include "UI/uiRender.h"
 
@@ -75,7 +77,7 @@ CGUIbase::CGUIbase()  {
 	
 }
 
-CGUIbase::CGUIbase(int x, int y, int w, int h) : CGUIbase(){
+CGUIbase::CGUIbase(int x, int y, int w, int h) :  CGUIbase(){
 	
 	setWidth(w);
 	setHeight(h);

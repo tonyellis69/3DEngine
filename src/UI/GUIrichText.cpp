@@ -12,12 +12,15 @@
 
 #include "UI/uiRender.h"
 
+#include "listen/listen.h"
+
 using namespace glm;
 
 //std::uniform_real_distribution<> CGUIrichText::randomPeriod{ 0,1.0f };
 
-CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0), 
-														CGUIbase(x,y,w,h) 
+CGUIrichText::CGUIrichText(int x, int y, int w, int h) : updateDt(0),
+//CGUIbase(x,y,w,h) 
+												CguiBase(x, y, w, h)
 {
 	prepForFirstText();
 	prepForScrolling();
@@ -77,8 +80,20 @@ void CGUIrichText::setAutoscrollDown(bool onOff) {
 
 /** Check for mouse over hot text. */
 bool CGUIrichText::OnMouseMove(const  int mouseX, const  int mouseY, int key) {	
-	checkHotTextContact(mouseX, mouseY);
+//	checkHotTextContact(mouseX, mouseY);
 	return true;
+}
+
+void CGUIrichText::onMouseMove(glm::ivec2& mousePos) {
+	i32vec2 localMouse = screenToLocalCoords(mousePos.x, mousePos.y);
+	std::string msg = lineBuffer2.onMouseMove(localMouse);
+	if (msg != lastHotTxt) {
+		lastHotTxt = msg;
+		CEvent e;
+		e.type = eHotTextHover;
+		e.data = msg;
+		lis::event(e);
+	}
 }
 
 /** Announce that the currently selected hot text has changed. */ 
@@ -133,13 +148,13 @@ bool CGUIrichText::OnClick(const int mouseX, const int mouseY) {
 
 
 /** Check for losing mouse while hot text selected. */
-bool CGUIrichText::onMouseOff(const int mouseX, const int mouseY, int key) {
+void CGUIrichText::onMouseOff() {
 	lineBuffer2.onMouseOff();
-	CMessage msg;
-	msg.Msg = uiMsgMouseOff;
-	parent->message(this, msg);
-
-	return true;
+	lastHotTxt = "";
+	CEvent e;
+	e.type = eMouseOff;
+	e.id = uniqueID;
+	lis::event(e);
 }
 
 

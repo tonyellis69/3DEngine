@@ -1,11 +1,11 @@
 #pragma once
-#include "GUIbase.h"
-
+//#include "GUIbase.h"
+#include "guiBase2.h"
 
 
 
 /** The class defining GUIroot, the parent UI control to which all other controls are attached. */
-class CGUIroot : public CGUIbase {
+class CGUIroot : public CguiBase { //CGUIbase {
 public:
 	CGUIroot();
 	~CGUIroot();
