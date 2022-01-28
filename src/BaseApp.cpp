@@ -17,6 +17,7 @@
 #include "UI/fonts.h"
 #include "utils/files.h"
 
+#include "UI/gui2.h"
 
 CFont* style::defaultFont;
 
@@ -79,7 +80,7 @@ CBaseApp::CBaseApp(void)  {
 	}
 
 
-	guiRoot2.init(&GUIroot);
+	gui.init(&GUIroot);
 
 	sysLog << "BaseApp constructor finished. Yay!\n";
 
@@ -113,7 +114,7 @@ void CBaseApp::start() {
 	onStart();
 
 	win.hideWindow(false);
-	//toggleLogWindow();
+	toggleLogWindow();
 	while (!win.windowClosing()) {
 		AppTasks();
 	}

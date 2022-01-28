@@ -91,24 +91,12 @@ void CGUIrichText::onMouseMove(glm::ivec2& mousePos) {
 		lastHotTxt = msg;
 		CEvent e;
 		e.type = eHotTextHover;
-		e.data = msg;
+		e.hotTxt = &msg;
+		e.guiID = uniqueID;
 		lis::event(e);
 	}
 }
 
-/** Announce that the currently selected hot text has changed. */ 
-void CGUIrichText::msgHotTextChange(glm::i32vec2& adjustedMousePos) {
-//	CMessage msg = { uiMsgHotTextChange };
-//	//if (selectedHotObj != -1) {
-//	if (currentHotText != -1) {
-//		//msg.value = textObjs[selectedHotObj].hotId; //formerly!
-//		msg.value = currentHotText;// textObjs[currentHotText].hotId;
-//		msg.x = adjustedMousePos.x; msg.y = adjustedMousePos.y;
-//	}
-//	else
-//		msg.value = -1;
-//	parent->message(this, msg);
-}
 
 /** Detect clicks on any menu items. */
 bool CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {
@@ -153,7 +141,7 @@ void CGUIrichText::onMouseOff() {
 	lastHotTxt = "";
 	CEvent e;
 	e.type = eMouseOff;
-	e.id = uniqueID;
+	e.guiID = uniqueID;
 	lis::event(e);
 }
 

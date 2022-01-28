@@ -386,22 +386,22 @@ public:
 	}
 
 	/** Create and add a child control of type T, using auto-positioning. */
-	template <typename T, typename S>
-	T* add(S const& s, int style) {
-		if constexpr (std::is_convertible_v<S, std::string>) {
-			T* ctrl = new T(s, style);
-			add(ctrl);
-			autoPosition(ctrl);
-			return ctrl;
-		}
+	//template <typename T, typename S>
+	//T* add(S const& s, int style) {
+	//	if constexpr (std::is_convertible_v<S, std::string>) {
+	//		T* ctrl = new T(s, style);
+	//		add(ctrl);
+	//		autoPosition(ctrl);
+	//		return ctrl;
+	//	}
 
-			T* ctrl = new T(s, style); //pretty damn sure this is just leftover code
-			add(ctrl);
-			autoPosition(ctrl);
-			return ctrl;
+	//		T* ctrl = new T(s, style); //pretty damn sure this is just leftover code
+	//		add(ctrl);
+	//		autoPosition(ctrl);
+	//		return ctrl;
 
-		return NULL;
-	}
+	//	return NULL;
+	//}
 
 	/** add a control supplying styling but no text.*/
 	template <typename T>

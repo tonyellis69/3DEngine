@@ -329,7 +329,7 @@
     <ClCompile Include="..\src\listen\listen.cpp">
       <Filter>Source Files\listen</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\guiRoot2.cpp">
+    <ClCompile Include="..\src\UI\gui2.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -652,10 +652,10 @@
     <ClInclude Include="..\src\listen\listen.h">
       <Filter>Source Files\listen</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\guiRoot2.h">
+    <ClInclude Include="..\src\UI\guiMsg.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\guiMsg.h">
+    <ClInclude Include="..\src\UI\gui2.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
   </ItemGroup>

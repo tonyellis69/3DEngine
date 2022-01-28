@@ -78,6 +78,7 @@ void CWin::setCallbacks() {
 	glfwSetKeyCallback(window, keyCallback);
 	glfwSetCharCallback(window, characterCallback);
 	glfwSetScrollCallback(window, scrollCallback);
+	glfwSetCursorEnterCallback(window, cursorEnterCallback);
 }
 
 void CWin::setApp(CBaseApp * app) {
@@ -188,6 +189,15 @@ void CWin::characterCallback(GLFWwindow* window, unsigned int codepoint) {
 
 void CWin::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	pApp->OnMouseWheelMsg(xoffset,yoffset);
+}
+
+void CWin::cursorEnterCallback(GLFWwindow* window, int entered) {
+	CEvent e;
+	if (entered)
+		e.type == eMouseEnterWindow;
+	else
+		e.type = eMouseExitWindow;
+	lis::event(e);
 }
 
 

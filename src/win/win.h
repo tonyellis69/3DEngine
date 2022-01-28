@@ -44,6 +44,7 @@ public:
 	static void keyCallback(GLFWwindow * window, int key, int scancode, int action, int mods);
 	static void characterCallback(GLFWwindow * window, unsigned int codepoint);
 	static void scrollCallback(GLFWwindow * window, double xoffset, double yoffset);
+	static void cursorEnterCallback(GLFWwindow* window, int entered);
 
 
 	GLFWwindow* window;

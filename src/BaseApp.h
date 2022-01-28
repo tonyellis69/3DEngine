@@ -44,7 +44,6 @@
 
 #include "timer.h"
 
-#include "UI/guiRoot2.h"
 
 
 //class CVMapp;
@@ -137,6 +136,5 @@ public:
 
 	CTimer timer;
 
-	CguiRoot2 guiRoot2; ///<To replace GUIroot as basis of all gui.
 	};
 
