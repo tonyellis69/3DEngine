@@ -2,62 +2,73 @@
 
 #include "listen/listen.h"
 
-#include "utils/log.h"
+#include "win/win.h"
 
-CguiRoot2 gui;
+CguiRoot2 gui; ///<Global object.
 
 CguiBase* findControlUnderMouse(CguiBase* ctrl, glm::i32vec2& mousePos);
 
 void CguiRoot2::init(CguiBase* root) {
 	pRoot = root;
 	hotControl = root;
-	lis::subscribe(this);
 }
 
 void CguiRoot2::addToIndex(CguiBase* ctrl) {
 	ctrlIndex.push_back(ctrl);
 }
 
-void CguiRoot2::onEvent(CEvent& e) {
-	if (e.type == eMouseMove) {
-		oldFocusControl = hotControl;
-		hotControl = findControlUnderMouse(pRoot, e.pos);
-		if (hotControl != oldFocusControl && oldFocusControl) {
-			CguiMsg msg;
-			msg.type = gMouseOff;
-			oldFocusControl->onGuiMsg(msg);
-		}
-
-
-		if (hotControl == nullptr)
-			return;
-		CguiMsg msg;
-		msg.type = gMouseMove;
-		msg.mousePos = e.pos;
-		hotControl->onGuiMsg(msg);
+void CguiRoot2::onMouseButton(int button, int action, int mod) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (action == GLFW_RELEASE && lMouseDown)
+			hotControl->onLeftClick();
+		lMouseDown = action;
 	}
-	else if (e.type == eMouseExitWindow) {
-		if (oldFocusControl) {
-			CguiMsg msg;
-			msg.type = gMouseOff;
-			oldFocusControl->onGuiMsg(msg);
-		}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (action == GLFW_RELEASE && rMouseDown)
+			hotControl->onRightClick();
+		rMouseDown = action;
+	}
+	else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		if (action == GLFW_RELEASE && mMouseDown)
+			hotControl->onMiddleClick();
+		mMouseDown = action;
+	}
 
+
+}
+
+
+void CguiRoot2::onMouseMove(double x, double y) {
+	glm::i32vec2 pos = { x,y };
+	oldHotControl = hotControl;
+	hotControl = findControlUnderMouse(pRoot, pos);
+	if (hotControl != oldHotControl && oldHotControl) {
+		oldHotControl->onMouseOff();
+	}
+
+	if (hotControl == nullptr)
+		return;
+	hotControl->onMouseMove(pos);
+}
+
+void CguiRoot2::onWinEnter(int entered) {	
+	if (entered == false && oldHotControl) {
+		oldHotControl->onMouseOff();
 	}
 
 }
 
-CguiBase* CguiRoot2::getControl(int id) {
-	CguiBase* result = nullptr;
-	if (uniqueID == id)
-		return this;
-	for (auto& control : controls) {
-		result = ((CguiBase*)control)->findDescendant(id);
-		if (result != NULL)
-			break;
-	}
-	return result;
-}
+//CguiBase* CguiRoot2::getControl(int id) {
+//	CguiBase* result = nullptr;
+//	//if (uniqueID == id)
+//	//	return this;
+//	//for (auto& control : controls) {
+//	//	result = ((CguiBase*)control)->findDescendant(id);
+//	//	if (result != NULL)
+//	//		break;
+//	//}
+//	return result;
+//}
 
 CguiBase* CguiRoot2::getParent(int id) {
 	CguiBase* ctrl = pRoot->findDescendant(id);
@@ -73,11 +84,18 @@ CguiBase* CguiRoot2::findControl(const std::string& targetName) {
 
 bool CguiRoot2::mouseIn(const std::string& name) {
 	CguiBase* ctrl = findControl(name);
-	return ctrl->isMouseOver();
+	//return ctrl->isMouseOver();
+	return ctrl->overlays(getMousePos());
 }
 
 bool CguiRoot2::mouseNotIn(const std::string& name) {
 	return !mouseIn(name);
+}
+
+glm::i32vec2 CguiRoot2::getMousePos() {
+	glm::i32vec2 p;
+	CWin::getMousePos(p.x, p.y);
+	return p;
 }
 
 

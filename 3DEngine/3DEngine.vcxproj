@@ -153,7 +153,6 @@
     <ClCompile Include="..\src\UI\GUIdropdownMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIimage1D.cpp" />
     <ClCompile Include="..\src\UI\GUIlabel.cpp" />
-    <ClCompile Include="..\src\UI\winEvent.cpp" />
     <ClCompile Include="..\src\UI\GUIpaletteBar.cpp" />
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp" />
     <ClCompile Include="..\src\UI\GUIposition.cpp" />
@@ -290,7 +289,6 @@
     <ClInclude Include="..\src\UI\textBuf.h" />
     <ClInclude Include="..\src\UI\textSprite.h" />
     <ClInclude Include="..\src\UI\uiRender.h" />
-    <ClInclude Include="..\src\UI\guiMsg.h" />
     <ClInclude Include="..\src\userTypes.h" />
     <ClInclude Include="..\src\utils\files.h" />
     <ClInclude Include="..\src\utils\idContainer.h" />

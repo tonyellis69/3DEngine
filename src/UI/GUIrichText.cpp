@@ -97,6 +97,14 @@ void CGUIrichText::onMouseMove(glm::ivec2& mousePos) {
 	}
 }
 
+void CGUIrichText::onLeftClick() {
+	CEvent e;
+	e.type = eLeftClick;
+	e.hotTxt = &lastHotTxt;
+	e.guiID = uniqueID;
+	lis::event(e);
+}
+
 
 /** Detect clicks on any menu items. */
 bool CGUIrichText::OnLMouseDown(const int mouseX, const int mouseY, int key) {

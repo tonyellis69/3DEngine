@@ -14,6 +14,18 @@ public:
 	void setSize(unsigned int size);
 	void freeMem();
 	unsigned int getBufferHandle();
+	//void add(CBuf& buf2, )
+
+	template <typename T>
+	void readIndex(std::vector<T>& t) {
+		t = sharedBuf->readIndex<T>();
+	}
+
+
+	template <typename T>
+	void readVerts(std::vector<T>& t) {
+		t = sharedBuf->readVerts<T>();
+	}
 
 	template <typename V, typename... T>
 	void storeVerts(std::vector<V>& verts, T... t) {

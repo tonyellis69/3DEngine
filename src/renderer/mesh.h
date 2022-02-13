@@ -12,6 +12,11 @@
 
 enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 
+struct vc {
+	glm::vec3 v;
+	glm::vec4 c;
+};
+
 /** Stores the data for drawing a mesh, but not 
 	the mesh itself. */
 struct TMeshRec {
@@ -40,15 +45,18 @@ struct TModelData {
 	TMeshExtents extents;
 };
 
+struct TDrawable{
+	TMeshRec mesh;
+	std::shared_ptr<CBuf2> buf;
+};
+
 struct TModelMesh {
 	std::string name;
 	glm::mat4 matrix;
-	TMeshRec mesh;
-
-	std::shared_ptr<CBuf2> buf;
+	TDrawable draw;
 	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; 
-
 };
+
 
 
 /** A class for the intermediate storage and management of 
@@ -76,6 +84,7 @@ public:
 	std::vector<glm::vec3> normals;
 	std::vector<unsigned int> indices;
 	std::vector<glm::vec2> texCoords;
+	std::vector<glm::vec4> vertColours;
 	//std::vector<glm::i32vec3> triangles;
 	TMesh type;
 

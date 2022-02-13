@@ -323,9 +323,6 @@
     <ClCompile Include="..\src\UI\guiBase2.cpp">
       <Filter>Source Files\gui</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\winEvent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\listen\listen.cpp">
       <Filter>Source Files\listen</Filter>
     </ClCompile>
@@ -651,9 +648,6 @@
     </ClInclude>
     <ClInclude Include="..\src\listen\listen.h">
       <Filter>Source Files\listen</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\guiMsg.h">
-      <Filter>Source Files\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\gui2.h">
       <Filter>Source Files\gui</Filter>

@@ -5,7 +5,15 @@
 
 #include <glm/glm.hpp>
 
-enum TEventType { eNone, eMouseMove, eMouseOff, eHotTextHover, eMouseEnterWindow, eMouseExitWindow};
+enum TEventType { eNone, eMouseMove, eLeftClick, eMouseOff, eHotTextHover, 
+	eMouseEnterWindow, eMouseExitWindow};
+
+enum TMouseButton {};
+
+struct TMouseButtonEvent {
+
+
+};
 
 class CEvent {
 public:
@@ -13,10 +21,11 @@ public:
 	//~CEvent() {}
 	TEventType type;
 	union {
-		glm::i32vec2 pos;
+		
 		unsigned int guiID;
 		int i1;
 	};
+	glm::i32vec2 pos;
 	//std::variant<glm::i32vec2, unsigned int, std::string> data;
 	std::string* hotTxt;
 };

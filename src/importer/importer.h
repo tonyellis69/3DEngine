@@ -19,6 +19,7 @@ public:
 	CMesh& getSingleMesh();
 	TModelData getMeshNodes();
 	CModel getModel();
+	TDrawable getHexTile(std::vector<glm::vec4>& colours);
 
 private:
 	TModelData processNode(aiNode* node, const aiScene* scene);

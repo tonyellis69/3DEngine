@@ -32,6 +32,8 @@ public:
 	bool OnMouseMove(const int mouseX, const int mouseY, int key);
 	void onMouseMove(glm::ivec2& mousePos);
 
+	void onLeftClick();
+
 	bool OnLMouseDown(const  int mouseX, const  int mouseY, int key);
 	bool OnLMouseUp(const int mouseX, const int mouseY, int key);
 

@@ -150,7 +150,8 @@ void CRenderer::init() {
 	getGLinfo();
 
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-
+	//glEnable(GL_MULTISAMPLE);
+	//glSampleCoverage(0.5f, false);
 
 	int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
 	if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)

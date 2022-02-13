@@ -49,13 +49,41 @@ CModel CImporter::getModel() {
 
 	for (auto& mesh : modelMeshes) {
 		model.meshes.push_back(mesh);
-		model.meshes.back().buf = buf;
+		model.meshes.back().draw.buf = buf;
 	}
 	
 
 
 	model.extents = rootNode.extents; //temp!
 	return model;
+}
+
+TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
+	//glm::vec4 colours[] = { { 1.0f,0.0f,0.0f,1.0f},
+	//	{0.0f,0.0f,1.0f,1.0f} };
+
+	auto buf = std::make_shared<CBuf2>();
+
+
+	std::vector<vc> colourVerts(singleMesh.vertices.size());
+
+	int c = 0; auto mesh = modelMeshes.begin()+1;
+	for (unsigned int v = 0; v < colourVerts.size(); v++) {
+		if (mesh != modelMeshes.end() && v == mesh->draw.mesh.vertStart)
+			c++;
+		colourVerts[v].v = singleMesh.vertices[v];
+		colourVerts[v].c = colours[c];
+	}
+
+
+	buf->storeVerts(colourVerts, singleMesh.indices, 3, 4);
+
+	TDrawable tile;
+	tile.mesh.indexSize = singleMesh.indices.size();
+	tile.mesh.indexStart = 0;
+	tile.mesh.vertStart = 0;
+	tile.buf = buf;
+	return tile;
 }
 
 /** Recursively retrieve all the verts etc from each node in the scene. */
@@ -98,6 +126,7 @@ std::tuple<TMeshRec, TMeshExtents> CImporter::processMesh(aiMesh* mesh, const ai
 		localExtents.BBmin = glm::min(localExtents.BBmin, vert);
 		localExtents.BBmax = glm::max(localExtents.BBmax, vert);
 	}
+	
 
 	//get indices to verts
 	for (unsigned int f = 0; f < mesh->mNumFaces; f++) {

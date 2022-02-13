@@ -4,27 +4,29 @@
 
 #include "listen/listen.h"
 
-
+/** Temporary. Adapting add() so ctrls get added to gui's index.*/
 void CguiBase::add(CGUIbase* child) {
 	CGUIbase::add(child);
 	gui.addToIndex((CguiBase*)child);
 }
 
-void CguiBase::onGuiMsg(CguiMsg& msg) {
-	switch (msg.type) {
-	case gMouseOff: onMouseOff(); break;
-	case gMouseMove: onMouseMove(msg.mousePos); break;
-
-	}
-}
-
 void CguiBase::onMouseMove(glm::ivec2& mousePos) {
-
+	CEvent e;
+	e.type = eMouseMove;
+	e.guiID = uniqueID; e.pos = mousePos;
+	lis::event(e);
 }
 
 void CguiBase::onMouseOff() {
 	CEvent e;
 	e.type = eMouseOff;
+	e.guiID = uniqueID;
+	lis::event(e);
+}
+
+void CguiBase::onLeftClick() {
+	CEvent e;
+	e.type = eLeftClick;
 	e.guiID = uniqueID;
 	lis::event(e);
 }

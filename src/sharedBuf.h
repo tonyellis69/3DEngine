@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <glew.h>
+
 /** A wrapper for an OpenGL vertex buffer, and VAO state. */
 class CSharedBuf {
 public:
@@ -14,6 +16,38 @@ public:
 	void setVAO();
 	void clearVAO();
 	void setSize(unsigned int size);
+
+	template <typename T>
+	std::vector<T> readIndex() {
+		GLint size = 0;
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
+		glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		int elements = size / indexStride;
+		std::vector<T> result(elements);
+
+		glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, (void*)result.data());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		return result;
+	}
+
+	template <typename T>
+	std::vector<T> readVerts() {
+		GLint size = 0;
+
+		glBindBuffer(GL_ARRAY_BUFFER, hBuffer);
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+		int elements = size / stride;
+		std::vector<T> result(elements);
+
+		glGetBufferSubData(GL_ARRAY_BUFFER, 0, size, (void*)result.data());
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		return result;
+	}
+
+
 	void setNumVerts(unsigned int n) {
 		numVerts = n;
 	}

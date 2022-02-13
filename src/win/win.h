@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW\glfw3.h>
@@ -23,7 +24,16 @@ public:
 	void pollEvents();
 	void setCallbacks();
 	void setApp(CBaseApp* app);
-	void getMousePos(int& x, int& y);
+	template <typename T>
+	void setReceiver(T& receiver ) {
+		mouseBtnReceiver = [&](int button, int action, int mods) {
+			receiver.onMouseButton(button, action, mods); };
+		mouseMoveReceiver = [&](double x, double y) {
+			receiver.onMouseMove(x,y); };
+		enterWindowReceiver = [&](int enter) {
+			receiver.onWinEnter(enter); };
+	}
+	static void getMousePos(int& x, int& y);
 	bool leftMouseHeldDown();
 	bool rightMouseDown();
 	bool middleMouseDown();
@@ -47,12 +57,18 @@ public:
 	static void cursorEnterCallback(GLFWwindow* window, int entered);
 
 
-	GLFWwindow* window;
+	static GLFWwindow* window;
 	GLFWmonitor* primaryMonitor;
 	const GLFWvidmode* lastMode;
 	int lastWindowPosX, lastWindowPosY;
 	int lastWindowWidth, lastWindowHeight;
 	static CBaseApp* pApp;
 	bool fullScreenOn;
+
+	static std::function <void(int,int,int)> mouseBtnReceiver;
+	static std::function <void(double, double)> mouseMoveReceiver;
+	static std::function <void(int)> enterWindowReceiver;
 };
+
+
 

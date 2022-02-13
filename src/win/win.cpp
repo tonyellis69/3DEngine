@@ -10,8 +10,10 @@
 #include "listen/listen.h"
 
 CBaseApp* CWin::pApp = NULL;
-
-
+GLFWwindow* CWin::window;
+std::function <void(int, int, int)> CWin::mouseBtnReceiver;
+std::function <void(double, double)> CWin::mouseMoveReceiver;
+std::function <void(int)> CWin::enterWindowReceiver;
 
 void error_callback(int error, const char* description) {
 	std::cerr << "Error here: " << description;
@@ -32,6 +34,7 @@ CWin::~CWin() {
 /** Create a window for rendering to. */
 void CWin::createWindow(int w, int h, std::string title) {
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+	//glfwWindowHint(GLFW_SAMPLES, 4);
 	window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
 	glfwMakeContextCurrent(window);
 
@@ -91,6 +94,8 @@ void CWin::getMousePos(int & x, int & y) {
 	x = floor(dx); y = floor(dy);
 	//pApp->mouseMove(x,y,0);
 }
+
+
 
 /** Poll cached left mouse button state. */
 bool CWin::leftMouseHeldDown() {
@@ -162,14 +167,13 @@ bool CWin::mouseButtonPressed(int button) {
 /** NB: only seems to trigger if mouse moves inside window. */
 void CWin::cursorPosCallback(GLFWwindow * window, double xpos, double ypos) {
 	pApp->onWinMouseMove(xpos, ypos);
-	CEvent e;
-	e.type = eMouseMove;
-	e.pos = glm::i32vec2(xpos, ypos);
-	lis::event(e);
+	mouseMoveReceiver(xpos, ypos);
 }
 
 void CWin::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 	pApp->onWinMouseButton(button, action, mods);
+
+	mouseBtnReceiver(button, action, mods);
 }
 
 void CWin::windowSizeCallback(GLFWwindow* window, int width, int height) {
@@ -192,12 +196,13 @@ void CWin::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 }
 
 void CWin::cursorEnterCallback(GLFWwindow* window, int entered) {
-	CEvent e;
-	if (entered)
-		e.type == eMouseEnterWindow;
-	else
-		e.type = eMouseExitWindow;
-	lis::event(e);
+	//CEvent e;
+	//if (entered)
+	//	e.type == eMouseEnterWindow;
+	//else
+	//	e.type = eMouseExitWindow;
+	//lis::event(e);
+	enterWindowReceiver(entered);
 }
 
 
