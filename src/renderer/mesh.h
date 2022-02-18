@@ -14,7 +14,7 @@ enum TMesh { meshTrisIndexed, meshTriStripIndexed };
 
 struct vc {
 	glm::vec3 v;
-	glm::vec4 c;
+	int c;
 };
 
 /** Stores the data for drawing a mesh, but not 
@@ -50,11 +50,23 @@ struct TDrawable{
 	std::shared_ptr<CBuf2> buf;
 };
 
+struct TMultiDrawable {
+	std::vector<TMeshRec> meshes;
+	std::shared_ptr<CBuf2> buf;
+};
+
+struct TVertData {
+	std::vector<TMeshRec> meshes;
+	std::vector<glm::vec3> vertices;
+	std::vector<unsigned int> indices;
+};
+
 struct TModelMesh {
 	std::string name;
 	glm::mat4 matrix;
 	TDrawable draw;
-	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; 
+	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; //TO DO: scrap
+	std::vector<glm::vec4> palette = { { 1.0f,1.0f,1.0f,1.0f } };
 };
 
 
@@ -65,17 +77,12 @@ class CMesh {
 public:
 	CMesh();
 	void calculateVertexNormals();
-	//void exportToBuffer(CBuf& buf);
 	void exportToBuffer(CBuf2& buf);
-	CBuf2 exportToBuffer();
 	void clear();
 	void mergeUniqueVerts();
 	void linesToLineStrip();
 	void closeLineLoops(std::vector<unsigned int>& loopSizes);
 	void addAdjacencyVerts();
-
-	unsigned int makeAdjacencyVert(glm::vec3& A, glm::vec3& B);
-
 
 	TMeshRec add(CMesh& mesh);
 
@@ -83,12 +90,13 @@ public:
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
 	std::vector<unsigned int> indices;
+	std::vector<unsigned int> vertColours;
 	std::vector<glm::vec2> texCoords;
-	std::vector<glm::vec4> vertColours;
-	//std::vector<glm::i32vec3> triangles;
+
 	TMesh type;
 
 private:
+	unsigned int makeAdjacencyVert(glm::vec3& A, glm::vec3& B);
 	void orderLines();
 
 };

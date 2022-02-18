@@ -52,19 +52,35 @@ CModel CImporter::getModel() {
 		model.meshes.back().draw.buf = buf;
 	}
 	
-
-
 	model.extents = rootNode.extents; //temp!
 	return model;
 }
 
-TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
-	//glm::vec4 colours[] = { { 1.0f,0.0f,0.0f,1.0f},
-	//	{0.0f,0.0f,1.0f,1.0f} };
-
+TMultiDrawable CImporter::getDrawables() {
 	auto buf = std::make_shared<CBuf2>();
+	singleMesh.exportToBuffer(*buf);
+	TMultiDrawable drawables;
+	for (auto& mesh : modelMeshes) {
+		drawables.meshes.push_back(mesh.draw.mesh);
+	}
+	drawables.buf = buf;
+	return drawables;
+}
+
+TVertData CImporter::getVertData() {
+	TVertData data;
+	data.vertices = singleMesh.vertices;  
+	data.indices = singleMesh.indices;
+	for (auto& mesh : modelMeshes) {
+		data.meshes.push_back(mesh.draw.mesh);
+	}
+	return data;
+};
 
 
+
+TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
+	auto buf = std::make_shared<CBuf2>();
 	std::vector<vc> colourVerts(singleMesh.vertices.size());
 
 	int c = 0; auto mesh = modelMeshes.begin()+1;
@@ -72,11 +88,11 @@ TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
 		if (mesh != modelMeshes.end() && v == mesh->draw.mesh.vertStart)
 			c++;
 		colourVerts[v].v = singleMesh.vertices[v];
-		colourVerts[v].c = colours[c];
+		//colourVerts[v].c = colours[c];
 	}
 
 
-	buf->storeVerts(colourVerts, singleMesh.indices, 3, 4);
+	buf->storeVerts(colourVerts, singleMesh.indices, 3, 1);
 
 	TDrawable tile;
 	tile.mesh.indexSize = singleMesh.indices.size();
@@ -99,6 +115,7 @@ TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {
 		currentNode.extents = extents;
 		TModelMesh modelMesh = { node->mName.C_Str(),currentNode.matrix,meshRec };
 		modelMeshes.push_back(modelMesh);
+		meshCount++;
 	}
 
 	for (unsigned int n = 0; n < node->mNumChildren; n++) {
@@ -160,7 +177,8 @@ std::tuple<TMeshRec, TMeshExtents> CImporter::processMesh(aiMesh* mesh, const ai
 		localMesh.addAdjacencyVerts();
 	}
 
-
+	//for now, assign colour ids to lines programatically
+	localMesh.vertColours.resize(localMesh.vertices.size(), meshCount);
 
 	//add to singleMesh
 	TMeshRec localMeshRec = singleMesh.add(localMesh);

@@ -1,9 +1,9 @@
 #include "shader.h"
 
-TStandardShaderType CShader::getType() {
+TStandardShaderType CShaderOld::getType() {
 	return ident;
 }
 
-void CShader::setType(TStandardShaderType ident) {
-	CShader::ident = ident;
+void CShaderOld::setType(TStandardShaderType ident) {
+	CShaderOld::ident = ident;
 }

@@ -11,9 +11,9 @@
 CBuf2 templateQuad;
 CBuf2 borderTemplateQuad;
 
-CShader* uiRectShader;
-CShader* uiTexShader;
-CShader* uiTexGradientShader;
+CShaderOld* uiRectShader;
+CShaderOld* uiTexShader;
+CShaderOld* uiTexGradientShader;
 
 glm::mat4 orthoView;
 

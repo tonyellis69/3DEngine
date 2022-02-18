@@ -94,7 +94,7 @@ public:
 	void setShaderValue(unsigned int intHandle, int elements, int value);
 	void setShaderValue(unsigned int floatHandle, int elements, float value);
 	void setShader(int program);
-	void setShader(CShader* shader);
+	void setShader(CShaderOld* shader);
 	void setClip(int x, int y, int width, int height);
 	//void drawModel(CRenderModel& model);
 	//void initRenderToTextureBufs();
@@ -149,8 +149,8 @@ public:
 	void createInstancedPhongShader();
 	void createTextShader();
 
-	CShader * createShader(std::string name);
-	CShader * createShader(std::string name,   char** strings, int nFeedbacks);
+	CShaderOld * createShader(std::string name);
+	CShaderOld * createShader(std::string name,   char** strings, int nFeedbacks);
 
 	void backFaceCulling(bool on);
 	void setVAO(GLuint newVAO);
@@ -178,11 +178,11 @@ public:
 
 	unsigned int tmpHandle;
 
-	CShader* phongShader; ///<The standard phong shader
-	CShader* texShader; ///<The standard texture shader
-	CShader* billboardShader;
-	CShader* textShader;
-	CShader* textSpriteShader;
+	CShaderOld* phongShader; ///<The standard phong shader
+	CShaderOld* texShader; ///<The standard texture shader
+	CShaderOld* billboardShader;
+	CShaderOld* textShader;
+	CShaderOld* textSpriteShader;
 
 	//std::vector<CShader*> shaderList; 
 	std::unordered_map<std::string, CRenderShader*> shaderList; ///<Tracks all shaders
@@ -225,13 +225,13 @@ public:
 	GLuint hBillboardSize;
 
 
-	CShader* multiTexShader; ///<The standard multi-texture shader
+	CShaderOld* multiTexShader; ///<The standard multi-texture shader
 	GLuint hMultTextureUnit[16]; ///<Handle to standard texture shader texture units;
 	GLuint hMultTile[16]; ///<Handle to standard texture shader texture tiling
 	GLuint hMultOffset[16]; ///<Handle to standard texture shader texture tiling
 	GLuint hMultMVP; ///<Handle to standard texture shader MVP matrix
 
-	CShader* phongShaderInstanced;
+	CShaderOld* phongShaderInstanced;
 	GLuint hPhongInstNormalModelToCameraMatrix;
 	GLuint hPhongInstLightDirection;
 	GLuint hPhongInstLightIntensity;

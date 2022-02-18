@@ -45,6 +45,9 @@
     <Filter Include="Source Files\listen">
       <UniqueIdentifier>{889aa8e0-dc66-4e55-a1f5-a5c4b4c2d4c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\graphics">
+      <UniqueIdentifier>{eaa85dc3-10d6-4d5b-93e8-624120d494f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\BaseApp.cpp">
@@ -328,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="..\src\UI\gui2.cpp">
       <Filter>Source Files\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\graphics\shader2.cpp">
+      <Filter>Source Files\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -651,6 +657,9 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\gui2.h">
       <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\graphics\shader2.h">
+      <Filter>Source Files\graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

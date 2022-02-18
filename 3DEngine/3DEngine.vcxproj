@@ -98,6 +98,7 @@
     <ClCompile Include="..\src\colour.cpp" />
     <ClCompile Include="..\src\colourGradient.cpp" />
     <ClCompile Include="..\src\createShape.cpp" />
+    <ClCompile Include="..\src\graphics\shader2.cpp" />
     <ClCompile Include="..\src\hex\hex.cpp" />
     <ClCompile Include="..\src\hex\hexElement.cpp" />
     <ClCompile Include="..\src\hex\hexArray.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="..\src\createShape.h" />
     <ClInclude Include="..\src\external\stb_image.h" />
     <ClInclude Include="..\src\external\stb_image_write.h" />
+    <ClInclude Include="..\src\graphics\shader2.h" />
     <ClInclude Include="..\src\hex\hex.h" />
     <ClInclude Include="..\src\hex\hexElement.h" />
     <ClInclude Include="..\src\hex\hexArray.h" />

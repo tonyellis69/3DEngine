@@ -15,10 +15,10 @@ enum TStandardShaderType { standardTex, standardPhong, standardWire, standardMul
 	and also hide OpenGL specifics from user. */
 
 
-class CShader {
+class CShaderOld {
 public:
-	CShader() { ident = userShader; };
-	~CShader() {};
+	CShaderOld() { ident = userShader; };
+	~CShaderOld() {};
 	virtual void load(shaderType shader, std::string shaderFile) {};
 	virtual void create(std::string shaderName) {};
 	virtual void create(std::string shaderName, int nFeedbacks) {};
@@ -43,6 +43,8 @@ public:
 	virtual void setShaderValue(unsigned int floatHandle,  float value) {};
 	virtual void setShaderValue(unsigned int textureHandle, CBaseTexture& texture) {};
 	virtual void setTextureUnit(unsigned int samplerHandle,  int textureUnit) {}
+	virtual void setShaderValue(unsigned int arrayHandle, glm::vec4* vec4Array) {}
+
 	TStandardShaderType ident;
 
 	std::string vertFile;
@@ -53,8 +55,3 @@ public:
 	unsigned int noFeedbackSettings;
 };
 
-template <typename T>
-class CShader2 : public CShader {
-
-	T uniforms;
-};

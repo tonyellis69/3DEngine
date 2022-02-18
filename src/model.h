@@ -9,9 +9,11 @@ public:
 	bool circleCollision(glm::vec3& segA, glm::vec3& segB);
 	bool BBcollision(glm::vec3& segA, glm::vec3& segB);
 	float getRadius();
+	void setBasePalette(std::vector<glm::vec4>& palette);
 
 	std::vector<TModelMesh> meshes;
 
 	glm::mat4 tmpMatrix;
 	TMeshExtents extents;
+
 };

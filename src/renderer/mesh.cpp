@@ -24,23 +24,15 @@ void CMesh::calculateVertexNormals() {
 	}
 }
 
-/** Write the vert data to the given graphics buffer object. */
-//void CMesh::exportToBuffer(CBuf& buf) {
-//	buf.storeVertexes(vertices.data(), sizeof(glm::vec3) * vertices.size(), vertices.size());
-//	buf.storeIndex(indices.data(), indices.size());
-//	buf.storeLayout(3, 0, 0, 0);
-//
-//}
 
 void CMesh::exportToBuffer(CBuf2& buf) {
-	buf.storeVerts(vertices, indices, 3);
-}
+	std::vector<vc> colourVerts(vertices.size());
+	for (unsigned int v = 0; v < colourVerts.size(); v++) {
+		colourVerts[v].v = vertices[v];
+		colourVerts[v].c = vertColours[v];
+	}
+	buf.storeVerts(colourVerts, indices, 3, 1);
 
-
-CBuf2 CMesh::exportToBuffer() {
-	CBuf2 buf;
-	buf.storeVerts(vertices, indices, 3);
-	return buf;
 }
 
 
@@ -321,6 +313,8 @@ TMeshRec CMesh::add(CMesh& mesh) {
 	meshRec.vertStart = vertices.size();
 
 	vertices.insert(vertices.end(), mesh.vertices.begin(), mesh.vertices.end());
+	vertColours.insert(vertColours.end(), mesh.vertColours.begin(), mesh.vertColours.end());
+
 	for (auto& index : mesh.indices) {
 		if (index == primitiveRestart)
 			indices.push_back(primitiveRestart);

@@ -72,3 +72,9 @@ bool CModel::BBcollision(glm::vec3& segA, glm::vec3& segB) {
 float CModel::getRadius() {
 	return glm::length(extents.furthestVert);
 }
+
+/** Probably temporary colour assignment. */
+void CModel::setBasePalette(std::vector<glm::vec4>& palette) {
+	for (auto& mesh : meshes)
+		mesh.palette = palette;
+}

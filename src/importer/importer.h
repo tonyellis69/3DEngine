@@ -19,6 +19,8 @@ public:
 	CMesh& getSingleMesh();
 	TModelData getMeshNodes();
 	CModel getModel();
+	TMultiDrawable getDrawables();
+	TVertData getVertData();
 	TDrawable getHexTile(std::vector<glm::vec4>& colours);
 
 private:
@@ -32,6 +34,8 @@ private:
 	CMesh singleMesh; ///<All the imported 3D model objects stored as one mesh object.
 
 	TModelData rootNode; 
+
+	int meshCount = 0;
 
 	std::vector<TModelMesh> modelMeshes;
 };

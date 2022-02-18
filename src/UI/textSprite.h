@@ -16,7 +16,7 @@ struct TTextSpriteShader {
 	unsigned int hOffset2;
 	unsigned int hSize;
 	unsigned int hAlpha;
-	CShader* shader;
+	CShaderOld* shader;
 };
 
 class ITextSpriteCallback;

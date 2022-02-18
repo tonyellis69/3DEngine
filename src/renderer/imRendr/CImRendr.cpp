@@ -32,8 +32,8 @@ void CImRendr::draw(glm::mat4& mvp) {
 		case drwCmdDrawLine:
 			renderer.setShader(cmd.shader);
 			renderer.setShaderValue(0, 1, cmd.vec4_0);
-			renderer.setShaderValue(1, 1, *pMatrix);
-			renderer.setShaderValue(2, 1, cmd.vec2_0);
+			renderer.setShaderValue(5, 1, *pMatrix);
+			renderer.setShaderValue(6, 1, cmd.vec2_0);
 
 			glDrawArrays(GL_LINE_STRIP_ADJACENCY, cmd.vertStart, cmd.vertCount);
 			break;

@@ -35,25 +35,37 @@ void CSharedBuf::attachData(void* verts, int numVerts, int vertSize) {
 	size = numVerts * vertSize;
 }
 
-void CSharedBuf::attachIndex(unsigned int* indices, unsigned int numIndices) {
+void CSharedBuf::attachIndex(std::vector<unsigned int>& indices, unsigned int numIndices) {
 	if (hIndex == 0)
 		glGenBuffers(1, &hIndex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 
-	if (numIndices < 0xffff) {
-		unsigned short* shortBuf = new unsigned short[numIndices];
-		std::copy(indices, indices + numIndices, shortBuf);
+	if (numVerts < 0xffff) {
+		//unsigned short* shortBuf = new unsigned short[numIndices];
+		//std::copy(indices, indices + numIndices, shortBuf);
+		//unsigned int intBuf = new unsigned int[numIndices];
+
+		std::vector<unsigned short> shortBuf(numIndices); unsigned int i = 0;
+		for (auto& index : indices) {
+			if (index == 0xFFFFFFFF)
+				shortBuf[i] = 0xFFFF;
+			else
+				shortBuf[i] = int(index);
+			i++;
+		}
+
+
 		indexStride = sizeof(unsigned short int);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, (void*)shortBuf, GL_STATIC_DRAW);
-		delete shortBuf;
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, (void*)shortBuf.data(), GL_STATIC_DRAW);
+		//delete shortBuf;
 	}
 	else 
 	////TO DO: doesn't work! Need the number of verts to make this decision, which we don't yet have.
 
 	{
 		indexStride = sizeof(unsigned int);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, (void*)indices.data(), GL_STATIC_DRAW);
 	}
 	
 	//NB NO GL ERROR HERE
@@ -61,14 +73,14 @@ void CSharedBuf::attachIndex(unsigned int* indices, unsigned int numIndices) {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void CSharedBuf::attachIndex(unsigned short* indices, unsigned int numIndices) {
+void CSharedBuf::attachIndex(std::vector<unsigned short>& indices, unsigned int numIndices) {
 	if (hIndex == 0)
 		glGenBuffers(1, &hIndex);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, hIndex);
 
 	indexStride = sizeof(unsigned short int);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * indexStride, (void*)indices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

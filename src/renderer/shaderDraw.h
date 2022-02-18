@@ -11,5 +11,5 @@ class CShaderDraw {
 public:
 
 
-	CShader* shader;
+	CShaderOld* shader;
 };

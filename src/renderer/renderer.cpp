@@ -402,7 +402,7 @@ void CRenderer::setShader(int program) {
 
 }
 
-void CRenderer::setShader(CShader * shader) {	
+void CRenderer::setShader(CShaderOld * shader) {	
 	glUseProgram(shader->getShaderHandle());
 }
 
@@ -1014,7 +1014,7 @@ void CRenderer::createTextShader() {
 }
 
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */
-CShader* CRenderer::createShader(std::string name) {
+CShaderOld* CRenderer::createShader(std::string name) {
 	CRenderShader* shader = new CRenderShader();
 	shader->name = name;
 	if (name.compare(0, dataPath.size(), dataPath))
@@ -1025,7 +1025,7 @@ CShader* CRenderer::createShader(std::string name) {
 	return shader;
 }
 
-CShader * CRenderer::createShader(std::string name,  char** strings,int nFeedbacks) {
+CShaderOld * CRenderer::createShader(std::string name,  char** strings,int nFeedbacks) {
 	CRenderShader* shader = new CRenderShader();
 	shader->name = name;
 	for (int s=0; s < nFeedbacks; s++)

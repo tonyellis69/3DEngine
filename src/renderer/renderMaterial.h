@@ -11,7 +11,7 @@ public:
 	GLuint textureUnit; ///<OpenGL texture unit no.
 };
 
-class CShader;
+class CShaderOld;
 class CRenderMaterial : public CMaterial {
 public:
 	CRenderMaterial();
@@ -19,18 +19,18 @@ public:
 	unsigned int getTexture(int texNo);
 	void assign();
 	void setColour(glm::vec4& colour);
-	void setShader(CShader* shader);
+	void setShader(CShaderOld* shader);
 	void setOffset(int texNo, glm::vec2& offset);
 	void setTile(int texNo, glm::vec2& tile);
 	void unAssign();
-	CShader* getShader();
+	CShaderOld* getShader();
 
 	
 	
 	std::vector<CTextureSlot> textures;
 	glm::vec4 colour;
 	//unsigned int hShader;
-	CShader* shader;
+	CShaderOld* shader;
 
 protected:
 	CRenderer* pRenderer;

@@ -64,7 +64,7 @@ void CRenderMaterial::setColour(glm::vec4 & iColour) {
 	colour = iColour;
 }
 
-void CRenderMaterial::setShader(CShader* shader) {
+void CRenderMaterial::setShader(CShaderOld* shader) {
 	CRenderMaterial::shader = shader;
 	currentShaderType = shader->getType();
 }
@@ -92,6 +92,6 @@ void CRenderMaterial::unAssign() {
 	}
 }
 
-CShader * CRenderMaterial::getShader() {
+CShaderOld * CRenderMaterial::getShader() {
 	return shader;
 }

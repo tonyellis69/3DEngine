@@ -6,7 +6,7 @@
 //using namespace std;
 
 class CRenderer;
-class CRenderShader : public CShader {
+class CRenderShader : public CShaderOld {
 public:
 	CRenderShader();
 	void load(shaderType shader, std::string shaderFile);
