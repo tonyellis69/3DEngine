@@ -12,6 +12,7 @@ enum TShader { vertexS, fragS, geometryS };
 class CShader {
 public:
 	CShader(const std::string& name);
+	void activate();
 	unsigned int getUniform(const std::string& uniformName);
 
 	void setUniform(unsigned int matrixHandle, glm::mat4& matrix);

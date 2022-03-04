@@ -13,6 +13,7 @@ CBaseApp* CWin::pApp = NULL;
 GLFWwindow* CWin::window;
 std::function <void(int, int, int)> CWin::mouseBtnReceiver;
 std::function <void(double, double)> CWin::mouseMoveReceiver;
+std::function <void(int, int, int)> CWin::keyReceiver;
 std::function <void(int)> CWin::enterWindowReceiver;
 
 void error_callback(int error, const char* description) {
@@ -185,6 +186,7 @@ void CWin::keyCallback(GLFWwindow* window, int key, int scancode, int action, in
 		pApp->onKeyPress(key, mods);
 	if (action == GLFW_RELEASE)
 		pApp->OnKeyRelease(key, mods);
+	keyReceiver(key, action, mods);
 }
 
 void CWin::characterCallback(GLFWwindow* window, unsigned int codepoint) {

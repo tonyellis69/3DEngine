@@ -73,8 +73,13 @@ float CModel::getRadius() {
 	return glm::length(extents.furthestVert);
 }
 
-/** Probably temporary colour assignment. */
-void CModel::setBasePalette(std::vector<glm::vec4>& palette) {
-	for (auto& mesh : meshes)
-		mesh.palette = palette;
-}
+///** Probably temporary colour assignment. */
+//void CModel::setBasePalette(std::vector<glm::vec4>& palette) {
+//	for (auto& mesh : meshes)
+//		mesh.palette = palette;
+//}
+//
+//void CModel::setPalette(std::vector<glm::vec4>* palette) {
+//	for (auto& mesh : meshes)
+//		mesh.pPalette = palette;
+//}

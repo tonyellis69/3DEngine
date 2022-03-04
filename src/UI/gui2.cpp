@@ -33,8 +33,18 @@ void CguiRoot2::onMouseButton(int button, int action, int mod) {
 			hotControl->onMiddleClick();
 		mMouseDown = action;
 	}
+}
 
-
+void CguiRoot2::onKey(int key, int action, int mod) {
+	CEvent e;
+	e.i1 = key; e.i2 = mod;
+	if (action == GLFW_PRESS) {
+		e.type = eKeyDown;
+	}
+	else {
+		e.type = eKeyUp;
+	}
+	lis::event(e);
 }
 
 

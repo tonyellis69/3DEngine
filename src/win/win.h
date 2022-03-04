@@ -32,6 +32,9 @@ public:
 			receiver.onMouseMove(x,y); };
 		enterWindowReceiver = [&](int enter) {
 			receiver.onWinEnter(enter); };
+		keyReceiver = [&](int key, int action, int mods) {
+			receiver.onKey(key, action, mods); };
+
 	}
 	static void getMousePos(int& x, int& y);
 	bool leftMouseHeldDown();
@@ -67,6 +70,7 @@ public:
 
 	static std::function <void(int,int,int)> mouseBtnReceiver;
 	static std::function <void(double, double)> mouseMoveReceiver;
+	static std::function <void(int, int, int)> keyReceiver;
 	static std::function <void(int)> enterWindowReceiver;
 };
 

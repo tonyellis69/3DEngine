@@ -43,9 +43,9 @@ CModel CImporter::getModel() {
 	singleMesh.exportToBuffer(*buf);
 
 	//Sort by tag if present, to get the correct drawing order.
-	std::sort(begin(modelMeshes), end(modelMeshes), []( auto const& A, auto const& B ) {	
-		return A.name.substr(A.name.length() -3) < B.name.substr(B.name.length() - 3); 
-	});
+	//std::sort(begin(modelMeshes), end(modelMeshes), []( auto const& A, auto const& B ) {	
+	//	return A.name.substr(A.name.length() -3) < B.name.substr(B.name.length() - 3); 
+	//});
 
 	for (auto& mesh : modelMeshes) {
 		model.meshes.push_back(mesh);
@@ -61,7 +61,7 @@ TMultiDrawable CImporter::getDrawables() {
 	singleMesh.exportToBuffer(*buf);
 	TMultiDrawable drawables;
 	for (auto& mesh : modelMeshes) {
-		drawables.meshes.push_back(mesh.draw.mesh);
+		drawables.meshes.push_back(mesh.draw.meshRec);
 	}
 	drawables.buf = buf;
 	return drawables;
@@ -72,7 +72,7 @@ TVertData CImporter::getVertData() {
 	data.vertices = singleMesh.vertices;  
 	data.indices = singleMesh.indices;
 	for (auto& mesh : modelMeshes) {
-		data.meshes.push_back(mesh.draw.mesh);
+		data.meshes.push_back(mesh.draw.meshRec);
 	}
 	return data;
 };
@@ -85,7 +85,7 @@ TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
 
 	int c = 0; auto mesh = modelMeshes.begin()+1;
 	for (unsigned int v = 0; v < colourVerts.size(); v++) {
-		if (mesh != modelMeshes.end() && v == mesh->draw.mesh.vertStart)
+		if (mesh != modelMeshes.end() && v == mesh->draw.meshRec.vertStart)
 			c++;
 		colourVerts[v].v = singleMesh.vertices[v];
 		//colourVerts[v].c = colours[c];
@@ -95,9 +95,9 @@ TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
 	buf->storeVerts(colourVerts, singleMesh.indices, 3, 1);
 
 	TDrawable tile;
-	tile.mesh.indexSize = singleMesh.indices.size();
-	tile.mesh.indexStart = 0;
-	tile.mesh.vertStart = 0;
+	tile.meshRec.indexSize = singleMesh.indices.size();
+	tile.meshRec.indexStart = 0;
+	tile.meshRec.vertStart = 0;
 	tile.buf = buf;
 	return tile;
 }

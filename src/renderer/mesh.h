@@ -46,7 +46,7 @@ struct TModelData {
 };
 
 struct TDrawable{
-	TMeshRec mesh;
+	TMeshRec meshRec;
 	std::shared_ptr<CBuf2> buf;
 };
 
@@ -67,6 +67,7 @@ struct TModelMesh {
 	TDrawable draw;
 	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; //TO DO: scrap
 	std::vector<glm::vec4> palette = { { 1.0f,1.0f,1.0f,1.0f } };
+	std::vector<glm::vec4>* pPalette;
 };
 
 

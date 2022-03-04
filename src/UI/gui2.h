@@ -21,6 +21,7 @@ public:
 	void init(CguiBase* root);
 	void addToIndex(CguiBase* ctrl);
 	void onMouseButton(int button, int action, int mod);
+	void onKey(int key, int action, int mod);
 	void onMouseMove(double x, double y);
 	void onWinEnter(int entered);
 	//CguiBase* getControl(int id);

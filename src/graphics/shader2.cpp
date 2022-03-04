@@ -19,6 +19,11 @@ CShader::CShader(const std::string& shaderName) {
 	linkShaders();
 }
 
+void CShader::activate() {
+	//TO DO: track active shader, set only if not already active.
+	glUseProgram(handle);
+}
+
 unsigned int CShader::getUniform(const std::string& uniformName) {
 	return glGetUniformLocation(handle, uniformName.c_str());
 }
