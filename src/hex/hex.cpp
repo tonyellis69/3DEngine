@@ -729,7 +729,7 @@ std::tuple<THexDir, glm::vec3> findSegmentExit(const glm::vec3 A, const glm::vec
 		glm::vec3 faceDir = glm::normalize(faceB - faceA);
 		glm::vec3 facePerp = { faceDir.y,-faceDir.x , 0 };
 
-		if (glm::dot(A - faceA, facePerp) < 0) //discard faces where the segment enters the hex
+		if (glm::dot(A - faceA, facePerp) <= 0) //discard faces where the segment enters the hex
 			continue;
 
 		if (segIntersect(A, B, faceA, faceB, intersection)) {

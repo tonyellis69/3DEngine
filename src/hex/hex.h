@@ -66,7 +66,8 @@ struct hex_hash {
 };
 
 using THexList = std::vector<CHex> ;
-using TIntersections = std::vector<std::pair<CHex, glm::vec3>>;
+using TIntersection = std::pair<CHex, glm::vec3>;
+using TIntersections = std::vector<TIntersection>;
 
 
 CHex cubeToAxial(CHex& cube);
