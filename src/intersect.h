@@ -11,3 +11,7 @@ bool segIntersect(const glm::vec3 & seg1A, const glm::vec3 & seg1B, const glm::v
 float signed2DTriArea(const glm::vec3 & a, const glm::vec3 & b, const glm::vec3 & c);
 
 bool inColinearSegment(const glm::vec3 & segA, const glm::vec3 & segB, const glm::vec3 & pt);
+
+float sqrDistPointSegment(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& pt);
+
+glm::vec3 closestPointSegment(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& pt);

@@ -67,3 +67,30 @@ bool inColinearSegment(const glm::vec3 & segA, const glm::vec3 & segB, const glm
 		return pt.y >= segB.y && pt.y <= segA.y;
 	return pt.y >= segA.y && pt.y <= segB.y;
 }
+
+/** Returns squared distance between point and segment. */
+float sqrDistPointSegment(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& pt) {
+	glm::vec3 ab = segB - segA;
+	glm::vec3 ac = pt - segA;
+	glm::vec3 bc = pt - segA;
+
+	float e = glm::dot(ab, ac);
+	if (e <= 0.0f)
+		return glm::dot(ac, ac);
+	float f = glm::dot(ab, ab);
+	if (e >= f)
+		return glm::dot(bc, bc);
+
+	return glm::dot(ac, ac) - e * e / f;
+}
+
+/** Returns closest position on a segment to a point. */
+glm::vec3 closestPointSegment(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& pt) {
+	glm::vec3 ab = segB - segA;
+	glm::vec3 ac = pt - segA;
+	float t = glm::dot(ac, ab) / glm::dot(ab, ab);
+	if (t < 0.0f) t = 0.0f;
+	if (t > 1.0f) t = 1.0f;
+
+	return segA + t * ab;
+}

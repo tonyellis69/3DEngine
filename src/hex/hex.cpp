@@ -691,6 +691,20 @@ THexList getNeighbours(CHex& hex) {
 
 }
 
+/** Return hexes surrounding the given one for a distance of radius hexes.*/
+THexList getNeighbours(CHex& hex, int radius) {
+	THexList hexes;
+	hexes.reserve(1 + 3 * radius * (radius + 1));
+
+	for (int q = -radius; q <= radius; q++) {
+		for (int r = std::max(-radius, -q - radius); r <= std::min(radius, -q + radius); r++) {
+			int s = -q - r;
+			hexes.push_back(hex + CHex(q,r,s));
+		}
+	}
+	return hexes;
+}
+
 TIntersections getIntersectedHexes(const glm::vec3& segA, const glm::vec3& segB) {
 	TIntersections intersectedHexes;
 	CHex startHex = worldSpaceToHex(segA);
