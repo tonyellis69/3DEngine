@@ -34,7 +34,7 @@ CWin::~CWin() {
 
 /** Create a window for rendering to. */
 void CWin::createWindow(int w, int h, std::string title) {
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT , true);
 	//glfwWindowHint(GLFW_SAMPLES, 4);
 	window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
 	glfwMakeContextCurrent(window);
@@ -120,16 +120,18 @@ void CWin::setMousePos(int x, int y) {
 
 /** Make the window fullscreen, borderless. */
 void CWin::fullScreen() {
-	glfwGetWindowPos(window, &lastWindowPosX, &lastWindowPosY);
-	glfwGetWindowSize(window, &lastWindowWidth, &lastWindowHeight);
-	lastMode = glfwGetVideoMode(primaryMonitor);
-	glfwSetWindowMonitor(window, primaryMonitor, 0, 0, lastMode->width, lastMode->height, lastMode->refreshRate);
+	//glfwGetWindowPos(window, &lastWindowPosX, &lastWindowPosY);
+	//glfwGetWindowSize(window, &lastWindowWidth, &lastWindowHeight);
+	//lastMode = glfwGetVideoMode(primaryMonitor);
+	//glfwSetWindowMonitor(window, primaryMonitor, 0, 0, lastMode->width, lastMode->height, lastMode->refreshRate);
+	glfwMaximizeWindow(window);
 	fullScreenOn = true;
 }
 
 /** Return the window to its windowed state. */
 void CWin::unFullScreen() {
-	glfwSetWindowMonitor(window, NULL, lastWindowPosX, lastWindowPosY, lastWindowWidth, lastWindowHeight, lastMode->refreshRate);
+	//glfwSetWindowMonitor(window, NULL, lastWindowPosX, lastWindowPosY, lastWindowWidth, lastWindowHeight, lastMode->refreshRate);
+	glfwRestoreWindow(window);
 	fullScreenOn = false; 
 }
 

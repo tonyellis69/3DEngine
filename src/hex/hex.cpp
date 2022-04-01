@@ -179,7 +179,7 @@ CHex OLDworldSpaceToHex(glm::vec3& worldSpace) {
 }
 
 CHex worldSpaceToHex(const glm::vec3& worldSpace) {
-	//first find the rectangle for this point
+	//find which rectangle encompassing the top 3/4 of a hex we're in
 	float halfHexHeight = hexHeight / 2.0f;
 	float hexQuarterHeight = hexHeight / 4.0f;
 	float rectHeight = hexHeight * 0.75f;
@@ -192,14 +192,14 @@ CHex worldSpaceToHex(const glm::vec3& worldSpace) {
 	int col = (int) floor((worldSpace.x + offset) / hexWidth);
 
 
-	//now check if we're in the upper triangles
+	//now check if we're in the upper triangles within the rectangle
 	//first, find BL origin of rectangle
 	glm::vec3 BL = { -halfHexWidth +  col * hexWidth, -hexQuarterHeight + row * -rectHeight,0 };
 	if (rowIsOdd)
 		BL.x += halfHexWidth;
 
 	glm::vec2 relative = (worldSpace) - (BL);
-	if (relative.y > halfHexHeight) {
+	if (relative.y > halfHexHeight) { //in upper triangles, so...
 		relative.y -= halfHexHeight;
 		float slope = hexQuarterHeight / halfHexWidth;
 
@@ -211,10 +211,12 @@ CHex worldSpaceToHex(const glm::vec3& worldSpace) {
 					col--;
 			}
 		}
-		else if (relative.y > (hexWidth - relative.x) * slope) {
-			row--;
-			if (rowIsOdd)
-				col++;
+		else {
+			if (relative.y > (hexWidth - relative.x) * slope) {
+				row--;
+				if (rowIsOdd)
+					col++;
+			}
 		}
 	}
 	
