@@ -65,8 +65,16 @@ void CShader::setUniform(unsigned int arrayHandle, std::vector<glm::vec4>& vec) 
 
 }
 
-void CShader::setTexture(unsigned int samplerHandle, int textureUnit) {
-	glUniform1i(samplerHandle, textureUnit);
+void CShader::setTexture0(unsigned int samplerHandle,  int textureHandle) {
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glUniform1i(samplerHandle, 0);
+}
+
+void CShader::setTexture1(unsigned int samplerHandle, int textureHandle) {
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glUniform1i(samplerHandle, 1);
 }
 
 

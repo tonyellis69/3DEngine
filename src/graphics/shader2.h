@@ -24,8 +24,8 @@ public:
 	void setUniform(unsigned int intHandle, int value);
 	void setUniform(unsigned int floatHandle, float value);
 	void setUniform(unsigned int arrayHandle, std::vector<glm::vec4>& value);
-	void setTexture(unsigned int samplerHandle, int textureUnit);
-
+	void setTexture0(unsigned int samplerHandle, int textureHandle);
+	void setTexture1(unsigned int samplerHandle, int textureHandle);
 
 	unsigned int handle;
 
