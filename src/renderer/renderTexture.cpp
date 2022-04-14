@@ -147,7 +147,13 @@ void CRenderTexture::createGreyscale(unsigned char * data, int w, int h) {
 }
 
 void CRenderTexture::clear() {
-	resize(width, height);
+	glBindTexture(GL_TEXTURE_2D, handle);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL ); //GL_FLOAT was GL_UNSIGNED_BYTE
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void CRenderTexture::setPixelData(void * pixels) {
