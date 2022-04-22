@@ -77,6 +77,12 @@ void CShader::setTexture1(unsigned int samplerHandle, int textureHandle) {
 	glUniform1i(samplerHandle, 1);
 }
 
+void CShader::setTexture2(unsigned int samplerHandle, int textureHandle) {
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, textureHandle);
+	glUniform1i(samplerHandle, 2);
+}
+
 
 std::vector<unsigned int> CShader::loadFiles(const std::string& shaderName) {
 	auto dataPath = std::filesystem::current_path().string() + "\\Data\\shaders\\";
