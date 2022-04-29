@@ -115,7 +115,9 @@ TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {
 		currentNode.extents = extents;
 		TModelMesh modelMesh = { node->mName.C_Str(),currentNode.matrix,meshRec };
 		modelMeshes.push_back(modelMesh);
-		meshCount++;
+
+		if (std::string(node->mName.C_Str()).find("mask") == std::string::npos)
+			meshCount++;
 	}
 
 	for (unsigned int n = 0; n < node->mNumChildren; n++) {
@@ -156,7 +158,8 @@ std::tuple<TMeshRec, TMeshExtents> CImporter::processMesh(aiMesh* mesh, const ai
 	bool isLine;
 	bool isLineLoop = false;
 	//if (std::string(mesh->mName.C_Str()).find("solid") != std::string::npos)
-	if (std::string(node->mName.C_Str()).find("solid") != std::string::npos)
+	if ( std::string(node->mName.C_Str()).find("solid") != std::string::npos || 
+		std::string(node->mName.C_Str()).find("mask") != std::string::npos )
 		isLine = false;
 	else {
 		isLine = true;
