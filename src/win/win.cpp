@@ -35,7 +35,7 @@ CWin::~CWin() {
 /** Create a window for rendering to. */
 void CWin::createWindow(int w, int h, std::string title) {
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT , true);
-//	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	window = glfwCreateWindow(w, h, title.c_str(), NULL, NULL);
 	glfwMakeContextCurrent(window);
 
