@@ -179,16 +179,7 @@
     <ClCompile Include="..\src\UI\GUIpopMenu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\UI\GUIpaletteBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\GUIimage1D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\GUIcolourPicker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\colourGradient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\rowObject.cpp">
@@ -204,9 +195,6 @@
       <Filter>Header Files\renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\src\renderer\model2 .cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\UI\GUIswatchContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\UI\GUIdragDrop.cpp">
@@ -478,16 +466,7 @@
     <ClInclude Include="..\src\UI\GUIpopMenu.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\UI\GUIpaletteBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\GUIimage1D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\GUIcolourPicker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\colourGradient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\rowObject.h">
@@ -501,9 +480,6 @@
     </ClInclude>
     <ClInclude Include="..\src\renderer\model2.h">
       <Filter>Header Files\renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\UI\GUIswatchContainer.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\src\UI\GUIcontainer.h">
       <Filter>Header Files</Filter>

@@ -4,7 +4,7 @@
 
 #include "win/win.h"
 
-CguiRoot2 gui; ///<Global object.
+CguiRoot2 UI; ///<Global object.
 
 CguiBase* findControlUnderMouse(CguiBase* ctrl, glm::i32vec2& mousePos);
 
@@ -41,8 +41,11 @@ void CguiRoot2::onKey(int key, int action, int mod) {
 	if (action == GLFW_PRESS) {
 		e.type = eKeyDown;
 	}
-	else {
+	else if (action == GLFW_RELEASE) {
 		e.type = eKeyUp;
+	}
+	else if (action == GLFW_REPEAT) { //NB: OK for text-entry, not game-smooth realtime.
+		e.type = eKeyRepeat;
 	}
 	lis::event(e);
 }
@@ -94,19 +97,16 @@ CguiBase* CguiRoot2::findControl(const std::string& targetName) {
 
 bool CguiRoot2::mouseIn(const std::string& name) {
 	CguiBase* ctrl = findControl(name);
-	//return ctrl->isMouseOver();
-	return ctrl->overlays(getMousePos());
+	glm::i32vec2 p;
+	CWin::getMousePos(p.x, p.y);
+	return ctrl->overlays(p);
 }
 
 bool CguiRoot2::mouseNotIn(const std::string& name) {
 	return !mouseIn(name);
 }
 
-glm::i32vec2 CguiRoot2::getMousePos() {
-	glm::i32vec2 p;
-	CWin::getMousePos(p.x, p.y);
-	return p;
-}
+
 
 
 

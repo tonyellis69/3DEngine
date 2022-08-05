@@ -80,8 +80,8 @@ CBaseApp::CBaseApp(void)  {
 	}
 
 
-	gui.init(&GUIroot);
-	win.setReceiver(gui);
+	UI.init(&GUIroot);
+	win.setReceiver(UI);
 
 	sysLog << "BaseApp constructor finished. Yay!\n";
 

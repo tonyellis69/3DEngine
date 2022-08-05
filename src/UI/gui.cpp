@@ -24,7 +24,7 @@ CGUIbutton2* gui::addButton(const std::string& text, int x, int y) {
 	pGUIroot->add(button);
 	return button;
 }
-
+/*
 CGUIswatchContainer* gui::addSwatchContainer(int x, int y) {
 	CGUIswatchContainer* swatch = new CGUIswatchContainer(x, y, 320, 300);
 	pGUIroot->add(swatch);
@@ -37,7 +37,7 @@ CGUIpaletteBar* gui::addPaletteBar(int x, int y) {
 	return palette;
 }
 
-
+*/
 
 void gui::removeControl(CGUIbase* ctrl) {
 	delete ctrl;

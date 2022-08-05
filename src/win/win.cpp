@@ -15,6 +15,8 @@ std::function <void(int, int, int)> CWin::mouseBtnReceiver;
 std::function <void(double, double)> CWin::mouseMoveReceiver;
 std::function <void(int, int, int)> CWin::keyReceiver;
 std::function <void(int)> CWin::enterWindowReceiver;
+GLFWmonitor* CWin::primaryMonitor;
+const GLFWvidmode* CWin::lastMode;
 
 void error_callback(int error, const char* description) {
 	std::cerr << "Error here: " << description;
@@ -89,12 +91,14 @@ void CWin::setApp(CBaseApp * app) {
 	pApp = app;
 }
 
+
 void CWin::getMousePos(int & x, int & y) {
 	double dx, dy;
 	glfwGetCursorPos(window, &dx, &dy);
 	x = floor(dx); y = floor(dy);
 	//pApp->mouseMove(x,y,0);
 }
+
 
 
 
@@ -186,8 +190,10 @@ void CWin::windowSizeCallback(GLFWwindow* window, int width, int height) {
 void CWin::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS)
 		pApp->onKeyPress(key, mods);
-	if (action == GLFW_RELEASE)
+	else if (action == GLFW_RELEASE)
 		pApp->OnKeyRelease(key, mods);
+	else if (GLFW_REPEAT)
+		;//not implemented
 	keyReceiver(key, action, mods);
 }
 

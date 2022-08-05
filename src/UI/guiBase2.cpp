@@ -7,7 +7,7 @@
 /** Temporary. Adapting add() so ctrls get added to gui's index.*/
 void CguiBase::add(CGUIbase* child) {
 	CGUIbase::add(child);
-	gui.addToIndex((CguiBase*)child);
+	UI.addToIndex((CguiBase*)child);
 }
 
 void CguiBase::onMouseMove(glm::ivec2& mousePos) {

@@ -47,7 +47,7 @@ public:
 	void hideWindow(bool onOff);
 	void setTitle(std::string & title);
 	void showMouse(bool onOff);
-	bool keyPressed(int key);
+	static bool keyPressed(int key);
 	bool mouseButtonPressed(int button);
 
 
@@ -61,8 +61,8 @@ public:
 
 
 	static GLFWwindow* window;
-	GLFWmonitor* primaryMonitor;
-	const GLFWvidmode* lastMode;
+	static GLFWmonitor* primaryMonitor;
+	static const GLFWvidmode* lastMode;
 	int lastWindowPosX, lastWindowPosY;
 	int lastWindowWidth, lastWindowHeight;
 	static CBaseApp* pApp;

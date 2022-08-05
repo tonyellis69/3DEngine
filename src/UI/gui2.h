@@ -29,7 +29,7 @@ public:
 	CguiBase* findControl(const std::string& name);
 	bool mouseIn(const std::string& name);
 	bool mouseNotIn(const std::string& name);
-	glm::i32vec2 getMousePos();
+
 
 	CguiBase* pRoot;
 	CguiBase* hotControl;
@@ -43,4 +43,4 @@ public:
 	bool mMouseDown = false;
 };
 
-extern CguiRoot2 gui;
+extern CguiRoot2 UI;
