@@ -637,5 +637,8 @@
     <ClInclude Include="..\src\graphics\shader2.h">
       <Filter>Source Files\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\utils\mathsLib.h">
+      <Filter>Header Files\utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
