@@ -17,3 +17,6 @@ glm::vec3 turnRight(const glm::vec3& v) {
 	return glm::vec3(v.y, -v.x, v.z);
 }
 
+bool isAcute(glm::vec3& vecA, glm::vec3& vecB) {
+	return glm::dot(vecA, vecB) > 0;
+}
