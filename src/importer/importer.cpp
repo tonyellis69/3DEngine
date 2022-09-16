@@ -39,8 +39,8 @@ TModelData CImporter::getMeshNodes() {
 CModel CImporter::getModel() {
 	CModel model;
 
-	auto buf = std::make_shared<CBuf2>();
-	singleMesh.exportToBuffer(*buf);
+	//auto buf = std::make_shared<CBuf2>();
+	singleMesh.exportToBuffer(model.buf);
 
 	//Sort by tag if present, to get the correct drawing order.
 	//std::sort(begin(modelMeshes), end(modelMeshes), []( auto const& A, auto const& B ) {	
@@ -48,59 +48,60 @@ CModel CImporter::getModel() {
 	//});
 
 	for (auto& mesh : modelMeshes) {
-		model.meshes.push_back(mesh);
-		model.meshes.back().draw.buf = buf;
+		//model.meshes.push_back(mesh);
+		model.addMesh(mesh);
+	//	model.meshes.back().draw.buf = std::make_shared<CBuf2>(model.buf);
 	}
 	
 	model.extents = rootNode.extents; //temp!
 	return model;
 }
 
-TMultiDrawable CImporter::getDrawables() {
-	auto buf = std::make_shared<CBuf2>();
-	singleMesh.exportToBuffer(*buf);
-	TMultiDrawable drawables;
-	for (auto& mesh : modelMeshes) {
-		drawables.meshes.push_back(mesh.draw.meshRec);
-	}
-	drawables.buf = buf;
-	return drawables;
-}
+//TMultiDrawable CImporter::getDrawables() {
+//	auto buf = std::make_shared<CBuf2>();
+//	singleMesh.exportToBuffer(*buf);
+//	TMultiDrawable drawables;
+//	for (auto& mesh : modelMeshes) {
+//		drawables.meshes.push_back(mesh.draw.meshRec);
+//	}
+//	drawables.buf = buf;
+//	return drawables;
+//}
 
 TVertData CImporter::getVertData() {
 	TVertData data;
 	data.vertices = singleMesh.vertices;  
 	data.indices = singleMesh.indices;
 	for (auto& mesh : modelMeshes) {
-		data.meshes.push_back(mesh.draw.meshRec);
+		data.meshes.push_back(mesh.meshRec);
 	}
 	return data;
 };
 
 
 
-TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
-	auto buf = std::make_shared<CBuf2>();
-	std::vector<vc> colourVerts(singleMesh.vertices.size());
-
-	int c = 0; auto mesh = modelMeshes.begin()+1;
-	for (unsigned int v = 0; v < colourVerts.size(); v++) {
-		if (mesh != modelMeshes.end() && v == mesh->draw.meshRec.vertStart)
-			c++;
-		colourVerts[v].v = singleMesh.vertices[v];
-		//colourVerts[v].c = colours[c];
-	}
-
-
-	buf->storeVerts(colourVerts, singleMesh.indices, 3, 1);
-
-	TDrawable tile;
-	tile.meshRec.indexSize = singleMesh.indices.size();
-	tile.meshRec.indexStart = 0;
-	tile.meshRec.vertStart = 0;
-	tile.buf = buf;
-	return tile;
-}
+//TDrawable CImporter::getHexTile(std::vector<glm::vec4>& colours) {
+//	auto buf = std::make_shared<CBuf2>();
+//	std::vector<vc> colourVerts(singleMesh.vertices.size());
+//
+//	int c = 0; auto mesh = modelMeshes.begin()+1;
+//	for (unsigned int v = 0; v < colourVerts.size(); v++) {
+//		if (mesh != modelMeshes.end() && v == mesh->draw.meshRec.vertStart)
+//			c++;
+//		colourVerts[v].v = singleMesh.vertices[v];
+//		//colourVerts[v].c = colours[c];
+//	}
+//
+//
+//	buf->storeVerts(colourVerts, singleMesh.indices, 3, 1);
+//
+//	TDrawable tile;
+//	tile.meshRec.indexSize = singleMesh.indices.size();
+//	tile.meshRec.indexStart = 0;
+//	tile.meshRec.vertStart = 0;
+//	tile.buf = buf;
+//	return tile;
+//}
 
 /** Recursively retrieve all the verts etc from each node in the scene. */
 TModelData CImporter::processNode(aiNode* node, const aiScene* scene) {

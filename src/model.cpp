@@ -3,6 +3,28 @@
 #include "intersect.h"
 
 
+void CModel::addMesh(TModelMesh& mesh) {
+	meshes.push_back(mesh);
+	if (mainMeshIdx < 0)
+		mainMeshIdx = 0;
+}
+
+void CModel::setMainMesh(const std::string& name) {
+	int i = 0;
+	for (auto& mesh : meshes) {
+		if (mesh.name == name) {
+			mainMeshIdx = i;
+			return;
+		}
+		i++;
+	}
+}
+
+TModelMesh* CModel::getMainMesh()
+{
+	return &meshes[mainMeshIdx];
+}
+
 TModelMesh* CModel::getMesh(const std::string& name) {
 	for (auto& mesh : meshes)
 		if (mesh.name == name)
@@ -15,7 +37,7 @@ TModelMesh* CModel::getMesh(const std::string& name) {
 //TO DO: needs rewrite for CModel.
 bool CModel::circleCollision(glm::vec3& segA, glm::vec3& segB) {
 	float radius = glm::length(extents.furthestVert);
-	glm::vec3 circleOrig = tmpMatrix[3];
+	glm::vec3 circleOrig = meshes[mainMeshIdx].matrix[3];
 	glm::vec3 localA = segA - circleOrig;
 	glm::vec3 segVec = (segB - segA);
 	glm::vec3 segVecN = glm::normalize(segVec);
@@ -48,6 +70,8 @@ bool CModel::BBcollision(glm::vec3& segA, glm::vec3& segB) {
 	glm::vec3 cornerB = extents.BBmax;
 	glm::vec3 cornerC(extents.BBmax.x, extents.BBmin.y, 0);
 	glm::vec3 cornerD = extents.BBmin;
+
+	glm::mat4& tmpMatrix = meshes[mainMeshIdx].matrix;
 
 	cornerA = tmpMatrix * glm::vec4(cornerA, 1);
 	cornerB = tmpMatrix * glm::vec4(cornerB, 1);

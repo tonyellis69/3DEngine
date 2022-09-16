@@ -44,16 +44,16 @@ struct TModelData {
 
 	TMeshExtents extents;
 };
+//
+//struct TDrawable{
+//	//TMeshRec meshRec;
+//	//std::shared_ptr<CBuf2> buf;
+//};
 
-struct TDrawable{
-	TMeshRec meshRec;
-	std::shared_ptr<CBuf2> buf;
-};
-
-struct TMultiDrawable {
-	std::vector<TMeshRec> meshes;
-	std::shared_ptr<CBuf2> buf;
-};
+//struct TMultiDrawable {
+//	std::vector<TMeshRec> meshes;
+////std::shared_ptr<CBuf2> buf;
+//};
 
 struct TVertData {
 	std::vector<TMeshRec> meshes;
@@ -64,7 +64,10 @@ struct TVertData {
 struct TModelMesh {
 	std::string name;
 	glm::mat4 matrix;
-	TDrawable draw;
+	TMeshRec meshRec;
+	//TDrawable draw;
+
+
 	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; //TO DO: scrap
 	std::vector<glm::vec4> palette = { { 1.0f,1.0f,1.0f,1.0f } };
 	std::vector<glm::vec4>* pPalette;

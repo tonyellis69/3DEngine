@@ -46,7 +46,7 @@ public:
 	void quitWindow();
 	void hideWindow(bool onOff);
 	void setTitle(std::string & title);
-	void showMouse(bool onOff);
+	static void showMouse(bool onOff);
 	static bool keyPressed(int key);
 	bool mouseButtonPressed(int button);
 
