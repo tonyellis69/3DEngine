@@ -7,14 +7,14 @@
 
 CCamera::CCamera() : C3dObject() {
 	//set up some default perspective settings
-	zNear = 0.1f; zFar = 90000.0f; Fov = 45.0f;
+	zNear = 0.1f; zFar = 90000.0f; Fov = glm::radians(45.0f);
 	lookAt(glm::vec3(0, 0, -1));
 	setAspectRatio(800,600);
 }
 	
 CCamera::CCamera(glm::vec3& pos) : C3dObject(pos) {
 	//set up some default perspective settings
-	zNear =  0.3f; zFar = 90000.0f; Fov = 45.0f;
+	zNear =  0.3f; zFar = 90000.0f; Fov = glm::radians(45.0f);
 	setAspectRatio(800,600);
 }
 
@@ -42,6 +42,13 @@ void CCamera::setAspectRatio(float w, float h) {
 	perspectiveMatrix = glm::perspective<float>(Fov,w/h,zNear,zFar);
 	createClipMatrix();
 	viewW = w; viewH = h;
+}
+
+void CCamera::setAspectRatio(glm::vec2& ratio, float newFov) {
+	perspectiveMatrix = glm::perspective<float>(newFov, ratio.x / ratio.y, zNear, zFar);
+	createClipMatrix();
+	viewW = ratio.x; viewH = ratio.y;
+	Fov = newFov;
 }
 
 /** Reposition camera, moving the target proportionally.*/

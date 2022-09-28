@@ -34,16 +34,7 @@ struct TMeshExtents {
 	glm::vec3 BBmax;
 };
 
-/** Holds the reference data for a model or part of a multipart
-	model, including all sub-parts. Does not store the actual vertices. */
-struct TModelData {
-	std::string name;
-	glm::mat4 matrix;
-	std::vector<TMeshRec> meshes;
-	std::vector<TModelData> subModels;
 
-	TMeshExtents extents;
-};
 //
 //struct TDrawable{
 //	//TMeshRec meshRec;
@@ -69,8 +60,8 @@ struct TModelMesh {
 
 
 	glm::vec4 colour = { 1.0f,1.0f,1.0f,1.0f }; //TO DO: scrap
-	std::vector<glm::vec4> palette = { { 1.0f,1.0f,1.0f,1.0f } };
-	std::vector<glm::vec4>* pPalette;
+	//std::vector<glm::vec4> palette = { { 1.0f,1.0f,1.0f,1.0f } };
+	//std::vector<glm::vec4>* pPalette;
 };
 
 

@@ -181,6 +181,7 @@
     <ClCompile Include="..\src\utils\files.cpp" />
     <ClCompile Include="..\src\utils\idContainer.cpp" />
     <ClCompile Include="..\src\utils\log.cpp" />
+    <ClCompile Include="..\src\utils\mathsLib.cpp" />
     <ClCompile Include="..\src\utils\random.cpp" />
     <ClCompile Include="..\src\vertBufs.cpp" />
     <ClCompile Include="..\src\win\win.cpp" />

@@ -13,6 +13,7 @@ public:
 	float getRadius();
 
 	CBuf2 buf;
+	std::vector<glm::vec4> palette{ { 1.0f,0.0f,0.0f,1.0f } };
 
 	std::vector<TModelMesh> meshes;
 

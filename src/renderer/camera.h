@@ -13,6 +13,7 @@ public:
 	void lookAt(glm::vec3& target);
 	void setNearFar(float, float);
 	void setAspectRatio(float w, float h);
+	void setAspectRatio(glm::vec2& ratio, float newFov);
 	void setPos(glm::vec3& pos);
 	void translate(glm::vec3& dir);
 	void adjustTarget(glm::vec2 inc);

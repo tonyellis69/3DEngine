@@ -12,6 +12,17 @@
 #include "../renderer/mesh.h"
 #include "model.h"
 
+/** Holds the reference data for a model or part of a multipart
+	model, including all sub-parts. Does not store the actual vertices. */
+struct TModelData {
+	std::string name;
+	glm::mat4 matrix;
+	std::vector<TMeshRec> meshes;
+	std::vector<TModelData> subModels;
+
+	TMeshExtents extents;
+};
+
 class CImporter {
 public:
 	void loadFile(const std::string& filename);
