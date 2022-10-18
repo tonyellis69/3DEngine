@@ -32,7 +32,9 @@ void CBuf2::freeMem() {
 unsigned int CBuf2::getBufferHandle() {
 	return sharedBuf->getBufferHandle();
 }
-
+unsigned int CBuf2::getVAOhandle() {
+	return sharedBuf->getVAOHandle();
+}
 
 
 /** Stores the given vertex array in a shareable internal buffer. */

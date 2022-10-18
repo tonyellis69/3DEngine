@@ -164,7 +164,7 @@ void CWin::showMouse(bool onOff) {
 }
 
 bool CWin::keyPressed(int key) {
-	return glfwGetKey(window, key);
+	return  glfwGetKey(window, key);
 }
 
 bool CWin::mouseButtonPressed(int button) {
@@ -189,7 +189,7 @@ void CWin::windowSizeCallback(GLFWwindow* window, int width, int height) {
 
 void CWin::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS)
-		pApp->onKeyPress(key, mods);
+		 pApp->onKeyPress(key, mods);
 	else if (action == GLFW_RELEASE)
 		pApp->OnKeyRelease(key, mods);
 	else if (GLFW_REPEAT)

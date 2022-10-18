@@ -55,6 +55,10 @@ public:
 		return hBuffer;
 	}
 
+	unsigned int getVAOHandle() {
+		return hVAO;
+	}
+
 	~CSharedBuf();
 
 private:

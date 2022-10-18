@@ -14,7 +14,7 @@ public:
 	void setSize(unsigned int size);
 	void freeMem();
 	unsigned int getBufferHandle();
-	//void add(CBuf& buf2, )
+	unsigned int getVAOhandle();
 
 	template <typename T>
 	void readIndex(std::vector<T>& t) {

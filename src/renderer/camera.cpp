@@ -63,7 +63,6 @@ void CCamera::translate(glm::vec3& dir)  {
 	createClipMatrix();
 }
 
-
 /** Create a transformation to clip space based on this camera's position, orientation and perspective.*/
 void CCamera::createClipMatrix() {
 	camMatrix = glm::inverse(worldMatrix);
