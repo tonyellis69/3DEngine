@@ -6,7 +6,8 @@
 #include <glm/glm.hpp>
 
 enum TEventType { eNone, eMouseMove, eLeftClick, eMouseOff, eHotTextHover, 
-	eMouseEnterWindow, eMouseExitWindow, eKeyDown, eKeyUp, eKeyRepeat};
+	eMouseEnterWindow, eMouseExitWindow, eKeyDown, eKeyUp, eKeyRepeat, 
+	eGameEvent};
 
 enum TMouseButton {};
 

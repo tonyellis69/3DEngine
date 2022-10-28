@@ -17,6 +17,7 @@ std::function <void(int, int, int)> CWin::keyReceiver;
 std::function <void(int)> CWin::enterWindowReceiver;
 GLFWmonitor* CWin::primaryMonitor;
 const GLFWvidmode* CWin::lastMode;
+bool CWin::fullScreenOn;
 
 void error_callback(int error, const char* description) {
 	std::cerr << "Error here: " << description;

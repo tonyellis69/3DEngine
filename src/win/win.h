@@ -41,14 +41,14 @@ public:
 	bool rightMouseDown();
 	bool middleMouseDown();
 	void setMousePos(int x, int y);
-	void fullScreen();
-	void unFullScreen();
+	static void fullScreen();
+	static void unFullScreen();
 	void quitWindow();
 	void hideWindow(bool onOff);
 	void setTitle(std::string & title);
 	static void showMouse(bool onOff);
 	static bool keyPressed(int key);
-	bool mouseButtonPressed(int button);
+	static bool mouseButtonPressed(int button);
 
 
 	static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
@@ -66,7 +66,7 @@ public:
 	int lastWindowPosX, lastWindowPosY;
 	int lastWindowWidth, lastWindowHeight;
 	static CBaseApp* pApp;
-	bool fullScreenOn;
+	static bool fullScreenOn;
 
 	static std::function <void(int,int,int)> mouseBtnReceiver;
 	static std::function <void(double, double)> mouseMoveReceiver;
