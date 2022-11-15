@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "listen/event.h"
+#include "guiEvent.h"
 //#include "guiMsg.h"
 
 class CguiBase : public CGUIbase {
@@ -13,7 +13,7 @@ public:
 	CguiBase(int x, int y, int w, int h) : CGUIbase(x, y, w, h) {}
 
 	void add(CGUIbase* child);
-	virtual void onEvent(CEvent& e) {}
+	virtual void onEvent(CGUIevent& e) {}
 	virtual void onMouseMove(glm::ivec2& mousePos);
 	virtual void onMouseOff();
 	virtual void onLeftClick();

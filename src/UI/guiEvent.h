@@ -5,9 +5,8 @@
 
 #include <glm/glm.hpp>
 
-enum TEventType { eNone, eMouseMove, eLeftClick, eMouseOff, eHotTextHover, 
-	eMouseEnterWindow, eMouseExitWindow, eKeyDown, eKeyUp, eKeyRepeat, 
-	eGameEvent};
+enum TGUIEventType { eNone, eMouseMove, eLeftClick, eMouseOff, eHotTextHover, 
+	eMouseEnterWindow, eMouseExitWindow, eKeyDown, eKeyUp, eKeyRepeat};
 
 enum TMouseButton {};
 
@@ -16,11 +15,11 @@ struct TMouseButtonEvent {
 
 };
 
-class CEvent {
+class CGUIevent {
 public:
-	CEvent() {}
+	CGUIevent() {}
 	//~CEvent() {}
-	TEventType type;
+	TGUIEventType type;
 	union {
 		
 		unsigned int guiID;

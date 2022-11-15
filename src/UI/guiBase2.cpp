@@ -11,21 +11,21 @@ void CguiBase::add(CGUIbase* child) {
 }
 
 void CguiBase::onMouseMove(glm::ivec2& mousePos) {
-	CEvent e;
+	CGUIevent e;
 	e.type = eMouseMove;
 	e.guiID = uniqueID; e.pos = mousePos;
 	lis::event(e);
 }
 
 void CguiBase::onMouseOff() {
-	CEvent e;
+	CGUIevent e;
 	e.type = eMouseOff;
 	e.guiID = uniqueID;
 	lis::event(e);
 }
 
 void CguiBase::onLeftClick() {
-	CEvent e;
+	CGUIevent e;
 	e.type = eLeftClick;
 	e.guiID = uniqueID;
 	lis::event(e);

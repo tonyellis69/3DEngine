@@ -628,9 +628,6 @@
     <ClInclude Include="..\src\UI\guiBase2.h">
       <Filter>Source Files\gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\listen\event.h">
-      <Filter>Source Files\listen</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\listen\listen.h">
       <Filter>Source Files\listen</Filter>
     </ClInclude>
@@ -642,6 +639,9 @@
     </ClInclude>
     <ClInclude Include="..\src\utils\mathsLib.h">
       <Filter>Header Files\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\UI\guiEvent.h">
+      <Filter>Source Files\gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

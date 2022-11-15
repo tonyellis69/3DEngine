@@ -89,7 +89,7 @@ void CGUIrichText::onMouseMove(glm::ivec2& mousePos) {
 	std::string msg = lineBuffer2.onMouseMove(localMouse);
 	if (msg != lastHotTxt) {
 		lastHotTxt = msg;
-		CEvent e;
+		CGUIevent e;
 		e.type = eHotTextHover;
 		e.hotTxt = &msg;
 		e.guiID = uniqueID;
@@ -98,7 +98,7 @@ void CGUIrichText::onMouseMove(glm::ivec2& mousePos) {
 }
 
 void CGUIrichText::onLeftClick() {
-	CEvent e;
+	CGUIevent e;
 	e.type = eLeftClick;
 	e.hotTxt = &lastHotTxt;
 	e.guiID = uniqueID;
@@ -147,7 +147,7 @@ bool CGUIrichText::OnClick(const int mouseX, const int mouseY) {
 void CGUIrichText::onMouseOff() {
 	lineBuffer2.onMouseOff();
 	lastHotTxt = "";
-	CEvent e;
+	CGUIevent e;
 	e.type = eMouseOff;
 	e.guiID = uniqueID;
 	lis::event(e);

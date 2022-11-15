@@ -200,7 +200,6 @@
     <ClInclude Include="..\src\importer\importer.h" />
     <ClInclude Include="..\src\importer\simpleMesh.h" />
     <ClInclude Include="..\src\intersect.h" />
-    <ClInclude Include="..\src\listen\event.h" />
     <ClInclude Include="..\src\listen\listen.h" />
     <ClInclude Include="..\Src\Macros.h" />
     <ClInclude Include="..\src\model.h" />
@@ -253,6 +252,7 @@
     <ClInclude Include="..\src\UI\GUIcontrols.h" />
     <ClInclude Include="..\src\UI\GUIdragDrop.h" />
     <ClInclude Include="..\src\UI\GUIdropdownMenu.h" />
+    <ClInclude Include="..\src\UI\guiEvent.h" />
     <ClInclude Include="..\src\UI\GUIimage1D.h" />
     <ClInclude Include="..\src\UI\GUIpopMenu.h" />
     <ClInclude Include="..\src\UI\GUIposition.h" />

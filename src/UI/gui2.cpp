@@ -2,6 +2,8 @@
 
 #include "listen/listen.h"
 
+#include "guiEvent.h"
+
 #include "win/win.h"
 
 CguiRoot2 UI; ///<Global object.
@@ -36,7 +38,7 @@ void CguiRoot2::onMouseButton(int button, int action, int mod) {
 }
 
 void CguiRoot2::onKey(int key, int action, int mod) {
-	CEvent e;
+	CGUIevent e;
 	e.i1 = key; e.i2 = mod;
 	if (action == GLFW_PRESS) {
 		e.type = eKeyDown;
