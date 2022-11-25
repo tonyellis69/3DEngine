@@ -95,7 +95,7 @@ void CGUImenu::addItem( std::initializer_list<std::string>  itemTexts) {
 	resizeToFit();
 }
 
-/** Resize to fit current items. The parent is messaged, as it might be a container that now
+/** Resize to fit current items. The parentEntity is messaged, as it might be a container that now
 	needs scrollbars, etc.*/
 void CGUImenu::resizeToFit() {
 	setWidth(itemWidth + 2 * hItemPad);

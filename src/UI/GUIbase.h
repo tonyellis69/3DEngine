@@ -255,7 +255,7 @@ public:
 	static	CMessage Message; ///<Any UI messages are returned here.
 
 	
-	glm::i32vec2 localPos; ///<Top left corner positionHint relative to parent;
+	glm::i32vec2 localPos; ///<Top left corner positionHint relative to parentEntity;
 	
 
 	//UIcoord screenPos; ///<Top left in ui screen coordinates.
@@ -277,7 +277,7 @@ public:
 
 	UIrect Clipbox; ///<A clipping rectangle defining the drawable area of this control.
 	
-	CGUIbase* parent; ///<Points to the parent control of this control.
+	CGUIbase* parent; ///<Points to the parentEntity control of this control.
 	
 	std::string Name; ///<String identifying this control.
 
@@ -296,8 +296,8 @@ public:
 
 	int borderWidth; ///<Deducted from clipping and child positioning calculations to ensure border isn't overwritten.
 
-	int anchorBottom; ///<Distance achored from bottom of parent control, if at all.
-	int anchorRight; ///<Distance anchored from left of parent control, if any.
+	int anchorBottom; ///<Distance achored from bottom of parentEntity control, if at all.
+	int anchorRight; ///<Distance anchored from left of parentEntity control, if any.
 	bool anchorLeft; ///<If true, anchorRight resizes the control rather than move it.
 	bool anchorTop; ///<If true, anchorBottom resizes the control rather than move it.
 
@@ -336,7 +336,7 @@ public:
 
 	glm::i32vec2 resizeMin; ///<Minimum size resizeToFit is allowed to go to.
 	glm::i32vec2 resizeMax; ///<Maximum size resizeToFit is allowed to go to.
-	CGUIposition positionHint; ///<How the control is to be positioned on its parent.
+	CGUIposition positionHint; ///<How the control is to be positioned on its parentEntity.
 	CGUIlayout currentLayoutStyle; ///<Layout style to use for next child control added.
 
 	//typedef struct {
@@ -374,7 +374,7 @@ public:
 		positionLogical(ctrl);
 		glm::i32vec2 maxSize = layoutControlsCoarse();
 
-		//resize parent if requested
+		//resize parentEntity if requested
 		if (resizesForChildren.x)
 			setWidth(maxSize.x);
 		if (resizesForChildren.y)

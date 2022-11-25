@@ -156,7 +156,7 @@ CGUIscrollbar::CGUIscrollbar(ScrollbarOrientationType axis, int x, int y, int le
 	GenName("Scrollbar",Count++);
 }
 
-/** Overloaded version of updateValue that notifies the parent that Value has changed. */
+/** Overloaded version of updateValue that notifies the parentEntity that Value has changed. */
 void CGUIsysScrollbar::updateValue() {
 	if (SliderPos < 0) 
 		SliderPos = 0;

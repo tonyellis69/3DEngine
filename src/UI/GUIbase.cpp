@@ -97,7 +97,7 @@ CGUIbase::~CGUIbase(void) {
 		}
 	}
 
-	//remove from parent's controls if any
+	//remove from parentEntity's controls if any
 	auto it = parent->controls.begin();
 	for (; it != parent->controls.end(); it++) {
 		if (*it == this) {
@@ -125,7 +125,7 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 	add(ctrl);
 	positionLogical(ctrl);
 	glm::i32vec2 maxSize = layoutControlsCoarse();
-	//resize parent if required
+	//resize parentEntity if required
 
 	//do fine layou
 	layoutFine();
@@ -139,7 +139,7 @@ CGUIbase * CGUIbase::add(UItype ctrlType, std::string text) {
 
 
 /** Set the given control's abstract position as a child control, as defined by its
-	requirements and by this, its parent control. */
+	requirements and by this, its parentEntity control. */
 void CGUIbase::positionLogical(CGUIbase * control) {
 	control->positionHint.rowCol = controlCursor.rowCol;
 	control->positionHint.layoutstyle = controlCursor.currentLayoutStyle;
@@ -284,7 +284,7 @@ glm::i32vec4 CGUIbase::calcCellSize(CGUIbase* cellControl) {
 	return glm::i32vec4(pos, size);
 }
 
-/////Oops, don't actually need this as parent resizing happens before this stage.
+/////Oops, don't actually need this as parentEntity resizing happens before this stage.
 /** Calculate the width and height of the given cell, and its position, by analysing the size of the controls
 	in its row and the preceeding rows, on the assumption controls are to take up the minimum space possible. */
 glm::i32vec4 CGUIbase::calcCellSizeMin(CGUIbase* cellControl) {
@@ -329,7 +329,7 @@ glm::i32vec4 CGUIbase::calcCellSizeMin(CGUIbase* cellControl) {
 /** Adjust the positions of these controls so that combined, they are centred. */
 void CGUIbase::centreCtrlRow(std::vector<CGUIbase*>& rowCtrls) {
 	//find combined width
-	//find difference to parent width
+	//find difference to parentEntity width
 	//find adjustment
 	//apply to all controls.
 	int combinedWidth = rowCtrls.back()->getLocalPos().x + rowCtrls.back()->getWidth()
@@ -515,7 +515,7 @@ void CGUIbase::setLocalDimensions(int x, int y, int w, int h) {
 
 void CGUIbase::setLocalPos(int x, int y) {
 	localPos = glm::i32vec2(x, y);
-	//NB: wait until updateAppearance to update drawBox.pos, as it depends on positionHint of parent control
+	//NB: wait until updateAppearance to update drawBox.pos, as it depends on positionHint of parentEntity control
 	needsUpdate = true;
 }
 
@@ -559,7 +559,7 @@ void CGUIbase::updateAppearance() {
 }
 
 /** Recalculate positionHint and size according to the current local positionHint and size of this control, its 
-	positional adjustment settings (eg, anchoring), and the positionHint and size of its parent.*/
+	positional adjustment settings (eg, anchoring), and the positionHint and size of its parentEntity.*/
 void CGUIbase::recalculateDiminsions() {
 	guiRect origDimensions = { drawBox.pos.x,drawBox.pos.y,drawBox.size.x,drawBox.size.y };
 
@@ -640,7 +640,7 @@ void CGUIbase::DrawSelf() {
 }
 
 
-/** Calculate the drawable area of this control, and clip it by the drawable area of its parent conntrol. */
+/** Calculate the drawable area of this control, and clip it by the drawable area of its parentEntity conntrol. */
 void CGUIbase::recalculateClipbox() {
 	UIrect parentClipbox = parent->Clipbox;
 	parentClipbox.x += parent->borderWidth;	parentClipbox.y += parent->borderWidth;
@@ -648,8 +648,8 @@ void CGUIbase::recalculateClipbox() {
 
 	Clipbox.width = getWidth(); //drawable width of this control
 	Clipbox.x = parent->drawBox.pos.x + getLocalPos().x; //screen x positionHint where drawing of control starts
-	if (Clipbox.x <parentClipbox.x) { //is it outside the clipbox of the parent control?
-		Clipbox.width -= (parentClipbox.x - Clipbox.x); //clip it to the parent clipbox start
+	if (Clipbox.x <parentClipbox.x) { //is it outside the clipbox of the parentEntity control?
+		Clipbox.width -= (parentClipbox.x - Clipbox.x); //clip it to the parentEntity clipbox start
 		Clipbox.x = parentClipbox.x;
 	}
 
@@ -878,7 +878,7 @@ CGUIbase* CGUIbase::findControl(CGUIbase* child) {
 
 
 
-/** Returns the positionHint of this control in the child-list of its parent. */
+/** Returns the positionHint of this control in the child-list of its parentEntity. */
 int CGUIbase::getControlNo() {
 	int x=0;
 	while (parent->controls[x] != this) {

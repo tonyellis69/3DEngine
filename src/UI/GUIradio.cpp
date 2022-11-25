@@ -64,7 +64,7 @@ void CGUIradio::DrawSelf( ) {
 
 bool CGUIradio::OnClick(const  int mouseX, const  int mouseY) {
 	Set = true;
-	//notify the parent  that this switch has been activated.
+	//notify the parentEntity  that this switch has been activated.
 	CMessage msg;
 	msg.value = true;
 	parent->message(this,msg);

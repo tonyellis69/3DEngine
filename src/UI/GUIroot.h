@@ -4,7 +4,7 @@
 
 
 
-/** The class defining GUIroot, the parent UI control to which all other controls are attached. */
+/** The class defining GUIroot, the parentEntity UI control to which all other controls are attached. */
 class CGUIroot : public CguiBase { //CGUIbase {
 public:
 	CGUIroot();

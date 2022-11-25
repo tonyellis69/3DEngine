@@ -27,7 +27,7 @@ public:
 
 
 /** A class describing how a control is to be positioned on its
-	parent control. */
+	parentEntity control. */
 class CGUIposition {
 public:
 	CGUIposition() : free(false),  hAlignment(uiHnone), vAlignment(uiVnone),

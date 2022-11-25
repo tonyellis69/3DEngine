@@ -86,7 +86,7 @@ void CGUIroot::setLocalDimensions(int x, int y, int w, int h) {
 }
 
 
-/** Override the normal clipping method, as GUIroot has no parent to clip against. */
+/** Override the normal clipping method, as GUIroot has no parentEntity to clip against. */
 void CGUIroot::recalculateClipbox() {
 	Clipbox.x = getLocalPos().x; Clipbox.y = getLocalPos().y; Clipbox.width = getWidth(); Clipbox.height = getHeight();
 }

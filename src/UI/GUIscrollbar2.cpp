@@ -191,7 +191,7 @@ CGUIsysScrollbar2::CGUIsysScrollbar2(ScrollbarOrientationType2 axis, unsigned in
 	setPositionStyles(styleWord);	
 }
 
-/** Overloaded version of updateValue that notifies the parent that Value has changed. */
+/** Overloaded version of updateValue that notifies the parentEntity that Value has changed. */
 void CGUIsysScrollbar2::updateValue() {
 	if (SliderPos < 0) 
 		SliderPos = 0;

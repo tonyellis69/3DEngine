@@ -238,7 +238,7 @@ CGUIbaseSurface::CGUIbaseSurface()  {
 }
 
 /** Overload the default clipbox calculation, basing it on the rectangle described by viewBox rather than
-	the dimensions of the parent container itself. */
+	the dimensions of the parentEntity container itself. */
 void CGUIbaseSurface::recalculateClipbox() {
 	UIrect parentClipbox = parent->Clipbox;
 	
