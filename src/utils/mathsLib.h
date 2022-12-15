@@ -1,4 +1,5 @@
 #pragma once
+#define _USE_MATH_DEFINES
 
 #include <glm/glm.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -6,6 +7,8 @@
 #include <cmath>
 
 /** Any maths thing I use more than once. */
+
+const float rad360 = float(M_PI) * 2.0f;
 
 float vec2angle(glm::vec3& v);
 
