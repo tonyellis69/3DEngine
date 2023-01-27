@@ -19,6 +19,8 @@ const float rad40 = 0.698132f;
 const float rad30 = float(M_PI) / 6;
 const float rad120 = rad360 / 3;
 
+glm::vec3 angle2vec(float angle);
+
 float vec2angle(glm::vec3& v);
 
 float shortestAngle(glm::vec3& v1, glm::vec3& v2);

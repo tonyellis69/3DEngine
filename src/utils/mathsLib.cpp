@@ -7,6 +7,11 @@
 
 /** Any maths thing I use more than once. */
 
+glm::vec3 angle2vec(float angle)
+{
+	return 	glm::vec3 ({ cos(angle), -sin(angle), 0 });
+}
+
 float vec2angle(glm::vec3& v) {
 	return std::atan2(-v.y, v.x);
 }
