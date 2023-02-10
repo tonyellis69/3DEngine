@@ -6,7 +6,7 @@
 
 class Contact; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-enum TCollider {collideAAbaseVert, collideTerrain };
+enum TColliderTmp {collideAAbaseVert, collideTerrain };
 
 struct TAaBB {
 public:
@@ -42,7 +42,7 @@ public:
 	glm::vec3 force;
 	float restitution; ///<Bounciness.
 
-	TCollider collideType = collideAAbaseVert;
+	TColliderTmp collideType = collideAAbaseVert;
 
 	
 	};

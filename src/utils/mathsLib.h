@@ -17,6 +17,8 @@ const float rad50 = 0.872665f;
 const float rad45 = float(M_PI) / 4;
 const float rad40 = 0.698132f;
 const float rad30 = float(M_PI) / 6;
+const float rad20 = float(M_PI) / 9;
+const float rad10 = float(M_PI) / 18;
 const float rad120 = rad360 / 3;
 
 glm::vec3 angle2vec(float angle);
