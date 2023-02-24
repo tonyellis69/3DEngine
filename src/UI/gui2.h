@@ -23,6 +23,7 @@ public:
 	void onMouseButton(int button, int action, int mod);
 	void onKey(int key, int action, int mod);
 	void onMouseMove(double x, double y);
+	void onMouseWheel(double x, double y);
 	void onWinEnter(int entered);
 	//CguiBase* getControl(int id);
 	CguiBase* getParent(int id);

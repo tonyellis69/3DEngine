@@ -30,6 +30,8 @@ public:
 			receiver.onMouseButton(button, action, mods); };
 		mouseMoveReceiver = [&](double x, double y) {
 			receiver.onMouseMove(x,y); };
+		mouseWheelReceiver = [&](double x, double y) {
+			receiver.onMouseWheel(x, y); };
 		enterWindowReceiver = [&](int enter) {
 			receiver.onWinEnter(enter); };
 		keyReceiver = [&](int key, int action, int mods) {
@@ -70,6 +72,7 @@ public:
 
 	static std::function <void(int,int,int)> mouseBtnReceiver;
 	static std::function <void(double, double)> mouseMoveReceiver;
+	static std::function <void(double, double)> mouseWheelReceiver;
 	static std::function <void(int, int, int)> keyReceiver;
 	static std::function <void(int)> enterWindowReceiver;
 };

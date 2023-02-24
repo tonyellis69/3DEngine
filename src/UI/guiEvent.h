@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 
 enum TGUIEventType { eNone, eMouseMove, eLeftClick, eMouseOff, eHotTextHover, 
-	eMouseEnterWindow, eMouseExitWindow, eKeyDown, eKeyUp, eKeyRepeat};
+	eMouseEnterWindow, eMouseExitWindow, eKeyDown, eKeyUp, eKeyRepeat, eMouseWheel};
 
 enum TMouseButton {};
 
@@ -24,9 +24,12 @@ public:
 		
 		unsigned int guiID;
 		int i1;
+		float f1;
 	};
 	int i2;
+	float f2;
 	glm::i32vec2 pos;
 	//std::variant<glm::i32vec2, unsigned int, std::string> data;
 	std::string* hotTxt;
+
 };

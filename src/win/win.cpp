@@ -13,6 +13,7 @@ CBaseApp* CWin::pApp = NULL;
 GLFWwindow* CWin::window;
 std::function <void(int, int, int)> CWin::mouseBtnReceiver;
 std::function <void(double, double)> CWin::mouseMoveReceiver;
+std::function <void(double, double)> CWin::mouseWheelReceiver;
 std::function <void(int, int, int)> CWin::keyReceiver;
 std::function <void(int)> CWin::enterWindowReceiver;
 GLFWmonitor* CWin::primaryMonitor;
@@ -204,6 +205,7 @@ void CWin::characterCallback(GLFWwindow* window, unsigned int codepoint) {
 
 void CWin::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	pApp->OnMouseWheelMsg(xoffset,yoffset);
+	mouseWheelReceiver(xoffset, yoffset);
 }
 
 void CWin::cursorEnterCallback(GLFWwindow* window, int entered) {

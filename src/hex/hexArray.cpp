@@ -38,6 +38,7 @@ void CHexArray::init(int w, int h) {
 
 
 			getHexOffset(x, y).position = worldPos;
+			getHexOffset(x, y).content = emptyHex;
 		}
 
 	}

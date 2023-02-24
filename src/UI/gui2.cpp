@@ -66,6 +66,15 @@ void CguiRoot2::onMouseMove(double x, double y) {
 	hotControl->onMouseMove(pos);
 }
 
+/** One day message gui controls. For now just announce an event. */
+void CguiRoot2::onMouseWheel(double x, double y) {
+	CGUIevent e;
+	e.type = eMouseWheel;
+	e.f1 = float(x);
+	e.f2 = float(y);
+	lis::event(e);
+}
+
 void CguiRoot2::onWinEnter(int entered) {	
 	if (entered == false && oldHotControl) {
 		oldHotControl->onMouseOff();
