@@ -405,7 +405,7 @@ void CHexArray::setHighlight(CHex& hex, float highlight) {
 	offset.x = std::clamp(offset.x, 0, width - 1);
 	offset.y = std::clamp(offset.y, 0, height - 1);
 	effectsData[offset.y * width + offset.x].highlight = highlight;
-	effectsNeedUpdate = true;
+	//effectsNeedUpdate = true;
 }
 
 void CHexArray::setVisibility(CHex& hex, float visibility) {
@@ -415,7 +415,7 @@ void CHexArray::setVisibility(CHex& hex, float visibility) {
 	offset.x = std::clamp(offset.x, 0, width - 1);
 	offset.y = std::clamp(offset.y, 0, height - 1);
 	effectsData[offset.y * width + offset.x].visibility = visibility;
-	effectsNeedUpdate = true;
+	//effectsNeedUpdate = true;
 }
 
 TFlatArray CHexArray::getFlatArray() {

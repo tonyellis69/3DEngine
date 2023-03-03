@@ -79,6 +79,7 @@ glm::i32vec2 cubeToOffset(const CHex& hex);
 glm::i32vec2 axialToOffset(int q, int r);
 glm::vec3 cubeToWorldSpace(const CHex& hex);
 CHex offsetToCube(int x, int y);
+CHex offsetToCube(glm::i32vec2& p);
 CHex hexRound(glm::vec3& cubePos);
 CHex hexRound(float q, float r);
 CHex worldSpaceToHex(const glm::vec3& worldSpace);

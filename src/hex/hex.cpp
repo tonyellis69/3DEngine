@@ -136,6 +136,14 @@ CHex offsetToCube(int x, int y) {
 	return hex;
 }
 
+CHex offsetToCube(glm::i32vec2& p) {
+	CHex hex;
+	hex.x = p.x - (p.y - (p.y & 1)) / 2;
+	hex.z = p.y;
+	hex.y = -hex.x - hex.z;
+	return hex;
+}
+
 /** Round floating point coordinates to the nearest hex. */
 CHex hexRound(glm::vec3& cubePos) {
 	int rx = (int) round(cubePos.x);
