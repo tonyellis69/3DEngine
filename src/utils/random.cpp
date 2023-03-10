@@ -26,5 +26,5 @@ namespace rnd {
 		return f(randEngine);
 	}
 
-
+	/** Return a weighted average.*/
 }
