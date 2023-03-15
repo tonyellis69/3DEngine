@@ -18,6 +18,7 @@
 
 class CguiRoot2 { //: public CguiBase {
 public:
+	CguiRoot2() ;
 	void init(CguiBase* root);
 	void addToIndex(CguiBase* ctrl);
 	void onMouseButton(int button, int action, int mod);
@@ -42,6 +43,8 @@ public:
 	bool lMouseDown = false;
 	bool rMouseDown = false;
 	bool mMouseDown = false;
+
+	
 };
 
 extern CguiRoot2 UI;

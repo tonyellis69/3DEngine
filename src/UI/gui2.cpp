@@ -10,6 +10,9 @@ CguiRoot2 UI; ///<Global object.
 
 CguiBase* findControlUnderMouse(CguiBase* ctrl, glm::i32vec2& mousePos);
 
+CguiRoot2::CguiRoot2() {
+}
+
 void CguiRoot2::init(CguiBase* root) {
 	pRoot = root;
 	hotControl = root;
@@ -20,26 +23,32 @@ void CguiRoot2::addToIndex(CguiBase* ctrl) {
 }
 
 void CguiRoot2::onMouseButton(int button, int action, int mod) {
+	CGUIevent e;
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (action == GLFW_RELEASE && lMouseDown)
 			hotControl->onLeftClick();
 		lMouseDown = action;
+		e.type = (action == GLFW_RELEASE) ? eLeftUp : eLeftDown;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
 		if (action == GLFW_RELEASE && rMouseDown)
 			hotControl->onRightClick();
 		rMouseDown = action;
+		e.type = (action == GLFW_RELEASE) ? eRightUp : eRightDown;
 	}
 	else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		if (action == GLFW_RELEASE && mMouseDown)
 			hotControl->onMiddleClick();
 		mMouseDown = action;
+		e.type = (action == GLFW_RELEASE) ? eMiddleUp : eMiddleDown;
 	}
+	lis::event(e);
 }
 
 void CguiRoot2::onKey(int key, int action, int mod) {
 	CGUIevent e;
-	e.i1 = key; e.i2 = mod;
+	e.key = key; 
+	e.i2 = mod; //TO DO:scrap, use dedicated member 'keyMod'
 	if (action == GLFW_PRESS) {
 		e.type = eKeyDown;
 	}
@@ -49,11 +58,24 @@ void CguiRoot2::onKey(int key, int action, int mod) {
 	else if (action == GLFW_REPEAT) { //NB: OK for text-entry, not game-smooth realtime.
 		e.type = eKeyRepeat;
 	}
+
+	switch (mod) {
+		case GLFW_MOD_SHIFT: e.keyMod = eModShift; break;
+		case GLFW_MOD_CONTROL: e.keyMod = eModCtrl; break;
+		case GLFW_MOD_ALT: e.keyMod = eModAlt; break;
+		case GLFW_MOD_SUPER: e.keyMod = eModSuper; break;
+	}
+
 	lis::event(e);
 }
 
 
 void CguiRoot2::onMouseMove(double x, double y) {
+	CGUIevent e;
+	e.type = eMouseMove;
+	e.pos = { int(x),int(y) };
+	lis::event(e);
+
 	glm::i32vec2 pos = { x,y };
 	oldHotControl = hotControl;
 	hotControl = findControlUnderMouse(pRoot, pos);
@@ -70,8 +92,8 @@ void CguiRoot2::onMouseMove(double x, double y) {
 void CguiRoot2::onMouseWheel(double x, double y) {
 	CGUIevent e;
 	e.type = eMouseWheel;
-	e.f1 = float(x);
-	e.f2 = float(y);
+	e.dx = float(x);
+	e.dy = float(y);
 	lis::event(e);
 }
 
