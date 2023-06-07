@@ -12,7 +12,7 @@
 class CImRendr {
 public:
 	CImRendr();
-	void init();
+	void onSpawn();
 	void draw(glm::mat4& mvp);
 	void drawLine(const glm::vec3& a, const glm::vec3& b);
 	void drawText(int x, int y, const std::string& text);

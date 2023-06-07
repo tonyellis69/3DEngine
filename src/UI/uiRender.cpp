@@ -25,7 +25,7 @@ unsigned int hOrtho, hColour1, hColour2, hTextureUnit, hTexOrtho, hTile, hOffset
 
 /** Initialise the library for drawing to a screen of
 	the current size. */
-void uiDraw::init() {
+void uiDraw::onSpawn() {
 	if (templateQuad.numElements == 0) {//only need to do this once
 		initialiseTemplateQuads();
 		loadShaders();

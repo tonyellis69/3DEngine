@@ -10,7 +10,7 @@
 
 namespace uiDraw {
 
-	void init();
+	void onSpawn();
 	void drawRect(guiRect& drawBox, const glm::vec4& colour1, const glm::vec4& colour2);
 	void drawBorder(guiRect& drawBox, const glm::vec4& colour);
 	void drawTexture(guiRect& drawBox, CRenderTexture& texture);

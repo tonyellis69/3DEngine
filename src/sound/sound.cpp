@@ -12,7 +12,7 @@ std::unordered_map<std::string, Mix_Chunk*> samplesStr;
 
 namespace snd {
 
-	bool init(int frequency) {
+	bool onSpawn(int frequency) {
 		if (SDL_Init(SDL_INIT_AUDIO) < 0)
 			return false;
 		atexit(quit);

@@ -6,7 +6,7 @@
 /** A hopefully universal header for a sound system.*/
 
 namespace snd {
-	bool init(int frequency);
+	bool onSpawn(int frequency);
 	void quit();
 	int loadSample(const std::string& filename);
 	int loadSample(const std::string& name, const std::string& filename);

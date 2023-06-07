@@ -8,7 +8,7 @@ CImRendr::CImRendr() {
 }
 
 /** Erase everything ready for another frame of drawing. */
-void CImRendr::init() {
+void CImRendr::onSpawn() {
 	srcBuf3v.clear();
 	freeMem = 0;
 	numDrawCmds = 0;
@@ -46,7 +46,7 @@ void CImRendr::draw(glm::mat4& mvp) {
 		}
 	}
 	vertBuf3v.clearVAO();
-	init();
+	onSpawn();
 }
 
 void CImRendr::drawLine(const glm::vec3& a, const glm::vec3& b) {

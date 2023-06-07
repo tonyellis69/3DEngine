@@ -19,7 +19,7 @@
 class CguiRoot2 { //: public CguiBase {
 public:
 	CguiRoot2() ;
-	void init(CguiBase* root);
+	void onSpawn(CguiBase* root);
 	void addToIndex(CguiBase* ctrl);
 	void onMouseButton(int button, int action, int mod);
 	void onKey(int key, int action, int mod);

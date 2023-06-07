@@ -53,7 +53,7 @@ public:
 	void renderTextAt(int x, int y, TLineFragDrawRec& drawData);
 	void renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, float fadeInX);
 	void clearBuffer();
-	void init(int clearBuffer);
+	void onSpawn(int clearBuffer);
 	int addFragment(int x, int y, TLineFragDrawRec& drawData);
 	void render();
 	void render(float fadeInX);

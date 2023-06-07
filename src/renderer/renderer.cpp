@@ -146,7 +146,7 @@ void CRenderer::resetMatrix() {
 }
 
 /** Set up standard rendering paramaters. */
-void CRenderer::init() {
+void CRenderer::onSpawn() {
 	getGLinfo();
 
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

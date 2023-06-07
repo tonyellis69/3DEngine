@@ -57,7 +57,7 @@ CBaseApp::CBaseApp(void)  {
 	win.createWindowHidden(800, 600, "Base window");
 	win.setCallbacks();
 	
-	renderer.init();
+	renderer.onSpawn();
 	
 
 	loadSystemFonts();
@@ -75,12 +75,12 @@ CBaseApp::CBaseApp(void)  {
 
 
 
-	if (!snd::init(44100)) {
+	if (!snd::onSpawn(44100)) {
 		fatalLog << "Sound initialisation failed.";
 	}
 
 
-	UI.init(&GUIroot);
+	UI.onSpawn(&GUIroot);
 	win.setReceiver(UI);
 
 	sysLog << "BaseApp constructor finished. Yay!\n";
@@ -137,7 +137,7 @@ void CBaseApp::onWinResize( int w, int h) {
 	renderer.set2DView(0, 0, w, h); //We need to change shape of view.
 	renderer.currentCamera->setAspectRatio((float)w, (float)h);
 	//drawFuncs->setScreenSize(w, h); //!!!!!!!!!!!!TO DO scrap
-	uiDraw::init();
+	uiDraw::onSpawn();
 	GUIroot.setLocalDimensions(0,0,w,h); //Resize the base UI control so it's always the size of the view.
 	onResize(w,h); //Call the user's resize handler, in case they want to do something;
 }

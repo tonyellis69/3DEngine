@@ -13,7 +13,7 @@ CguiBase* findControlUnderMouse(CguiBase* ctrl, glm::i32vec2& mousePos);
 CguiRoot2::CguiRoot2() {
 }
 
-void CguiRoot2::init(CguiBase* root) {
+void CguiRoot2::onSpawn(CguiBase* root) {
 	pRoot = root;
 	hotControl = root;
 }

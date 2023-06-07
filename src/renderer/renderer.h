@@ -67,7 +67,7 @@ public:
 	void clearFrame();
 	void setBackColour(const rgba& colour);
 	void set2DView(int x, int y,int width,int height);
-	void init();
+	void onSpawn();
 	void setTextureMode(bool enabled);
 	void setCurrentTexture(int textureHandle);	
 	void saveDisplayMatrix();

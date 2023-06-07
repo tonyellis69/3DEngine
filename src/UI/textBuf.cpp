@@ -26,7 +26,7 @@ void CTextBuffer::renderTextAt(int x, int y, TLineFragDrawRec& drawData) {
 void CTextBuffer::renderFadeInTextAt(int x, int y, TLineFragDrawRec& drawData, float fadeInX) {
 	if (!drawData.text->size())
 		return;
-	init(false);
+	onSpawn(false);
 	addFragment(x, y, drawData);
 	render(fadeInX);
 }
@@ -53,7 +53,7 @@ void CTextBuffer::writeToTexture2(CBuf2& glyphQuads, float fadeInX) {
 }
 
 /** Prepare to compose a buffer-full of text for rendering. */
-void CTextBuffer::init(int clearBuf) {
+void CTextBuffer::onSpawn(int clearBuf) {
 	if (clearBuf == CLEAR_EXISTING_IMAGE)
 		clearBuffer(); 
 	textQuads.clear();

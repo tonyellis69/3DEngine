@@ -21,7 +21,7 @@ using TFlatArray = std::vector<CHexElement>;
 class CHexArray {
 public:
 	CHexArray() {};
-	void init(int w, int h);
+	void onSpawn(int w, int h);
 	//void setEntityList(THexObjs* pEntities);
 	CHexElement& getHexOffset(int x, int y);
 	CHexElement& getHexAxial(int q, int r);
