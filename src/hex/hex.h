@@ -76,6 +76,7 @@ glm::vec3 cubeToAxialFloat(CHex& cube);
 glm::vec3 axialToCube(float q, float r);
 CHex axialToCube(int q, int r);
 glm::i32vec2 cubeToOffset(const CHex& hex);
+glm::i32vec2 cubeToOffset2(const CHex& hex);
 glm::i32vec2 axialToOffset(int q, int r);
 glm::vec3 cubeToWorldSpace(const CHex& hex);
 CHex offsetToCube(int x, int y);

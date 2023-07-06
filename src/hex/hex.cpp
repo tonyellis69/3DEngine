@@ -112,6 +112,12 @@ glm::i32vec2 cubeToOffset(const CHex& hex) {
 	return glm::i32vec2(hex.x + (hex.z - (hex.z & 1)) / 2, hex.z);
 }
 
+/** Convert cube coordinates to odd-row offset coordinates.
+	This conforms to Red Blob.*/
+glm::i32vec2 cubeToOffset2(const CHex& hex) {
+	return glm::i32vec2(hex.x + (hex.y - (hex.y & 1)) / 2, hex.y);
+}
+
 /** Convert axial coordinates to odd-row offset coordinates. */
 glm::i32vec2 axialToOffset(int q, int r) {
 	return glm::i32vec2(q + (r - (r & 1)) / 2, r);
