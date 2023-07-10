@@ -22,7 +22,6 @@ class CHexArray {
 public:
 	CHexArray() {};
 	void onSpawn(int w, int h);
-	//void setEntityList(THexObjs* pEntities);
 	CHexElement& getHexOffset(int x, int y);
 	CHexElement& getHexAxial(int q, int r);
 	CHexElement& getHexCube(const CHex& cube);

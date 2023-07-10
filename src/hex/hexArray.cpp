@@ -196,7 +196,7 @@ THexList CHexArray::aStarPath(CHex& start, CHex& end, bool fogCheck, CHex& omit)
 		//for each neighbour of this hex
 		for (int dir = 0; dir < 6; dir++) {
 			CHex next;
-			if (current.x & 1 || current.z & 1)
+			if (current.q & 1 || current.r & 1)
 				next = getNeighbour(current, (THexDir)dir);
 			else
 				next = getNeighbour(current, (THexDir)(5-dir));
@@ -263,9 +263,9 @@ bool CHexArray::outsideArray(CHex& hex) {
 CHex CHexArray::findLineEnd(CHex& start, CHex& target) {
 	int N = cubeDistance(start, target);
 
-	glm::vec3 A(start.x, start.y, start.z);
+	glm::vec3 A(start.q, start.r, start.s);
 	A += glm::vec3(1e-6, 2e-6, -3e-6);
-	glm::vec3 B(target.x, target.y, target.z);
+	glm::vec3 B(target.q, target.r, target.s);
 
 	glm::vec3 travelVector = (B - A) / float(N);
 
@@ -286,9 +286,9 @@ CHex CHexArray::findLineEnd(CHex& start, CHex& target) {
 THexList CHexArray::findLineHexes(CHex& start, CHex& end) {
 	int N = cubeDistance(start, end);
 
-	glm::vec3 A(start.x, start.y, start.z);
+	glm::vec3 A(start.q, start.r, start.s);
 	A += glm::vec3(1e-6, 2e-6, -3e-6);
-	glm::vec3 B(end.x, end.y, end.z);
+	glm::vec3 B(end.q, end.r, end.s);
 
 	CHex prevHex;
 
@@ -309,9 +309,9 @@ THexList CHexArray::findLineHexes(CHex& start, CHex& end) {
 bool CHexArray::inLineOfSight(CHex& start, CHex& end) {
 	int N = cubeDistance(start, end);
 
-	glm::vec3 A(start.x, start.y, start.z);
+	glm::vec3 A(start.q, start.r, start.s);
 	A += glm::vec3(1e-6, 2e-6, -3e-6);
-	glm::vec3 B(end.x, end.y, end.z);
+	glm::vec3 B(end.q, end.r, end.s);
 
 	for (int h = 0; h <= N; h++) {
 		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));
@@ -324,9 +324,9 @@ bool CHexArray::inLineOfSight(CHex& start, CHex& end) {
 bool CHexArray::inLineOfSight2(CHex& start, CHex& end) {
 	int N = cubeDistance(start, end);
 
-	glm::vec3 A(start.x, start.y, start.z);
+	glm::vec3 A(start.q, start.r, start.s);
 	A += glm::vec3(1e-6, 2e-6, -3e-6);
-	glm::vec3 B(end.x, end.y, end.z);
+	glm::vec3 B(end.q, end.r, end.s);
 
 	for (int h = 0; h <= N; h++) {
 		CHex hex = hexRound(glm::mix(A, B, 1.0 / N * h));

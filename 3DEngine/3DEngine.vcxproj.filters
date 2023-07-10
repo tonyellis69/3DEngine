@@ -227,9 +227,6 @@
     <ClCompile Include="..\src\hex\hexElement.cpp">
       <Filter>Source Files\hex</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\hex\hex.cpp">
-      <Filter>Source Files\hex</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\UI\imageBuf.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
@@ -325,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="..\src\utils\mathsLib.cpp">
       <Filter>Header Files\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\hex\hex.cpp">
+      <Filter>Source Files\hex</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -529,9 +529,6 @@
     <ClInclude Include="..\src\hex\hexElement.h">
       <Filter>Source Files\hex</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\hex\hex.h">
-      <Filter>Source Files\hex</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\UI\imageBuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -642,6 +639,9 @@
     </ClInclude>
     <ClInclude Include="..\src\UI\guiEvent.h">
       <Filter>Source Files\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\hex\hex.h">
+      <Filter>Source Files\hex</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

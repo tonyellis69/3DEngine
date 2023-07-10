@@ -12,7 +12,7 @@ extern bool dbgOn;
 
 
 enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE, hexNone};
-static glm::i32vec3 moveVectorCube[]{ {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0,1,-1}, {1,0,-1} };
+static glm::i32vec3 moveVectorCube[]{ {1,0,-1}, {0,1,-1}, {-1,1,0}, {-1,0,1}, {0,-1,1}, {1,-1,0} };
 
 const float hexSize = 1.0f;
 const float hexWidth = sqrt(3.0f);
@@ -50,19 +50,19 @@ public:
 	glm::i32vec3 getCubeVec();
 
 	//cube coordinates:
-	int x;
-	int y;
-	int z;
+	int q;
+	int r;
+	int s;
 };
 
 static CHex nullHex(-1);
 
-static CHex neighbourHex[]{ {1,-1,0}, {0,-1,1}, {-1,0,1}, {-1,1,0}, {0,1,-1}, {1,0,-1} };
+static CHex neighbourHex[]{ {1,0,-1}, {0,1,-1}, {-1,1,0}, {-1,0,1}, {0,-1,1}, {1,-1,0} };
 
 
 struct hex_hash {
 	size_t operator()(const CHex& hex) const {
-		return std::hash<glm::i32vec3>()(glm::i32vec3(hex.x, hex.y, hex.z));
+		return std::hash<glm::i32vec3>()(glm::i32vec3(hex.q, hex.r, hex.s));
 	}
 };
 
@@ -76,7 +76,6 @@ glm::vec3 cubeToAxialFloat(CHex& cube);
 glm::vec3 axialToCube(float q, float r);
 CHex axialToCube(int q, int r);
 glm::i32vec2 cubeToOffset(const CHex& hex);
-glm::i32vec2 cubeToOffset2(const CHex& hex);
 glm::i32vec2 axialToOffset(int q, int r);
 glm::vec3 cubeToWorldSpace(const CHex& hex);
 CHex offsetToCube(int x, int y);

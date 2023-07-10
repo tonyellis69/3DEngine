@@ -11,21 +11,21 @@
 bool dbgOn = false;
 
 CHex::CHex() {
-	x = 0; y = 0; z = 0;
+	q = 0; r = 0; s = 0;
 }
 
 CHex::CHex(int n) {
 	if (n == -1) { //special negated hex
-		x = -1; y = -1; z = -1;
+		q = -1; r = -1; s = -1;
 	}
 	else {
-		x = n; z = n; y = -x - z;
+		q = n; s = n; r = -q - s;
 	}
 }
 
 /** Construct from cube coordinates. */
 CHex::CHex(int x, int y, int z) {
-	this->x = x; this->y = y; this->z = z;
+	this->q = x; this->r = y; this->s = z;
 }
 
 //CHex::CHex(glm::i32vec3& v) {
@@ -34,34 +34,34 @@ CHex::CHex(int x, int y, int z) {
 
 /** Construct from axial coordinates. */
 CHex::CHex(int q, int r) {
-	x = q;
-	z = r;
-	y = -x - z;
+	this->q = q;
+	this->r = r;
+	this->s = -q - s;
 }
 
 CHex CHex::operator+(CHex& hex2) {
-	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
+	return CHex(q + hex2.q, r + hex2.r, s + hex2.s);
 }
 
 //CHex CHex::operator+(glm::i32vec3& hex2) {
 //	return CHex(x + hex2.x, y + hex2.y, z + hex2.z);
 //}
 
-CHex CHex::operator * (int& s) {
-	return CHex(x * s, y * s, z * s);
+CHex CHex::operator * (int& t) {
+	return CHex(q * t, r * t, s * t);
 
 }
 
 CHex CHex::operator-(const CHex& hex2) const {
-	return CHex(x - hex2.x, y - hex2.y, z - hex2.z);
+	return CHex(q - hex2.q, r - hex2.r, s - hex2.s);
 }
 
 bool CHex::operator==(const CHex& hex2) const {
-	return (x == hex2.x && y == hex2.y && z == hex2.z);
+	return (q == hex2.q && r == hex2.r && s == hex2.s);
 }
 
 bool CHex::operator!=(CHex& hex2) {
-	return (x != hex2.x) || (y != hex2.y) || (z != hex2.z);
+	return (q != hex2.q) || (r != hex2.r) || (s != hex2.s);
 }
 
 /** Construct from a worldspace location.*/
@@ -72,12 +72,12 @@ CHex::CHex(glm::vec3& worldSpace) {
 
 /** Return position in axial coordiantes. */
 glm::i32vec2 CHex::getAxial() {
-	return glm::i32vec2(x,z);
+	return glm::i32vec2(q,r);
 }
 
 glm::i32vec3 CHex::getCubeVec()
 {
-	return glm::i32vec3(x,y,z);
+	return glm::i32vec3(q,r,s);
 }
 
 
@@ -85,42 +85,37 @@ glm::i32vec3 CHex::getCubeVec()
 
 /**Convert cube coordinates to axial.*/
 CHex cubeToAxial(CHex & cube) {
-	return CHex(cube.x, cube.z);
+	return CHex(cube.q, cube.r);
 }
 
 glm::vec3 cubeToAxialFloat(CHex& cube) {
-	return { cube.x,cube.z,0 };
+	return { cube.q,cube.r,0 };
 }
 
 /**Convert axial coordinates to cube (float version). */
-glm::vec3 axialToCube(float q, float r) {
-	float x = q;
-	float z = r;
-	float y = -x - z;
+glm::vec3 axialToCube(float qf, float rf) {
+	float x = qf;
+	float y = rf;
+	float z = -x - y;
 	return glm::vec3(x, y, z);
 }
 
-CHex axialToCube(int q, int r) {
-	int x = q;
-	int z = r;
-	int y = -x - z;
+CHex axialToCube(int qi, int ri) {
+	int x = qi;
+	int y = ri;
+	int z = -x - y;
 	return CHex(x, y, z);
 }
 
 /** Convert cube coordinates to odd-row offset coordinates.*/
 glm::i32vec2 cubeToOffset(const CHex& hex) {
-	return glm::i32vec2(hex.x + (hex.z - (hex.z & 1)) / 2, hex.z);
+	return glm::i32vec2(hex.q + (hex.r - (hex.r & 1)) / 2, hex.r);
 }
 
-/** Convert cube coordinates to odd-row offset coordinates.
-	This conforms to Red Blob.*/
-glm::i32vec2 cubeToOffset2(const CHex& hex) {
-	return glm::i32vec2(hex.x + (hex.y - (hex.y & 1)) / 2, hex.y);
-}
 
 /** Convert axial coordinates to odd-row offset coordinates. */
-glm::i32vec2 axialToOffset(int q, int r) {
-	return glm::i32vec2(q + (r - (r & 1)) / 2, r);
+glm::i32vec2 axialToOffset(int qi, int ri) {
+	return glm::i32vec2(qi + (ri - (ri & 1)) / 2, ri);
 }
 
 /** Convert cube coordinates to a point in worldspace. */
@@ -128,7 +123,7 @@ glm::vec3 cubeToWorldSpace(const CHex& hex) {
 	//float x = (hex.x + (-0.5f * (hex.z & 1))) * hexWidth;
 	//float y = -hex.z * 1.5f;
 	glm::i32vec2 offset = cubeToOffset(hex);
-	float x = (offset.x + (0.5f * (hex.z & 1))) * hexWidth;
+	float x = (offset.x + (0.5f * (hex.r & 1))) * hexWidth;
 	float y = -offset.y * 1.5f;
 	return glm::vec3(x, y, 0);
 }
@@ -136,17 +131,17 @@ glm::vec3 cubeToWorldSpace(const CHex& hex) {
 /** Convert odd-row offset coordinates to cube coordinates. */
 CHex offsetToCube(int x, int y) {
 	CHex hex;
-	hex.x = x - (y - (y & 1)) / 2;
-	hex.z = y;
-	hex.y = -hex.x - hex.z;
+	hex.q = x - (y - (y & 1)) / 2;
+	hex.r = y;
+	hex.s = -hex.q - hex.r;
 	return hex;
 }
 
 CHex offsetToCube(glm::i32vec2& p) {
 	CHex hex;
-	hex.x = p.x - (p.y - (p.y & 1)) / 2;
-	hex.z = p.y;
-	hex.y = -hex.x - hex.z;
+	hex.q = p.x - (p.y - (p.y & 1)) / 2;
+	hex.r = p.y;
+	hex.s = -hex.q - hex.r;
 	return hex;
 }
 
@@ -241,20 +236,20 @@ CHex worldSpaceToHex(const glm::vec3& worldSpace) {
 
 /** Distance between two hex coordinates. */
 int cubeDistance(CHex& cubeA, CHex& cubeB) {
-	return (abs(cubeA.x - cubeB.x) + abs(cubeA.y - cubeB.y) +  abs(cubeA.z - cubeB.z)) / 2;
+	return (abs(cubeA.q - cubeB.q) + abs(cubeA.r - cubeB.r) +  abs(cubeA.s - cubeB.s)) / 2;
 }
 
 /** Return the approximate vertical line between A and B. */
 THexList vertLine(CHex A, CHex B, bool veer) {
 
-	if (A.z > B.z) {
+	if (A.r > B.r) {
 		std::swap(A, B);
 	}
 
 	THexList hexes;
 
 	CHex hex = A;
-	for (int z = A.z; z < B.z; z++) {
+	for (int z = A.r; z < B.r; z++) {
 		if (veer)
 			hex = getNeighbour(hex, hexSE);
 		else
@@ -267,9 +262,9 @@ THexList vertLine(CHex A, CHex B, bool veer) {
 }
 
 glm::vec3 hexLerp(CHex& cubeA, CHex& cubeB, float t) {
-	return glm::vec3(glm::mix(cubeA.x, cubeB.x, t),
-		glm::mix(cubeA.y, cubeB.y, t),
-		glm::mix(cubeA.z, cubeB.z, t));
+	return glm::vec3(glm::mix(cubeA.q, cubeB.q, t),
+		glm::mix(cubeA.r, cubeB.r, t),
+		glm::mix(cubeA.s, cubeB.s, t));
 
 }
 
@@ -279,9 +274,9 @@ THexList* hexLine(CHex& cubeA, CHex& cubeB) {
 	static THexList results;
 	results.clear();
 
-	glm::vec3 A(cubeA.x, cubeA.y, cubeA.z);
+	glm::vec3 A(cubeA.q, cubeA.r, cubeA.s);
 	A += glm::vec3(1e-4, 2e-4, -3e-4);
-	glm::vec3 B(cubeB.x, cubeB.y, cubeB.z);
+	glm::vec3 B(cubeB.q, cubeB.r, cubeB.s);
 	for (int h = 0; h <= N; h++) {
 		results.push_back(hexRound(glm::mix(A, B, 1.0 / N * h)  ));
 	}
@@ -472,8 +467,8 @@ THexList* hexLine4(CHex& cubeA, CHex& cubeB, int offset) {
 THexDir neighbourDirection(const CHex & hex, const CHex & neighbour) {
 	CHex dirVector = neighbour - hex;
 	for (int dir = hexEast; dir <= hexNE; dir++) {
-		if (dirVector.x == moveVectorCube[dir].x && dirVector.y == moveVectorCube[dir].y
-			&& dirVector.z == moveVectorCube[dir].z)
+		if (dirVector.q == moveVectorCube[dir].x && dirVector.r == moveVectorCube[dir].y
+			&& dirVector.s == moveVectorCube[dir].z)
 			return (THexDir)dir;
 	}
 	return hexNone;
@@ -504,7 +499,7 @@ CHex getNeighbour(CHex& hex, THexDir direction){
 
 /** Return true if cube coordinated ar malformed. */
 bool badHex(CHex& hex) {
-	return hex.x + hex.y + hex.z;
+	return hex.q + hex.r + hex.s;
 }
 
 /** Return the shortest angle of rotation required to get from start to end. */

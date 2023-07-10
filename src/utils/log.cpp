@@ -87,7 +87,7 @@ CLog& operator<<(CLog& log, const glm::vec2& in) {
 
 
 CLog& operator<<(CLog& log, const CHex& in) {
-	log.ss << "x " << in.x << " y " << in.y << " z " << in.z;
+	log.ss << "x " << in.q << " y " << in.r << " z " << in.s;
 	log.writeToOutput();
 	return log;
 }
