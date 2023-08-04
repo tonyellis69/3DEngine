@@ -203,6 +203,9 @@ void CRenderer::onSpawn() {
 	createStandardMultiTexShader();
 	createInstancedPhongShader();
 	createTextShader();
+
+	createShader("lineModel");
+
 	initialised = true;
 
 	clearColour = rendererTurquiose;
@@ -1012,6 +1015,8 @@ void CRenderer::createTextShader() {
 
 	textSpriteShader = createShader(dataPath + "lineBuf");
 }
+
+
 
 /** Compile the given shader, create a wrapper instance for it and return a pointer to it. */
 CShaderOld* CRenderer::createShader(std::string name) {

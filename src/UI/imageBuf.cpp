@@ -16,7 +16,7 @@ C2DimageBuf::C2DimageBuf() {
 /** Set the size of the main buffer. This will wipe any existing content.*/
 void C2DimageBuf::setSize(int width, int height) {
 	
-	imageBuffer.resize(width, height  * 1.0f );
+	imageBuffer.resize(width, height  );
 	clear();
 }
 
@@ -105,7 +105,7 @@ void C2DimageBuf::splitVertical(unsigned int index, int width) {
 /** Buffer has been found to be too small, so resize it.*/
 int C2DimageBuf::panic() {
 	int oldSize = imageBuffer.height;
-	imageBuffer.resizeSafe(imageBuffer.width, imageBuffer.height * 1.25f);
+	imageBuffer.resizeSafe(imageBuffer.width, int(imageBuffer.height * 1.25f));
 	int newSize = imageBuffer.height;
 
 	//is there a free block at the end of the old memory?

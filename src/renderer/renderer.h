@@ -149,6 +149,7 @@ public:
 	void createInstancedPhongShader();
 	void createTextShader();
 
+
 	CShaderOld * createShader(std::string name);
 	CShaderOld * createShader(std::string name,   char** strings, int nFeedbacks);
 
@@ -187,6 +188,17 @@ public:
 	//std::vector<CShader*> shaderList; 
 	std::unordered_map<std::string, CRenderShader*> shaderList; ///<Tracks all shaders
 	//TO DO: use shared ptr for garbage collection
+
+	//lineshader stuff
+	CShaderOld* lineShader;
+	//unsigned int hMVP;
+	//unsigned int hColour;
+	//unsigned int hWinSize;
+	//unsigned int hPalette;
+
+	CShaderOld* lineShaderBasic;
+	unsigned int hMVPb;
+	unsigned int hColourb;
 
 	//TO DO: phongshader handles, hopefully temp
 	GLuint hNormalModelToCameraMatrix;

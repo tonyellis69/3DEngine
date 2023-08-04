@@ -116,3 +116,5 @@ THexList getNeighbours(CHex& hex, int radius);
 
 TIntersections getIntersectedHexes(const glm::vec3& segA, const glm::vec3& segB);
 std::tuple<THexDir, glm::vec3> findSegmentExit(const glm::vec3 A, const glm::vec3 B, const CHex& hex);
+
+float hexColHeight(int rows);

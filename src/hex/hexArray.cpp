@@ -12,7 +12,7 @@
 
 
 /** Initialise the array to the given dimensions. */
-void CHexArray::onSpawn(int w, int h) {
+void CHexArray::initialise(int w, int h) {
 	flatArray.clear();
 	flatArray.resize(w * h);
 	effectsData.clear();

@@ -784,3 +784,9 @@ std::tuple<THexDir, glm::vec3> findSegmentExit(const glm::vec3 A, const glm::vec
 	//getting here is an error! fix!!
 	return { exitDir, intersection };
 }
+
+/** Height from midpoint of top hex to bottom. */
+float hexColHeight(int rows) {
+
+	return 0.0f;
+}
