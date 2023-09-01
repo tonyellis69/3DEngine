@@ -15,3 +15,4 @@ bool inColinearSegment(const glm::vec3 & segA, const glm::vec3 & segB, const glm
 float sqrDistPointSegment(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& pt);
 
 glm::vec3 closestPointSegment(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& pt);
+

@@ -1,4 +1,5 @@
 #include "intersect.h"
+#include "intersect.h"
 
 
 
@@ -94,3 +95,5 @@ glm::vec3 closestPointSegment(const glm::vec3& segA, const glm::vec3& segB, cons
 
 	return segA + t * ab;
 }
+
+

@@ -34,3 +34,6 @@ glm::vec3 turnLeft(const glm::vec3& v);
 glm::vec3 turnRight(const glm::vec3& v);
 
 bool isAcute(glm::vec3& vecA, glm::vec3& vecB);
+
+bool lineSegmentIntersect(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& lineDir, const glm::vec3& linePt);
+
