@@ -40,7 +40,7 @@ bool isAcute(glm::vec3& vecA, glm::vec3& vecB) {
 
 /** Returns true if pt-dir intersects segA-B. */
 bool lineSegmentIntersect(const glm::vec3& segA, const glm::vec3& segB, const glm::vec3& lineDir, const glm::vec3& linePt) {
-	glm::vec3 lineN = turnLeft(glm::normalize(lineDir - linePt);
+	glm::vec3 lineN = turnLeft(glm::normalize(lineDir - linePt));
 	float a = glm::dot(segA - linePt, lineN);
 	float b = glm::dot(segB - linePt, lineN);
 

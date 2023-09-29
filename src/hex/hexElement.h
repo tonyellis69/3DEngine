@@ -2,7 +2,7 @@
 
 #include "glm/glm.hpp"
 
-#include "hex.h"
+//#include "hex.h"
 
 
 
@@ -11,11 +11,11 @@
 class CHexElement {
 public:
 	CHexElement() : content(0), blocks(0) { };
-	
-
 	int content;
-	glm::vec3 position; //TO DO: not really used, might save shaders some work
+	int cost = 0;
+	glm::vec3 position = glm::vec3(0); //TO DO: not really used, might save shaders some work
 	unsigned int blocks;
+
 };
 
 const int solidHex = 2;

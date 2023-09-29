@@ -39,6 +39,10 @@ void CHexArray::initialise(int w, int h) {
 
 			getHexOffset(x, y).position = worldPos;
 			getHexOffset(x, y).content = emptyHex;
+
+		/*	CHexElement& tmp = getHexOffset(x, y);
+			tmp.position = worldPos;
+			tmp.content = emptyHex;*/
 		}
 
 	}
@@ -50,7 +54,7 @@ void CHexArray::initialise(int w, int h) {
 CHexElement& CHexArray::getHexOffset(int x, int y) {
 	x = std::clamp(x, 0, width - 1);
 	y = std::clamp(y,0, height - 1);
-	return flatArray[y * width + x];
+	return flatArray[(y * width) + x];
 }
 
 /** Return a reference to the hex at the given axial coordinates.*/

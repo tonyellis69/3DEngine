@@ -64,6 +64,16 @@ bool CHex::operator!=(CHex& hex2) {
 	return (q != hex2.q) || (r != hex2.r) || (s != hex2.s);
 }
 
+//bool CHex::operator<( const CHex& hex2)  const {
+//	if (q != hex2.q) {
+//		return q < hex2.q;
+//	}
+//	if (r != hex2.r) {
+//		return r < hex2.r;
+//	}
+//	return s < hex2.s;
+//}
+
 /** Construct from a worldspace location.*/
 CHex::CHex(glm::vec3& worldSpace) {
 	
@@ -527,7 +537,7 @@ THexDir angleToDir(float angle) {
 	glm::vec3 A = glm::rotate(glm::vec3(1, 0, 0), angle, glm::vec3(0, 0, -1));
 	//NB assumes CW polar coords, try to be consistent about this!
 
-	float nearestDot = -FLT_MAX; int nearestFace;
+	float nearestDot = -FLT_MAX; int nearestFace = hexNone ;
 	for (int face = 0; face < 6; face++) {
 		float dot = glm::dot(A, moveVector3D[face]);
 		if (dot > nearestDot) {

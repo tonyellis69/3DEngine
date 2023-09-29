@@ -45,6 +45,7 @@ public:
 	CHex operator - (const CHex& hex2) const;
 	bool operator == (const CHex& hex2) const;
 	bool operator != (CHex& hex2);
+//	bool operator < ( const CHex& hex2) const; //FIXME: creates linkage errors with set etc
 	CHex(glm::vec3& worldSpace);
 	glm::i32vec2 getAxial();
 	glm::i32vec3 getCubeVec();
@@ -53,7 +54,15 @@ public:
 	int q;
 	int r;
 	int s;
+
+
 };
+
+//struct HComparator {
+//	bool operator()(const CHex& lhs, const CHex& rhs)  const {
+//		return lhs < rhs;
+//	}
+//};
 
 static CHex nullHex(-1);
 

@@ -99,8 +99,8 @@
     <ClCompile Include="..\src\createShape.cpp" />
     <ClCompile Include="..\src\graphics\shader2.cpp" />
     <ClCompile Include="..\src\hex\hex.cpp" />
-    <ClCompile Include="..\src\hex\hexElement.cpp" />
     <ClCompile Include="..\src\hex\hexArray.cpp" />
+    <ClCompile Include="..\src\hex\hexElement.cpp" />
     <ClCompile Include="..\src\importer\importer.cpp" />
     <ClCompile Include="..\src\intersect.cpp" />
     <ClCompile Include="..\src\listen\listen.cpp" />
