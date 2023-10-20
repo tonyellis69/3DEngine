@@ -37,7 +37,7 @@ public:
 	CHex();
 	CHex(int n);
 	CHex(int x, int y, int z);
-	//CHex(glm::i32vec3& v);
+	CHex(glm::i32vec3& v);
 	CHex(int q, int r);
 	CHex operator + (CHex& hex2);
 	//CHex operator + (glm::i32vec3& hex2);

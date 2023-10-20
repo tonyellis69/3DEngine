@@ -12,7 +12,9 @@ class CHexElement {
 public:
 	CHexElement() : content(0), blocks(0) { };
 	int content;
-	int cost = 0;
+	int cost = 3;
+	int roomNo = -1;
+	
 	glm::vec3 position = glm::vec3(0); //TO DO: not really used, might save shaders some work
 	unsigned int blocks;
 
@@ -20,6 +22,7 @@ public:
 
 const int solidHex = 2;
 const int emptyHex = 1;
+const int testHex = 42;
 
 
 const int blocksNone = 0;

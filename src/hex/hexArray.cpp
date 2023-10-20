@@ -380,6 +380,8 @@ bool CHexArray::isValidPath(CHex& start, CHex& end) {
 void CHexArray::clear() {
 	for (auto& element : flatArray) {
 		element.content = 1;
+		element.cost = 3;
+		element.roomNo = -1;
 	}
 }
 

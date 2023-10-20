@@ -28,9 +28,9 @@ CHex::CHex(int x, int y, int z) {
 	this->q = x; this->r = y; this->s = z;
 }
 
-//CHex::CHex(glm::i32vec3& v) {
-//	this->x = v.x; this->y = v.y; this->z = v.z;
-//}
+CHex::CHex(glm::i32vec3& v) {
+	this->q = v.x; this->r = v.y; this->s = v.z;
+}
 
 /** Construct from axial coordinates. */
 CHex::CHex(int q, int r) {
