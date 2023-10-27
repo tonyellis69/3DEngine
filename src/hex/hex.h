@@ -11,7 +11,7 @@
 extern bool dbgOn;
 
 
-enum THexDir {hexEast, hexSE, hexSW, hexWest, hexNW, hexNE, hexNone};
+enum THexDir {hexEast = 0, hexSE, hexSW, hexWest, hexNW, hexNE, hexNone};
 static glm::i32vec3 moveVectorCube[]{ {1,0,-1}, {0,1,-1}, {-1,1,0}, {-1,0,1}, {0,-1,1}, {1,-1,0} };
 
 const float hexSize = 1.0f;

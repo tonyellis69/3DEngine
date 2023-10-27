@@ -23,6 +23,8 @@ public:
 const int solidHex = 2;
 const int emptyHex = 1;
 const int testHex = 42;
+const int testHex2 = 43;
+const int testHex3 = 44;
 
 
 const int blocksNone = 0;
