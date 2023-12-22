@@ -800,3 +800,10 @@ float hexColHeight(int rows) {
 
 	return 0.0f;
 }
+
+/** Return hex this distance and direction from given one. */
+CHex relativeHex(CHex hex, THexDir dir, int dist) {
+	for (int step = 0; step < dist; step++)
+		hex = getNeighbour(hex, dir);
+	return hex;
+}
